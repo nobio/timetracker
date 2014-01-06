@@ -5,6 +5,8 @@ var TimeEntry  = mongoose.model('TimeEntry');
 /* ================================================================== */
 /* =========================== JADE/HTML ============================ */
 /* ================================================================== */
+
+// calculates the number of entries and renders the index.jade by passing the size
 exports.index = function(req, res) {
     var size;
     TimeEntry.find(function(err, timeentries) {
@@ -25,6 +27,9 @@ exports.admin = function(req, res) {
 /* ============================== REST ============================== */
 /* ================================================================== */
 
+/*
+ * creates a new TimeEntry; the date is "now" and the direction needs to be given
+ */
 exports.entry = function(req, res) {
     console.log('entry function');
     var direction = req.body.direction;
@@ -43,6 +48,10 @@ exports.entry = function(req, res) {
                           });
 }
 
+/*
+ * deletes all TimeEnty-items from database. This should only be used during development time
+ * and later either deleted or put behind some special user privileges
+ */
 exports.deleteAll = function(req, res) {
     var size;
     TimeEntry.find(function(err, timeentries) {
@@ -56,6 +65,15 @@ exports.deleteAll = function(req, res) {
                    res.send({ size: size });
                    });
 }
+
+
+
+
+
+/* ================================================================== */
+/* ============================ EXAMPLES ============================ */
+/* ================================================================== */
+
                    
 /*
 exports.person_post = function(req, res) {
