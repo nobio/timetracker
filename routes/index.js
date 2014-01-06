@@ -6,7 +6,9 @@ var TimeEntry  = mongoose.model('TimeEntry');
 /* =========================== JADE/HTML ============================ */
 /* ================================================================== */
 
-// calculates the number of entries and renders the index.jade by passing the size
+/*
+ * calculates the number of entries and renders the index.jade by passing the size
+ */
 exports.index = function(req, res) {
     var size;
     TimeEntry.find(function(err, timeentries) {
