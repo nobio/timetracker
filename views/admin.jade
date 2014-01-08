@@ -8,3 +8,13 @@ block content
         input(type='button', value='Delete all time entries', onclick='deleteAllTimeEntries();')
       td
         #result
+        
+
+  p
+  #datepick
+  #timepick
+  
+  script(type='text/javascript').
+    $(document).ready(function() {
+        $('#datepick').datepicker();
+    })

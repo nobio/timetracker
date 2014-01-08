@@ -13,36 +13,38 @@ var path = require('path');
 var app = express();
 
 app.configure(function() {
-  app.set('host', process.env.OPENSHIFT_NODEJS_IP   || '0.0.0.0');
-  app.set('port', process.env.OPENSHIFT_NODEJS_PORT || '30000');
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.favicon());
-  app.use(express.logger('dev'));
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.cookieParser());
-  app.use(express.static(path.join(__dirname, 'public')));
+    app.set('host', process.env.OPENSHIFT_NODEJS_IP   || '0.0.0.0');
+    app.set('port', process.env.OPENSHIFT_NODEJS_PORT || '30000');
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'jade');
+    app.use(express.favicon());
+    app.use(express.logger('dev'));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(app.router);
+    app.use(express.cookieParser());
+    app.use(express.static(path.join(__dirname, 'public')));
 });
 
 
 app.configure('development', function () {
-              app.use(express.errorHandler({ dumpExceptions : true, showStack : true }));
-              });
+    app.use(express.errorHandler({ dumpExceptions : true, showStack : true }));
+});
 
 app.configure('production', function () {
-              app.use(express.errorHandler());
-              });
+    app.use(express.errorHandler());
+});
 
 // routes
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
+app.get('/advanced', routes.advanced);
 
+// restful services
 app.post('/entry', routes.entry);
 app.delete('/entry', routes.deleteAll);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
-  console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
+    console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
