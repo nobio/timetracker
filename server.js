@@ -45,6 +45,7 @@ app.post('/entry', routes.entry);
 app.delete('/entry', routes.deleteAll);
 
 // start the web service
+console.log('usage: node --dbenv=[local|mongodb] server.js');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
     console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
