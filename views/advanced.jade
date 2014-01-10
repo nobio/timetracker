@@ -1,31 +1,47 @@
 extends layout
 block content
 
-  script(type='text/javascript').
-    $(document).ready(function() {
-      $('#datepick').datepicker({dateFormat: 'yy-mm-dd'});
-      $('#timepick').datepicker({dateFormat: 'yy-mm-dd'});
-      $('#datetimepicker').datetimepicker({
-        format:'d.m.Y H:i',
-        lang:'de'
-      });
-        
-      $('#datetimepicker2').datetimepicker({
-        format:'d.m.Y H:i',
-        lang:'de'
-      });
-        
-      $('#image_button').click(function(){
-        alert($('#datetimepicker2').width())
-          $('#datetimepicker2').datetimepicker('show');
-      });
-    })
+    script(type='text/javascript').
+        $(document).ready(function() {
+            $('#datetimepicker').datetimepicker({
+                format:'d.m.Y H:i'
+                ,inline:false
+                ,lang:'de'
+                ,timepicker:true
+                ,datepicker:true
+            });
+            $('#datepicker').datetimepicker({
+                format:'d.m.Y H:i'
+                ,lang:'de'
+                ,inline:false
+                ,timepicker:false
+                ,datepicker:true
+            });
+
+        })
 
 
-  form
-    input(type='text' name='date' id='datepick')
-    input(type='text' name='time' id='timepick')
-    input#datetimepicker(type='text' name='datetime')
-    input#datetimepicker2(type='text' name='datetime2')
-    span(class='input-group-btn')
-      button#image_button(class='btn btn-default' type='button')
+    h3 Bitte Datum und Uhrzeit auswählen
+    table
+        tr
+            td
+                input(type='radio' name='direction' id='enter' value='enter' checked='checked')
+                | Kommen <br/>
+                input(type='radio' name='direction' id='go' value='go')
+                | Gehen
+        tr
+            td
+                input#datetimepicker(type='text' name='datetime')
+        tr
+            td
+                input(type='button', value='Kommen/Gehen', onclick='enterNow();')
+
+    h3 Bitte Datum auswählen
+    table
+        tr
+            td
+                input(type='checkbox' name='holiday' id='holiday' checked='checked' )
+                | Der Tag ist ein Feiertag/Wochenende?
+        tr
+            td
+                input#datepicker(type='text' name='date')
