@@ -11,13 +11,12 @@ block content
                 ,datepicker:true
             });
             $('#datepicker').datetimepicker({
-                format:'d.m.Y H:i'
+                format:'d.m.Y'
                 ,lang:'de'
                 ,inline:false
                 ,timepicker:false
                 ,datepicker:true
             });
-
         })
 
 
@@ -25,16 +24,17 @@ block content
     table
         tr
             td
-                input(type='radio' name='direction' id='enter' value='enter' checked='checked')
+                input#enter(type='radio' name='direction' value='enter' checked='checked')
                 | Kommen <br/>
-                input(type='radio' name='direction' id='go' value='go')
+                input#go(type='radio' name='direction' value='go')
                 | Gehen
         tr
             td
                 input#datetimepicker(type='text' name='datetime')
         tr
             td
-                input(type='button', value='Kommen/Gehen', onclick='enterNow();')
+                input(type='button', value='Kommen/Gehen', 
+                    onclick='timeentryAtDate($("#datetimepicker").val(), $("input[name=direction]:checked").val());')
 
     h3 Bitte Datum auswählen
     table
@@ -45,3 +45,8 @@ block content
         tr
             td
                 input#datepicker(type='text' name='date')
+        tr
+            td
+                input(type='button', value='Feiertag setzen', 
+                    onclick='maintainHoliday($("#datepicker").val(), $("input[name=holiday]:checked").val());')
+

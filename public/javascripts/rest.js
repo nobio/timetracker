@@ -32,6 +32,14 @@ function goNow() {
     });
 }
 
+function timeentryAtDate(datetime, enter) {
+	alert(datetime + " " + enter);
+}
+
+function maintainHoliday(date, holyday) {
+	alert(date + " " + holyday);
+}
+
 function deleteAllTimeEntries() {
     $.ajax({
     type: 'DELETE',
