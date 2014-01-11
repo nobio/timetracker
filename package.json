@@ -1,22 +1,23 @@
 {
-      "name"     : "Carpark"
+    "name"     : "Carpark"
     , "version"  : "0.0.1"
     , "author"   : "Gernot H. Reichel <gernot.reichel@me.com>"
     , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
     , "private"  : true
     , "scripts"  : {
         "start"    : "node app"
-      }
+    }
     , "dependencies": {
         "express"  : ">=3.1.0"
-       , "jade"     : ">=1.0.0"
-       , "mongodb"  : ">=1.2.14"
-       , "mongoose" : ">=3.6.4"
+        , "jade"     : ">=1.0.0"
+        , "mongodb"  : ">=1.2.14"
+        , "mongoose" : ">=3.6.4"
+        , "moment"   : ">=2.5.0"
     }
     , "engines": { "node": ">=0.6.19" }
     , "repository": {
         "type": "git"
         , "url": "git://github.com/nobio/noodle.git"
     }
-
+    
 }

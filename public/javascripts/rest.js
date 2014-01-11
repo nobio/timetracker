@@ -2,38 +2,38 @@ $.ajaxSetup ({
 cache: false
 });
 
-function enterNow() {
+function timeentry(direction, datetime) {
+    // setup the date & time
+    var dt;
+    if(datetime === 'self') {
+        dt = moment();
+        dt.millisecond(0);
+        dt.second(0);
+        dt = dt.toISOString();
+    } else {
+        dt = moment(datetime, 'DD.MM.YYYY HH:mm').toISOString();
+    }
+    
     $.ajax({
     type: 'POST',
     url: '/entry',
-    data: { 'direction': 'enter' }
+    data: { 'direction': direction, 'datetime': dt }
     })
     .done(function(timeentry) {
-        result.innerHTML = timeentry.entry_date;
+        var sDate = moment(timeentry.entry_date).format('DD.MM.YYYY');
+        var sTime = moment(timeentry.entry_date).format('HH:mm');
+        
+        result.innerHTML = timeentry.direction;
+        result.innerHTML += " am ";
+        result.innerHTML += sDate;
+        result.innerHTML += " um ";
+        result.innerHTML += sTime
         size.innerHTML = timeentry.size;
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     });
-}
-
-function goNow() {
-    $.ajax({
-    type: 'POST',
-    url: '/entry',
-    data: { 'direction': 'go' }
-    })
-    .done(function(timeentry) {
-        result.innerHTML = timeentry.entry_date;
-        size.innerHTML = timeentry.size;
-    }, 'json')
-    .error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
-    });
-}
-
-function timeentryAtDate(datetime, enter) {
-	alert(datetime + " " + enter);
+    
 }
 
 function maintainHoliday(date, holyday) {
@@ -53,52 +53,3 @@ function deleteAllTimeEntries() {
     //    .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
     //    .always(function() { alert("always"); })
 }
-
-/*
- function getById(id, div) {
- $.get("/load/" + id,
- function(todo, status) {
- div.innerHTML = todo.content + ", " + todo.color + ", " + todo._id;
- })
- .error(function(err) { alert("error: " + err.status + " (" + err.statusText + ")"); })
- .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
- }
- 
- function putById(id, color, div) {
- $.ajax({
- type: "PUT",
- url: "/save/" + id,
- data: { "color": color }
- }).done(function(todo) {
- div.innerHTML = todo.content + ", " + todo.color + ", " + todo._id;
- });
- }
- 
- function postTodo(name, color, div) {
- $.post("/post", { "content": name, "color": color },
- function(todo){
- div.innerHTML = todo.content + ", " + todo.color + ", " + todo._id;
- },
- "json")
- .error(function(err) { alert("error: " + err.status + " (" + err.statusText + ")"); })
- .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
- }
- 
- function deleteById(id, div) {
- $.ajax({
- type: "DELETE",
- url: "/delete/" + id,
- }).done(function(todo) {
- div.innerHTML = id;
- });
- }
- 
- function getAll(div) {
- $.get("/load",
- function(todos, status) {
- div.innerHTML = todos;
- })
- .error(function(err) { alert("error: " + err.status + " (" + err.statusText + ")"); })
- .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
- }
- */

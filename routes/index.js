@@ -1,5 +1,6 @@
 
 var mongoose = require('mongoose');
+var moment = require('moment');
 var TimeEntry  = mongoose.model('TimeEntry');
 
 /* ================================================================== */
@@ -35,8 +36,11 @@ exports.advanced = function(req, res) {
  */
 exports.entry = function(req, res) {
     var direction = req.body.direction;
+    var datetime = req.body.datetime;
     
-    validateRequest(direction, new Date, function(err) {
+    console.log(datetime);
+    
+    validateRequest(direction, datetime, function(err) {
         
         if(err) {
             console.log('exports.entry received an error: ' + err);
@@ -58,7 +62,7 @@ exports.entry = function(req, res) {
                         res.send(500, 'Error while saving new Time Entry: ' + err.message);
                     }
                 });
-
+                
             });
         }
     });
@@ -89,6 +93,7 @@ exports.deleteAll = function(req, res) {
  * loads the TimeEntries from the given day and checking, denpending on direction,
  *   when direction == "enter" -> the last entry of this given day must either not exist or be "go"; otherwise -> error
  *   when direction == "go"    -> the last entry of this given day must be "enter"; if no entry exists or the last was "go" -> error
+ *   dt is expected in ISO format
  */
 function validateRequest(direction, dt, callback) {
     
@@ -120,21 +125,24 @@ function validateRequest(direction, dt, callback) {
  */
 function getLastTimeEntryByDate(dt, callback) {
     
-    var dtStart = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
-    var dtEnd = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()+1);
+    var dtStart = moment(dt).toDate();
+    var dtEnd = moment(dt).add('days', '1').toDate();
+    
+    console.log(dtStart + "\n" + dtEnd);
     
     TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
     .skip(0)
     .limit(1)
     .sort({entry_date: -1})
     .exec(function(err, docs) {
+        console.log(err);
+        console.log(docs);
         if(docs.length == 0) {
             callback(err);
         } else {
             callback(err, docs[0]);
         }
-    })
-    ;
+    });
 }
 
 /*

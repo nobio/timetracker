@@ -4,19 +4,32 @@ block content
     script(type='text/javascript').
         $(document).ready(function() {
             $('#datetimepicker').datetimepicker({
+                onGenerate:function(ct) {
+                    $(this).find('.xdsoft_date.xdsoft_weekend').addClass('xdsoft_disabled');
+                },
                 format:'d.m.Y H:i'
                 ,inline:false
                 ,lang:'de'
+                ,step:5
+                ,dayOfWeekStart:1
                 ,timepicker:true
                 ,datepicker:true
             });
+            $('#datetimepicker').val(moment().format('DD.MM.YYYY HH:mm'));
+            
+            
             $('#datepicker').datetimepicker({
+                onGenerate:function(ct) {
+                    $(this).find('.xdsoft_date.xdsoft_weekend').addClass('xdsoft_disabled');
+                },
                 format:'d.m.Y'
                 ,lang:'de'
                 ,inline:false
+                ,dayOfWeekStart:1
                 ,timepicker:false
                 ,datepicker:true
             });
+            $('#datepicker').val(moment().format('DD.MM.YYYY'));
         })
 
 
@@ -34,7 +47,7 @@ block content
         tr
             td
                 input(type='button', value='Kommen/Gehen', 
-                    onclick='timeentryAtDate($("#datetimepicker").val(), $("input[name=direction]:checked").val());')
+                    onclick='timeentry($("input[name=direction]:checked").val(), $("#datetimepicker").val());')
 
     h3 Bitte Datum auswählen
     table

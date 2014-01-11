@@ -2,7 +2,5 @@ extends layout
 
 block content
   p
-    input(type='button', value='Kommen', onclick='enterNow();')
-    input(type='button', value='Gehen', onclick='goNow();')
-
-    #result
+    input(type='button', value='Kommen', onclick='timeentry("enter", "self");')
+    input(type='button', value='Gehen', onclick='timeentry("go", "self");')
