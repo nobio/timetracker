@@ -27,6 +27,10 @@ exports.advanced = function(req, res) {
     res.render('advanced');
 }
 
+exports.stats = function(req, res) {
+    res.render('stats');
+}
+
 /* ================================================================== */
 /* ============================== REST ============================== */
 /* ================================================================== */
@@ -47,7 +51,7 @@ exports.entry = function(req, res) {
             res.send(500, 'Error while saving new Time Entry: ' + err.message);
         } else {
             new TimeEntry({
-            entry_date: new Date,
+            entry_date: datetime,
             direction: direction,
             isWorkingDay: false
             }).save(function(err, timeentry) {
@@ -56,10 +60,10 @@ exports.entry = function(req, res) {
                 getNumberOfTimeEntries(function(err, size) {
                     t.size = size;
                     
-                    if(!err) {
-                        res.send(t);
-                    } else {
+                    if(err) {
                         res.send(500, 'Error while saving new Time Entry: ' + err.message);
+                    } else {
+                        res.send(t);
                     }
                 });
                 
@@ -83,6 +87,28 @@ exports.deleteAll = function(req, res) {
         console.log('deleted ' + size + ' items');
         res.send({ size: size });
     });
+}
+
+/*
+ * lists all Time Entries for a given date (this particular day)
+ */
+exports.getAllByDate = function(req, res) {
+    var dt = moment.unix(req.params.date/1000);
+    dt.millisecond(0);
+    dt.second(0);
+    dt.minutes(0);
+    dt.hours(0);
+
+    getTimeEntriesByDate(dt, function(err, timeentries) {
+
+        if(err) {
+            res.send(500, 'Error while loading Time Entries: ' + err.message);
+        } else {
+            res.send(timeentries);
+        }
+
+    });
+    
 }
 
 /* ================================================================== */
@@ -121,7 +147,7 @@ function validateRequest(direction, dt, callback) {
 }
 
 /*
- * reads all time entries for a given date
+ * reads the last entry for a given date
  */
 function getLastTimeEntryByDate(dt, callback) {
     
@@ -135,12 +161,32 @@ function getLastTimeEntryByDate(dt, callback) {
     .limit(1)
     .sort({entry_date: -1})
     .exec(function(err, docs) {
-        console.log(err);
-        console.log(docs);
         if(docs.length == 0) {
             callback(err);
         } else {
             callback(err, docs[0]);
+        }
+    });
+}
+
+/*
+ * reads all time entries for a given date
+ */
+function getTimeEntriesByDate(dt, callback) {
+    
+    var dtStart = moment(dt).toDate();
+    var dtEnd = moment(dt).add('days', '1').toDate();
+    
+    console.log(dtStart + "\n" + dtEnd);
+    
+    TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
+    .skip(0)
+    .sort({entry_date: 1})
+    .exec(function(err, timeentries) {
+        if(err) {
+            callback(err);
+        } else {
+            callback(err, timeentries);
         }
     });
 }

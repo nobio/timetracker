@@ -17,6 +17,7 @@ function timeentry(direction, datetime) {
     $.ajax({
     type: 'POST',
     url: '/entry',
+    dataType: 'json',
     data: { 'direction': direction, 'datetime': dt }
     })
     .done(function(timeentry) {
@@ -43,7 +44,8 @@ function maintainHoliday(date, holyday) {
 function deleteAllTimeEntries() {
     $.ajax({
     type: 'DELETE',
-    url: '/entry'
+    url: '/entry',
+    dataType: 'json'
     })
     .done(function(response) {
         result.innerHTML = 'deleted ' + response.size + ' time entries';
@@ -52,4 +54,30 @@ function deleteAllTimeEntries() {
     .error(function(err) { alert("error: " + err.status + " (" + err + ")"); })
     //    .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
     //    .always(function() { alert("always"); })
+}
+
+function getTimeEntriesByDate(dt) {
+
+    $.ajax({
+    type: 'GET',
+    url: '/entry/dt/' + dt,
+    dataType: 'json',
+    })
+    .done(function(timeentries) {
+        var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYYY') + '</b><table>';
+        timeentries.forEach(function(entry) {
+            html += '<tr>';
+            html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
+            html += '<td>' + entry.direction + '</td>';
+            html += '<td>' + entry.isWorkingDay + '</td>';
+            html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
+            html += '</tr>';
+        })
+        html += '</table>';
+        data_by_date.innerHTML = html;
+    }, 'json')
+    .error(function(err) {
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    });
+
 }

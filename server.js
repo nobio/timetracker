@@ -39,10 +39,12 @@ app.configure('production', function () {
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
 app.get('/advanced', routes.advanced);
+app.get('/stats', routes.stats);
 
 // restful services
 app.post('/entry', routes.entry);
 app.delete('/entry', routes.deleteAll);
+app.get('/entry/dt/:date', routes.getAllByDate)
 
 // start the web service
 console.log('usage: node --dbenv=[local|mongodb] server.js');
