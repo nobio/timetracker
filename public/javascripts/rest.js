@@ -65,12 +65,21 @@ function getTimeEntriesByDate(dt) {
     })
     .done(function(timeentries) {
         var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYYY') + '</b><table>';
+        html += '<th>Datum</th>';
+        html += '<th>Kommen/Gehen</th>';
+        html += '<th>Feiertag</th>';
+        html += '<th>Letzte Änderung</th>';
+        html += '<th>Bearbeiten/Löschen</th>';
         timeentries.forEach(function(entry) {
             html += '<tr>';
             html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
             html += '<td>' + entry.direction + '</td>';
             html += '<td>' + entry.isWorkingDay + '</td>';
             html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
+            html += '<td>';
+            html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">'
+            html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">'
+            html += '</td>';
             html += '</tr>';
         })
         html += '</table>';
@@ -80,4 +89,19 @@ function getTimeEntriesByDate(dt) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     });
 
+}
+
+function deleteTimeEntryById(id) {
+    
+    $.ajax({
+    type: 'DELETE',
+    url: '/entry/' + id,
+    dataType: 'json',
+    })
+    .done(function(response) {
+        result.innerHTML = 'deleted Time Entry ' + response;
+    })
+    .error(function(err) {
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    })
 }

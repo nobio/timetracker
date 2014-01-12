@@ -44,6 +44,7 @@ app.get('/stats', routes.stats);
 // restful services
 app.post('/entry', routes.entry);
 app.delete('/entry', routes.deleteAll);
+app.delete('/entry/:id', routes.delete);
 app.get('/entry/dt/:date', routes.getAllByDate)
 
 // start the web service

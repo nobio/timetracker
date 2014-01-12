@@ -90,6 +90,23 @@ exports.deleteAll = function(req, res) {
 }
 
 /*
+ * deletes one time entry by it's id
+ */
+exports.delete = function(req, res) {
+    var id = req.params.id;
+    console.log(id);
+    console.log(typeof(id));
+    
+    TimeEntry.findByIdAndRemove(id, function(err) {
+        if(err) {
+            res.send(500, 'Error while deleting Time Entry: ' + id + " " + err.message);
+        } else {
+            res.send(id);
+        }
+    });
+}
+
+/*
  * lists all Time Entries for a given date (this particular day)
  */
 exports.getAllByDate = function(req, res) {

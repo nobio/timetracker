@@ -3,12 +3,9 @@ block content
     script(type='text/javascript').
         $(document).ready(function() {
             $('#datepicker').datetimepicker({
-                onGenerate:function(ct) {
-                    $(this).find('.xdsoft_date.xdsoft_weekend').addClass('xdsoft_disabled');
-                },
                 format:'d.m.Y'
                 ,lang:'de'
-                ,inline:false
+                ,inline:true
                 ,dayOfWeekStart:1
                 ,timepicker:false
                 ,datepicker:true
@@ -20,7 +17,7 @@ block content
         tr
             td
                 input(type='button', value='all data from today', onclick='getTimeEntriesByDate(moment());') 
-                input(type='button', value='all data from...', onclick='getTimeEntriesByDate(moment($("#datepicker").val()).unix());') 
+                input(type='button', value='all data from...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
                 input#datepicker(type='text' name='date')
         tr
             td
