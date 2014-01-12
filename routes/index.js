@@ -94,8 +94,6 @@ exports.deleteAll = function(req, res) {
  */
 exports.delete = function(req, res) {
     var id = req.params.id;
-    console.log(id);
-    console.log(typeof(id));
     
     TimeEntry.findByIdAndRemove(id, function(err) {
         if(err) {
@@ -126,6 +124,30 @@ exports.getAllByDate = function(req, res) {
 
     });
     
+}
+
+/*
+ * get one Time Entry by it's id
+ */
+exports.getEntryById = function(req, res) {
+
+    TimeEntry.findById(req.params.id, function(err, timeentry) {
+        if(err) {
+            res.send(500, 'Error while reading Time Entry: ' + id + " " + err.message);
+        } else {
+            res.send(timeentry);
+        }
+    });
+
+}
+
+/*
+ * stores one Time Entry
+ */
+exports.storeEntryById = function(req, res) {
+
+    res.send(null);
+
 }
 
 /* ================================================================== */

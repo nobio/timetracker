@@ -16,9 +16,10 @@ block content
     table
         tr
             td
-                input(type='button', value='all data from today', onclick='getTimeEntriesByDate(moment());') 
-                input(type='button', value='all data from...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
                 input#datepicker(type='text' name='date')
+                input(type='button', value='data from...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
         tr
             td
                 #data_by_date
+            td
+                #dialog

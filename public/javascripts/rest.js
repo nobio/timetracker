@@ -57,7 +57,7 @@ function deleteAllTimeEntries() {
 }
 
 function getTimeEntriesByDate(dt) {
-
+    
     $.ajax({
     type: 'GET',
     url: '/entry/dt/' + dt,
@@ -88,7 +88,49 @@ function getTimeEntriesByDate(dt) {
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     });
+    
+}
 
+function editTimeEntryById(id) {
+    
+    $.ajax({
+    type: 'GET',
+    url: '/entry/' + id,
+    dataType: 'json',
+    })
+    .done(function(timeentry) {
+        var html = '<b>ID: ' + timeentry._id + '</b><table>';
+        html += '<tr><td>Datum</td><td><input id="entry_date" type="text" value="' + moment(timeentry.entry_date).format('DD.MM.YYYY HH:mm') + '" /></td></tr>';
+        html += '<tr><td>Kommen/Gehen</td><td><input id="direction" type="text" value="' + timeentry.direction + '" /></td></tr>';
+        html += '<tr><td>Feiertag</td><td><input id="isWorkingDay" type="text" value="' + timeentry.isWorkingDay + '" /></td></tr>';
+        html += '<tr><td>Letzte Änderung</td><td>' + moment(timeentry.last_changed).format('DD.MM.YYYY HH:mm') + '</td></tr>';
+        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + ', $(#direction), ' + timeentry.isWorkingDay + '\');"></td></tr>'
+        html += '</table>';
+        dialog.innerHTML = html;
+    }, 'json')
+    .error(function(err) {
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    });
+    //        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + '\',\'' + timeentry.direction + '\',\'' + timeentry.isWorkingDay + '\');"></td></tr>'
+
+}
+
+function storeTimeEntryById(id, entry_date, direction, isWorkingDay) {
+    
+    alert(id + ", " + entry_date + ", " + direction + ", " + isWorkingDay)
+    
+    $.ajax({
+    type: 'PUT',
+    url: '/entry/' + id,
+    dataType: 'json',
+    data: { 'direction': direction, 'datetime': dt, 'isWorkingDay': isWorkingDay }
+    })
+    .done(function(response) {
+        result.innerHTML = 'stored Time Entry ' + response;
+    })
+    .error(function(err) {
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    })
 }
 
 function deleteTimeEntryById(id) {
@@ -104,4 +146,5 @@ function deleteTimeEntryById(id) {
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     })
+    
 }
