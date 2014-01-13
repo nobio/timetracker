@@ -1,6 +1,7 @@
 
 var mongoose = require('mongoose');
 var moment = require('moment');
+var timzone = require('moment-timezone');
 var TimeEntry  = mongoose.model('TimeEntry');
 
 /* ================================================================== */
@@ -113,15 +114,15 @@ exports.getAllByDate = function(req, res) {
     dt.second(0);
     dt.minutes(0);
     dt.hours(0);
-
+    
     getTimeEntriesByDate(dt, function(err, timeentries) {
-
+        
         if(err) {
             res.send(500, 'Error while loading Time Entries: ' + err.message);
         } else {
             res.send(timeentries);
         }
-
+        
     });
     
 }
@@ -130,7 +131,7 @@ exports.getAllByDate = function(req, res) {
  * get one Time Entry by it's id
  */
 exports.getEntryById = function(req, res) {
-
+    
     TimeEntry.findById(req.params.id, function(err, timeentry) {
         if(err) {
             res.send(500, 'Error while reading Time Entry: ' + id + " " + err.message);
@@ -138,16 +139,16 @@ exports.getEntryById = function(req, res) {
             res.send(timeentry);
         }
     });
-
+    
 }
 
 /*
  * stores one Time Entry
  */
 exports.storeEntryById = function(req, res) {
-
+    
     res.send(null);
-
+    
 }
 
 /* ================================================================== */
@@ -189,11 +190,10 @@ function validateRequest(direction, dt, callback) {
  * reads the last entry for a given date
  */
 function getLastTimeEntryByDate(dt, callback) {
+    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
+    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
     
-    var dtStart = moment(dt).toDate();
-    var dtEnd = moment(dt).add('days', '1').toDate();
-    
-    console.log(dtStart + "\n" + dtEnd);
+    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     
     TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
     .skip(0)
@@ -213,10 +213,10 @@ function getLastTimeEntryByDate(dt, callback) {
  */
 function getTimeEntriesByDate(dt, callback) {
     
-    var dtStart = moment(dt).toDate();
-    var dtEnd = moment(dt).add('days', '1').toDate();
+    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
+    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
     
-    console.log(dtStart + "\n" + dtEnd);
+    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     
     TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
     .skip(0)

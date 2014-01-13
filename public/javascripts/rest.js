@@ -64,7 +64,7 @@ function getTimeEntriesByDate(dt) {
     dataType: 'json',
     })
     .done(function(timeentries) {
-        var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYYY') + '</b><table>';
+        var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYY') + '</b><table>';
         html += '<th>Datum</th>';
         html += '<th>Kommen/Gehen</th>';
         html += '<th>Feiertag</th>';
