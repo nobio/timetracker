@@ -48,6 +48,7 @@ app.put('/entry/:id', routes.storeEntryById);
 app.delete('/entry', routes.deleteAll);
 app.delete('/entry/:id', routes.delete);
 app.get('/entry/dt/:date', routes.getAllByDate)
+app.get('/entry/busy/:date', routes.getBusyTime)
 
 // start the web service
 console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');

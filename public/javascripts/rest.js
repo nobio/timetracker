@@ -57,36 +57,50 @@ function deleteAllTimeEntries() {
 }
 
 function getTimeEntriesByDate(dt) {
+    alert(dt);
+    result.innerHTML = '';
     
-    $.ajax({
-    type: 'GET',
-    url: '/entry/dt/' + dt,
-    dataType: 'json',
-    })
-    .done(function(timeentries) {
-        var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYY') + '</b><table>';
-        html += '<th>Datum</th>';
-        html += '<th>Kommen/Gehen</th>';
-        html += '<th>Feiertag</th>';
-        html += '<th>Letzte Änderung</th>';
-        html += '<th>Bearbeiten/Löschen</th>';
-        timeentries.forEach(function(entry) {
-            html += '<tr>';
-            html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
-            html += '<td>' + entry.direction + '</td>';
-            html += '<td>' + entry.isWorkingDay + '</td>';
-            html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
-            html += '<td>';
-            html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">'
-            html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">'
-            html += '</td>';
-            html += '</tr>';
+    getBusyTime(dt, function(err, duration) {
+        
+        if(err) {
+            result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        }
+        
+        $.ajax({
+        type: 'GET',
+        url: '/entry/dt/' + dt,
+        dataType: 'json',
         })
-        html += '</table>';
-        data_by_date.innerHTML = html;
-    }, 'json')
-    .error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        .done(function(timeentries) {
+            var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYY');
+            if(duration) {
+                html += ' - Anwesenheit: ' + moment(duration.duration-60*60*1000).format('HH:mm:ss') + ' Stunden';
+            }
+            html += '<table><th>Datum</th>';
+            html += '<th>Kommen/Gehen</th>';
+            html += '<th>Feiertag</th>';
+            html += '<th>Letzte Änderung</th>';
+            html += '<th>Bearbeiten/Löschen</th>';
+            timeentries.forEach(function(entry) {
+                html += '<tr>';
+                html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
+                html += '<td>' + entry.direction + '</td>';
+                html += '<td>' + entry.isWorkingDay + '</td>';
+                html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
+                html += '<td>';
+                html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">'
+                html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">'
+                html += '</td>';
+                html += '</tr>';
+            })
+            html += '</table>';
+            data_by_date.innerHTML = html;
+            
+        }, 'json')
+        .error(function(err) {
+            result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        });
+        
     });
     
 }
@@ -109,10 +123,26 @@ function editTimeEntryById(id) {
         dialog.innerHTML = html;
     }, 'json')
     .error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        return err;
     });
-    //        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + '\',\'' + timeentry.direction + '\',\'' + timeentry.isWorkingDay + '\');"></td></tr>'
+    
+}
 
+function getBusyTime(dt, callback) {
+    
+    $.ajax({
+    type: 'GET',
+    url: '/entry/busy/' + dt,
+    dataType: 'json',
+    })
+    .done(function(duration) {
+        callback(null, duration);
+    }, 'json')
+    .error(function(err) {
+        callback(err);
+    })
+    ;
+    
 }
 
 function storeTimeEntryById(id, entry_date, direction, isWorkingDay) {
