@@ -109,7 +109,10 @@ exports.delete = function(req, res) {
  * lists all Time Entries for a given date (this particular day)
  */
 exports.getAllByDate = function(req, res) {
+    
+    console.log('getAllByDate received date: ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
     var dt = stripdownToDate(moment.unix(req.params.date/1000));
+    console.log('getAllByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
     getTimeEntriesByDate(dt, function(err, timeentries) {
         
