@@ -58,8 +58,9 @@ function deleteAllTimeEntries() {
 
 function getTimeEntriesByDate(dt) {
 
-    result.innerHTML = '';
+    alert(dt);
     
+    result.innerHTML = '';
     getBusyTime(dt, function(err, duration) {
         
         if(err) {
