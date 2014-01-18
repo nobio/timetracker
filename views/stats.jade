@@ -17,7 +17,7 @@ block content
         tr
             td
                 input#datepicker(type='text' name='date')
-                input(type='button', value='data from...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
+                input(type='button', value='data from...', onclick='alert($("#datepicker").val()); getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
         tr
             td
                 #data_by_date
