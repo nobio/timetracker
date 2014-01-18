@@ -247,6 +247,7 @@ function getLastTimeEntryByDate(dt, callback) {
  * reads all time entries for a given date
  */
 function getTimeEntriesByDate(dt, callback) {
+    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
     var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
     var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');

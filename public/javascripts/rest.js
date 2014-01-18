@@ -57,7 +57,7 @@ function deleteAllTimeEntries() {
 }
 
 function getTimeEntriesByDate(dt) {
-    alert(dt);
+
     result.innerHTML = '';
     
     getBusyTime(dt, function(err, duration) {
