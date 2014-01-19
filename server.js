@@ -49,7 +49,7 @@ app.delete('/entry', routes.deleteAll);
 app.delete('/entry/:id', routes.delete);
 app.get('/entry/dt/:date', routes.getAllByDate)
 app.get('/entry/busy/:date', routes.getBusyTime)
-
+app.put('/admin/rnd_entries', routes.setRandomTimeEntries)
 // start the web service
 console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
