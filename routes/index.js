@@ -74,23 +74,6 @@ exports.entry = function(req, res) {
 }
 
 /*
- * deletes all TimeEntry-items from database. This should only be used during development time
- * and later either deleted or put behind some special user privileges
- */
-exports.deleteAll = function(req, res) {
-    var size;
-    TimeEntry.find(function(err, timeentries) {
-        size = timeentries.length;
-        timeentries.forEach(function(timeentry) {
-            //console.log(timeentry);
-            timeentry.remove();
-        });
-        console.log('deleted ' + size + ' items');
-        res.send({ size: size });
-    });
-}
-
-/*
  * deletes one time entry by it's id
  */
 exports.delete = function(req, res) {
@@ -145,6 +128,18 @@ exports.getEntryById = function(req, res) {
     
 }
 
+/*
+ * stores one Time Entry
+ */
+exports.storeEntryById = function(req, res) {
+    
+    res.send(null);
+    
+}
+
+/*
+ * Reads the busy time of all entries for a given day
+ */
 exports.getBusyTime = function(req, res) {
     var dt = stripdownToDate(moment.unix(req.params.date/1000));
     
@@ -185,70 +180,7 @@ exports.getBusyTime = function(req, res) {
     });
 }
 
-/*
- * stores one Time Entry
- */
-exports.storeEntryById = function(req, res) {
-    
-    res.send(null);
-    
-}
 
-/*
- * creates random Time Entries; supposed to be used after cleaning the TimeEntry table
- *
- * curl -X PUT http://localhost:30000/admin/rnd_entries 
- */
- exports.setRandomTimeEntries = function (req, res) {
- 	var DAY_IN_SECS = 60*60*24;
- 	var now = moment().unix();
-    var today = now - (now % DAY_IN_SECS);
-    
-    console.log(today);
-    
-    for(var t=today - 18*DAY_IN_SECS; t<today +180*DAY_IN_SECS; t+=DAY_IN_SECS) {
-    
-        var dt = moment(t);
-        console.log(t + ': ' + dt.format('DD.MM.YYYY HH:mm:ss'));
-        
-        var countEntries = 1 + Math.floor(Math.random() * 3);
-    	console.log("Anzahl Eiträge: " + countEntries * 2);
-        
-        var pointer = t + 60*60*5; // 5 hours offset per day
-        for(var i=0; i<countEntries; i++) {
- 			var varianz = Math.floor(Math.random() * 60*60*4); // random range +/- 60 min
-        	var start = pointer + varianz - 60*60;
-            
- 			varianz += Math.floor(Math.random() * 60*60*4); // random range +/- 30 min
-            var end = start + varianz -60*60;
-            
-            console.log("Start: " + moment(1000*start).format('DD.MM.YYYY HH:mm:ss') + " - End: " + moment(1000*end).format('DD.MM.YYYY HH:mm:ss'));
-            pointer = end + 61*60;
-
-            new TimeEntry({
-            entry_date: moment(1000 * start),
-            direction: 'enter',
-            isWorkingDay: false
-            }).save(function(err, timeentry) {
-            	if(err) {
-                	console.log(err);
-                }
-            });
-            
-            new TimeEntry({
-            entry_date: moment(1000 * end),
-            direction: 'go',
-            isWorkingDay: false
-            }).save(function(err, timeentry) {
-            	if(err) {
-                	console.log(err);
-                }
-            });
-        }
-    }
-    
-	res.send({now:today}); 
- }
 
 /* ================================================================== */
 /* ======================== INTERNAL METHODS ======================== */

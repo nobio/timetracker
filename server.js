@@ -7,6 +7,7 @@ require('./db');
 
 var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
+var admin = require('./routes/admin');
 var http = require('http');
 var path = require('path');
 
@@ -45,11 +46,16 @@ app.get('/stats', routes.stats);
 app.post('/entry', routes.entry);
 app.get('/entry/:id', routes.getEntryById);
 app.put('/entry/:id', routes.storeEntryById);
-app.delete('/entry', routes.deleteAll);
 app.delete('/entry/:id', routes.delete);
 app.get('/entry/dt/:date', routes.getAllByDate)
 app.get('/entry/busy/:date', routes.getBusyTime)
-app.put('/admin/rnd_entries', routes.setRandomTimeEntries)
+
+// admin and statistics stuff
+app.delete('/entry', admin.deleteAll);
+app.put('/admin/rnd_entries', admin.setRandomTimeEntries)
+app.put('/admin/holiday', admin.setHolidays)
+app.put('/stats', admin.calcStats)
+
 // start the web service
 console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {

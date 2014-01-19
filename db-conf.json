@@ -1,11 +1,16 @@
 {
 	"local" : {
-		  "user"		: ""
+        "user"		: ""
 		, "password"	: ""
 		, "uri"			: "localhost:27017/timetrack"
 	}
+	, "jupiter" : {
+        "user"		: ""
+		, "password"	: ""
+		, "uri"			: "jupiter:27017/timetrack"
+	}
 	, "openshift": {
-		  "user"		: "nobio"
+        "user"		: "nobio"
 		, "password"	: "1gR7hW2cPhtkRlv2"
 		, "uri"			: "ds061928.mongolab.com:61928/timetrack"
 	}

@@ -13,8 +13,15 @@ function dburl() {
             console.log('database environment: ' + dbenv);
         }
     });
-    
+
     var dbconfig = (process.env.OPENSHIFT_APP_UUID || dbenv == 'openshift' ? db_config.openshift : db_config.local);
+    if(process.env.OPENSHIFT_APP_UUID || dbenv === 'openshift') {
+        dbconfig = db_config.openshift;
+    } else if (dbenv === 'local') {
+        dbconfig = db_config.local;
+    } else if (dbenv === 'jupiter') {
+        dbconfig = db_config.jupiter;
+    }
     
 	return 'mongodb://' + dbconfig.user + ':' + dbconfig.password + '@' + dbconfig.uri;
 }
@@ -37,6 +44,7 @@ console.log("init database");
 var mongoose = require('mongoose');
 var schema   = mongoose.Schema;
 
+// TimeEntry
 var directions = 'enter go'.split(' ')
 var TimeEntry = new schema({
       entry_date:   {type: Date, required: true, default: Date.now, index: true}
@@ -44,8 +52,18 @@ var TimeEntry = new schema({
     , isWorkingDay: {type: Boolean, required: true}
     , last_changed: {type: Date, default: Date.now, required: true}
 });
-
 mongoose.model('TimeEntry', TimeEntry);
+
+// StatisticsDay
+var StatsDay = new schema({
+      date:         {type: Date, required: true, default: Date.now, index: true}
+    , busytime:     {type: Number, required: true}
+    , isWorkingDay: {type: Boolean, required: true}
+    , isComplete  : {type: Boolean, required: true}
+    , last_changed: {type: Date, default: Date.now, required: true}
+});
+mongoose.model('StatsDay', StatsDay);
+
 
 var mongodb_url = dburl();
 

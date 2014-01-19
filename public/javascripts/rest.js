@@ -56,6 +56,18 @@ function deleteAllTimeEntries() {
     //    .always(function() { alert("always"); })
 }
 
+function calculateStats() {
+    $.ajax({
+    type: 'PUT',
+    url: '/stats',
+    dataType: 'json'
+    })
+    .done(function(response) {
+        result.innerHTML = 'updated statistics: ' + response;
+    })
+    .error(function(err) { alert("error: " + err.status + " (" + err + ")"); })
+}
+
 function getTimeEntriesByDate(dt) {
 
     result.innerHTML = '';
