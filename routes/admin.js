@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var moment = require('moment');
 var timzone = require('moment-timezone');
 var TimeEntry  = mongoose.model('TimeEntry');
+var StatsDay = mongoose.model('StatsDay');
 
 
 /*
@@ -21,6 +22,7 @@ var TimeEntry  = mongoose.model('TimeEntry');
  <holiday title="1. Weihnachtstag" timestamp="1356390000" date="2012/12/25" />
  <holiday title="2. Weihnachtstag" timestamp="1356476400" date="2012/12/26" />
  </holidays>
+ var isWeekend = yourDateObject.getDay()%6==0;
  */
 
 
@@ -59,9 +61,39 @@ exports.calcStats = function(req, res) {
 /*
  * fills the Stats schema with holidays and weekends
  *
- * curl -X PUT http://localhost:30000/admin/holiday
+ * curl -X PUT http://localhost:30000/admin/holidays
  */
 exports.setHolidays = function (req, res) {
+    res.send(null);
+}
+
+/*
+ * marks/unmarks a day as holiday 
+ *
+ * curl -X PUT http://localhost:30000/admin/holiday
+ */
+exports.setHoliday = function (req, res) {
+    var holiday = req.body.holiday;
+    var date = req.body.date;
+
+	console.log('date: ' + date + ', holiday: ' + holiday);
+
+    new StatsDay({
+    	date: moment(date, 'DD.MM.YYYY')
+    , actual_working_time: 0
+    , planned_working_time: 0
+    , is_working_day: holiday
+    , is_complete: true
+    }).save(function(err, stat) {
+    	if(err) {
+        	console.log(err);
+	        res.send(500, 'Error while saving new day statistics: ' + err.message);
+        } else {
+        	res.send(stat);
+        }
+    });
+
+    
     res.send(null);
 }
 

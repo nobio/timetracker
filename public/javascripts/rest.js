@@ -37,8 +37,25 @@ function timeentry(direction, datetime) {
     
 }
 
-function maintainHoliday(date, holyday) {
-	alert(date + " " + holyday);
+function maintainHoliday(date, holiday) {
+    var isHoliday = (holiday === 'on');
+
+	alert('date: ' + date + ', holiday: ' + holiday);
+
+    $.ajax({
+    type: 'PUT',
+    url: '/admin/holiday',
+    dataType: 'json',
+    data: { 'holiday': isHoliday, 'date': date }
+    })
+    .done(function() {
+	    alert('date: ' + date + ', holiday: ' + holiday);
+        result.innerHTML = 'holiday set/reset successfully';
+    }, 'json')
+    .error(function(err) {
+	    alert(err);
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    }); 
 }
 
 function deleteAllTimeEntries() {
@@ -89,14 +106,12 @@ function getTimeEntriesByDate(dt) {
             }
             html += '<table><th>Datum</th>';
             html += '<th>Kommen/Gehen</th>';
-            html += '<th>Feiertag</th>';
             html += '<th>Letzte Änderung</th>';
             html += '<th>Bearbeiten/Löschen</th>';
             timeentries.forEach(function(entry) {
                 html += '<tr>';
                 html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
                 html += '<td>' + entry.direction + '</td>';
-                html += '<td>' + entry.isWorkingDay + '</td>';
                 html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
                 html += '<td>';
                 html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">'
@@ -127,9 +142,8 @@ function editTimeEntryById(id) {
         var html = '<b>ID: ' + timeentry._id + '</b><table>';
         html += '<tr><td>Datum</td><td><input id="entry_date" type="text" value="' + moment(timeentry.entry_date).format('DD.MM.YYYY HH:mm') + '" /></td></tr>';
         html += '<tr><td>Kommen/Gehen</td><td><input id="direction" type="text" value="' + timeentry.direction + '" /></td></tr>';
-        html += '<tr><td>Feiertag</td><td><input id="isWorkingDay" type="text" value="' + timeentry.isWorkingDay + '" /></td></tr>';
         html += '<tr><td>Letzte Änderung</td><td>' + moment(timeentry.last_changed).format('DD.MM.YYYY HH:mm') + '</td></tr>';
-        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + ', $(#direction), ' + timeentry.isWorkingDay + '\');"></td></tr>'
+        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + ', $(#direction), \');"></td></tr>'
         html += '</table>';
         dialog.innerHTML = html;
     }, 'json')
@@ -156,15 +170,15 @@ function getBusyTime(dt, callback) {
     
 }
 
-function storeTimeEntryById(id, entry_date, direction, isWorkingDay) {
+function storeTimeEntryById(id, entry_date, direction) {
     
-    alert(id + ", " + entry_date + ", " + direction + ", " + isWorkingDay)
+    alert(id + ", " + entry_date + ", " + direction)
     
     $.ajax({
     type: 'PUT',
     url: '/entry/' + id,
     dataType: 'json',
-    data: { 'direction': direction, 'datetime': dt, 'isWorkingDay': isWorkingDay }
+    data: { 'direction': direction, 'datetime': dt }
     })
     .done(function(response) {
         result.innerHTML = 'stored Time Entry ' + response;

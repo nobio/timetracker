@@ -49,18 +49,18 @@ var directions = 'enter go'.split(' ')
 var TimeEntry = new schema({
       entry_date:   {type: Date, required: true, default: Date.now, index: true}
     , direction:    {type: String, enum: directions, required: true}
-    , isWorkingDay: {type: Boolean, required: true}
     , last_changed: {type: Date, default: Date.now, required: true}
 });
 mongoose.model('TimeEntry', TimeEntry);
 
 // StatisticsDay
 var StatsDay = new schema({
-      date:         {type: Date, required: true, default: Date.now, index: true}
-    , busytime:     {type: Number, required: true}
-    , isWorkingDay: {type: Boolean, required: true}
-    , isComplete  : {type: Boolean, required: true}
-    , last_changed: {type: Date, default: Date.now, required: true}
+      date:                  {type: Date, required: true, default: Date.now, index: true}
+    , actual_working_time:   {type: Number, required: true, default: 0}
+    , planned_working_time:  {type: Number, required: true, default: 0}
+    , is_working_day:        {type: Boolean, required: true, default: false}
+    , is_complete  :         {type: Boolean, required: true}
+    , last_changed:          {type: Date, required: true, default: Date.now}
 });
 mongoose.model('StatsDay', StatsDay);
 

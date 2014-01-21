@@ -53,8 +53,7 @@ exports.entry = function(req, res) {
         } else {
             new TimeEntry({
             entry_date: datetime,
-            direction: direction,
-            isWorkingDay: false
+            direction: direction
             }).save(function(err, timeentry) {
                 // and now add the size to the monggose-JSON (needs to be converted to an object first)
                 var t = timeentry.toObject();
