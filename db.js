@@ -13,7 +13,7 @@ function dburl() {
             console.log('database environment: ' + dbenv);
         }
     });
-
+    
     var dbconfig = (process.env.OPENSHIFT_APP_UUID || dbenv == 'openshift' ? db_config.openshift : db_config.local);
     if(process.env.OPENSHIFT_APP_UUID || dbenv === 'openshift') {
         dbconfig = db_config.openshift;
@@ -29,7 +29,7 @@ function dburl() {
 /**
  * adding the contains method to the String object
  */
-if (!String.prototype.contains) {
+if(!String.prototype.contains) {
     String.prototype.contains = function (arg) {
         return !!~this.indexOf(arg);
     };
@@ -47,7 +47,7 @@ var schema   = mongoose.Schema;
 // TimeEntry
 var directions = 'enter go'.split(' ')
 var TimeEntry = new schema({
-      entry_date:   {type: Date, required: true, default: Date.now, index: true}
+entry_date:   {type: Date, required: true, default: Date.now, index: true}
     , direction:    {type: String, enum: directions, required: true}
     , last_changed: {type: Date, default: Date.now, required: true}
 });
@@ -55,7 +55,7 @@ mongoose.model('TimeEntry', TimeEntry);
 
 // StatisticsDay
 var StatsDay = new schema({
-      date:                  {type: Date, required: true, default: Date.now, index: true}
+      date:                  {type: Date, required: true, default: Date.now, index: true, unique: true}
     , actual_working_time:   {type: Number, required: true, default: 0}
     , planned_working_time:  {type: Number, required: true, default: 0}
     , is_working_day:        {type: Boolean, required: true, default: false}

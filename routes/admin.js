@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
 var timzone = require('moment-timezone');
+var util = require('./util');
+
 var TimeEntry  = mongoose.model('TimeEntry');
 var StatsDay = mongoose.model('StatsDay');
 
@@ -68,33 +70,56 @@ exports.setHolidays = function (req, res) {
 }
 
 /*
- * marks/unmarks a day as holiday 
+ * marks/unmarks a day as holiday
  *
  * curl -X PUT http://localhost:30000/admin/holiday
  */
 exports.setHoliday = function (req, res) {
     var holiday = req.body.holiday;
-    var date = req.body.date;
-
+    var date = util.stripdownToDate(moment(req.body.date, 'DD.MM.YYYY').tz("Europe/Berlin"));
+    
+    
 	console.log('date: ' + date + ', holiday: ' + holiday);
-
-    new StatsDay({
-    	date: moment(date, 'DD.MM.YYYY')
-    , actual_working_time: 0
-    , planned_working_time: 0
-    , is_working_day: holiday
-    , is_complete: true
-    }).save(function(err, stat) {
+    
+    StatsDay.find({date: date}, function(err, stats) {
     	if(err) {
         	console.log(err);
-	        res.send(500, 'Error while saving new day statistics: ' + err.message);
+	        res.send(500, 'Error while loading new day statistics: ' + err.message);
         } else {
-        	res.send(stat);
+            
+            if(util.isEmpty(stats)) {
+                stats = new StatsDay({
+                date: date
+                    , actual_working_time: 0
+                    , planned_working_time: 0
+                    , is_working_day: holiday
+                    , is_complete: true
+                });
+                
+                console.log("I'm saving now this " + stats)
+                stats.save(function(err, stat, numberAffected) {
+                    if(err) {
+                        console.log(err);
+                        res.send(500, 'Error while saving new day statistics: ' + err.message);
+                    }
+                });
+                
+            } else {
+                console.log("I'm updating now this " + stats + " > " + stats.length);
+                StatsDay.update(
+                                {_id: stats[0]._id},
+                                {$set:{is_working_day: holiday}},
+                                {upsert:true},
+                                function (err, numberAffected, raw) {
+                                    if(err) {
+                                        console.log(err);
+                                        res.send(500, 'Error while saving new day statistics: ' + err.message);
+                                    }
+                                });
+            }
         }
     });
-
     
-    res.send(null);
 }
 
 

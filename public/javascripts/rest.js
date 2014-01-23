@@ -38,9 +38,7 @@ function timeentry(direction, datetime) {
 }
 
 function maintainHoliday(date, holiday) {
-    var isHoliday = (holiday === 'on');
-
-	alert('date: ' + date + ', holiday: ' + holiday);
+    var isHoliday = (holiday !== 'on');
 
     $.ajax({
     type: 'PUT',
@@ -48,12 +46,10 @@ function maintainHoliday(date, holiday) {
     dataType: 'json',
     data: { 'holiday': isHoliday, 'date': date }
     })
-    .done(function() {
-	    alert('date: ' + date + ', holiday: ' + holiday);
-        result.innerHTML = 'holiday set/reset successfully';
+    .done(function(response) {
+        result.innerHTML = 'holiday set/reset successfully: ' + response._id;
     }, 'json')
     .error(function(err) {
-	    alert(err);
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     }); 
 }

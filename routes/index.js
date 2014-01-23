@@ -2,6 +2,7 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
 var timzone = require('moment-timezone');
+var util = require('./util');
 var TimeEntry  = mongoose.model('TimeEntry');
 
 /* ================================================================== */
@@ -98,7 +99,7 @@ exports.getAllByDate = function(req, res) {
     console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
     console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
     console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
-    var dt = stripdownToDate(moment.unix(req.params.date/1000));
+    var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
     console.log('getAllByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
     getTimeEntriesByDate(dt, function(err, timeentries) {
@@ -140,7 +141,7 @@ exports.storeEntryById = function(req, res) {
  * Reads the busy time of all entries for a given day
  */
 exports.getBusyTime = function(req, res) {
-    var dt = stripdownToDate(moment.unix(req.params.date/1000));
+    var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
     
     getTimeEntriesByDate(dt, function(err, timeentries) {
         if(err) {
@@ -275,17 +276,4 @@ function getNumberOfTimeEntries(callback) {
     })
 }
 
-
-/*
- * takes the date and removes all time components
- */
-function stripdownToDate(dt) {
-    var d = dt;
-    d.millisecond(0);
-    d.second(0);
-    d.minutes(0);
-    d.hours(0);
-    
-    return d;
-}
 
