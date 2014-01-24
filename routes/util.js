@@ -12,6 +12,9 @@ exports.stripdownToDate = function(date) {
     return d;
 }
 
+/*
+ * checks if an object is empty; this is something different to undefined or null (sigh...)
+ */
 exports.isEmpty = function(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))

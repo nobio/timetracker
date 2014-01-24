@@ -38,7 +38,7 @@ function timeentry(direction, datetime) {
 }
 
 function maintainHoliday(date, holiday) {
-    var isHoliday = (holiday !== 'on');
+    var isHoliday = (holiday === 'on');
 
     $.ajax({
     type: 'PUT',

@@ -105,12 +105,18 @@ exports.setHoliday = function (req, res) {
                 });
                 
             } else {
-                console.log("I'm updating now this " + stats + " > " + stats.length);
+                var planned_working_time = (holiday === 'true' ? 0 : 7.8);
+                console.log("I'm updating record now; planned time : " + planned_working_time);
+                if(stats.length === 0 || stats.length > 1) {
+                        res.send(500, 'somethings corrupt with your StatsDay data. I received ' + stats.length + ' entries for ' + date + ' instead of 1 entry');                    
+                }
                 StatsDay.update(
                                 {_id: stats[0]._id},
-                                {$set:{is_working_day: holiday}},
+                                {$set:{is_working_day: holiday, planned_working_time: planned_working_time}},
                                 {upsert:true},
                                 function (err, numberAffected, raw) {
+                                    console.log(numberAffected);
+                                    console.log(raw);
                                     if(err) {
                                         console.log(err);
                                         res.send(500, 'Error while saving new day statistics: ' + err.message);
