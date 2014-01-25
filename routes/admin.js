@@ -105,7 +105,7 @@ exports.setHoliday = function (req, res) {
                 });
                 
             } else {
-                console.log("I'm updating now this " + stats + " > " + stats.length);
+                console.log("I'm updating now the stats entry for " + stats.date);
                 StatsDay.update(
                                 {_id: stats[0]._id},
                                 {$set:{is_working_day: holiday}},
