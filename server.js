@@ -55,6 +55,7 @@ app.delete('/entry', admin.deleteAll);
 app.put('/admin/rnd_entries', admin.setRandomTimeEntries)
 app.put('/admin/holiday', admin.setHoliday)
 app.put('/admin/holidays', admin.setHolidays)
+app.get('/admin/maintain', admin.maintain)
 
 app.put('/stats', admin.calcStats)
 

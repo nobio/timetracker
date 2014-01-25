@@ -36,6 +36,8 @@ var StatsDay = mongoose.model('StatsDay');
 /*
  * deletes all TimeEntry-items from database. This should only be used during development time
  * and later either deleted or put behind some special user privileges
+ *
+ * curl -X DELETE http://localhost:30000/entry
  */
 exports.deleteAll = function(req, res) {
     var size;
@@ -63,16 +65,30 @@ exports.calcStats = function(req, res) {
 /*
  * fills the Stats schema with holidays and weekends
  *
- * curl -X PUT http://localhost:30000/admin/holidays
+ * curl -X PUT http://localhost:30000/admin/holidays -d year=2013
  */
-exports.setHolidays = function (req, res) {
-    res.send(null);
+exports.setHolidays = function(req, res) {
+    // get the year
+    var year_start = moment(req.body.year, 'YYYY');
+    var year_end = moment(req.body.year, 'YYYY').add('year', '1');
+    
+    for(var d = year_start; d<year_end; d+=60*60*24*1000) {
+        var day = moment(d);
+        if(day.isoWeekday() == '6' || day.isoWeekday() == '7') {
+            util.setHoliday(day, true, function(err) {
+                console.log(err);
+            });
+        }
+    }
+    
+    
+    res.send('done with year ' + year_start.year());
 }
 
 /*
  * marks/unmarks a day as holiday
  *
- * curl -X PUT http://localhost:30000/admin/holiday
+ * curl -X PUT http://localhost:30000/admin/holiday -d date=05.01.2013 -d holiday=true
  */
 exports.setHoliday = function (req, res) {
     var holiday = req.body.holiday;
@@ -81,52 +97,14 @@ exports.setHoliday = function (req, res) {
     
 	console.log('date: ' + date + ', holiday: ' + holiday);
     
-    StatsDay.find({date: date}, function(err, stats) {
-    	if(err) {
-        	console.log(err);
-	        res.send(500, 'Error while loading new day statistics: ' + err.message);
+    util.setHoliday(date, holiday, function(err) {
+        if(err) {
+            res.send(500, err);
         } else {
-            
-            if(util.isEmpty(stats)) {
-                stats = new StatsDay({
-                date: date
-                    , actual_working_time: 0
-                    , planned_working_time: 0
-                    , is_working_day: holiday
-                    , is_complete: true
-                });
-                
-                //                console.log("I'm saving now this " + stats)
-                stats.save(function(err, stat, numberAffected) {
-                    if(err) {
-                        console.log(err);
-                        res.send(500, 'Error while saving new day statistics: ' + err.message);
-                    }
-                });
-                
-            } else {
-                //                console.log("I'm updating now the stats entry for " + stats.date);
-                var planned_working_time = (holiday === 'true' ? 0 : 7.8);
-                if(stats.length === 0 || stats.length > 1) {
-                        res.send(500, 'somethings corrupt with your StatsDay data. I received ' + stats.length + ' entries for ' + date + ' instead of 1 entry');                    
-                }
-                StatsDay.update(
-                                {_id: stats[0]._id},
-                                {$set:{is_working_day: holiday, planned_working_time: planned_working_time}},
-                                {upsert:true},
-                                function (err, numberAffected, raw) {
-                                    console.log(numberAffected);
-                                    console.log(raw);
-                                    if(err) {
-                                        console.log(err);
-                                        res.send(500, 'Error while saving new day statistics: ' + err.message);
-                                    }
-                                });
-            }
+            res.send('ok');
         }
     });
-    
-}
+ }
 
 
 /*
@@ -184,4 +162,19 @@ exports.setRandomTimeEntries = function (req, res) {
     }
     
 	res.send({now:today});
+}
+
+/*
+ * generic Maintain function
+ *
+ * curl -X GET http://localhost:30000/admin/maintain
+ */
+exports.maintain = function(req, res) {
+    TimeEntry.update(
+                     {$set:{isWorkingDay:true}},
+                     {multi:true},
+                     function (err, numberAffected, raw) {
+                         console.log(err + " " + numberAffected);
+                     });
+    res.send(null);
 }
