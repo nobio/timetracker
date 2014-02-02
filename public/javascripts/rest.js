@@ -203,7 +203,8 @@ function deleteTimeEntryById(id) {
 function nextStatsDay(tableref, month, direction) {
     var date = moment(month.val(), 'MMMM YYYY');
     var nextDate = date.add('months', direction);
-    month.val(nextDate.format('MMMM YYYY'));
+    alert(nextDate);
+    month.val(nextDate.format('MMMM YYYY')); // setting nextDate as value of text field
     
     $.ajax({
     type: 'GET',

@@ -200,11 +200,11 @@ exports.getStatsByRange = function(dtStart, dtEnd) {
     .sort({date: -1})
     .exec(function(err, stats) {
         stats.forEach(function(stat) {
-            console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
+            //            console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
         });
-        console.log(actual_working_time + " " + planned_working_time);
+        //        console.log(actual_working_time + " " + planned_working_time);
         return {actual_working_time:actual_working_time, planned_working_time:planned_working_time};
     });
 }
