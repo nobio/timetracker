@@ -39,7 +39,7 @@ function timeentry(direction, datetime) {
 
 function maintainHoliday(date, holiday) {
     var isHoliday = (holiday === 'on');
-
+    
     $.ajax({
     type: 'PUT',
     url: '/admin/holiday',
@@ -51,7 +51,7 @@ function maintainHoliday(date, holiday) {
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
-    }); 
+    });
 }
 
 function deleteAllTimeEntries() {
@@ -82,7 +82,7 @@ function calculateStats() {
 }
 
 function getTimeEntriesByDate(dt) {
-
+    
     result.innerHTML = '';
     getBusyTime(dt, function(err, duration) {
         
@@ -198,4 +198,28 @@ function deleteTimeEntryById(id) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
     })
     
+}
+
+function nextStatsDay(tableref, month, direction) {
+    var date = moment(month.val(), 'MMMM YYYY');
+    var nextDate = date.add('months', direction);
+    month.val(nextDate.format('MMMM YYYY'));
+    
+    $.ajax({
+    type: 'GET',
+    url: '/stats/' + nextDate,
+    dataType: 'json',
+    })
+    .done(function(timerecord) {
+        console.log(timerecord);
+        result.innerHTML = "planned_working_time=" + timerecord.planned_working_time + "; actual_working_time=" + timerecord.actual_working_time;
+    }, 'json')
+    .error(function(err) {
+        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    })
+    ;
+    
+    
+    
+    return null;
 }

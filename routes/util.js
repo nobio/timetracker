@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var moment = require('moment');
+//var timzone = require('moment-timezone');
 var TimeEntry  = mongoose.model('TimeEntry');
 var StatsDay = mongoose.model('StatsDay');
 
@@ -89,4 +91,144 @@ exports.setHoliday = function (date, holiday, callback) {
         }
     });
 }
+
+/* ================================================================== */
+/* ======================== INTERNAL METHODS ======================== */
+/* ================================================================== */
+
+/*
+ * loads the TimeEntries from the given day and checking, denpending on direction,
+ *   when direction == "enter" -> the last entry of this given day must either not exist or be "go"; otherwise -> error
+ *   when direction == "go"    -> the last entry of this given day must be "enter"; if no entry exists or the last was "go" -> error
+ *   dt is expected in ISO format
+ */
+exports.validateRequest = function(direction, dt, callback) {
+    
+    this.getLastTimeEntryByDate(dt, function(err, entry) {
+        if(err) {
+            callback(err);
+            return;
+        }
+        
+        // entries should have zero or one entry
+        if(direction == 'enter') {  // enter
+            if(typeof(entry) == 'undefined' || entry.direction == 'go') {
+                callback(); // everything's ok
+            } else {
+                callback(new Error('When entering there must be either no entry or a "go" entry earlier this day'));
+            }
+        } else { // go
+            if(typeof(entry) !== 'undefined' && entry.direction == 'enter') {
+                callback(); // everything's ok
+            } else {
+                callback(new Error('When leaving there must be an "enter" entry earlier this day'));
+            }
+        }
+    });
+}
+
+/*
+ * reads the last entry for a given date
+ */
+/*
+exports.getLastTimeEntryByDate = function(dt, callback) {
+    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
+    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    
+    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    
+    TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
+    .skip(0)
+    .limit(1)
+    .sort({entry_date: -1})
+    .exec(function(err, docs) {
+        if(docs.length == 0) {
+            callback(err);
+        } else {
+            callback(err, docs[0]);
+        }
+    });
+}
+ */
+
+/*
+ * reads all time entries for a given date
+ */
+exports.getTimeEntriesByDate = function(dt, callback) {
+    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    
+    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
+    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    
+    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    
+    TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
+    .skip(0)
+    .sort({entry_date: 1})
+    .exec(function(err, timeentries) {
+        if(err) {
+            callback(err);
+        } else {
+            callback(err, timeentries);
+        }
+    });
+}
+
+/*
+ * reads the number of all TimeEntries in database
+ */
+exports.getNumberOfTimeEntries = function(callback) {
+    
+    TimeEntry.find(function(err, timeentries) {
+        if(err) {
+            callback(err);
+        } else {
+            callback(err, timeentries.length);
+        }
+    })
+}
+
+/*
+ * returns the aggregated statistics for a given time range defined by start and end
+ */
+exports.getStatsByRange = function(dtStart, dtEnd) {
+    
+    var actual_working_time = -1;
+    var planned_working_time = -1;
+    
+    StatsDay.find({date: {$gte: dtStart, $lt: dtEnd}})
+    .sort({date: -1})
+    .exec(function(err, stats) {
+        stats.forEach(function(stat) {
+            console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
+            actual_working_time += stat.actual_working_time;
+            planned_working_time += stat.planned_working_time;
+        });
+        console.log(actual_working_time + " " + planned_working_time);
+        return {actual_working_time:actual_working_time, planned_working_time:planned_working_time};
+    });
+}
+
+
+/*
+ * returns the aggregated statistics for a given day
+ */
+exports.getStatsByDate = function(date) {
+    
+    var actual_working_time = -1;
+    var planned_working_time = -1;
+    
+    StatsDay.find({date: {$gte: dtStart, $lt: dtEnd}})
+    .sort({date: -1})
+    .exec(function(err, stats) {
+        stats.forEach(function(stat) {
+            console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
+            actual_working_time += stat.actual_working_time;
+            planned_working_time += stat.planned_working_time;
+        });
+        console.log(actual_working_time + " " + planned_working_time);
+        return {actual_working_time:actual_working_time, planned_working_time:planned_working_time};
+    });
+}
+
 

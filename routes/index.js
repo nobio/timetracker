@@ -13,7 +13,7 @@ var TimeEntry  = mongoose.model('TimeEntry');
  * calculates the number of entries and renders the index.jade by passing the size
  */
 exports.index = function(req, res) {
-    getNumberOfTimeEntries(function(err, size) {
+    util.getNumberOfTimeEntries(function(err, size) {
         console.log(size);
         res.render('index', {
         size: size
@@ -46,7 +46,7 @@ exports.entry = function(req, res) {
     
     console.log(datetime);
     
-    validateRequest(direction, datetime, function(err) {
+    util.validateRequest(direction, datetime, function(err) {
         
         if(err) {
             console.log('exports.entry received an error: ' + err);
@@ -58,7 +58,7 @@ exports.entry = function(req, res) {
             }).save(function(err, timeentry) {
                 // and now add the size to the monggose-JSON (needs to be converted to an object first)
                 var t = timeentry.toObject();
-                getNumberOfTimeEntries(function(err, size) {
+                util.getNumberOfTimeEntries(function(err, size) {
                     t.size = size;
                     
                     if(err) {
@@ -92,17 +92,18 @@ exports.delete = function(req, res) {
  * lists all Time Entries for a given date (this particular day)
  */
 exports.getAllByDate = function(req, res) {
-    
-    console.log('getAllByDate received date (raw)    : ' + req.params.date);
-    console.log('getAllByDate received date (paresed): ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
-    console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date/1, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
-    console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
-    console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
-    console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
+    /*
+     console.log('getAllByDate received date (raw)    : ' + req.params.date);
+     console.log('getAllByDate received date (paresed): ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
+     console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date/1, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
+     console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
+     console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
+     console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
+     */
     var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
     console.log('getAllByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
-    getTimeEntriesByDate(dt, function(err, timeentries) {
+    util.getTimeEntriesByDate(dt, function(err, timeentries) {
         
         if(err) {
             res.send(500, 'Error while loading Time Entries: ' + err.message);
@@ -143,7 +144,7 @@ exports.storeEntryById = function(req, res) {
 exports.getBusyTime = function(req, res) {
     var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
     
-    getTimeEntriesByDate(dt, function(err, timeentries) {
+    util.getTimeEntriesByDate(dt, function(err, timeentries) {
         if(err) {
             res.send(500, 'Error while reading Time Entry: ' + id + " " + err.message);
         } else {
@@ -180,100 +181,5 @@ exports.getBusyTime = function(req, res) {
     });
 }
 
-
-
-/* ================================================================== */
-/* ======================== INTERNAL METHODS ======================== */
-/* ================================================================== */
-
-/*
- * loads the TimeEntries from the given day and checking, denpending on direction,
- *   when direction == "enter" -> the last entry of this given day must either not exist or be "go"; otherwise -> error
- *   when direction == "go"    -> the last entry of this given day must be "enter"; if no entry exists or the last was "go" -> error
- *   dt is expected in ISO format
- */
-function validateRequest(direction, dt, callback) {
-    
-    getLastTimeEntryByDate(dt, function(err, entry) {
-        if(err) {
-            callback(err);
-            return;
-        }
-        
-        // entries should have zero or one entry
-        if(direction == 'enter') {  // enter
-            if(typeof(entry) == 'undefined' || entry.direction == 'go') {
-                callback(); // everything's ok
-            } else {
-                callback(new Error('When entering there must be either no entry or a "go" entry earlier this day'));
-            }
-        } else { // go
-            if(typeof(entry) !== 'undefined' && entry.direction == 'enter') {
-                callback(); // everything's ok
-            } else {
-                callback(new Error('When leaving there must be an "enter" entry earlier this day'));
-            }
-        }
-    });
-}
-
-/*
- * reads the last entry for a given date
- */
-function getLastTimeEntryByDate(dt, callback) {
-    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
-    
-    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
-    
-    TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
-    .skip(0)
-    .limit(1)
-    .sort({entry_date: -1})
-    .exec(function(err, docs) {
-        if(docs.length == 0) {
-            callback(err);
-        } else {
-            callback(err, docs[0]);
-        }
-    });
-}
-
-/*
- * reads all time entries for a given date
- */
-function getTimeEntriesByDate(dt, callback) {
-    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
-    
-    var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
-    
-    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
-    
-    TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
-    .skip(0)
-    .sort({entry_date: 1})
-    .exec(function(err, timeentries) {
-        if(err) {
-            callback(err);
-        } else {
-            callback(err, timeentries);
-        }
-    });
-}
-
-/*
- * reads the number of all TimeEntries in database
- */
-function getNumberOfTimeEntries(callback) {
-    
-    TimeEntry.find(function(err, timeentries) {
-        if(err) {
-            callback(err);
-        } else {
-            callback(err, timeentries.length);
-        }
-    })
-}
 
 

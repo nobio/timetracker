@@ -37,7 +37,7 @@ var StatsDay = mongoose.model('StatsDay');
  * deletes all TimeEntry-items from database. This should only be used during development time
  * and later either deleted or put behind some special user privileges
  *
- * curl -X DELETE http://localhost:30000/entry
+ * curl -X DELETE http://localhost:30000/entries
  */
 exports.deleteAll = function(req, res) {
     var size;
@@ -54,12 +54,34 @@ exports.deleteAll = function(req, res) {
 
 
 /*
- * calculates the statistics for today +/- one month
+ * calculates the statistics for today +/- one month and stores them in database
  *
  * curl -X PUT http://localhost:30000/stats
  */
 exports.calcStats = function(req, res) {
-    res.send(null);
+    TimeEntry.aggregate( [ { $group: { _id:0, minAge: { $min: "$entry_date"} } } ] )
+    .exec(function(err, timeentries) {
+        if(err) {
+            res.send(500, 'Error while loading Time Entries: ' + err.message);
+        } else {
+            if(timeentries.length === 0) {
+                res.send(200, 'no time entries yet available. Please enter some...');
+            } else {
+                console.log(timeentries[0]);
+                util.getTimeEntriesByDate(timeentries[0], function(err, entries) {
+                    if(err) {
+                        res.send(500, err.message);
+                    } else {
+                        console.log(entries);
+                        entries.forEach(function(entry) {
+                            
+                        });
+                    }
+                });
+            }}
+    });
+    
+      res.send(null);
 }
 
 /*
@@ -104,7 +126,7 @@ exports.setHoliday = function (req, res) {
             res.send('ok');
         }
     });
- }
+}
 
 
 /*
@@ -165,6 +187,24 @@ exports.setRandomTimeEntries = function (req, res) {
 }
 
 /*
+ * returns the aggregated statistics for a given time day
+ *
+ *  curl -X GET http://localhost:30000/stats/1391295600000
+ */
+exports.getStatsDay = function(req, res) {
+    console.log(req.params.date);
+    
+    var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
+    var dtStart = moment(dt); dtStart.days(0);
+    var dtEnd = moment(dtStart).add('months', '1');
+    
+    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    
+    
+    res.send(util.getStatsByRange(dtStart, dtEnd));
+}
+
+/*
  * generic Maintain function
  *
  * curl -X GET http://localhost:30000/admin/maintain
@@ -178,3 +218,4 @@ exports.maintain = function(req, res) {
                      });
     res.send(null);
 }
+

@@ -30,6 +30,9 @@ block content
                 ,datepicker:true
             });
             $('#datepicker').val(moment().format('DD.MM.YYYY'));
+
+            $('#month_to_display').val(moment().format('MMMM YYYY'));
+
         })
 
 
@@ -61,5 +64,16 @@ block content
         tr
             td
                 input(type='button', value='Feiertag setzen', 
-                    onclick='maintainHoliday($("#datepicker").val(), $("input[name=holiday]:checked").val());')
+                    onclick='maintainHoliday($("#datepicker").val(), $("input[id=holiday]:checked").val());')
 
+    input#month_to_display(type='text')
+    table#table_stats_day
+        th
+            input(type='button', value='<', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), -1)')
+        th Datum
+        th ist Feiertag
+        th Soll
+        th Ist
+        th Differenz
+        th
+            input(type='button', value='>', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), 1)')

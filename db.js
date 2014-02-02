@@ -47,7 +47,7 @@ var schema   = mongoose.Schema;
 // TimeEntry
 var directions = 'enter go'.split(' ')
 var TimeEntry = new schema({
-entry_date:   {type: Date, required: true, default: Date.now, index: true}
+      entry_date:   {type: Date, required: true, default: Date.now, index: true}
     , direction:    {type: String, enum: directions, required: true}
     , last_changed: {type: Date, default: Date.now, required: true}
 });
@@ -67,7 +67,14 @@ mongoose.model('StatsDay', StatsDay);
 
 var mongodb_url = dburl();
 
-console.log('connecting to mongodb on ' + mongodb_url);
-mongoose.connect(mongodb_url, { server: { poolSize: 2 }});
+var options = {
+db: { native_parser: true },
+server: { poolSize: 2 },
+server: { socketOptions: { keepAlive: 1 } },
+replset: { socketOptions: { keepAlive: 1 } }
+}
+
+console.log('connecting to mongodb on ' + mongodb_url + ' with options ' + JSON.stringify(options));
+mongoose.connect(mongodb_url, options);
 console.log('connected to mongodb');
 
