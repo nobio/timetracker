@@ -127,10 +127,54 @@ exports.validateRequest = function(direction, dt, callback) {
     });
 }
 
+exports.getBusytimeByDate = function(dt, callback) {
+    
+    // first get all entries for this day....
+    this.getTimeEntriesByDate(dt, function(err, timeentries) {
+        
+        if(err) {
+            callback(new Error('Error while reading Time Entry: ' + id + " " + err.message));
+        } else {
+            
+            if(timeentries.length === 0) {
+                
+                callback(new Error('Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')'), 0);
+                
+            } else if(timeentries.length % 2 !== 0) {
+                
+                callback(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0);
+                
+            } else {
+                
+                var busytime;
+                for (var n = timeentries.length - 1; n > 0; n-=2) {
+                    // this must be a go-event
+                    if(timeentries[n].direction !== 'go') {
+                        callback(new Error('Die Reihenfolge der Kommen/Gehen-Einträge am ' + dt.format('DD.MM.YYYY') + ' scheint nicht zu stimmen.'), 0);
+                    }
+                    
+                    var end = timeentries[n].entry_date;
+                    var start = timeentries[n-1].entry_date;
+                    var diff = moment.duration(moment(end).subtract(moment(start)));
+                    //console.log("duration: " + diff);
+                    
+                    if(!busytime) {
+                        busytime = diff;
+                    } else {
+                        busytime.add(diff, 'millisecond');
+                    }
+                }
+                callback(null, dt, busytime);
+            }
+            
+        }
+        
+    });
+};
+
 /*
  * reads the last entry for a given date
  */
-/*
 exports.getLastTimeEntryByDate = function(dt, callback) {
     var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
     var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
@@ -149,18 +193,17 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
         }
     });
 }
- */
 
 /*
  * reads all time entries for a given date
  */
 exports.getTimeEntriesByDate = function(dt, callback) {
-    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
     var dtStart = moment(dt).tz("Europe/Berlin"); dtStart.hours(0); dtStart.minutes(0); dtStart.seconds(0);
     var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
     
-    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     
     TimeEntry.find({entry_date: {$gte: dtStart, $lt: dtEnd}})
     .skip(0)
@@ -192,7 +235,7 @@ exports.getNumberOfTimeEntries = function(callback) {
  * returns the aggregated statistics for a given time range defined by start and end
  */
 exports.getStatsByRange = function(dtStart, dtEnd) {
-    
+
     var actual_working_time = -1;
     var planned_working_time = -1;
     
@@ -200,11 +243,11 @@ exports.getStatsByRange = function(dtStart, dtEnd) {
     .sort({date: -1})
     .exec(function(err, stats) {
         stats.forEach(function(stat) {
-            //            console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
+            //console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time);
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
         });
-        //        console.log(actual_working_time + " " + planned_working_time);
+        //console.log(actual_working_time + " " + planned_working_time);
         return {actual_working_time:actual_working_time, planned_working_time:planned_working_time};
     });
 }
@@ -231,4 +274,16 @@ exports.getStatsByDate = function(date) {
     });
 }
 
+exports.getFirstTimeEntry = function(callback) {
+    TimeEntry.aggregate( [ { $group: { _id:0, age: { $min: "$entry_date"} } } ] )
+    .exec(function(err, timeentries) {
+        callback(err, timeentries[0]);
+    });
+};
 
+exports.getLastTimeEntry = function(callback) {
+    TimeEntry.aggregate( [ { $group: { _id:0, age: { $max: "$entry_date"} } } ] )
+    .exec(function(err, timeentries) {
+        callback(err, timeentries[0]);
+    });
+};

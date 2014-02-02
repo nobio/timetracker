@@ -144,40 +144,12 @@ exports.storeEntryById = function(req, res) {
 exports.getBusyTime = function(req, res) {
     var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
     
-    util.getTimeEntriesByDate(dt, function(err, timeentries) {
+    util.getBusytimeByDate(dt, function(err, d, busytime) {
         if(err) {
-            res.send(500, 'Error while reading Time Entry: ' + id + " " + err.message);
+            res.send(500, 'Error while reading Time Entries for day: ' + d.format('DD.MM.YYYY'));
         } else {
-            
-            if(timeentries.length === 0) {
-                res.send(500, 'Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')');
-            } else if(timeentries.length % 2 !== 0) {
-                res.send(500, 'Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen');
-            } else {
-                var busytime;
-                for (var n = timeentries.length - 1; n > 0; n-=2) {
-                    // this must be a go-event
-                    if(timeentries[n].direction !== 'go') {
-                        res.send(500, 'Die Reihenfolge der Kommen/Gehen-Einträge scheint nicht zu stimmen.');
-                    }
-                    var end = timeentries[n].entry_date;
-                    var start = timeentries[n-1].entry_date;
-                    var diff = moment.duration(moment(end).subtract(moment(start)));
-                    console.log("duration: " + diff);
-                    
-                    if(!busytime) {
-                        busytime = diff;
-                    } else {
-                        busytime.add(diff, 'millisecond');
-                    }
-                }
-                var busy = {"duration": busytime._milliseconds, "time": {"hours": busytime.get('hours'), "minutes":busytime.get('minutes'), "seconds": busytime.get('seconds')}};
-                console.log(busy);
-                res.send(busy);
-            }
-            
+            res.send(moment.duration(busytime));
         }
-        
     });
 }
 

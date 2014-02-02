@@ -92,13 +92,13 @@ function getTimeEntriesByDate(dt) {
         
         $.ajax({
         type: 'GET',
-        url: '/entry/dt/' + dt,
+        url: '/entries/dt/' + dt,
         dataType: 'json',
         })
         .done(function(timeentries) {
             var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYY');
             if(duration) {
-                html += ' - Anwesenheit: ' + moment(duration.duration-60*60*1000).format('HH:mm:ss') + ' Stunden';
+                html += ' - Anwesenheit: ' + moment(duration._milliseconds-60*60*1000).format('HH:mm:ss') + ' Stunden';
             }
             html += '<table><th>Datum</th>';
             html += '<th>Kommen/Gehen</th>';
@@ -153,7 +153,7 @@ function getBusyTime(dt, callback) {
     
     $.ajax({
     type: 'GET',
-    url: '/entry/busy/' + dt,
+    url: '/entries/busy/' + dt,
     dataType: 'json',
     })
     .done(function(duration) {
@@ -203,7 +203,6 @@ function deleteTimeEntryById(id) {
 function nextStatsDay(tableref, month, direction) {
     var date = moment(month.val(), 'MMMM YYYY');
     var nextDate = date.add('months', direction);
-    alert(nextDate);
     month.val(nextDate.format('MMMM YYYY')); // setting nextDate as value of text field
     
     $.ajax({

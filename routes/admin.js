@@ -59,29 +59,37 @@ exports.deleteAll = function(req, res) {
  * curl -X PUT http://localhost:30000/stats
  */
 exports.calcStats = function(req, res) {
-    TimeEntry.aggregate( [ { $group: { _id:0, minAge: { $min: "$entry_date"} } } ] )
-    .exec(function(err, timeentries) {
-        if(err) {
-            res.send(500, 'Error while loading Time Entries: ' + err.message);
-        } else {
-            if(timeentries.length === 0) {
-                res.send(200, 'no time entries yet available. Please enter some...');
-            } else {
-                console.log(timeentries[0]);
-                util.getTimeEntriesByDate(timeentries[0], function(err, entries) {
+
+    util.getFirstTimeEntry(function(err, firstTimeentry) {
+        if(!firstTimeentry) {
+            res.send({message:'no entries in database'});
+            return;
+        }
+        
+        util.getLastTimeEntry(function(err, lastTimeentry) {
+            
+            var date = moment(firstTimeentry.age);
+            date.hours(0);date.minutes(0);date.seconds(0);
+
+            while (date <= moment(lastTimeentry.age)) {
+                console.log('calculating for day ' + date.format('YYYY-MM-DD'));
+                var dt = moment(date);
+                
+                util.getBusytimeByDate(dt, function(err, d, busytime) {
                     if(err) {
-                        res.send(500, err.message);
+                        console.log('****** ' + d + ': ' + err);
                     } else {
-                        console.log(entries);
-                        entries.forEach(function(entry) {
-                            
-                        });
+                        console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
                     }
                 });
-            }}
+
+                date = date.add('day', '1');
+            }
+ 
+            res.send({message:'Hi Schernoo'});
+        });
+        
     });
-    
-      res.send(null);
 }
 
 /*
@@ -192,10 +200,7 @@ exports.setRandomTimeEntries = function (req, res) {
  *  curl -X GET http://localhost:30000/stats/1391295600000
  */
 exports.getStatsDay = function(req, res) {
-    console.log(req.params.date);
-    
-    var dt = util.stripdownToDate(moment.unix(req.params.date/1000));
-    var dtStart = moment(dt); dtStart.days(0);
+    var dtStart = moment.unix(req.params.date/1000);
     var dtEnd = moment(dtStart).add('months', '1');
     
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
