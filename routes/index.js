@@ -121,7 +121,7 @@ exports.getEntryById = function(req, res) {
     
     TimeEntry.findById(req.params.id, function(err, timeentry) {
         if(err) {
-            res.send(500, 'Error while reading Time Entry: ' + id + " " + err.message);
+            res.send(500, 'Error while reading Time Entry: ' + id + " " + err);
         } else {
             res.send(timeentry);
         }
@@ -146,7 +146,7 @@ exports.getBusyTime = function(req, res) {
     
     util.getBusytimeByDate(dt, function(err, d, busytime) {
         if(err) {
-            res.send(500, 'Error while reading Time Entries for day: ' + d.format('DD.MM.YYYY'));
+            res.send(500, 'Error while reading Time Entries for day: ' + dt.format('DD.MM.YYYY'));
         } else {
             res.send(moment.duration(busytime));
         }
