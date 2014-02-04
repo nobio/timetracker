@@ -77,8 +77,10 @@ exports.calcStats = function(req, res) {
                 
                 util.getBusytimeByDate(dt, function(err, d, busytime) {
                     if(err) {
+                        // when this is not a working day, ignore it; otherwise set "isComplete" to false
                         console.log('****** ' + d + ': ' + err);
                     } else {
+                        // update the StatsDay entry for this day
                         console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
                     }
                 });
