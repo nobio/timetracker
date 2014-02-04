@@ -106,7 +106,7 @@ exports.getAllByDate = function(req, res) {
     util.getTimeEntriesByDate(dt, function(err, timeentries) {
         
         if(err) {
-            res.send(500, 'Error while loading Time Entries: ' + err.message);
+            res.send(500, err);
         } else {
             res.send(timeentries);
         }
@@ -146,7 +146,7 @@ exports.getBusyTime = function(req, res) {
     
     util.getBusytimeByDate(dt, function(err, d, busytime) {
         if(err) {
-            res.send(500, 'Error while reading Time Entries for day: ' + dt.format('DD.MM.YYYY'));
+            res.send(500, err.toString());
         } else {
             res.send(moment.duration(busytime));
         }

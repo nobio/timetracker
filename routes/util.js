@@ -234,7 +234,7 @@ exports.getNumberOfTimeEntries = function(callback) {
 /*
  * returns the aggregated statistics for a given time range defined by start and end
  */
-exports.getStatsByRange = function(dtStart, dtEnd) {
+exports.getStatsByRange = function(dtStart, dtEnd, callback) {
 
     var actual_working_time = -1;
     var planned_working_time = -1;
@@ -247,8 +247,8 @@ exports.getStatsByRange = function(dtStart, dtEnd) {
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
         });
-        //console.log(actual_working_time + " " + planned_working_time);
-        return {actual_working_time:actual_working_time, planned_working_time:planned_working_time};
+        console.log({actual_working_time:actual_working_time, planned_working_time:planned_working_time});
+        callback(null, {actual_working_time:actual_working_time, planned_working_time:planned_working_time});
     });
 }
 

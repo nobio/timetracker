@@ -212,7 +212,7 @@ function nextStatsDay(tableref, month, direction) {
     })
     .done(function(timerecord) {
         console.log(timerecord);
-        result.innerHTML = "planned_working_time=" + timerecord.planned_working_time + "; actual_working_time=" + timerecord.actual_working_time;
+        result.innerHTML = "Planned=" + timerecord.planned_working_time + "; Actual: " + timerecord.actual_working_time;
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
