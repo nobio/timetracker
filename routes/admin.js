@@ -82,13 +82,45 @@ exports.calcStats = function(req, res) {
                     } else {
                         // update the StatsDay entry for this day
                         console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
+			
+			StatsDay.findOneAndUpdate(
+				{date: d},
+				{
+//			  		date: d,
+			    		actual_working_time: busytime/1,
+					planned_working_time:"7.8",
+					is_working_day:true,
+					is_complete:true,
+					last_changed:new Date()			
+				},
+				{new: true},
+				function(err, statsday) {
+					if(err) {
+						console.log(err);
+					} else {
+						console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
+						if(statsday == null) {
+							new StatsDay({
+					  		date: d,
+					    		actual_working_time: busytime/1,
+							planned_working_time: '7.8',
+							is_working_day:true,
+							is_complete:true,
+							last_changed:new Date()			
+					    		}).save(function(err) {
+								console.log(err);
+							});
+						}
+					}
+				} 
+			);
                     }
                 });
 
                 date = date.add('day', '1');
             }
  
-            res.send({message:'Hi Schernoo'});
+            res.send({firstTimeentry:firstTimeentry, lastTimeentry:lastTimeentry});
         });
         
     });
