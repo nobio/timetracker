@@ -200,20 +200,33 @@ function deleteTimeEntryById(id) {
     
 }
 
-function nextStatsDay(tableref, month, direction) {
-    var date = moment(month.val(), 'MMMM YYYY');
-    var nextDate = date.add('months', direction);
-    month.val(nextDate.format('MMMM YYYY')); // setting nextDate as value of text field
+function nextStatsDay(tableref, time, timeUnit, direction) {
+    var date;
+    var nextDate;
+    if(timeUnit === 'month') {
+        date = moment(time.val(), 'MMMM YYYY');
+        nextDate = date.add('months', direction);
+        time.val(nextDate.format('MMMM YYYY')); // setting nextDate as value of text field
+    } else if (timeUnit === 'week') {
+        date = moment(time.val(), 'W');
+        nextDate = date.add('weeks', direction);
+        time.val(nextDate.format('W')); // setting nextDate as value of text field
+    } else if (timeUnit === 'day') {
+        date = moment(time.val(), 'DD.MM.YYYY');
+        nextDate = date.add('days', direction);
+        time.val(nextDate.format('DD.MM.YYYY')); // setting nextDate as value of text field
+    }
     
     $.ajax({
     type: 'GET',
     url: '/stats/' + nextDate,
+    data: { 'timeUnit': timeUnit },
     dataType: 'json',
     })
     .done(function(timerecord) {
-        var plannedTime = moment.duration(timerecord.planned_working_time);
-        var actualTime = moment.duration(timerecord.actual_working_time);
-        result.innerHTML = "<table><tr><td>Planned time: </td><td>" + plannedTime.days() + " days " + plannedTime.hours() + ": " + plannedTime.minutes() + " hours</td></tr><tr/><td>Actual time: </td><td>" + actualTime.days() + " days " + actualTime.hours() + ":" + actualTime.minutes() + " hours</td></tr></table>";
+        var plannedTime = Math.round(timerecord.planned_working_time/1000/60/60 * 10000) / 10000;
+        var actualTime = Math.round(timerecord.actual_working_time/1000/60/60 * 10000) / 10000;
+        result.innerHTML = "<table><tr><td>Planned time: </td><td>" + plannedTime + " hours</td></tr><tr/><td>Actual time: </td><td>" + actualTime + " hours</td></tr></table>";
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;

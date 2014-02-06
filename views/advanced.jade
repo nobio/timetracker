@@ -32,9 +32,10 @@ block content
             $('#datepicker').val(moment().format('DD.MM.YYYY'));
 
             $('#month_to_display').val(moment().format('MMMM YYYY'));
+            
+            nextStatsDay($("#table_stats_day"), $("#month_to_display"), "month", "0");
 
         })
-
 
     h3 Bitte Datum und Uhrzeit auswählen
     table
@@ -66,14 +67,19 @@ block content
                 input(type='button', value='Feiertag setzen', 
                     onclick='maintainHoliday($("#datepicker").val(), $("input[id=holiday]:checked").val());')
 
-    input#month_to_display(type='text')
     table#table_stats_day
         th
-            input(type='button', value='<', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), -1)')
-        th Datum
-        th ist Feiertag
-        th Soll
-        th Ist
-        th Differenz
+            input(type='button', value='<', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "-1")')
         th
-            input(type='button', value='>', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), 1)')
+            input#month_to_display(type='text')
+        th
+            input(type='button', value='>', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "1")')
+        th
+            input(type='radio', name='time_unit', value='day' onclick='$("#month_to_display").val(moment().format("DD.MM.YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
+            | day
+        th
+            input(type='radio', name='time_unit', value='week' onclick='$("#month_to_display").val(moment().format("W")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
+            | week
+        th
+            input(type='radio', name='time_unit', value='month' checked, onclick='$("#month_to_display").val(moment().format("MMMM YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0");')
+            | month

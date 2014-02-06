@@ -237,7 +237,15 @@ exports.setRandomTimeEntries = function (req, res) {
  */
 exports.getStatsDay = function(req, res) {
     var dtStart = moment.unix(req.params.date/1000);
-    var dtEnd = moment(dtStart).add('months', '1');
+    var dtEnd;
+    
+    if('month' === req.param('timeUnit')) {
+        dtEnd = moment(dtStart).add('months', '1');
+    } else if('week' === req.param('timeUnit')) {
+        dtEnd = moment(dtStart).add('weeks', '1');
+    } else if('day' === req.param('timeUnit')) {
+        dtEnd = moment(dtStart).add('days', '1');
+    }
     
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     
