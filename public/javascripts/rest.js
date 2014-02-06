@@ -96,7 +96,7 @@ function getTimeEntriesByDate(dt) {
         dataType: 'json',
         })
         .done(function(timeentries) {
-            var html = '<b>Datum: ' + moment(dt).format('DD.MM.YYYY');
+            var html;
             if(duration) {
                 html += ' - Anwesenheit: ' + moment(duration._milliseconds-60*60*1000).format('HH:mm:ss') + ' Stunden';
             }
