@@ -75,7 +75,7 @@ block content
         th
             input(type='button', value='>', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "1")')
         th
-            input(type='radio', name='time_unit', value='day' onclick='$("#month_to_display").val(moment().format("DD.MM.YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
+            input(type='radio', name='time_unit', value='day' onclick='$("#month_to_display").val(moment().format("ddd DD.MM.YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
             | day
         th
             input(type='radio', name='time_unit', value='week' onclick='$("#month_to_display").val(moment().format("W")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')

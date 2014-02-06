@@ -212,9 +212,9 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         nextDate = date.add('weeks', direction);
         time.val(nextDate.format('W')); // setting nextDate as value of text field
     } else if (timeUnit === 'day') {
-        date = moment(time.val(), 'DD.MM.YYYY');
+        date = moment(time.val(), 'ddd DD.MM.YYYY');
         nextDate = date.add('days', direction);
-        time.val(nextDate.format('DD.MM.YYYY')); // setting nextDate as value of text field
+        time.val(nextDate.format('ddd DD.MM.YYYY')); // setting nextDate as value of text field
     }
     
     $.ajax({
