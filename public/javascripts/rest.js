@@ -211,8 +211,9 @@ function nextStatsDay(tableref, month, direction) {
     dataType: 'json',
     })
     .done(function(timerecord) {
-        console.log(timerecord);
-        result.innerHTML = "planned_working_time=" + timerecord.planned_working_time + "; actual_working_time=" + timerecord.actual_working_time;
+        var plannedTime = moment.duration(timerecord.planned_working_time);
+        var actualTime = moment.duration(timerecord.actual_working_time);
+        result.innerHTML = "<table><tr><td>Planned time: </td><td>" + plannedTime.days() + " days " + plannedTime.hours() + ": " + plannedTime.minutes() + " hours</td></tr><tr/><td>Actual time: </td><td>" + actualTime.days() + " days " + actualTime.hours() + ":" + actualTime.minutes() + " hours</td></tr></table>";
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
