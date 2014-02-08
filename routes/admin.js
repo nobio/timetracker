@@ -61,7 +61,7 @@ exports.deleteAll = function(req, res) {
  * curl -X PUT http://localhost:30000/stats
  */
 exports.calcStats = function(req, res) {
-    
+    StatsDay.remove();  // delete all statisctics entries first
     util.getFirstTimeEntry(function(err, firstTimeentry) {
         if(!firstTimeentry) {
             res.send({message:'no entries in database'});

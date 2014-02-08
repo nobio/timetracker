@@ -22,8 +22,9 @@ block content
             navigator.geolocation.watchPosition(function(position) {
                 $('#currentLat').text(position.coords.latitude);
                 $('#currentLon').text(position.coords.longitude);
-                var dist = calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude);
-                $('#distance').text(dist);
+                var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceKm').text(dist.kilometer);
+                $('#distanceM').text(dist.meter);
             });
           }
 
@@ -32,7 +33,7 @@ block content
           // http://www.movable-type.co.uk/scripts/latlong.html
           // Under Creative Commons License http://creativecommons.org/licenses/by/3.0/
           function calculateDistance(lat1, lon1, lat2, lon2) {
-              var R = 6371; // km
+              var R = 6371; // km -> m
               var dLat = (lat2-lat1).toRad();
               var dLon = (lon2-lon1).toRad();
               var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -43,6 +44,13 @@ block content
               return d;
           }
 
+          function formatDistance(distOrig) {
+              var distKm = parseInt(distOrig);
+              var distM = (1000 * distOrig) - distKm;
+              distM = Math.round(distM * 100) / 100;
+
+              return {kilometer:distKm, meter:distM};
+          }
           Number.prototype.toRad = function() {
               return this * Math.PI / 180;
           }
@@ -61,9 +69,11 @@ block content
             span#currentLon ---
             | &deg;
 
-        p Distance from starting location:
-            span#distance
-            | &nbsp; km
+        p Distance from starting location:&nbsp;
+            span#distanceKm
+            | km &nbsp;
+            span#distanceM
+            | m
 
 
 
