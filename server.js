@@ -52,7 +52,7 @@ app.get('/entries/dt/:date', routes.getAllByDate)
 app.get('/entries/busy/:date', routes.getBusyTime)
 
 // admin and statistics stuff
-app.delete('/entries', admin.deleteAll);
+app.delete('/entries', admin.deleteAllTimeEntries);
 app.put('/admin/rnd_entries', admin.setRandomTimeEntries)
 app.put('/admin/holiday', admin.setHoliday)
 app.put('/admin/holidays', admin.setHolidays)
@@ -60,6 +60,7 @@ app.get('/admin/maintain', admin.maintain)
 
 app.put('/stats', admin.calcStats)
 app.get('/stats/:date', admin.getStatsDay)
+app.delete('/stats', admin.deleteAllStatsDays)
 
 // start the web service
 console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');

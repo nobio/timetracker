@@ -243,7 +243,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
     .sort({date: -1})
     .exec(function(err, stats) {
         stats.forEach(function(stat) {
-            //console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time);
+            // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time);
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
         });
@@ -287,3 +287,17 @@ exports.getLastTimeEntry = function(callback) {
         callback(err, timeentries[0]);
     });
 };
+
+exports.deleteAllStatsDays = function(callback) {
+    var size;
+    StatsDay.find(function(err, statsdays) {
+        size = statsdays.length;
+        statsdays.forEach(function(statsday) {
+            //console.log('removing ' + statsday);
+            statsday.remove();
+        });
+        console.log('deleted ' + size + ' items');
+        callback(null, { size: size });
+    });
+}
+

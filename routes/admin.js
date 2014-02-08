@@ -41,7 +41,7 @@ var DEFAULT_WORKING_TIME = 7.8 * 60*60*1000;  // 7.8 hours in milli seconds
  *
  * curl -X DELETE http://localhost:30000/entries
  */
-exports.deleteAll = function(req, res) {
+exports.deleteAllTimeEntries = function(req, res) {
     var size;
     TimeEntry.find(function(err, timeentries) {
         size = timeentries.length;
@@ -54,6 +54,21 @@ exports.deleteAll = function(req, res) {
     });
 }
 
+/*
+ * deletes all StatsDay-items from database. This should only be used during development time
+ * and later either deleted or put behind some special user privileges
+ *
+ * curl -X DELETE http://localhost:30000/stats
+ */
+exports.deleteAllStatsDays = function(req, res) {
+    util.deleteAllStatsDays(function(err, result) {
+        if(err) {
+            res.send(500, err);
+        } else {
+            res.send(result);
+        }
+    });
+}
 
 /*
  * calculates the statistics for today +/- one month and stores them in database
@@ -61,70 +76,72 @@ exports.deleteAll = function(req, res) {
  * curl -X PUT http://localhost:30000/stats
  */
 exports.calcStats = function(req, res) {
-    StatsDay.remove();  // delete all statisctics entries first
-    util.getFirstTimeEntry(function(err, firstTimeentry) {
-        if(!firstTimeentry) {
-            res.send({message:'no entries in database'});
-            return;
-        }
-        
-        util.getLastTimeEntry(function(err, lastTimeentry) {
-            
-            var date = moment(firstTimeentry.age);
-            date.hours(0);date.minutes(0);date.seconds(0);
-            
-            while (date <= moment(lastTimeentry.age)) {
-                console.log('calculating for day ' + date.format('YYYY-MM-DD'));
-                var dt = moment(date);
-                
-                util.getBusytimeByDate(dt, function(err, d, busytime) {
-                    if(err) {
-                        // when this is not a working day, ignore it; otherwise set "isComplete" to false
-                        console.log('****** ' + d + ': ' + err);
-                    } else {
-                        // update the StatsDay entry for this day
-                        console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
-                        
-                        StatsDay.findOneAndUpdate(
-                                                  {date: d},
-                                                  {
-                                                  //			  		date: d,
-                                                  actual_working_time: busytime/1,
-                                                  planned_working_time:DEFAULT_WORKING_TIME,
-                                                  is_working_day:true,
-                                                  is_complete:true,
-                                                  last_changed:new Date()
-                                                  },
-                                                  {new: true},
-                                                  function(err, statsday) {
-                                                      if(err) {
-                                                          console.log(err);
-                                                      } else {
-                                                          console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
-                                                          if(statsday == null) {
-                                                              new StatsDay({
-                                                              date: d,
-                                                              actual_working_time: busytime/1,
-                                                              planned_working_time: DEFAULT_WORKING_TIME,
-                                                              is_working_day:true,
-                                                              is_complete:true,
-                                                              last_changed:new Date()
-                                                              }).save(function(err) {
-                                                                  console.log(err);
-                                                              });
-                                                          }
-                                                      }
-                                                  }
-                                                  );
-                    }
-                });
-                
-                date = date.add('day', '1');
+    util.deleteAllStatsDays(function(err, result) {
+
+        util.getFirstTimeEntry(function(err, firstTimeentry) {
+            if(!firstTimeentry) {
+                res.send({message:'no entries in database'});
+                return;
             }
             
-            res.send({firstTimeentry:firstTimeentry, lastTimeentry:lastTimeentry});
+            util.getLastTimeEntry(function(err, lastTimeentry) {
+                
+                var date = moment(firstTimeentry.age);
+                date.hours(0);date.minutes(0);date.seconds(0);
+                
+                while (date <= moment(lastTimeentry.age)) {
+                    console.log('calculating for day ' + date.format('YYYY-MM-DD'));
+                    var dt = moment(date);
+                    
+                    util.getBusytimeByDate(dt, function(err, d, busytime) {
+                        if(err) {
+                            // when this is not a working day, ignore it; otherwise set "isComplete" to false
+                            console.log('****** ' + d + ': ' + err);
+                        } else {
+                            // update the StatsDay entry for this day
+                            console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
+                            
+                            StatsDay.findOneAndUpdate(
+                                                      {date: d},
+                                                      {
+                                                      //			  		date: d,
+                                                      actual_working_time: busytime/1,
+                                                      planned_working_time:DEFAULT_WORKING_TIME,
+                                                      is_working_day:true,
+                                                      is_complete:true,
+                                                      last_changed:new Date()
+                                                      },
+                                                      {new: true},
+                                                      function(err, statsday) {
+                                                          if(err) {
+                                                              console.log(err);
+                                                          } else {
+                                                              console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
+                                                              if(statsday == null) {
+                                                                  new StatsDay({
+                                                                  date: d,
+                                                                  actual_working_time: busytime/1,
+                                                                  planned_working_time: DEFAULT_WORKING_TIME,
+                                                                  is_working_day:true,
+                                                                  is_complete:true,
+                                                                  last_changed:new Date()
+                                                                  }).save(function(err) {
+                                                                      console.log(err);
+                                                                  });
+                                                              }
+                                                          }
+                                                      }
+                                                      );
+                        }
+                    });
+                    
+                    date = date.add('day', '1');
+                }
+                
+                res.send({firstTimeentry:firstTimeentry, lastTimeentry:lastTimeentry});
+            });
+            
         });
-        
     });
 }
 
@@ -247,7 +264,7 @@ exports.getStatsDay = function(req, res) {
         dtEnd = moment(dtStart).add('days', '1');
     }
     
-    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
     
     var calculatedBusTime = util.getStatsByRange(dtStart, dtEnd, function(err, calculatedBusyTime) {
         console.log('calculatedBusTime = ' + calculatedBusyTime);
