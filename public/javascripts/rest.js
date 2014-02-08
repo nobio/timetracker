@@ -224,9 +224,10 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
     dataType: 'json',
     })
     .done(function(timerecord) {
-        var plannedTime = Math.round(timerecord.planned_working_time/1000/60/60 * 10000) / 10000;
-        var actualTime = Math.round(timerecord.actual_working_time/1000/60/60 * 10000) / 10000;
-        result.innerHTML = "<table><tr><td>Planned time: </td><td>" + plannedTime + " hours</td></tr><tr/><td>Actual time: </td><td>" + actualTime + " hours</td></tr></table>";
+        var plannedTime = Math.round(timerecord.planned_working_time/1000/60/60 * 100) / 100;
+        var actualTime = Math.round(timerecord.actual_working_time/1000/60/60 * 100) / 100;
+        var diffTime = Math.round((timerecord.actual_working_time - timerecord.planned_working_time)/1000/60/60 * 100) / 100;
+        result.innerHTML = "<table><tr><td>Planned time: </td><td>" + plannedTime + " hours</td></tr><tr/><td>Actual time: </td><td>" + actualTime + " hours</td></tr></tr><tr/><td>Difference: </td><td>" + diffTime + " hours</td></tr></table>";
     }, 'json')
     .error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;
