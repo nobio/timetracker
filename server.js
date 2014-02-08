@@ -41,6 +41,7 @@ app.get('/', routes.index);
 app.get('/admin', routes.admin);
 app.get('/advanced', routes.advanced);
 app.get('/stats', routes.stats);
+app.get('/geo', routes.geoloc);
 
 // restful services
 app.post('/entry', routes.entry);

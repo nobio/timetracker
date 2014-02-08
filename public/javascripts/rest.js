@@ -98,7 +98,7 @@ function getTimeEntriesByDate(dt) {
         .done(function(timeentries) {
             var html;
             if(duration) {
-                html += ' - Anwesenheit: ' + moment(duration._milliseconds-60*60*1000).format('HH:mm:ss') + ' Stunden';
+                html = 'Anwesenheit: ' + moment(duration._milliseconds-60*60*1000).format('HH:mm:ss') + ' Stunden';
             }
             html += '<table><th>Datum</th>';
             html += '<th>Kommen/Gehen</th>';
