@@ -51,21 +51,21 @@ app.post('/entry', routes.entry);
 app.get('/entry/:id', routes.getEntryById);
 app.put('/entry/:id', routes.storeEntryById);
 app.delete('/entry/:id', routes.delete);
-app.get('/entries/dt/:date', routes.getAllByDate)
-app.get('/entries/busy/:date', routes.getBusyTime)
+app.get('/entries/dt/:date', routes.getAllByDate);
+app.get('/entries/busy/:date', routes.getBusyTime);
 
 // admin stuff
 app.delete ('/entries', admin.deleteAllTimeEntries);
-app.put('/admin/rnd_entries', admin.setRandomTimeEntries)
-app.put('/admin/holiday', admin.setHoliday)
-app.put('/admin/holidays', admin.setHolidays)
-app.get('/admin/maintain', admin.maintain)
-app.post('/admin/dump/timeentry', admin.dumpTimeEntry)
+app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
+app.put('/admin/holiday', admin.setHoliday);
+app.put('/admin/holidays', admin.setHolidays);
+app.get('/admin/maintain', admin.maintain);
+app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
 
 // statistics stuff
-app.put('/stats', admin.calcStats)
-app.get('/stats/:date', admin.getStatsDay)
-app.delete ('/stats', admin.deleteAllStatsDays)
+app.put('/stats', admin.calcStats);
+app.get('/stats/:date', admin.getStatsDay);
+app.delete('/stats', admin.deleteAllStatsDays);
 
 // start the web service
 console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');

@@ -2,7 +2,10 @@ extends layout
 block content
     script(type='text/javascript').
       $(document).ready(function() {
+
         var startPos;
+        var workPos = {latitude:49.44843, longitude:11.09182};
+        var homePos = {latitude:49.51414, longitude:10.87549};
       
         if (navigator.geolocation) {
             
@@ -22,9 +25,18 @@ block content
             navigator.geolocation.watchPosition(function(position) {
                 $('#currentLat').text(position.coords.latitude);
                 $('#currentLon').text(position.coords.longitude);
+
                 var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
                 $('#distanceKm').text(dist.kilometer);
                 $('#distanceM').text(dist.meter);
+                
+                var distWork = formatDistance(calculateDistance(workPos.latitude, workPos.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceWorkKm').text(distWork.kilometer);
+                $('#distanceWorkM').text(distWork.meter);
+
+                var distHome = formatDistance(calculateDistance(homePos.latitude, homePos.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceHomeKm').text(distHome.kilometer);
+                $('#distanceHomeM').text(distHome.meter);
             });
           }
 
@@ -46,7 +58,7 @@ block content
 
           function formatDistance(distOrig) {
               var distKm = parseInt(distOrig);
-              var distM = (1000 * distOrig) - distKm;
+              var distM = (distOrig - distKm) * 1000;
               distM = Math.round(distM * 100) / 100;
 
               return {kilometer:distKm, meter:distM};
@@ -74,6 +86,19 @@ block content
             | km &nbsp;
             span#distanceM
             | m
+
+        p Distance from work:&nbsp;
+            span#distanceWorkKm
+            | km &nbsp;
+            span#distanceWorkM
+            | m
+
+        p Distance from home:&nbsp;
+            span#distanceHomeKm
+            | km &nbsp;
+            span#distanceHomeM
+            | m
+
 
 
 
