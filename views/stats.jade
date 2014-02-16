@@ -29,6 +29,7 @@ block content
             var opts = {
                 "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
                 "tickFormatX": function (x) { return d3.time.format('%d')(x); },
+                "tickHintX": 15,
                 "tickHintY": 5,
             };
             busyChartVariable = new xChart('line-dotted', data, '#busyChart', opts);
@@ -56,12 +57,15 @@ block content
             input(type='radio', name='time_unit', value='day' onclick='$("#month_to_display").val(moment().format("ddd DD.MM.YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
             | day
         th
-            input(type='radio', name='time_unit', value='week' onclick='$("#month_to_display").val(moment().format("W")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
+            input(type='radio', name='time_unit', value='week', onclick='$("#month_to_display").val(moment().format("W")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0")')
             | week
         th
             input(type='radio', name='time_unit', value='month' checked, onclick='$("#month_to_display").val(moment().format("MMMM YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0");')
             | month
-        
+        th
+            input(type='radio', name='time_unit', value='year', onclick='$("#month_to_display").val(moment().format("YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0");')
+            | year
+
     table
         tr
             td

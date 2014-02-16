@@ -199,9 +199,14 @@ function deleteTimeEntryById(id) {
 function nextStatsDay(tableref, time, timeUnit, direction) {
     var date;
     var nextDate;
-    if (timeUnit === 'month') {
+    if (timeUnit === 'year') {
+        date = moment(time.val(), 'YYYY');
+        nextDate = date.add('years', direction);
+        time.val(nextDate.format('YYYY'));
+        // setting nextDate as value of text field
+    } else if (timeUnit === 'month') {
         date = moment(time.val(), 'MMMM YYYY');
-        nextDate = date.add('months', direction);
+        nextDate = date.add('weeks', direction);
         time.val(nextDate.format('MMMM YYYY'));
         // setting nextDate as value of text field
     } else if (timeUnit === 'week') {

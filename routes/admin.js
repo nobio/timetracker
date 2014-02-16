@@ -261,7 +261,9 @@ exports.getStatsDay = function(req, res) {
     var dtStart = moment.unix(req.params.date / 1000);
     var dtEnd;
 
-    if ('month' === timeUnit) {
+    if ('year' === timeUnit) {
+        dtEnd = moment(dtStart).add('years', '1');
+    } else if ('month' === timeUnit) {
         dtEnd = moment(dtStart).add('months', '1');
     } else if ('week' === timeUnit) {
         dtEnd = moment(dtStart).add('weeks', '1');
