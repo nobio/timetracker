@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
 var fs = require('fs');
-var timzone = require('moment-timezone');
 var util = require('./util');
 
 var TimeEntry = mongoose.model('TimeEntry');
@@ -74,7 +73,7 @@ exports.deleteAllStatsDays = function(req, res) {
  */
 exports.calcStats = function(req, res) {
     util.deleteAllStatsDays(function(err, result) {
-
+        
         util.getFirstTimeEntry(function(err, firstTimeentry) {
             if (!firstTimeentry) {
                 res.send({
@@ -82,18 +81,18 @@ exports.calcStats = function(req, res) {
                 });
                 return;
             }
-
+            
             util.getLastTimeEntry(function(err, lastTimeentry) {
-
+                
                 var date = moment(firstTimeentry.age);
                 date.hours(0);
                 date.minutes(0);
                 date.seconds(0);
-
+                
                 while (date <= moment(lastTimeentry.age)) {
                     console.log('calculating for day ' + date.format('YYYY-MM-DD'));
                     var dt = moment(date);
-
+                    
                     util.getBusytimeByDate(dt, function(err, d, busytime) {
                         if (err) {
                             // when this is not a working day, ignore it; otherwise set "isComplete" to false
@@ -101,49 +100,49 @@ exports.calcStats = function(req, res) {
                         } else {
                             // update the StatsDay entry for this day
                             console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
-
+                            
                             StatsDay.findOneAndUpdate(
-                            {date: d},
-                            {
-                            //			  		date: d,
-                            actual_working_time: busytime/1,
-                            planned_working_time:DEFAULT_WORKING_TIME,
-                            is_working_day:true,
-                            is_complete:true,
-                            last_changed:new Date()
-                            },
-                            {new: true},
-                            function(err, statsday) {
-                                if (err) {
-                                    console.log(err);
-                                } else {
-                                    console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
-                                    if (statsday == null) {
-                                        new StatsDay({
-                                            date : d,
-                                            actual_working_time : busytime / 1,
-                                            planned_working_time : DEFAULT_WORKING_TIME,
-                                            is_working_day : true,
-                                            is_complete : true,
-                                            last_changed : new Date()
-                                        }).save(function(err) {
-                                            console.log(err);
-                                        });
-                                    }
-                                }
-                            });
+                                                      {date: d},
+                                                      {
+                                                      //			  		date: d,
+                                                      actual_working_time: busytime/1,
+                                                      planned_working_time:DEFAULT_WORKING_TIME,
+                                                      is_working_day:true,
+                                                      is_complete:true,
+                                                      last_changed:new Date()
+                                                      },
+                                                      {new: true},
+                                                      function(err, statsday) {
+                                                          if (err) {
+                                                              console.log(err);
+                                                          } else {
+                                                              console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
+                                                              if (statsday == null) {
+                                                                  new StatsDay({
+                                                                      date : d,
+                                                                      actual_working_time : busytime / 1,
+                                                                      planned_working_time : DEFAULT_WORKING_TIME,
+                                                                      is_working_day : true,
+                                                                      is_complete : true,
+                                                                      last_changed : new Date()
+                                                                  }).save(function(err) {
+                                                                      console.log(err);
+                                                                  });
+                                                              }
+                                                          }
+                                                      });
                         }
                     });
-
+                    
                     date = date.add('day', '1');
                 }
-
+                
                 res.send({
                     firstTimeentry : firstTimeentry,
                     lastTimeentry : lastTimeentry
                 });
             });
-
+            
         });
     });
 };
@@ -157,7 +156,7 @@ exports.setHolidays = function(req, res) {
     // get the year
     var year_start = moment(req.body.year, 'YYYY');
     var year_end = moment(req.body.year, 'YYYY').add('year', '1');
-
+    
     for (var d = year_start; d < year_end; d += 60 * 60 * 24 * 1000) {
         var day = moment(d);
         if (day.isoWeekday() == '6' || day.isoWeekday() == '7') {
@@ -166,7 +165,7 @@ exports.setHolidays = function(req, res) {
             });
         }
     }
-
+    
     res.send('done with year ' + year_start.year());
 }
 /*
@@ -177,9 +176,9 @@ exports.setHolidays = function(req, res) {
 exports.setHoliday = function(req, res) {
     var holiday = req.body.holiday;
     var date = util.stripdownToDate(moment(req.body.date, 'DD.MM.YYYY').tz("Europe/Berlin"));
-
+    
     console.log('date: ' + date + ', holiday: ' + holiday);
-
+    
     util.setHoliday(date, holiday, function(err) {
         if (err) {
             res.send(500, err);
@@ -195,35 +194,35 @@ exports.setHoliday = function(req, res) {
  * curl -X PUT http://localhost:30000/admin/rnd_entries
  */
 exports.setRandomTimeEntries = function(req, res) {
-
+    
     var DAY_IN_SECS = 60 * 60 * 24;
     var now = moment().unix();
     var today = now - (now % DAY_IN_SECS);
-
+    
     console.log(today);
-
+    
     for (var t = today - 18 * DAY_IN_SECS; t < today + 180 * DAY_IN_SECS; t += DAY_IN_SECS) {
-
+        
         var dt = moment(t);
         console.log(t + ': ' + dt.format('DD.MM.YYYY HH:mm:ss'));
-
+        
         var countEntries = 1 + Math.floor(Math.random() * 3);
         console.log("Anzahl Eiträge: " + countEntries * 2);
-
+        
         var pointer = t + 60 * 60 * 5;
         // 5 hours offset per day
         for (var i = 0; i < countEntries; i++) {
             var varianz = Math.floor(Math.random() * 60 * 60 * 4);
             // random range +/- 60 min
             var start = pointer + varianz - 60 * 60;
-
+            
             varianz += Math.floor(Math.random() * 60 * 60 * 4);
             // random range +/- 30 min
             var end = start + varianz - 60 * 60;
-
+            
             console.log("Start: " + moment(1000 * start).format('DD.MM.YYYY HH:mm:ss') + " - End: " + moment(1000 * end).format('DD.MM.YYYY HH:mm:ss'));
             pointer = end + 61 * 60;
-
+            
             new TimeEntry({
                 entry_date : moment(1000 * start),
                 direction : 'enter',
@@ -233,7 +232,7 @@ exports.setRandomTimeEntries = function(req, res) {
                     console.log(err);
                 }
             });
-
+            
             new TimeEntry({
                 entry_date : moment(1000 * end),
                 direction : 'go',
@@ -245,7 +244,7 @@ exports.setRandomTimeEntries = function(req, res) {
             });
         }
     }
-
+    
     res.send({
         now : today
     });
@@ -260,7 +259,7 @@ exports.getStatsDay = function(req, res) {
     var timeUnit = req.param('timeUnit');
     var dtStart = moment.unix(req.params.date / 1000);
     var dtEnd;
-
+    
     if ('year' === timeUnit) {
         dtEnd = moment(dtStart).add('years', '1');
     } else if ('month' === timeUnit) {
@@ -270,27 +269,24 @@ exports.getStatsDay = function(req, res) {
     } else if ('day' === timeUnit) {
         dtEnd = moment(dtStart).add('days', '1');
     }
-
+    
     console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
-
+    
     var calculatedBusTime = util.getStatsByRange(dtStart, dtEnd, function(err, calculatedBusyTime) {
-        console.log('calculatedBusTime = ' + JSON.stringify(calculatedBusyTime));
-
+        
         var chart_data = {
             "xScale" : ('day' === timeUnit ? "ordinal" : "time"),
             "yScale" : "linear",
             "type" : ('day' === timeUnit ? "bar" : "line-dotted"),
             "main" : [{
-                "data" : calculatedBusyTime.inner_data,
-            }],
+                      "data" : calculatedBusyTime.inner_data,
+                      }],
             "comp" : [{
-                "type" : "line",
-                "data" : calculatedBusyTime.inner_comp,
-            }]
+                      "type" : "line",
+                      "data" : calculatedBusyTime.inner_comp,
+                      }]
         };
-
-        console.log('chart_data = ' + JSON.stringify(chart_data));
-
+        
         res.send({
             actual_working_time : calculatedBusyTime.actual_working_time,
             planned_working_time : calculatedBusyTime.planned_working_time,
@@ -331,13 +327,19 @@ exports.maintain = function(req, res) {
 
 exports.dumpTimeEntry = function(req, res) {
     TimeEntry.find(function(err, timeentries) {
-
-        var dumpFile = './dump/timeentry_' + moment().format('YYYY-MM-DD_HHmmss') + '.json';
-        fs.writeFileSync(dumpFile, timeentries)
-        console.log('saved ' + timeentries.length + ' items');
-        res.send({
-            size : timeentries.length,
-            filename : dumpFile
+        
+        fs.stat('./dump', function(err, stats) {
+            if(err) {
+                fs.mkdirSync('./dump');
+            }
+            var dumpFile = './dump/timeentry_' + moment().format('YYYY-MM-DD_HHmmss') + '.json';
+            fs.writeFileSync(dumpFile, timeentries)
+            console.log('saved ' + timeentries.length + ' items');
+            res.send({
+                size : timeentries.length,
+                filename : dumpFile
+            });
+            
         });
     });
 };

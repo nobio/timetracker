@@ -14,5 +14,6 @@ results
 .classpath
 npm-debug.log
 node_modules
+dump
 
 *.xcodeproj

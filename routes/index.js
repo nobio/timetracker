@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
-var timzone = require('moment-timezone');
 var util = require('./util');
 var TimeEntry = mongoose.model('TimeEntry');
 

@@ -1,5 +1,5 @@
 {
-    "name"     : "Carpark"
+    "name"     : "Timetrack"
     , "version"  : "0.0.1"
     , "author"   : "Gernot H. Reichel <gernot.reichel@me.com>"
     , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
@@ -13,7 +13,7 @@
         , "mongodb"  : ">=1.2.14"
         , "mongoose" : ">=3.6.4"
         , "moment"   : ">=2.5.0"
-        , "moment-timezone" : "*"
+        , "node-schedule" : "*"
     }
     , "engines": { "node": ">=0.6.19" }
     , "repository": {
