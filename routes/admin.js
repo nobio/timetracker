@@ -137,10 +137,12 @@ exports.calcStats = function(req, res) {
                     date = date.add('day', '1');
                 }
                 
-                res.send({
-                    firstTimeentry : firstTimeentry,
-                    lastTimeentry : lastTimeentry
-                });
+		if(res) {
+                    res.send({
+                        firstTimeentry : firstTimeentry,
+                     	lastTimeentry : lastTimeentry
+                    });
+		}
             });
             
         });

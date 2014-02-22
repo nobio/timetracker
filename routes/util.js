@@ -181,11 +181,11 @@ exports.getBusytimeByDate = function(dt, callback) {
  * reads the last entry for a given date
  */
 exports.getLastTimeEntryByDate = function(dt, callback) {
-    var dtStart = moment(dt).tz("Europe/Berlin");
+    var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    var dtEnd = moment(dtStart).add('days', '1');
 
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -210,11 +210,11 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
 exports.getTimeEntriesByDate = function(dt, callback) {
     //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
 
-    var dtStart = moment(dt).tz("Europe/Berlin");
+    var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    var dtEnd = moment(dtStart).add('days', '1');
 
     //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
