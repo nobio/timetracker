@@ -337,11 +337,12 @@ exports.dumpTimeEntry = function(req, res) {
             var dumpFile = './dump/timeentry_' + moment().format('YYYY-MM-DD_HHmmss') + '.json';
             fs.writeFileSync(dumpFile, timeentries)
             console.log('saved ' + timeentries.length + ' items');
-            res.send({
-                size : timeentries.length,
-                filename : dumpFile
-            });
-            
+            if(res) {
+            	res.send({
+                    size : timeentries.length,
+                    filename : dumpFile
+            	});
+            }            
         });
     });
 };

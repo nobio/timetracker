@@ -75,8 +75,11 @@ http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 
 // start the scheduler
 var schedule = require('node-schedule');
-var j = schedule.scheduleJob({minute: 0}, function(){
+schedule.scheduleJob({minute: 0}, function(){
     admin.calcStats();
+});
+schedule.scheduleJob({hour: 4, minute: 0}, function(){
+    admin.dumpTimeEntry();
 });
 
 
