@@ -69,3 +69,15 @@ console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 	console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
+
+// start the scheduler
+var schedule = require('node-schedule');
+schedule.scheduleJob({minute: 0}, function(){
+    admin.calcStats();
+});
+schedule.scheduleJob({hour: 4, minute: 0}, function(){
+    admin.dumpTimeEntry();
+});
+
+
+
