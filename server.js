@@ -42,7 +42,6 @@ app.configure('production', function() {
 // routes
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
-app.get('/advanced', routes.advanced);
 app.get('/stats', routes.stats);
 app.get('/geo', routes.geoloc);
 
@@ -57,8 +56,6 @@ app.get('/entries/busy/:date', routes.getBusyTime);
 // admin stuff
 app.delete ('/entries', admin.deleteAllTimeEntries);
 app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
-app.put('/admin/holiday', admin.setHoliday);
-app.put('/admin/holidays', admin.setHolidays);
 app.get('/admin/maintain', admin.maintain);
 app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
 

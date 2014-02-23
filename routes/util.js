@@ -31,69 +31,6 @@ function isEmpty(obj) {
     return true;
 };
 
-/*
- * marks/unmarks a day as holiday
- */
-exports.setHoliday = function(date, holiday, callback) {
-
-    var isWorkingDay = (holiday == 'false');
-    console.log('date: ' + date + ', holiday: ' + holiday + ', isWorkingDay: ' + isWorkingDay);
-
-    StatsDay.find({
-        date : date
-    }, function(err, stats) {
-        console.log(err + " " + stats);
-        if (err) {
-            callback(err);
-        } else {
-
-            if (isEmpty(stats)) {
-                stats = new StatsDay({
-                    date : date,
-                    actual_working_time : 0,
-                    planned_working_time : 0,
-                    is_working_day : isWorkingDay,
-                    is_complete : true
-                });
-
-                console.log("I'm saving now this " + stats)
-                stats.save(function(err, stat, numberAffected) {
-                    console.log(err + " " + stat);
-                    if (err) {
-                        callback(err);
-                    } else {
-                        callback(null);
-                    }
-                });
-
-            } else {
-                console.log("I'm updating now the stats entry for " + stats.date);
-                var planned_working_time = (isWorkingDay === 'true' ? 0 : 7.8);
-                if (stats.length === 0 || stats.length > 1) {
-                    callback(new Error('somethings corrupt with your StatsDay data. I received ' + stats.length + ' entries for ' + date + ' instead of 1 entry'));
-                }
-                StatsDay.update({
-                    _id : stats[0]._id
-                }, {
-                    $set : {
-                        is_working_day : isWorkingDay,
-                        planned_working_time : planned_working_time
-                    }
-                }, {
-                    upsert : true
-                }, function(err, numberAffected, raw) {
-                    console.log(numberAffected);
-                    console.log(raw);
-                    if (err) {
-                        callback(err);
-                    } else {
-                        callback(null);
-                    }
-                });
-            }
-        }
-    });
-};
 
 /* ================================================================== */
 /* ======================== INTERNAL METHODS ======================== */
@@ -181,11 +118,11 @@ exports.getBusytimeByDate = function(dt, callback) {
  * reads the last entry for a given date
  */
 exports.getLastTimeEntryByDate = function(dt, callback) {
-    var dtStart = moment(dt).tz("Europe/Berlin");
+    var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    var dtEnd = moment(dtStart).add('days', '1');
 
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -210,11 +147,11 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
 exports.getTimeEntriesByDate = function(dt, callback) {
     //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
 
-    var dtStart = moment(dt).tz("Europe/Berlin");
+    var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).tz("Europe/Berlin").add('days', '1');
+    var dtEnd = moment(dtStart).add('days', '1');
 
     //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 

@@ -23,10 +23,6 @@ exports.admin = function(req, res) {
 	res.render('admin');
 }
 
-exports.advanced = function(req, res) {
-	res.render('advanced');
-}
-
 exports.stats = function(req, res) {
 	res.render('stats');
 }

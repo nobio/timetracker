@@ -148,47 +148,6 @@ exports.calcStats = function(req, res) {
 };
 
 /*
- * fills the Stats schema with holidays and weekends
- *
- * curl -X PUT http://localhost:30000/admin/holidays -d year=2013
- */
-exports.setHolidays = function(req, res) {
-    // get the year
-    var year_start = moment(req.body.year, 'YYYY');
-    var year_end = moment(req.body.year, 'YYYY').add('year', '1');
-    
-    for (var d = year_start; d < year_end; d += 60 * 60 * 24 * 1000) {
-        var day = moment(d);
-        if (day.isoWeekday() == '6' || day.isoWeekday() == '7') {
-            util.setHoliday(day, true, function(err) {
-                console.log(err);
-            });
-        }
-    }
-    
-    res.send('done with year ' + year_start.year());
-}
-/*
- * marks/unmarks a day as holiday
- *
- * curl -X PUT http://localhost:30000/admin/holiday -d date=05.01.2013 -d holiday=true
- */
-exports.setHoliday = function(req, res) {
-    var holiday = req.body.holiday;
-    var date = util.stripdownToDate(moment(req.body.date, 'DD.MM.YYYY').tz("Europe/Berlin"));
-    
-    console.log('date: ' + date + ', holiday: ' + holiday);
-    
-    util.setHoliday(date, holiday, function(err) {
-        if (err) {
-            res.send(500, err);
-        } else {
-            res.send('ok');
-        }
-    });
-};
-
-/*
  * creates random Time Entries; supposed to be used after cleaning the TimeEntry table
  *
  * curl -X PUT http://localhost:30000/admin/rnd_entries
