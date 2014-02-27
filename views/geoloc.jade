@@ -4,17 +4,27 @@ block content
       $(document).ready(function() {
 
         var startPos;
-        var workPos = {latitude:49.44843, longitude:11.09182};
-        var homePos = {latitude:49.51414, longitude:10.87549};
+        var lastBookingDate;
+          
+          
+        var WORK_POS = {latitude:49.44843, longitude:11.09182};
+        var HOME_POS = {latitude:49.51414, longitude:10.87549};
       
         if (navigator.geolocation) {
-            
+
             navigator.geolocation.getCurrentPosition(function(position) {
                 startPos = position;
                 $('#startLat').text(startPos.coords.latitude);
                 $('#startLon').text(startPos.coords.longitude)
             }, function(error) {
-                alert("Error occurred. Error code: " + error.code);
+                var msg;
+                switch(error.code) {
+                    case 0: msg = 'unknown error';
+                    case 1: msg = 'permission denied';
+                    case 2: msg = 'position unavailable (error response from locaton provider)';
+                    case 3: msg = 'timed out';
+                }
+                alert("Error occurred. Error code: " + error.code + " " + msg);
                 // error.code can be:
                 //   0: unknown error
                 //   1: permission denied
@@ -30,15 +40,26 @@ block content
                 $('#distanceKm').text(dist.kilometer);
                 $('#distanceM').text(dist.meter);
                 
-                var distWork = formatDistance(calculateDistance(workPos.latitude, workPos.longitude, position.coords.latitude, position.coords.longitude));
+                var distWork = formatDistance(calculateDistance(WORK_POS.latitude, WORK_POS.longitude, position.coords.latitude, position.coords.longitude));
                 $('#distanceWorkKm').text(distWork.kilometer);
                 $('#distanceWorkM').text(distWork.meter);
 
-                var distHome = formatDistance(calculateDistance(homePos.latitude, homePos.longitude, position.coords.latitude, position.coords.longitude));
+                var distHome = formatDistance(calculateDistance(HOME_POS.latitude, HOME_POS.longitude, position.coords.latitude, position.coords.longitude));
                 $('#distanceHomeKm').text(distHome.kilometer);
                 $('#distanceHomeM').text(distHome.meter);
+                
+                // book in or out at work
+                if(distWork.kilometer == 17 && distWork.meter <= 900) {
+                    if(typeof(lastBookingDate) == 'undefined') {
+                        lastBookingDate = moment();
+                    }
+                    alert(lastBookingDate.format('DD.MM.YYYY HH:mm:ss') + " ................. " + moment(lastBookingDate).add('hours', '1').format('DD.MM.YYYY HH:mm:ss'));
+                    alert(JSON.stringify(distWork));
+                }
             });
-          }
+        } else {
+            $('#startLat').text('your browser does not support geo location');
+        }
 
 
           // Reused code - copyright Moveable Type Scripts - retrieved May 4, 2010.

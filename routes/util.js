@@ -3,6 +3,8 @@ var moment = require('moment');
 var TimeEntry = mongoose.model('TimeEntry');
 var StatsDay = mongoose.model('StatsDay');
 
+var DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
+
 /*
  * takes the date and removes all time components
  * date expected to be a moment object
@@ -13,7 +15,7 @@ exports.stripdownToDate = function(date) {
     d.second(0);
     d.minutes(0);
     d.hours(0);
-
+    
     return d;
 };
 /*
@@ -43,13 +45,13 @@ function isEmpty(obj) {
  *   dt is expected in ISO format
  */
 exports.validateRequest = function(direction, dt, callback) {
-
+    
     this.getLastTimeEntryByDate(dt, function(err, entry) {
         if (err) {
             callback(err);
             return;
         }
-
+        
         // entries should have zero or one entry
         if (direction == 'enter') {// enter
             if ( typeof (entry) == 'undefined' || entry.direction == 'go') {
@@ -70,47 +72,52 @@ exports.validateRequest = function(direction, dt, callback) {
 };
 
 exports.getBusytimeByDate = function(dt, callback) {
-
+    
     // first get all entries for this day....
     this.getTimeEntriesByDate(dt, function(err, timeentries) {
-
+        
         if (err) {
             callback(new Error('Error while reading Time Entry: ' + id + " " + err.message));
         } else {
-
+            
             if (timeentries.length === 0) {
-
+                
                 callback(new Error('Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')'), 0);
-
+                
             } else if (timeentries.length % 2 !== 0) {
-
+                
                 callback(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0);
-
+                
             } else {
-
+                
                 var busytime;
                 for (var n = timeentries.length - 1; n > 0; n -= 2) {
                     // this must be a go-event
                     if (timeentries[n].direction !== 'go') {
                         callback(new Error('Die Reihenfolge der Kommen/Gehen-Einträge am ' + dt.format('DD.MM.YYYY') + ' scheint nicht zu stimmen.'), 0);
                     }
-
+                    
                     var end = timeentries[n].entry_date;
                     var start = timeentries[n - 1].entry_date;
                     var diff = moment.duration(moment(end).subtract(moment(start)));
-                    //console.log("duration: " + diff);
-
+                    
                     if (!busytime) {
                         busytime = diff;
                     } else {
                         busytime.add(diff, 'millisecond');
                     }
                 }
+                
+                // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
+                if(timeentries.length === 2) {
+                    busytime = busytime - DEFAULT_BREAK_TIME;
+                }
+                
                 callback(null, dt, busytime);
             }
-
+            
         }
-
+        
     });
 };
 
@@ -123,9 +130,9 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
     dtStart.minutes(0);
     dtStart.seconds(0);
     var dtEnd = moment(dtStart).add('days', '1');
-
+    
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
-
+    
     TimeEntry.find({
         entry_date : {
             $gte : dtStart,
@@ -146,15 +153,15 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
  */
 exports.getTimeEntriesByDate = function(dt, callback) {
     //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
-
+    
     var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
     var dtEnd = moment(dtStart).add('days', '1');
-
+    
     //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
-
+    
     TimeEntry.find({
         entry_date : {
             $gte : dtStart,
@@ -174,7 +181,7 @@ exports.getTimeEntriesByDate = function(dt, callback) {
  * reads the number of all TimeEntries in database
  */
 exports.getNumberOfTimeEntries = function(callback) {
-
+    
     TimeEntry.find(function(err, timeentries) {
         if (err) {
             callback(err);
@@ -187,10 +194,10 @@ exports.getNumberOfTimeEntries = function(callback) {
  * returns the aggregated statistics for a given time range defined by start and end
  */
 exports.getStatsByRange = function(dtStart, dtEnd, callback) {
-
+    
     var actual_working_time = -1;
     var planned_working_time = -1;
-
+    
     StatsDay.find({
         date : {
             $gte : dtStart,
@@ -228,10 +235,10 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
  * returns the aggregated statistics for a given day
  */
 exports.getStatsByDate = function(date) {
-
+    
     var actual_working_time = -1;
     var planned_working_time = -1;
-
+    
     StatsDay.find({
         date : {
             $gte : dtStart,
@@ -255,26 +262,26 @@ exports.getStatsByDate = function(date) {
 
 exports.getFirstTimeEntry = function(callback) {
     TimeEntry.aggregate([{
-        $group : {
-            _id : 0,
-            age : {
-                $min : "$entry_date"
-            }
-        }
-    }]).exec(function(err, timeentries) {
+                         $group : {
+                            _id : 0,
+                            age : {
+                                $min : "$entry_date"
+                            }
+                         }
+                         }]).exec(function(err, timeentries) {
         callback(err, timeentries[0]);
     });
 };
 
 exports.getLastTimeEntry = function(callback) {
     TimeEntry.aggregate([{
-        $group : {
-            _id : 0,
-            age : {
-                $max : "$entry_date"
-            }
-        }
-    }]).exec(function(err, timeentries) {
+                         $group : {
+                            _id : 0,
+                            age : {
+                                $max : "$entry_date"
+                            }
+                         }
+                         }]).exec(function(err, timeentries) {
         callback(err, timeentries[0]);
     });
 };

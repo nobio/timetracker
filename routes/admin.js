@@ -6,8 +6,7 @@ var util = require('./util');
 var TimeEntry = mongoose.model('TimeEntry');
 var StatsDay = mongoose.model('StatsDay');
 
-var DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000;
-// 7.8 hours in milli seconds
+var DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
 /*
  <?xml version="1.0" encoding="utf-8"?>
@@ -120,7 +119,7 @@ exports.calcStats = function(req, res) {
                                                               if (statsday == null) {
                                                                   new StatsDay({
                                                                       date : d,
-                                                                      actual_working_time : busytime / 1,
+                                                                      actual_working_time : busytime/1,
                                                                       planned_working_time : DEFAULT_WORKING_TIME,
                                                                       is_working_day : true,
                                                                       is_complete : true,
@@ -137,12 +136,12 @@ exports.calcStats = function(req, res) {
                     date = date.add('day', '1');
                 }
                 
-		if(res) {
+                if(res) {
                     res.send({
                         firstTimeentry : firstTimeentry,
                      	lastTimeentry : lastTimeentry
                     });
-		}
+                }
             });
             
         });
@@ -301,7 +300,7 @@ exports.dumpTimeEntry = function(req, res) {
                     size : timeentries.length,
                     filename : dumpFile
             	});
-            }            
+            }
         });
     });
 };

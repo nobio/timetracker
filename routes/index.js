@@ -40,11 +40,11 @@ exports.geoloc = function(req, res) {
 exports.entry = function(req, res) {
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
-
+    
 	console.log(datetime);
-
+    
 	util.validateRequest(direction, datetime, function(err) {
-
+        
 		if (err) {
 			console.log('exports.entry received an error: ' + err);
 			res.send(500, 'Error while saving new Time Entry: ' + err.message);
@@ -57,14 +57,14 @@ exports.entry = function(req, res) {
 				var t = timeentry.toObject();
 				util.getNumberOfTimeEntries(function(err, size) {
 					t.size = size;
-
+                    
 					if (err) {
 						res.send(500, 'Error while saving new Time Entry: ' + err.message);
 					} else {
 						res.send(t);
 					}
 				});
-
+                
 			});
 		}
 	});
@@ -76,7 +76,7 @@ exports.
 delete  =
 function(req, res) {
 	var id = req.params.id;
-
+    
 	TimeEntry.findByIdAndRemove(id, function(err) {
 		if (err) {
 			res.send(500, 'Error while deleting Time Entry: ' + id + " " + err.message);
@@ -100,22 +100,22 @@ exports.getAllByDate = function(req, res) {
 	 */
 	var dt = util.stripdownToDate(moment.unix(req.params.date / 1000));
 	console.log('getAllByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
-
+    
 	util.getTimeEntriesByDate(dt, function(err, timeentries) {
-
+        
 		if (err) {
 			res.send(500, err);
 		} else {
 			res.send(timeentries);
 		}
-
+        
 	});
 }
 /*
  * get one Time Entry by it's id
  */
 exports.getEntryById = function(req, res) {
-
+    
 	TimeEntry.findById(req.params.id, function(err, timeentry) {
 		if (err) {
 			res.send(500, 'Error while reading Time Entry: ' + id + " " + err);
@@ -123,22 +123,24 @@ exports.getEntryById = function(req, res) {
 			res.send(timeentry);
 		}
 	});
-
+    
 }
 /*
  * stores one Time Entry
  */
 exports.storeEntryById = function(req, res) {
-
+    
 	res.send(null);
-
+    
 }
 /*
  * Reads the busy time of all entries for a given day
+ *
+ * curl -X GET http://localhost:30000/entries/busy/1393455600000
  */
 exports.getBusyTime = function(req, res) {
 	var dt = util.stripdownToDate(moment.unix(req.params.date / 1000));
-
+    
 	util.getBusytimeByDate(dt, function(err, d, busytime) {
 		if (err) {
 			res.send(500, err.toString());

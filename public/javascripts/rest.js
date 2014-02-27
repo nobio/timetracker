@@ -199,6 +199,7 @@ function deleteTimeEntryById(id) {
 function nextStatsDay(tableref, time, timeUnit, direction) {
     var date;
     var nextDate;
+
     if (timeUnit === 'year') {
         date = moment(time.val(), 'YYYY');
         nextDate = date.add('years', direction);
@@ -240,4 +241,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
     });
 
     return null;
+}
+
+function book() {
 }
