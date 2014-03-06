@@ -21,6 +21,10 @@ block content
             
             nextStatsDay($("#table_stats_day"), $("#month_to_display"), "month", "0");
 
+            var tt = document.createElement('div'),leftOffset = -(~~$('html').css('padding-left').replace('px', '') + ~~$('body').css('margin-left').replace('px', '')), topOffset = -32;
+            tt.className = 'ex-tooltip';
+            document.body.appendChild(tt);
+
             var data = {
               "xScale": "ordinal",
               "yScale": "linear",
@@ -29,8 +33,13 @@ block content
             var opts = {
                 "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
                 "tickFormatX": function (x) { return d3.time.format('%d')(x); },
-                "tickHintX": 15,
-                "tickHintY": 5,
+                "mouseover": function (d, i) {
+                        var pos = $(this).offset();
+                        $(tt).text(d3.time.format('%A, %d.%m.%Y')(d.x) + ': ' + d.y).css({top: topOffset + pos.top, left: pos.left + leftOffset}).show();
+                },
+                "mouseout": function (x) {
+                    $(tt).hide();
+                }
             };
             busyChartVariable = new xChart('line-dotted', data, '#busyChart', opts);
         })
