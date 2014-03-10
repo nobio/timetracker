@@ -11,6 +11,7 @@ var routes = require('./routes');
 var admin = require('./routes/admin');
 var http = require('http');
 var path = require('path');
+var schedule = require('node-schedule');
 
 var app = express();
 
@@ -39,7 +40,7 @@ app.configure('production', function() {
 	app.use(express.errorHandler());
 });
 
-// routes
+// routes to jade templates
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
 app.get('/stats', routes.stats);
@@ -71,7 +72,6 @@ http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 });
 
 // start the scheduler
-var schedule = require('node-schedule');
 schedule.scheduleJob({minute: 0}, function(){
     admin.calcStats();
 });

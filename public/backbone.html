@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<title>Backbone Test</title>
+<script src="http://jashkenas.github.io/underscore/underscore-min.js"></script>
+<script src="http://jashkenas.github.io/backbone/backbone-min.js"></script>
+<script>
+
+console.log('----------------------------');
+TimeEntry = Backbone.Model.extend({
+    urlRoot: '/entry',
+    defaults: {
+        entry_date: new Date(),
+        direction: '',
+        last_changed: new Date()
+    },
+    initialize: function() {
+        //        alert("Hi Schernoo");
+    }
+});
+
+//var entry = new TimeEntry({id: '53181191ab15eb00000004cb'});
+var entry = new TimeEntry({id: '52ee8c4c5ba0e5e019053ea1'});
+
+
+//alert(entry.get('id'));
+entry.fetch({
+    success: function(e) {
+        var direction = e.get('direction');
+        if(direction == 'enter') {
+            direction = 'go';
+        } else {
+            direction = 'enter';
+        }
+
+        e.set({direction: direction});
+        
+        e.save();
+        
+    },
+    error: function(err) {
+        alert("Error: " + err.toString());
+    }
+});
+//alert(entry.get('last_changed'));
+
+</script>
+</head>
+<body>
+
+</body>
+</html>

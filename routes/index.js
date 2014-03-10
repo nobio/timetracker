@@ -30,6 +30,7 @@ exports.stats = function(req, res) {
 exports.geoloc = function(req, res) {
 	res.render('geoloc');
 }
+
 /* ================================================================== */
 /* ============================== REST ============================== */
 /* ================================================================== */
@@ -72,9 +73,7 @@ exports.entry = function(req, res) {
 /*
  * deletes one time entry by it's id
  */
-exports.
-delete  =
-function(req, res) {
+exports.delete = function(req, res) {
 	var id = req.params.id;
     
 	TimeEntry.findByIdAndRemove(id, function(err) {
@@ -129,8 +128,24 @@ exports.getEntryById = function(req, res) {
  * stores one Time Entry
  */
 exports.storeEntryById = function(req, res) {
+    console.log(req.params.id);
+    console.log(req.body.direction + ", " + req.body.entry_date);
     
-	res.send(null);
+    TimeEntry.findById(req.params.id, function(err, timeentry) {
+		if (err) {
+			res.send(500, 'Error while reading Time Entry: ' + id + " " + err);
+		} else {
+            console.log(timeentry);
+            timeentry.direction = req.body.direction;
+            timeentry.save(function(err) {
+                if (err) {
+                    res.send(500, 'Error while saving Time Entry: ' + id + " " + err);
+                } else {
+                    res.send(timeentry);
+                }
+            });
+		}
+	});
     
 }
 /*
