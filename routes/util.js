@@ -224,9 +224,11 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
             };
             idx++;
         });
+
         callback(null, {
-            actual_working_time : actual_working_time,
+            actual_working_time  : actual_working_time,
             planned_working_time : planned_working_time,
+            average_working_time : actual_working_time / stats.length,
             inner_data : innerData,
             inner_comp : innerComp
         });

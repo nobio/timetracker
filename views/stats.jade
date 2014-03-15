@@ -78,7 +78,28 @@ block content
     table
         tr
             td
-                span#busytime
+                table
+                    tr
+                        td Planned time:
+                        td 
+                            span#plannedTime
+                            |  hours
+                    tr
+                        td Actual time:
+                        td
+                            span#actualTime
+                            |  hours
+                    tr
+                        td Difference
+                        td
+                            span#diffTime
+                            |  hours
+                    tr
+                        td Average:
+                        td
+                            span#averageTime
+                            |  hours
+
             td
                 figure#busyChart(style='width: 400px; height: 300px;')
 

@@ -250,6 +250,7 @@ exports.getStatsDay = function(req, res) {
         res.send({
             actual_working_time : calculatedBusyTime.actual_working_time,
             planned_working_time : calculatedBusyTime.planned_working_time,
+            average_working_time : calculatedBusyTime.average_working_time,
             chart_data : chart_data
         });
     });
