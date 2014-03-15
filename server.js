@@ -51,6 +51,7 @@ app.post('/entry', routes.entry);
 app.get('/entry/:id', routes.getEntryById);
 app.put('/entry/:id', routes.storeEntryById);
 app.delete('/entry/:id', routes.delete);
+app.get('/entry', routes.getEntries);
 app.get('/entries/dt/:date', routes.getAllByDate);
 app.get('/entries/busy/:date', routes.getBusyTime);
 

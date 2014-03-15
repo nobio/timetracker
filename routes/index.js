@@ -86,6 +86,20 @@ exports.delete = function(req, res) {
 }
 
 /*
+ * Reads all time entries
+ *
+ * curl -X GET http://localhost:30000/entry
+ */
+exports.getEntries = function(req, res) {
+	TimeEntry.find(function(err, timeentries) {
+		if (err) {
+			res.send(500, 'Error while reading Time Entries: ' + id + " " + err);
+		} else {
+			res.send(timeentries);
+		}
+	});
+}
+/*
  * lists all Time Entries for a given date (this particular day)
  */
 exports.getAllByDate = function(req, res) {
@@ -148,6 +162,7 @@ exports.storeEntryById = function(req, res) {
 	});
     
 }
+
 /*
  * Reads the busy time of all entries for a given day
  *

@@ -32,7 +32,7 @@ block content
             };
             var opts = {
                 "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
-                "tickFormatX": function (x) { return d3.time.format('%d')(x); },
+                "tickFormatX": function (x) { return d3.time.format('%d.%m')(x); },
                 "mouseover": function (d, i) {
                         var pos = $(this).offset();
                         $(tt).text(d3.time.format('%A, %d.%m.%Y')(d.x) + ': ' + d.y).css({top: topOffset + pos.top, left: pos.left + leftOffset}).show();

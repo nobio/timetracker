@@ -8,6 +8,7 @@
 <script>
 
 console.log('----------------------------');
+// defining Backbone models
 TimeEntry = Backbone.Model.extend({
     urlRoot: '/entry',
     defaults: {
@@ -20,11 +21,16 @@ TimeEntry = Backbone.Model.extend({
     }
 });
 
-//var entry = new TimeEntry({id: '53181191ab15eb00000004cb'});
-var entry = new TimeEntry({id: '52ee8c4c5ba0e5e019053ea1'});
+EntryList = Backbone.Collection.extend({
+    model: TimeEntry,
+    url: '/entry'
+});
 
 
-//alert(entry.get('id'));
+// initializing backbone models
+var entry = new TimeEntry({id: '53181191ab15eb00000004cb'});
+//var entry = new TimeEntry({id: '52ee8c4c5ba0e5e019053ea1'});
+
 entry.fetch({
     success: function(e) {
         var direction = e.get('direction');
@@ -36,14 +42,20 @@ entry.fetch({
 
         e.set({direction: direction});
         
-        e.save();
+        //        e.save();
         
     },
     error: function(err) {
-        alert("Error: " + err.toString());
+         alert("Error: " + err.toString());
     }
 });
-//alert(entry.get('last_changed'));
+
+var entries = new EntryList();
+entries.fetch({
+    success: function(timeentries) {
+        alert(timeentries.length);
+    }
+});
 
 </script>
 </head>
