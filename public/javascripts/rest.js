@@ -100,9 +100,9 @@ function getTimeEntriesByDate(dt) {
             url : '/entries/dt/' + dt,
             dataType : 'json',
         }).done(function(timeentries) {
-            var html;
+            var html = 'Anwesenheit: ';
             if (duration) {
-                html = 'Anwesenheit: ' + moment(duration._milliseconds - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
+                html += moment(duration._milliseconds - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
             }
             html += '<table><th>Datum</th>';
             html += '<th>Kommen/Gehen</th>';
