@@ -53,13 +53,17 @@ entry.fetch({
 var entries = new EntryList();
 entries.fetch({
     success: function(timeentries) {
-        alert(timeentries.length);
+        //        alert(timeentries.length);
+        $('#xxx').val(timeentries.at(0).attributes.direction);
+    },
+    error: function(err) {
+        alert("Error: " + err.toString());
     }
 });
 
 </script>
 </head>
 <body>
-
+  <input type="text", id="xxx", onchange="alert($('#xxx').val());" />
 </body>
 </html>

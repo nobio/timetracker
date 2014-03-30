@@ -25,6 +25,9 @@ if (navigator.geolocation) {
     navigator.geolocation.watchPosition(function(position) {
         $('#currentLat').text(position.coords.latitude);
         $('#currentLon').text(position.coords.longitude);
+        $('#accuracy').text(position.coords.accuracy);
+        $('#speed').text(position.coords.speed/1);
+        $('#speedKMH').text(position.coords.speed/3.6);
         
         var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
         $('#distanceKm').text(dist.kilometer);
@@ -40,7 +43,7 @@ if (navigator.geolocation) {
         $('#distanceHomeM').text(firstload);
         if(firstload === 'true') {
             //            alert('it\'s my first load');
-            firstload = 'falsec';
+            firstload = 'false';
         }
         // book in or out at work
         if(distWork.kilometer == 17 && distWork.meter <= 900) {
