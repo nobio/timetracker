@@ -27,7 +27,7 @@ if (navigator.geolocation) {
         $('#currentLon').text(position.coords.longitude);
         $('#accuracy').text(position.coords.accuracy);
         $('#speed').text(position.coords.speed/1);
-        $('#speedKMH').text(position.coords.speed/3.6);
+        $('#speedKMH').text(position.coords.speed*3.6);
         
         var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
         $('#distanceKm').text(dist.kilometer);
