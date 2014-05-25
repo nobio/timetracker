@@ -39,14 +39,14 @@ entry.fetch({
         } else {
             direction = 'enter';
         }
-
+        
         e.set({direction: direction});
         
         //        e.save();
         
     },
     error: function(err) {
-         alert("Error: " + err.toString());
+        alert("Error: " + err.toString());
     }
 });
 
@@ -64,6 +64,6 @@ entries.fetch({
 </script>
 </head>
 <body>
-  <input type="text", id="xxx", onchange="alert($('#xxx').val());" />
+<input type="text", id="xxx", onchange="alert($('#xxx').val());" />
 </body>
 </html>

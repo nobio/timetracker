@@ -115,6 +115,7 @@ function getTimeEntriesByDate(dt) {
                 html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
                 html += '<td>';
                 html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">';
+                html += '<input type="button" value="bearbeiten (neu)" onclick="window.location=\'/admin_item?id=' + entry._id + '\';">';
                 html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">';
                 html += '</td>';
                 html += '</tr>';

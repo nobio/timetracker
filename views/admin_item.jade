@@ -1,0 +1,38 @@
+extends layout
+block content
+    script(type='text/javascript').
+        function getURLParameter(param) {
+            var pageURL = window.location.search.substring(1);
+            var urlVariables = pageURL.split('&');
+            for (var i = 0; i < urlVariables.length; i++) {
+                var parameterName = urlVariables[i].split('=');
+                if (parameterName[0] == param) {
+                    return parameterName[1];
+                }
+            }
+        }
+
+        $(document).ready(function() {
+            var id = getURLParameter('id');
+        })
+
+    h3 Edit Time Entry
+
+    table
+        tr
+            td ID
+            td
+                #id
+        tr
+            td Datum
+            td
+                input#item_date(type='text')
+        tr
+            td Kommen
+            td
+                input(type='checkbox', name='enter', value='enter')
+        tr
+            td
+                input(type='button', value='übernehmen', 
+                    onclick='timeentry($("input[name=direction]:checked").val(), $("#datetimepicker").val());')
+

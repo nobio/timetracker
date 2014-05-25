@@ -23,6 +23,11 @@ exports.admin = function(req, res) {
 	res.render('admin');
 }
 
+exports.admin = function(req, res) {
+	res.render('admin_item');
+    // http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
+}
+
 exports.stats = function(req, res) {
 	res.render('stats');
 }
