@@ -114,8 +114,7 @@ function getTimeEntriesByDate(dt) {
                 html += '<td>' + entry.direction + '</td>';
                 html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
                 html += '<td>';
-                html += '<input type="button" value="bearbeiten" onclick="editTimeEntryById(\'' + entry._id + '\');">';
-                html += '<input type="button" value="bearbeiten (neu)" onclick="window.location=\'/admin_item?id=' + entry._id + '\';">';
+                html += '<input type="button" value="bearbeiten" onclick="window.location=\'/admin_item?id=' + entry._id + '\';">';
                 html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">';
                 html += '</td>';
                 html += '</tr>';
@@ -127,26 +126,6 @@ function getTimeEntriesByDate(dt) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         });
 
-    });
-
-}
-
-function editTimeEntryById(id) {
-
-    $.ajax({
-        type : 'GET',
-        url : '/entry/' + id,
-        dataType : 'json',
-    }).done(function(timeentry) {
-        var html = '<b>ID: ' + timeentry._id + '</b><table>';
-        html += '<tr><td>Datum</td><td><input id="entry_date" type="text" value="' + moment(timeentry.entry_date).format('DD.MM.YYYY HH:mm') + '" /></td></tr>';
-        html += '<tr><td>Kommen/Gehen</td><td><input id="direction" type="text" value="' + timeentry.direction + '" /></td></tr>';
-        html += '<tr><td>Letzte Änderung</td><td>' + moment(timeentry.last_changed).format('DD.MM.YYYY HH:mm') + '</td></tr>';
-        html += '<tr><td colspan="2"><input type="button" value="übernehmen" onclick="storeTimeEntryById(\'' + timeentry._id + ', $(#direction), \');"></td></tr>';
-        html += '</table>';
-        dialog.innerHTML = html;
-    }, 'json').error(function(err) {
-        return err;
     });
 
 }

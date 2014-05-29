@@ -23,7 +23,7 @@ exports.admin = function(req, res) {
 	res.render('admin');
 }
 
-exports.admin = function(req, res) {
+exports.admin_item = function(req, res) {
 	res.render('admin_item');
     // http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
 }
@@ -147,18 +147,22 @@ exports.getEntryById = function(req, res) {
  * stores one Time Entry
  */
 exports.storeEntryById = function(req, res) {
-    console.log(req.params.id);
-    console.log(req.body.direction + ", " + req.body.entry_date);
+    console.log(req.params.id + ", " + req.body.direction + ", " + req.body.entry_date);
     
     TimeEntry.findById(req.params.id, function(err, timeentry) {
+        console.log(err);
 		if (err) {
-			res.send(500, 'Error while reading Time Entry: ' + id + " " + err);
+			res.send(500, 'Error while reading Time Entry: ' + err);
 		} else {
-            console.log(timeentry);
             timeentry.direction = req.body.direction;
+            timeentry.entry_date = moment(req.body.entry_date);
+            timeentry.last_changed = new Date();
+            
+            console.log(timeentry);
+            
             timeentry.save(function(err) {
                 if (err) {
-                    res.send(500, 'Error while saving Time Entry: ' + id + " " + err);
+                    res.send(500, 'Error while saving Time Entry: '  + err);
                 } else {
                     res.send(timeentry);
                 }

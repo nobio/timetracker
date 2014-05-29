@@ -1,6 +1,12 @@
 extends layout
 block content
+    script(src='http://jashkenas.github.io/underscore/underscore-min.js', type='text/javascript')
+    script(src='http://jashkenas.github.io/backbone/backbone-min.js', type='text/javascript')
+    script(src='/javascripts/backbone-timeentry.js', type='text/javascript')
+
     script(type='text/javascript').
+
+        var entry;
         function getURLParameter(param) {
             var pageURL = window.location.search.substring(1);
             var urlVariables = pageURL.split('&');
@@ -12,27 +18,49 @@ block content
             }
         }
 
+        function saveEntry() {
+            entry.set('entry_date', moment($('#entry_date').val(), 'DD.MM.YYYY HH:mm'));
+            entry.save({done: window.location.href='/stats'});
+        }
+
+
         $(document).ready(function() {
+            // initializing backbone models
             var id = getURLParameter('id');
+            entry = new TimeEntry({id: id});
+                          
+            entry.fetch({
+                success: function() {
+                    $('#itemId').text(entry.attributes.id);
+                    $('#entry_date').val(moment(entry.attributes.entry_date).format('DD.MM.YYYY HH:mm'));
+                    $('#last_changed').text(moment(entry.attributes.last_changed).format('DD.MM.YYYY HH:mm'));
+                    $('#direction').text(entry.attributes.direction);
+                },
+                error: function(err) {
+                    alert("Error: " + err.toString());
+                }
+            });
+                          
         })
 
     h3 Edit Time Entry
+    div#itemId
+                        
 
     table
         tr
-            td ID
-            td
-                #id
-        tr
             td Datum
             td
-                input#item_date(type='text')
+                input#entry_date(type='text')
         tr
             td Kommen
             td
-                input(type='checkbox', name='enter', value='enter')
+                div#direction
+        tr
+            td Datum
+            td
+                div#last_changed
         tr
             td
-                input(type='button', value='übernehmen', 
-                    onclick='timeentry($("input[name=direction]:checked").val(), $("#datetimepicker").val());')
+                input(type='button', value='übernehmen', onclick='saveEntry();')
 

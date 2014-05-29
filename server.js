@@ -43,7 +43,7 @@ app.configure('production', function() {
 // routes to jade templates
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
-app.get('/admin_item', routes.admin);
+app.get('/admin_item', routes.admin_item);
 app.get('/stats', routes.stats);
 app.get('/geo', routes.geoloc);
 
