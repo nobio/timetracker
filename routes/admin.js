@@ -89,16 +89,16 @@ exports.calcStats = function(req, res) {
                 date.seconds(0);
                 
                 while (date <= moment(lastTimeentry.age)) {
-                    console.log('calculating for day ' + date.format('YYYY-MM-DD'));
+                    //console.log('calculating for day ' + date.format('YYYY-MM-DD'));
                     var dt = moment(date);
                     
                     util.getBusytimeByDate(dt, function(err, d, busytime) {
                         if (err) {
                             // when this is not a working day, ignore it; otherwise set "isComplete" to false
-                            console.log('****** ' + d + ': ' + err);
+                            //console.log('****** ' + d + ': ' + err);
                         } else {
                             // update the StatsDay entry for this day
-                            console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
+                            //console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
                             
                             StatsDay.findOneAndUpdate(
                                                       {date: d},
@@ -113,9 +113,9 @@ exports.calcStats = function(req, res) {
                                                       {new: true},
                                                       function(err, statsday) {
                                                           if (err) {
-                                                              console.log(err);
+                                                              //console.log(err);
                                                           } else {
-                                                              console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
+                                                              //console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
                                                               if (statsday == null) {
                                                                   new StatsDay({
                                                                       date : d,
@@ -125,7 +125,9 @@ exports.calcStats = function(req, res) {
                                                                       is_complete : true,
                                                                       last_changed : new Date()
                                                                   }).save(function(err) {
-                                                                      console.log(err);
+                                                                      if(err) {
+                                                                          console.log(err);
+                                                                      }
                                                                   });
                                                               }
                                                           }
@@ -137,10 +139,12 @@ exports.calcStats = function(req, res) {
                 }
                 
                 if(res) {
-                    res.send({
+                    var reply = {
                         firstTimeentry : firstTimeentry,
-                     	lastTimeentry : lastTimeentry
-                    });
+                     	lastTimeentry  : lastTimeentry
+                    };
+                    console.log(reply);
+                    res.send(reply);
                 }
             });
             
