@@ -189,6 +189,25 @@ exports.getBusyTime = function(req, res) {
 	});
 }
 
+/*
+ { 
+    device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
+    id: 'Work',
+    latitude: '49.51429653451733',
+    longitude: '10.87531216443598',
+    timestamp: '1401728167.886038',
+    trigger: 'exit' 
+ }
+ { 
+    device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
+    id: 'Work',
+    latitude: '49.51429653451733',
+    longitude: '10.87531216443598',
+    timestamp: '1401729237.592610',
+    trigger: 'enter' 
+ }
+ *
+ */
 exports.geofence = function(req, res) {
     console.log(req.body);
     res.send(null);

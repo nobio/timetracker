@@ -12,6 +12,7 @@ var admin = require('./routes/admin');
 var http = require('http');
 var path = require('path');
 var schedule = require('node-schedule');
+var moment = require('moment');
 
 var app = express();
 
@@ -21,7 +22,11 @@ app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
-	app.use(express.logger('dev'));
+    app.use(express.logger('dev'));
+    express.logger.format('mydate', function() {
+        return moment().format('DD.MM.YYYY HH:mm:ss SSS');
+    });
+    app.use(express.logger('[:mydate] :method :url :status :res[content-length] - :remote-addr - :response-time ms'));
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
