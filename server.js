@@ -56,6 +56,9 @@ app.get('/entry', routes.getEntries);
 app.get('/entries/dt/:date', routes.getAllByDate);
 app.get('/entries/busy/:date', routes.getBusyTime);
 
+// geofencing
+app.post('/geofence', routes.geofence);
+
 // admin stuff
 app.delete ('/entries', admin.deleteAllTimeEntries);
 app.put('/admin/rnd_entries', admin.setRandomTimeEntries);

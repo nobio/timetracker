@@ -189,3 +189,8 @@ exports.getBusyTime = function(req, res) {
 	});
 }
 
+exports.geofence = function(req, res) {
+    console.log(req.body);
+    res.send(null);
+}
+
