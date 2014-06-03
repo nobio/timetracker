@@ -43,37 +43,18 @@ exports.geoloc = function(req, res) {
 /*
  * creates a new TimeEntry; the date is "now" and the direction needs to be given
  */
-exports.entry = function(req, res) {
+exports.createEntry = function(req, res) {
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
-    
-	console.log(datetime);
-    
-	util.validateRequest(direction, datetime, function(err) {
-        
+
+	util.createTimeEntry(direction, datetime, function(err, timeentry) {
 		if (err) {
-			console.log('exports.entry received an error: ' + err);
-			res.send(500, 'Error while saving new Time Entry: ' + err.message);
+			res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 		} else {
-			new TimeEntry({
-				entry_date : datetime,
-				direction : direction
-			}).save(function(err, timeentry) {
-				// and now add the size to the monggose-JSON (needs to be converted to an object first)
-				var t = timeentry.toObject();
-				util.getNumberOfTimeEntries(function(err, size) {
-					t.size = size;
-                    
-					if (err) {
-						res.send(500, 'Error while saving new Time Entry: ' + err.message);
-					} else {
-						res.send(t);
-					}
-				});
-                
-			});
-		}
+			res.send(timeentry);
+		}		
 	});
+    
 }
 /*
  * deletes one time entry by it's id
@@ -210,6 +191,16 @@ exports.getBusyTime = function(req, res) {
  */
 exports.geofence = function(req, res) {
     console.log(req.body);
+    var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
+    if(req.body.id == 'Work') {
+		util.createTimeEntry(direction, moment(), function(err, timeentry) {
+			if (err) {
+				res.send(500, 'Error while creating new  Time Entry: ' + err.message);
+			} else {
+				res.send(timeentry);
+			}		
+		});    			
+    } 
     res.send(null);
 }
 

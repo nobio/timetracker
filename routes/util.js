@@ -178,10 +178,18 @@ exports.getTimeEntriesByDate = function(dt, callback) {
         }
     });
 };
+
 /*
  * reads the number of all TimeEntries in database
  */
 exports.getNumberOfTimeEntries = function(callback) {
+    return getNumberOfTimeEntries(callback);
+};
+
+/*
+ * reads the number of all TimeEntries in database
+ */
+getNumberOfTimeEntries = function(callback) {
     
     TimeEntry.find(function(err, timeentries) {
         if (err) {
@@ -191,6 +199,7 @@ exports.getNumberOfTimeEntries = function(callback) {
         }
     });
 };
+
 /*
  * returns the aggregated statistics for a given time range defined by start and end
  */
@@ -302,5 +311,34 @@ exports.deleteAllStatsDays = function(callback) {
             size : size
         });
     });
+};
+
+exports.createTimeEntry = function(direction, datetime, callback) {
+
+    this.validateRequest(direction, datetime, function(err) {
+        
+        if (err) {
+            console.log('exports.entry received an error: ' + err);
+            callback(err);
+        } else {
+            new TimeEntry({
+                entry_date : datetime,
+                direction : direction
+            }).save(function(err, timeentry) {
+                // and now add the size to the mongoose-JSON (needs to be converted to an object first)
+                var t = timeentry.toObject();
+                getNumberOfTimeEntries(function(err, size) {
+                    t.size = size;
+                    if (err) {
+                        callback(err);                    
+                    } else {
+                        callback(err, t);                    
+                    }
+                });
+                
+            });
+        }
+    });
+
 };
 

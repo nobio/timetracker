@@ -53,7 +53,7 @@ app.get('/stats', routes.stats);
 app.get('/geo', routes.geoloc);
 
 // restful services
-app.post('/entry', routes.entry);
+app.post('/entry', routes.createEntry);
 app.get('/entry/:id', routes.getEntryById);
 app.put('/entry/:id', routes.storeEntryById);
 app.delete('/entry/:id', routes.delete);
