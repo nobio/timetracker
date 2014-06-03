@@ -303,7 +303,7 @@ exports.deleteAllStatsDays = function(callback) {
     StatsDay.find(function(err, statsdays) {
         size = statsdays.length;
         statsdays.forEach(function(statsday) {
-            //console.log('removing ' + statsday);
+            console.log('removing ' + statsday);
             statsday.remove();
         });
         console.log('deleted ' + size + ' items');
@@ -318,7 +318,7 @@ exports.createTimeEntry = function(direction, datetime, callback) {
     this.validateRequest(direction, datetime, function(err) {
         
         if (err) {
-            console.log('exports.entry received an error: ' + err);
+            console.log('exports.createTimeEntry received an error: ' + err);
             callback(err);
         } else {
             new TimeEntry({

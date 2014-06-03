@@ -171,7 +171,7 @@ exports.getBusyTime = function(req, res) {
 }
 
 /*
- { 
+  {
     device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
     id: 'Work',
     latitude: '49.51429653451733',
@@ -188,9 +188,11 @@ exports.getBusyTime = function(req, res) {
     trigger: 'enter' 
  }
  *
+ * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geofence
  */
 exports.geofence = function(req, res) {
     console.log(req.body);
+   
     var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
     if(req.body.id == 'Work') {
 		util.createTimeEntry(direction, moment(), function(err, timeentry) {
@@ -200,7 +202,8 @@ exports.geofence = function(req, res) {
 				res.send(timeentry);
 			}		
 		});    			
-    } 
-    res.send(null);
+    } else {
+        res.send({message: "nothing to be entered"});
+    }
 }
 
