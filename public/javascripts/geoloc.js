@@ -6,7 +6,6 @@ var WORK_POS = {latitude:49.44843, longitude:11.09182};
 var HOME_POS = {latitude:49.51414, longitude:10.87549};
 
 if (navigator.geolocation) {
-    
     navigator.geolocation.getCurrentPosition(function(position) {
         startPos = position;
         $('#startLat').text(startPos.coords.latitude);
@@ -38,6 +37,7 @@ if (navigator.geolocation) {
         $('#distanceWorkM').text(distWork.meter);
         
         var distHome = formatDistance(calculateDistance(HOME_POS.latitude, HOME_POS.longitude, position.coords.latitude, position.coords.longitude));
+        $('#gauge').refresh(position.coords.speed*3.6);
         $('#distanceHomeKm').text(distHome.kilometer);
         $('#distanceHomeM').text(distHome.meter);
         $('#distanceHomeM').text(firstload);
