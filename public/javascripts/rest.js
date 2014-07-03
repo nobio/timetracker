@@ -187,7 +187,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     } else if (timeUnit === 'month') {
         date = moment(time.val(), 'MMMM YYYY');
-        nextDate = date.add('weeks', direction);
+        nextDate = date.add('months', direction);
         time.val(nextDate.format('MMMM YYYY'));
         // setting nextDate as value of text field
     } else if (timeUnit === 'week') {
