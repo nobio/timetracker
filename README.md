@@ -1,4 +1,4 @@
 TimeTracker
 ===========
 
-tracks time
+tracks time of my adsence
