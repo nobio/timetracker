@@ -90,7 +90,7 @@ exports.getBusytimeByDate = function(dt, callback) {
                 callback(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0);
                 
             } else {
-                
+
                 var busytime;
                 for (var n = timeentries.length - 1; n > 0; n -= 2) {
                     // this must be a go-event
@@ -107,6 +107,7 @@ exports.getBusytimeByDate = function(dt, callback) {
                     } else {
                         busytime.add(diff, 'millisecond');
                     }
+                    
                 }
                 
                 // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)

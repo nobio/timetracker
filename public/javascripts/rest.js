@@ -90,7 +90,7 @@ function getTimeEntriesByDate(dt) {
 
     result.innerHTML = '';
     getBusyTime(dt, function(err, duration) {
-
+        
         if (err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
@@ -102,7 +102,7 @@ function getTimeEntriesByDate(dt) {
         }).done(function(timeentries) {
             var html = 'Anwesenheit: ';
             if (duration) {
-                html += moment(duration._milliseconds - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
+                html += moment(duration - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
             }
             html += '<table><th>Datum</th>';
             html += '<th>Kommen/Gehen</th>';
