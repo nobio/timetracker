@@ -105,11 +105,13 @@ function getTimeEntriesByDate(dt) {
                 html += moment(duration - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
             }
             html += '<table><th>Datum</th>';
+            html += '<th>Zeit</th>';
             html += '<th>Kommen/Gehen</th>';
             html += '<th>Letzte Änderung</th>';
             html += '<th>Bearbeiten/Löschen</th>';
             timeentries.forEach(function(entry) {
                 html += '<tr>';
+                html += '<td>' + moment(entry.entry_date).format('DD.MM.YYYY') + '</td>';
                 html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
                 html += '<td>' + entry.direction + '</td>';
                 html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
