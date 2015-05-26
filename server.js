@@ -76,7 +76,7 @@ app.get('/stats/:date', admin.getStatsDay);
 app.delete('/stats', admin.deleteAllStatsDays);
 
 // start the web service
-console.log('\nusage: node --dbenv=[local|mongodb] server.js\n');
+console.log('\nusage: node --dbenv=[local|openshift] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 	console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
