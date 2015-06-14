@@ -1,19 +1,128 @@
 extends layout
 block content
 
-    script(src='/javascripts/geoloc.js', type='text/javascript')
+    //script(src='/javascripts/geoloc.js', type='text/javascript')
     script(src='/javascripts/raphael.2.1.0.min.js', type='text/javascript')
-    script(src='/javascripts/justgage.1.0.1.min.js', type='text/javascript')
+    script(src='/javascripts/gauge-1.2.1.min.js', type='text/javascript')
     script(type='text/javascript').
-        var gauge;
-        $(document).ready(function() {            
-            gauge = new JustGage({
-                id: "gauge", 
-                value: 0, 
-                min: 0,
-                max: 80,
-                title: "Speed"
+
+        // =============================================================================
+        var startPos;
+        var lastBookingDate;
+
+        var WORK_POS = {latitude:49.44843, longitude:11.09182};
+        var HOME_POS = {latitude:49.51414, longitude:10.87549};
+
+        // gauge: http://bernii.github.io/gauge.js/
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                startPos = position;
+                $('#startLat').text(startPos.coords.latitude);
+                $('#startLon').text(startPos.coords.longitude)
+            }, function(error) {
+                var msg;
+                switch(error.code) {
+                    case 0: msg = 'unknown error';
+                    case 1: msg = 'permission denied';
+                    case 2: msg = 'position unavailable (error response from locaton provider)';
+                    case 3: msg = 'timed out';
+                }
+                alert("Error occurred. Error code: " + error.code + " " + msg);
             });
+            
+            navigator.geolocation.watchPosition(function(position) {
+                $('#currentLat').text(position.coords.latitude);
+                $('#currentLon').text(position.coords.longitude);
+                $('#accuracy').text(position.coords.accuracy);
+                $('#speed').text(position.coords.speed/1);
+                $('#speedKMH').text(position.coords.speed*3.6);
+                $('#heading').text(position.coords.heading);
+                
+                var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceKm').text(dist.kilometer);
+                $('#distanceM').text(dist.meter);
+                
+                var distWork = formatDistance(calculateDistance(WORK_POS.latitude, WORK_POS.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceWorkKm').text(distWork.kilometer);
+                $('#distanceWorkM').text(distWork.meter);
+                
+                var distHome = formatDistance(calculateDistance(HOME_POS.latitude, HOME_POS.longitude, position.coords.latitude, position.coords.longitude));
+                $('#distanceHomeKm').text(distHome.kilometer);
+                $('#distanceHomeM').text(distHome.meter);
+
+                if(position.coords.speed) {
+                    gauge.set(position.coords.speed*3.6);           
+                }
+                gauge.set(gauge.value + 20*Math.random()-10);
+                $('#speedometer-value').text(gauge.value);               
+                // book in or out at work
+                if(distWork.kilometer == 17 && distWork.meter <= 900) {
+                    if(typeof(lastBookingDate) == 'undefined') {
+                        lastBookingDate = moment();
+                    }
+                    /*
+                    alert(lastBookingDate.format('DD.MM.YYYY HH:mm:ss') + " ................. " + moment(lastBookingDate).add('hours', '1').format('DD.MM.YYYY HH:mm:ss'));
+                    alert(JSON.stringify(distWork));
+                     */
+                }
+            });
+        } else {
+            $('#startLat').text('your browser does not support geo location');
+        }
+
+
+        // Reused code - copyright Moveable Type Scripts - retrieved May 4, 2010.
+        // http://www.movable-type.co.uk/scripts/latlong.html
+        // Under Creative Commons License http://creativecommons.org/licenses/by/3.0/
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            var R = 6371; // km -> m
+            var dLat = (lat2-lat1).toRad();
+            var dLon = (lon2-lon1).toRad();
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            var d = R * c;
+            return d;
+        }
+
+        function formatDistance(distOrig) {
+            var distKm = parseInt(distOrig);
+            var distM = (distOrig - distKm) * 1000;
+            distM = Math.round(distM * 100) / 100;
+            
+            return {kilometer:distKm, meter:distM};
+        }
+        Number.prototype.toRad = function() {
+            return this * Math.PI / 180;
+        }
+        // =============================================================================
+
+
+        var gauge;
+        $(document).ready(function() {
+             var opts = {
+              lines: 12, // The number of lines to draw
+              angle: 0, //0.15, // The length of each line
+              lineWidth: 0.44, // The line thickness
+              pointer: {
+                length: 0.9, // The radius of the inner circle
+                strokeWidth: 0.035, // The rotation offset
+                fontsize:24,
+                color: '#000000' // Fill color
+              },
+              limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
+              colorStart: '#B9CF2B',   // Colors
+              strokeColor: '#E0E0E0',   // to see which ones work best for you
+              generateGradient: false
+            };
+            var target = document.getElementById('speedometer'); // your canvas element
+            gauge = new Gauge(target).setOptions(opts); // create sexy gauge!
+            gauge.maxValue = 80; // set max gauge value
+            gauge.animationSpeed = 15; // set animation speed (32 is default value)
+            gauge.set(0); // set actual value 
+
         }) 
 
     #tripmeter
@@ -39,6 +148,9 @@ block content
             span#accuracy
             | m &nbsp;
 
+        p Heading:&nbsp;
+            span#heading
+
         p Current Speed:&nbsp;
             span#speed
             | m/s &nbsp;
@@ -56,6 +168,7 @@ block content
             | km &nbsp;
             span#distanceHomeM
             | m
+    
 
-
-    #gauge(class="200x160px")
+    canvas#speedometer
+    #speedometer-value 

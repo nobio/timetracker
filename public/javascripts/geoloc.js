@@ -1,9 +1,10 @@
 var startPos;
 var lastBookingDate;
-var firstload = 'true';
 
 var WORK_POS = {latitude:49.44843, longitude:11.09182};
 var HOME_POS = {latitude:49.51414, longitude:10.87549};
+
+// gauge: http://bernii.github.io/gauge.js/
 
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -27,6 +28,7 @@ if (navigator.geolocation) {
         $('#accuracy').text(position.coords.accuracy);
         $('#speed').text(position.coords.speed/1);
         $('#speedKMH').text(position.coords.speed*3.6);
+        $('#heading').text(position.coords.heading);
         
         var dist = formatDistance(calculateDistance(startPos.coords.latitude, startPos.coords.longitude, position.coords.latitude, position.coords.longitude));
         $('#distanceKm').text(dist.kilometer);
@@ -37,14 +39,16 @@ if (navigator.geolocation) {
         $('#distanceWorkM').text(distWork.meter);
         
         var distHome = formatDistance(calculateDistance(HOME_POS.latitude, HOME_POS.longitude, position.coords.latitude, position.coords.longitude));
-        $('#gauge').refresh(position.coords.speed*3.6);
         $('#distanceHomeKm').text(distHome.kilometer);
         $('#distanceHomeM').text(distHome.meter);
-        $('#distanceHomeM').text(firstload);
-        if(firstload === 'true') {
-            //            alert('it\'s my first load');
-            firstload = 'false';
+
+console.log("Gernot");
+
+        if(position.coords.speed) {
+            $('#gauge').refresh(position.coords.speed*3.6);           
         }
+        $('#gauge').refresh(50);
+
         // book in or out at work
         if(distWork.kilometer == 17 && distWork.meter <= 900) {
             if(typeof(lastBookingDate) == 'undefined') {
