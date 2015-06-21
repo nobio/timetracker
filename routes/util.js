@@ -205,7 +205,8 @@ getNumberOfTimeEntries = function(callback) {
  * returns the aggregated statistics for a given time range defined by start and end
  */
 exports.getStatsByRange = function(dtStart, dtEnd, callback) {
-    
+    console.log(">>> searching data for date between $1 and $2", moment(dtStart).format('YYYY-MM-DD'), moment(dtEnd).format('YYYY-MM-DD'));
+
     StatsDay.find({
         date : {
             $gte : dtStart,
@@ -225,10 +226,12 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
             actual_working_time += stat.actual_working_time;
         });
         average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
+        
         //console.log("average_working_time = " + average_working_time);
+        //console.log("length = " + stats.length);
 
         stats.forEach(function(stat) {
-            // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time);
+            //console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
             innerData[idx] = {
