@@ -206,9 +206,6 @@ getNumberOfTimeEntries = function(callback) {
  */
 exports.getStatsByRange = function(dtStart, dtEnd, callback) {
     
-    var actual_working_time = -1;
-    var planned_working_time = -1;
-    
     StatsDay.find({
         date : {
             $gte : dtStart,
@@ -220,6 +217,16 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         var innerData = [{0:0}];
         var innerComp = [{0:0}];
         var idx = 0;
+        var actual_working_time = -1;
+        var planned_working_time = -1;
+        var average_working_time = -1;
+
+        stats.forEach(function(stat) {
+            actual_working_time += stat.actual_working_time;
+        });
+        average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
+        //console.log("average_working_time = " + average_working_time);
+
         stats.forEach(function(stat) {
             // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time);
             actual_working_time += stat.actual_working_time;
@@ -230,7 +237,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
             };
             innerComp[idx] = {
                 "x" : moment(stat.date).format('YYYY-MM-DD'),
-                "y" : 7.8
+                "y" : average_working_time
             };
             idx++;
         });
@@ -238,7 +245,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         callback(null, {
             actual_working_time  : actual_working_time,
             planned_working_time : planned_working_time,
-            average_working_time : actual_working_time / stats.length,
+            average_working_time : average_working_time,
             inner_data : innerData,
             inner_comp : innerComp
         });
