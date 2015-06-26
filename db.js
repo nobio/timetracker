@@ -5,7 +5,6 @@ function dburl() {
 	var fs = require('fs');
 	var db_config = JSON.parse(fs.readFileSync('./db-conf.json','utf8'));
     
-    
     var dbenv;
     process.execArgv.forEach(function(val, index, array) {
         if(val.contains('--dbenv')) {
@@ -13,6 +12,15 @@ function dburl() {
             console.log('database environment: ' + dbenv);
         }
     });
+    if(!dbenv) {
+        process.argv.forEach(function(val, index, array) {
+            console.log(val + " " + index + " " +array);
+            if(val.contains('--dbenv')) {
+                dbenv = val.substring(val.indexOf('=')+1, val.length);
+                console.log('database environment: ' + dbenv);
+            }
+        });
+    }
     
     var dbconfig = (process.env.OPENSHIFT_APP_UUID || dbenv == 'openshift' ? db_config.openshift : db_config.local);
     if(process.env.OPENSHIFT_APP_UUID || dbenv === 'openshift') {
