@@ -75,6 +75,9 @@ app.put('/stats', admin.calcStats);
 app.get('/stats/:date', admin.getStatsDay);
 app.delete('/stats', admin.deleteAllStatsDays);
 
+// maintain stuff
+app.get('/ping', admin.ping);
+
 // start the web service
 console.log('\nusage: node --dbenv=[local|openshift] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {

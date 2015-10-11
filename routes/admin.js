@@ -309,3 +309,13 @@ exports.dumpTimeEntry = function(req, res) {
         });
     });
 };
+
+/*
+ * ping functionality - resonses a pong ;-)
+ *
+ * curl -X GET http://localhost:30000/ping
+ */
+exports.ping = function(req, res) {
+    res.send({'response':'pong'});
+};
+
