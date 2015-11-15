@@ -5,7 +5,7 @@
     , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
     , "privawte"  : true
     , "scripts"  : {
-        "start"    : "node app"
+        "start"    : "node --dbenv=openshift server"
     }
     , "dependencies": {
         "express"  : "=3.1.0"
