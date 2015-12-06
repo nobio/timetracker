@@ -97,7 +97,7 @@ exports.getAllByDate = function(req, res) {
 	console.log('getAllByDate received date (Los_Angeles): ' + moment.tz(req.params.date/1, 'America/Los_Angeles').format('DD.MM.YYYY HH:mm:ss'));
 	console.log('getAllByDate received date (New_York):    ' + moment.tz(req.params.date/1, 'America/New_York').format('DD.MM.YYYY HH:mm:ss'));
 
-	var dt = util.stripdownToDate(moment.unix(req.params.date / 1000));
+	var dt = util.stripdownToDateBerlin(moment.unix(req.params.date / 1000));
 	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
 	util.getTimeEntriesByDate(dt, function(err, timeentries) {
@@ -159,7 +159,7 @@ exports.storeEntryById = function(req, res) {
  * curl -X GET http://localhost:30000/entries/busy/1393455600000
  */
 exports.getBusyTime = function(req, res) {
-	var dt = util.stripdownToDate(moment.unix(req.params.date / 1000));
+	var dt = util.stripdownToDateBerlin(moment.unix(req.params.date / 1000));
     
 	util.getBusytimeByDate(dt, function(err, d, busytime) {
 		if (err) {

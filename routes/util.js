@@ -9,8 +9,8 @@ var DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
  * takes the date and removes all time components
  * date expected to be a moment object
  */
-exports.stripdownToDate = function(date) {
-    var d = date;
+exports.stripdownToDateBerlin = function(date) {
+    var d = moment.tz(date/1, 'Europe/Berlin');
     d.millisecond(0);
     d.second(0);
     d.minutes(0);
