@@ -237,11 +237,11 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
             planned_working_time += stat.planned_working_time;
             innerData[idx] = {
                 "x" : moment(stat.date).format('YYYY-MM-DD'),
-                "y" : stat.actual_working_time / 60 / 60 / 1000
+                "y" : Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100  //rounding 2 digits after comma
             };
             innerComp[idx] = {
                 "x" : moment(stat.date).format('YYYY-MM-DD'),
-                "y" : average_working_time
+                "y" : Math.round(average_working_time * 100) / 100 //rounding 2 digits after comma
             };
             idx++;
         });
