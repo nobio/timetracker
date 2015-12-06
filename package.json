@@ -18,7 +18,7 @@
     , "engines": { "node": ">=0.6.19" }
     , "repository": {
         "type": "git"
-        , "url": "git://github.com/nobio/noodle.git"
+        , "url": "https://github.com/nobio/timetrack.git"
     }
     
 }
