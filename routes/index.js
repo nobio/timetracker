@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
+var tz = require('moment-timezone');
 var util = require('./util');
 var TimeEntry = mongoose.model('TimeEntry');
 
@@ -89,16 +90,15 @@ exports.getEntries = function(req, res) {
  * lists all Time Entries for a given date (this particular day)
  */
 exports.getAllByDate = function(req, res) {
-	
-	console.log('getAllByDate received date (raw)    : ' + req.params.date);
-	console.log('getAllByDate received date (paresed): ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date/1, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Berlin):  ' + moment.tz(req.params.date, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Toronto): ' + moment.tz(req.params.date, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date (raw):         ' + req.params.date);
+	console.log('getAllByDate received date (parsed):      ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date (Berlin):      ' + moment.tz(req.params.date/1, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date (Toronto):     ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date (Los_Angeles): ' + moment.tz(req.params.date/1, 'America/Los_Angeles').format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date (New_York):    ' + moment.tz(req.params.date/1, 'America/New_York').format('DD.MM.YYYY HH:mm:ss'));
 
 	var dt = util.stripdownToDate(moment.unix(req.params.date / 1000));
-	console.log('getAllByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
 	util.getTimeEntriesByDate(dt, function(err, timeentries) {
         
