@@ -238,6 +238,8 @@ exports.getStatsDay = function(req, res) {
     
     var calculatedBusTime = util.getStatsByRange(dtStart, dtEnd, function(err, calculatedBusyTime) {
         
+        //console.log(calculatedBusyTime);
+
         var chart_data = {
             "xScale" : ('day' === timeUnit ? "ordinal" : "time"),
             "yScale" : "linear",

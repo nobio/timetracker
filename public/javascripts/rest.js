@@ -217,7 +217,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         actualTime.innerHTML = Math.round(timerecord.actual_working_time / 1000 / 60 / 60 * 100) / 100;
         averageTime.innerHTML = Math.round(timerecord.average_working_time * 100) / 100;
         diffTime.innerHTML = Math.round((timerecord.actual_working_time - timerecord.planned_working_time) / 1000 / 60 / 60 * 100) / 100;
-
+        
         busyChartVariable.setData(timerecord.chart_data);
     }, 'json').error(function(err) {
         result.innerHTML = "Error (" + err.status + "): " + err.responseText;

@@ -222,17 +222,18 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         var planned_working_time = -1;
         var average_working_time = -1;
 
+        // calculating actual working time
         stats.forEach(function(stat) {
             actual_working_time += stat.actual_working_time;
         });
         average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
         
-        //console.log("average_working_time = " + average_working_time);
-        //console.log("length = " + stats.length);
+        // console.log("average_working_time = " + average_working_time);
+        // console.log("length = " + stats.length);
 
         stats.forEach(function(stat) {
             //console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
-            actual_working_time += stat.actual_working_time;
+            //actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
             innerData[idx] = {
                 "x" : moment(stat.date).format('YYYY-MM-DD'),
