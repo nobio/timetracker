@@ -9,7 +9,7 @@
 		, "password"	: ""
 		, "uri"			: "jupiter:27017/timetrack"
 	}
-	, "openshift": {
+	, "mongolab": {
         "user"		: "nobio"
 		, "password"	: "1gR7hW2cPhtkRlv2"
 		, "uri"			: "ds061928.mongolab.com:61928/timetrack"

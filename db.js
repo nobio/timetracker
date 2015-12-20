@@ -4,33 +4,21 @@
 function dburl() {
 	var fs = require('fs');
 	var db_config = JSON.parse(fs.readFileSync('./db-conf.json','utf8'));
-    
-    var dbenv;
-    process.execArgv.forEach(function(val, index, array) {
-        if(val.contains('--dbenv')) {
-            dbenv = val.substring(val.indexOf('=')+1, val.length);
-            console.log('database environment: ' + dbenv);
-        }
-    });
-    if(!dbenv) {
-        process.argv.forEach(function(val, index, array) {
-            console.log(val + " " + index + " " +array);
-            if(val.contains('--dbenv')) {
-                dbenv = val.substring(val.indexOf('=')+1, val.length);
-                console.log('database environment: ' + dbenv);
-            }
-        });
-    }
-    
-    var dbconfig = (process.env.OPENSHIFT_APP_UUID || dbenv == 'openshift' ? db_config.openshift : db_config.local);
-    if(process.env.OPENSHIFT_APP_UUID || dbenv === 'openshift') {
+
+    /*        
+    console.log(">" + process.env.dbenv + "<");    
+    console.log(">" + process.execArgv + "<");    
+           
+    var dbconfig = (process.env.OPENSHIFT_APP_UUID || process.env.dbenv == 'openshift' ? db_config.openshift : db_config.local);
+    if(process.env.OPENSHIFT_APP_UUID || process.env.dbenv === 'openshift') {
         dbconfig = db_config.openshift;
-    } else if (dbenv === 'local') {
+    } else if (process.env.dbenv === 'local') {
         dbconfig = db_config.local;
-    } else if (dbenv === 'jupiter') {
+    } else if (process.env.dbenv === 'jupiter') {
         dbconfig = db_config.jupiter;
     }
-    
+    */
+    var dbconfig = db_config.mongolab;
 	return 'mongodb://' + dbconfig.user + ':' + dbconfig.password + '@' + dbconfig.uri;
 }
 
