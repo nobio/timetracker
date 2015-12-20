@@ -3,7 +3,7 @@
     , "version"  : "0.0.1"
     , "author"   : "Gernot H. Reichel <gernot.reichel@me.com>"
     , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
-    , "privawte"  : true
+    , "private"  : true
     , "scripts"  : {
         "start"    : "node --dbenv=openshift server"
     }
