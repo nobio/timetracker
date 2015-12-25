@@ -164,16 +164,17 @@ function storeTimeEntryById(id, entry_date, direction) {
 };
 
 function deleteTimeEntryById(id) {
-
-    $.ajax({
-        type : 'DELETE',
-        url : '/entry/' + id,
-        dataType : 'json',
-    }).done(function(response) {
-        result.innerHTML = 'deleted Time Entry ' + response;
-    }).error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+    var entry = new TimeEntry({'id': id}); // TimeEntry is a Backbone Model defined in layout.jade
+    entry.destroy({
+        wait:true,
+        success:function(model, response) {
+            result.innerHTML = 'deleted Time Entry ' + response;
+        },
+        error: function(model, err) {
+            result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        }
     });
+
 };
 
 function nextStatsDay(tableref, time, timeUnit, direction) {
