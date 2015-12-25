@@ -203,23 +203,21 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     }
 
-    $.ajax({
-        type : 'GET',
-        url : '/stats/' + nextDate,
-        data : {
-            'timeUnit' : timeUnit
+    var stats = new Statistics({'id': ""+nextDate}); // TimeEntry is a Backbone Model defined in layout.jade
+    stats.fetch({ 
+        data: {timeUnit: timeUnit},
+        success:function(timerecord) {
+            plannedTime.innerHTML = Math.round(timerecord.get("planned_working_time") / 1000 / 60 / 60 * 100) / 100;
+            actualTime.innerHTML = Math.round(timerecord.get("actual_working_time") / 1000 / 60 / 60 * 100) / 100;
+            averageTime.innerHTML = Math.round(timerecord.get("average_working_time") * 100) / 100;
+            diffTime.innerHTML = Math.round((timerecord.get("actual_working_time") - timerecord.get("planned_working_time")) / 1000 / 60 / 60 * 100) / 100;
+            
+            busyChartVariable.setData(timerecord.get("chart_data"));
         },
-        dataType : 'json',
-    }).done(function(timerecord) {
-
-        plannedTime.innerHTML = Math.round(timerecord.planned_working_time / 1000 / 60 / 60 * 100) / 100;
-        actualTime.innerHTML = Math.round(timerecord.actual_working_time / 1000 / 60 / 60 * 100) / 100;
-        averageTime.innerHTML = Math.round(timerecord.average_working_time * 100) / 100;
-        diffTime.innerHTML = Math.round((timerecord.actual_working_time - timerecord.planned_working_time) / 1000 / 60 / 60 * 100) / 100;
-        
-        busyChartVariable.setData(timerecord.chart_data);
-    }, 'json').error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        error: function(model, err) {
+            console.log(model);
+            console.log(err);
+        }
     });
 
     return null;
