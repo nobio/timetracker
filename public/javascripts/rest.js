@@ -16,26 +16,24 @@ function timeentry(direction, datetime) {
         dt = moment(datetime, 'DD.MM.YYYY HH:mm').toISOString();
     }
 
-    $.ajax({
-        type : 'POST',
-        url : '/entry',
-        dataType : 'json',
-        data : {
-            'direction' : direction,
-            'datetime' : dt
-        }
-    }).done(function(timeentry) {
-        var sDate = moment(timeentry.entry_date).format('DD.MM.YYYY');
-        var sTime = moment(timeentry.entry_date).format('HH:mm');
+    var entry = new TimeEntry(); // TimeEntry is a Backbone Model defined in layout.jade
+    entry.save({'direction': direction, 'datetime': dt}, {
+        wait:true,
+        success:function(model, timeentry) {
+            console.log('Successfully saved!');
+            var sDate = moment(timeentry.entry_date).format('DD.MM.YYYY');
+            var sTime = moment(timeentry.entry_date).format('HH:mm');
 
-        result.innerHTML = timeentry.direction;
-        result.innerHTML += " am ";
-        result.innerHTML += sDate;
-        result.innerHTML += " um ";
-        result.innerHTML += sTime;
-        size.innerHTML = timeentry.size;
-    }, 'json').error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+            result.innerHTML = timeentry.direction;
+            result.innerHTML += " am ";
+            result.innerHTML += sDate;
+            result.innerHTML += " um ";
+            result.innerHTML += sTime;
+            size.innerHTML = timeentry.size;
+        },
+        error: function(model, err) {
+            result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+        }
     });
 
 }

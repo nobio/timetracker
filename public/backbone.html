@@ -28,7 +28,7 @@ entry.fetch({
         $('#xxx').val(e.get('direction'));
         //$('#xxx').val(e.id);
     }, error: function(err) {
-        alert("Error: " + err.toString());
+        alert("Error: " + JSON.stringify(err));
     }
 });
 

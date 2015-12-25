@@ -117,7 +117,7 @@ exports.getEntryById = function(req, res) {
     
 	TimeEntry.findById(req.params.id, function(err, timeentry) {
 		if (err) {
-			res.send(500, 'Error while reading Time Entry: ' + id + " " + err);
+			res.send(500, 'Error while reading Time Entry: ' + req.params.id + " " + err);
 		} else {
 			res.send(timeentry);
 		}
