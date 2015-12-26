@@ -16,3 +16,7 @@ EntryList = Backbone.Collection.extend({
     url: '/entry'
 });
 
+Statistics = Backbone.Model.extend({
+    urlRoot: '/stats',
+});
+

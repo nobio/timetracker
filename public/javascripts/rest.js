@@ -223,5 +223,3 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
     return null;
 }
 
-function book() {
-}
