@@ -73,14 +73,15 @@ function deleteAllTimeEntries() {
 }
 
 function calculateStats() {
-    $.ajax({
-        type : 'PUT',
-        url : '/stats',
-        dataType : 'json'
-    }).done(function(response) {
-        result.innerHTML = 'updated statistics: ' + response;
-    }).error(function(err) {
-        alert("error: " + err.status + " (" + err + ")");
+    var stats = new Statistics({id:''}); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
+    stats.save({}, {
+        wait:true,
+        success:function(model, response) {
+            result.innerHTML = 'updated statistics: ' + response;
+        },
+        error: function(model, err) {
+            alert("Error (" + err.status + "): " + err.responseText);
+        }
     });
 }
 
