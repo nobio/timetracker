@@ -11,12 +11,12 @@ console.log('----------------------------');
 // defining Backbone models
 TimeEntry = Backbone.Model.extend({
     // urlRoot for single objects
-    urlRoot: '/entry',
+    urlRoot: '/entries',
 });
 
 EntryList = Backbone.Collection.extend({
     model: TimeEntry,
-    url: '/entry'
+    url: '/entries'
 });
 
 

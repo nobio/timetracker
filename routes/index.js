@@ -74,30 +74,44 @@ exports.delete = function(req, res) {
 
 /*
  * Reads all time entries
+ * Read entries by date: getAllByDate
+ * Read busy time: getBusyTime
  *
- * curl -X GET http://localhost:30000/entry
+ * curl -X GET http://localhost:30000/entries
+ * curl -X GET http://localhost:30000/entries?dt=1393455600000
+ * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
 exports.getEntries = function(req, res) {
-	TimeEntry.find(function(err, timeentries) {
-		if (err) {
-			res.send(500, 'Error while reading Time Entries: ' + id + " " + err);
-		} else {
-			res.send(timeentries);
-		}
-	});
+	var filterByDate = req.param('dt');
+	var filterByBusy = req.param('busy');
+	
+	if(filterByDate && filterByBusy) {
+		console.log("filter by date and busy");
+		res.send(500, 'date and busy filter set; can only handle one of them');
+	} else if(filterByDate) {
+		getAllByDate(filterByDate, res);
+	} else if(filterByBusy) {
+		console.log("filter by busy: " + filterByBusy);
+		getBusyTime(filterByBusy,res);
+	} else {
+		TimeEntry.find(function(err, timeentries) {
+			if (err) {
+				res.send(500, 'Error while reading Time Entries: ' + id + " " + err);
+			} else {
+				res.send(timeentries);
+			}
+		});
+	}
+	
+	
 }
 /*
  * lists all Time Entries for a given date (this particular day)
+ *
+ * curl -X GET http://localhost:30000/entries/dt/1451084400000
  */
-exports.getAllByDate = function(req, res) {
-	console.log('getAllByDate received date (raw):         ' + req.params.date);
-	console.log('getAllByDate received date (parsed):      ' + moment(req.params.date/1).format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Berlin):      ' + moment.tz(req.params.date/1, 'Europe/Berlin').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Toronto):     ' + moment.tz(req.params.date/1, 'America/Toronto').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (Los_Angeles): ' + moment.tz(req.params.date/1, 'America/Los_Angeles').format('DD.MM.YYYY HH:mm:ss'));
-	console.log('getAllByDate received date (New_York):    ' + moment.tz(req.params.date/1, 'America/New_York').format('DD.MM.YYYY HH:mm:ss'));
-
-	var dt = util.stripdownToDateBerlin(moment.unix(req.params.date / 1000));
+function getAllByDate(date, res) {
+	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
 	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
 	util.getTimeEntriesByDate(dt, function(err, timeentries) {
@@ -156,10 +170,10 @@ exports.storeEntryById = function(req, res) {
 /*
  * Reads the busy time of all entries for a given day
  *
- * curl -X GET http://localhost:30000/entries/busy/1393455600000
+ * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
-exports.getBusyTime = function(req, res) {
-	var dt = util.stripdownToDateBerlin(moment.unix(req.params.date / 1000));
+function getBusyTime(date, res) {
+	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
     
 	util.getBusytimeByDate(dt, function(err, d, busytime) {
 		if (err) {

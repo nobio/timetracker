@@ -53,13 +53,11 @@ app.get('/stats', routes.stats);
 app.get('/geo', routes.geoloc);
 
 // restful services
-app.post('/entry', routes.createEntry);
-app.get('/entry/:id', routes.getEntryById);
-app.put('/entry/:id', routes.storeEntryById);
-app.delete('/entry/:id', routes.delete);
-app.get('/entry', routes.getEntries);
-app.get('/entries/dt/:date', routes.getAllByDate);
-app.get('/entries/busy/:date', routes.getBusyTime);
+app.post('/entries', routes.createEntry);
+app.get('/entries/:id', routes.getEntryById);
+app.put('/entries/:id', routes.storeEntryById);
+app.delete('/entries/:id', routes.delete);
+app.get('/entries', routes.getEntries);
 
 // geofencing
 app.post('/geofence', routes.geofence);

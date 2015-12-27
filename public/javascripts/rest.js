@@ -38,28 +38,10 @@ function timeentry(direction, datetime) {
 
 }
 
-function maintainHoliday(date, holiday) {
-    var isHoliday = (holiday === 'on');
-
-    $.ajax({
-        type : 'PUT',
-        url : '/admin/holiday',
-        dataType : 'json',
-        data : {
-            'holiday' : isHoliday,
-            'date' : date
-        }
-    }).done(function(response) {
-        result.innerHTML = 'holiday set/reset successfully: ' + response._id;
-    }, 'json').error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
-    });
-}
-
 function deleteAllTimeEntries() {
     $.ajax({
         type : 'DELETE',
-        url : '/entry',
+        url : '/entries',
         dataType : 'json'
     }).done(function(response) {
         result.innerHTML = 'deleted ' + response.size + ' time entries';
@@ -96,7 +78,7 @@ function getTimeEntriesByDate(dt) {
 
         $.ajax({
             type : 'GET',
-            url : '/entries/dt/' + dt,
+            url : '/entries?dt=' + dt,
             dataType : 'json',
         }).done(function(timeentries) {
             var html = 'Anwesenheit: ';
@@ -135,7 +117,7 @@ function getBusyTime(dt, callback) {
 
     $.ajax({
         type : 'GET',
-        url : '/entries/busy/' + dt,
+        url : '/entries?busy=' + dt,
         dataType : 'json',
     }).done(function(duration) {
         callback(null, duration);
@@ -151,7 +133,7 @@ function storeTimeEntryById(id, entry_date, direction) {
 
     $.ajax({
         type : 'PUT',
-        url : '/entry/' + id,
+        url : '/entries/' + id,
         dataType : 'json',
         data : {
             'direction' : direction,
