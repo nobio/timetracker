@@ -38,6 +38,7 @@ function timeentry(direction, datetime) {
 
 }
 
+/*
 function deleteAllTimeEntries() {
     $.ajax({
         type : 'DELETE',
@@ -53,7 +54,7 @@ function deleteAllTimeEntries() {
     //    .fail(function(err) { alert("failed: " + err.status + " (" + err.statusText + ")"); })
     //    .always(function() { alert("always"); })
 }
-
+*/
 function calculateStats() {
     var stats = new Statistics({id:''}); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
     stats.save({}, {
@@ -71,44 +72,43 @@ function getTimeEntriesByDate(dt) {
 
     result.innerHTML = '';
     getBusyTime(dt, function(err, duration) {
-        
+
         if (err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
-
-        $.ajax({
-            type : 'GET',
-            url : '/entries?dt=' + dt,
-            dataType : 'json',
-        }).done(function(timeentries) {
-            var html = 'Anwesenheit: ';
-            if (duration) {
-                html += moment(duration - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
+        
+        var entries = new TimeEntries(); // TimeEntry is a Backbone Model defined in layout.jade
+        entries.fetch({
+            data: { dt: ""+dt }, 
+            success: function(timeentries) {
+                var html = 'Anwesenheit: ';
+                if (duration) {
+                    html += moment(duration - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
+                }
+                html += '<table><th>Datum</th>';
+                html += '<th>Zeit</th>';
+                html += '<th>Kommen/Gehen</th>';
+                html += '<th>Letzte Änderung</th>';
+                html += '<th>Bearbeiten/Löschen</th>';
+                timeentries.forEach(function(entry) {
+                    html += '<tr>';
+                    html += '<td>' + moment(entry.get("entry_date")).format('DD.MM.YYYY') + '</td>';
+                    html += '<td>' + moment(entry.get("entry_date")).format('HH:mm') + '</td>';
+                    html += '<td>' + entry.get("direction") + '</td>';
+                    html += '<td>' + moment(entry.get("last_changed")).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
+                    html += '<td>';
+                    html += '<input type="button" value="bearbeiten" onclick="window.location=\'/admin_item?id=' + entry.get("_id") + '\';">';
+                    html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry.get("_id") + '\');">';
+                    html += '</td>';
+                    html += '</tr>';
+                });
+                html += '</table>';
+                data_by_date.innerHTML = html;
+            },
+            error: function(model, err) {
+                result.innerHTML = "Error (" + err.status + "): " + err.responseText;
             }
-            html += '<table><th>Datum</th>';
-            html += '<th>Zeit</th>';
-            html += '<th>Kommen/Gehen</th>';
-            html += '<th>Letzte Änderung</th>';
-            html += '<th>Bearbeiten/Löschen</th>';
-            timeentries.forEach(function(entry) {
-                html += '<tr>';
-                html += '<td>' + moment(entry.entry_date).format('DD.MM.YYYY') + '</td>';
-                html += '<td>' + moment(entry.entry_date).format('HH:mm') + '</td>';
-                html += '<td>' + entry.direction + '</td>';
-                html += '<td>' + moment(entry.last_changed).format('DD.MM.YYYYY HH:mm:ss') + '</td>';
-                html += '<td>';
-                html += '<input type="button" value="bearbeiten" onclick="window.location=\'/admin_item?id=' + entry._id + '\';">';
-                html += '<input type="button" value="löschen" onclick="deleteTimeEntryById(\'' + entry._id + '\');">';
-                html += '</td>';
-                html += '</tr>';
-            });
-            html += '</table>';
-            data_by_date.innerHTML = html;
-
-        }, 'json').error(function(err) {
-            result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         });
-
     });
 
 }
