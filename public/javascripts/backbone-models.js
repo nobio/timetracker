@@ -20,3 +20,7 @@ Statistics = Backbone.Model.extend({
     urlRoot: '/stats',
 });
 
+Duration = Backbone.Model.extend({
+    urlRoot: '/entries'
+});
+

@@ -114,17 +114,18 @@ function getTimeEntriesByDate(dt) {
 }
 
 function getBusyTime(dt, callback) {
-
-    $.ajax({
-        type : 'GET',
-        url : '/entries?busy=' + dt,
-        dataType : 'json',
-    }).done(function(duration) {
-        callback(null, duration);
-    }, 'json').error(function(err) {
-        callback(err);
+    
+    var duration = new Duration();
+    duration.fetch({
+        data: {busy: ""+dt},
+        success: function(d) {
+            callback(null, d.get("duration"));
+        },
+        error: function(model, err) {
+            callback(err);
+        }
     });
-
+    
 }
 
 function storeTimeEntryById(id, entry_date, direction) {

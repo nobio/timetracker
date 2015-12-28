@@ -179,7 +179,8 @@ function getBusyTime(date, res) {
 		if (err) {
 			res.send(500, err.toString());
 		} else {
-			res.send(''+moment.duration(busytime)._milliseconds);
+		var duration = ''+moment.duration(busytime)._milliseconds;  
+			res.send({duration: duration});
 		}
 	});
 }
