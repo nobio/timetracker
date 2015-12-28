@@ -48,13 +48,11 @@ block content
         tr
             td
                 input#datepicker(type='text' name='date')
-                input(type='button', value='Auswertung...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
+                input(type='button', id='examin', value='Auswertung...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
         tr
             td
                 #data_by_date
-            td
-                #dialog
-
+            
     table#table_stats_day
         th
             input(type='button', value='<', onclick='nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "-1")')

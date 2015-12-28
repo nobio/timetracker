@@ -1,7 +1,3 @@
-$.ajaxSetup({
-    cache : false
-});
-
 var busyChartVariable;
 
 function timeentry(direction, datetime) {
@@ -127,25 +123,6 @@ function getBusyTime(dt, callback) {
     });
     
 }
-
-function storeTimeEntryById(id, entry_date, direction) {
-
-    alert(id + ", " + entry_date + ", " + direction);
-
-    $.ajax({
-        type : 'PUT',
-        url : '/entries/' + id,
-        dataType : 'json',
-        data : {
-            'direction' : direction,
-            'datetime' : dt
-        }
-    }).done(function(response) {
-        result.innerHTML = 'stored Time Entry ' + response;
-    }).error(function(err) {
-        result.innerHTML = "Error (" + err.status + "): " + err.responseText;
-    });
-};
 
 function deleteTimeEntryById(id) {
     var entry = new TimeEntry({'id': id}); // TimeEntry is a Backbone Model defined in layout.jade
