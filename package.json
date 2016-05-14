@@ -1,6 +1,6 @@
 {
     "name"     : "Timetrack"
-    , "version"  : "0.0.1"
+    , "version"  : "1.4.10"
     , "author"   : "Gernot H. Reichel <gernot.reichel@me.com>"
     , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
     , "private"  : true

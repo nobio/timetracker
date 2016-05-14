@@ -2,9 +2,7 @@
  * read the database url respcting the environment (local or openshift)
  */
 function dburl() {
-	var fs = require('fs');
-	var db_config = JSON.parse(fs.readFileSync('./db-conf.json','utf8'));
-
+    var db_config = require('./db-conf.json');
     /*        
     console.log(">" + process.env.dbenv + "<");    
     console.log(">" + process.execArgv + "<");    
