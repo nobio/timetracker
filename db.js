@@ -44,6 +44,8 @@ var TimeEntry = new schema({
       entry_date:   {type: Date, required: true, default: Date.now, index: true}
     , direction:    {type: String, enum: directions, required: true}
     , last_changed: {type: Date, default: Date.now, required: true}
+    , longitude:    {type: Number, required: false}
+    , latitude:     {type: Number, required: false}
 });
 mongoose.model('TimeEntry', TimeEntry);
 

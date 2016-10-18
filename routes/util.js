@@ -325,7 +325,7 @@ exports.deleteAllStatsDays = function(callback) {
     });
 };
 
-exports.createTimeEntry = function(direction, datetime, callback) {
+exports.createTimeEntry = function(direction, datetime, longitude, latitude, callback) {
 
     this.validateRequest(direction, datetime, function(err) {
         
@@ -335,7 +335,9 @@ exports.createTimeEntry = function(direction, datetime, callback) {
         } else {
             new TimeEntry({
                 entry_date : datetime,
-                direction : direction
+                direction : direction,
+                longitude: longitude,
+                latitude: latitude
             }).save(function(err, timeentry) {
                 // and now add the size to the mongoose-JSON (needs to be converted to an object first)
                 var t = timeentry.toObject();

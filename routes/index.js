@@ -48,7 +48,7 @@ exports.createEntry = function(req, res) {
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
 
-	util.createTimeEntry(direction, datetime, function(err, timeentry) {
+	util.createTimeEntry(direction, datetime, undefined, undefined, function(err, timeentry) {
 		if (err) {
 			res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 		} else {
@@ -210,7 +210,7 @@ exports.geofence = function(req, res) {
    
     var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
     if(req.body.id == 'Work') {
-		util.createTimeEntry(direction, moment(), function(err, timeentry) {
+		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, function(err, timeentry) {
 			if (err) {
 				res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 			} else {
