@@ -34,6 +34,37 @@ function isEmpty(obj) {
     return true;
 };
 
+Number.prototype.toRad = function() {
+    return this * Math.PI / 180;
+}
+function toRad(num) {
+    return num * Math.PI / 180;
+}
+
+function formatDistance(distOrig) {
+    var distKm = parseInt(distOrig);
+    var distM = (distOrig - distKm) * 1000;
+    distM = Math.round(distM * 100) / 100;
+    
+    return {kilometer:distKm, meter:distM};
+}
+
+
+// Reused code - copyright Moveable Type Scripts - retrieved May 4, 2010.
+// http://www.movable-type.co.uk/scripts/latlong.html
+// Under Creative Commons License http://creativecommons.org/licenses/by/3.0/
+// returns the distance in km
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // km -> m
+    var dLat = toRad(lat2-lat1); //;(lat2-lat1).toRad();
+    var dLon = toRad(lon2-lon1); //(lon2-lon1).toRad();
+//    var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return d;
+}
+
 
 /* ================================================================== */
 /* ======================== INTERNAL METHODS ======================== */
@@ -45,32 +76,54 @@ function isEmpty(obj) {
  *   when direction == "go"    -> the last entry of this given day must be "enter"; if no entry exists or the last was "go" -> error
  *   dt is expected in ISO format
  */
-exports.validateRequest = function(direction, dt, callback) {
+exports.validateRequest = function(direction, dt, longitude, latitude, callback) {
     
-    this.getLastTimeEntryByDate(dt, function(err, entry) {
+    this.getLastTimeEntryByDate(dt, function(err, last_entry) {
         if (err) {
             callback(err);
             return;
         }
         
-        // entries should have zero or one entry
-        if (direction == 'enter') {// enter
-            if ( typeof (entry) == 'undefined' || entry.direction == 'go') {
-                callback();
-                // everything's ok
-            } else {
-                callback(new Error('When entering there must be either no entry or a "go" entry earlier this day'));
+        if(typeof (last_entry) == 'undefined') {
+            if(direction == 'go') {
+                callback(new Error('Please enter a "enter" as a first entry of the day')); 
+                return;
             }
-        } else {// go
-            if ( typeof (entry) !== 'undefined' && entry.direction == 'enter') {
-                callback();
-                // everything's ok
-            } else {
-                callback(new Error('When leaving there must be an "enter" entry earlier this day'));
-            }
+            callback();
+            return;
         }
+        
+        // check if last entry was not during the last 3 seconds
+        console.log('time difference between last entry and this entry: ' + (dt - last_entry.entry_date)/1000);        
+        if(dt - last_entry.entry_date < 3000) { // ms not 
+            callback(new Error('Seems to be a double entry. The last entry is not older than 3 seconds.'));
+            return;
+        }
+        
+        /*
+        // check if last entry was not within 10m
+        console.log("distance: " + JSON.stringify(formatDistance(calculateDistance(latitude, longitude, last_entry.latitude, last_entry.longitude))));
+        console.log("distance: " + calculateDistance(latitude, longitude, last_entry.latitude, last_entry.longitude));
+        var distance_to_last_entry_in_meter = 1000 * calculateDistance(latitude, longitude, last_entry.latitude, last_entry.longitude);
+        if(distance_to_last_entry_in_meter < 10) {
+            callback(new Error('Seems to be a double entry. The last entry was done closer than ' + distance_to_last_entry_in_meter + ' meter'));
+            return;
+        }
+        */
+        
+        // entries should have zero or one entry
+        if (direction == 'enter' && last_entry.direction == 'enter') {
+            callback(new Error('When entering there must be either no entry or a "go" entry earlier this')); 
+            return;
+        } else if (direction == 'go' && last_entry.direction == 'go') {
+            callback(new Error('When leaving there must be an "enter" entry earlier this')); 
+            return;
+        }
+        callback();
+        return;
     });
 };
+
 
 exports.getBusytimeByDate = function(dt, callback) {
     
@@ -327,8 +380,8 @@ exports.deleteAllStatsDays = function(callback) {
 
 exports.createTimeEntry = function(direction, datetime, longitude, latitude, callback) {
 
-    this.validateRequest(direction, datetime, function(err) {
-        
+    this.validateRequest(direction, datetime, longitude, latitude, function(err) {
+      
         if (err) {
             console.log('exports.createTimeEntry received an error: ' + err);
             callback(err);

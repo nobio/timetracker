@@ -204,6 +204,17 @@ function getBusyTime(date, res) {
  }
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geofence
+
+Work: 
+{ device: '4AB9FC83-510B-4FFD-9EBE-5051E4F5EA57',
+  device_model: 'iPhone7,2',
+  device_type: 'iOS',
+  id: 'Work',
+  latitude: '49.448335',
+  longitude: '11.091801',
+  timestamp: '1477582315.800965',
+  trigger: 'exit‘ }
+  
  */
 exports.geofence = function(req, res) {
     console.log(req.body);
