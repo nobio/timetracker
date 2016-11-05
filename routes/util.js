@@ -368,7 +368,7 @@ exports.deleteAllStatsDays = function(callback) {
     StatsDay.find(function(err, statsdays) {
         size = statsdays.length;
         statsdays.forEach(function(statsday) {
-            console.log('removing ' + statsday);
+            //console.log('removing ' + statsday);
             statsday.remove();
         });
         console.log('deleted ' + size + ' items');
