@@ -24,7 +24,7 @@ app.configure(function() {
 	app.use(express.favicon());
     app.use(express.logger('dev'));
     express.logger.format('mydate', function() {
-        return moment().format('DD.MM.YYYY HH:mm:ss SSS');
+        return moment().format('YYYY-MM-DD HH:mm:ss SSS');
     });
     app.use(express.logger('[:mydate] :method :url :status :res[content-length] - :remote-addr - :response-time ms'));
 	app.use(express.bodyParser());
