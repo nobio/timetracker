@@ -22,11 +22,11 @@ app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
-    app.use(express.logger('dev'));
-    express.logger.format('mydate', function() {
-        return moment().format('YYYY-MM-DD HH:mm:ss SSS');
-    });
-    app.use(express.logger('[:mydate] :method :url :status :res[content-length] - :remote-addr - :response-time ms'));
+	app.use(express.logger('dev'));
+	express.logger.format('mydate', function() {
+		return moment().format('YYYY-MM-DD HH:mm:ss SSS');
+	});
+	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));     
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
@@ -75,6 +75,7 @@ app.delete('/stats', admin.deleteAllStatsDays);
 
 // maintain stuff
 app.get('/ping', admin.ping);
+app.get('/test', admin.test);
 
 // start the web service
 console.log('\nusage: node --dbenv=[local|openshift] server.js\n');
@@ -89,6 +90,3 @@ schedule.scheduleJob({minute: 0}, function(){
 schedule.scheduleJob({hour: 4, minute: 0}, function(){
     admin.dumpTimeEntry();
 });
-
-
-

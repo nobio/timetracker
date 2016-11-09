@@ -409,3 +409,27 @@ exports.createTimeEntry = function(direction, datetime, longitude, latitude, cal
 
 };
 
+exports.removeDoublets = function(callback) {
+    var lastTimeentry;
+    var count = 0;
+    TimeEntry.find().sort({
+        entry_date : 1
+    }).exec(function(err, timeentries) {
+        timeentries.forEach(function(timeentry) {
+            if(lastTimeentry !== undefined) {
+                if(moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 
+                    && timeentry.direction == lastTimeentry.direction) {
+                    //timeentry.remove();
+                    count++;
+                    console.log("removing timeentry " + timeentry);
+                } else {
+                    lastTimeentry = timeentry;                    
+                }
+            } else {
+                lastTimeentry = timeentry;                    
+            }
+        });
+
+        callback(err, {'count_removed_doubletts':count});
+    });
+};
