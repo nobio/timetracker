@@ -85,9 +85,15 @@ http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 });
 
 // start the scheduler
-schedule.scheduleJob({minute: 0}, function(){
-    admin.calcStats();
+console.log("job scheduler: calcStats");
+schedule.scheduleJob({minute: 0}, function() {
+    admin.calcStats;
 });
-schedule.scheduleJob({hour: 4, minute: 0}, function(){
-    admin.dumpTimeEntry();
+console.log("job scheduler: dumpTimeEntry");
+schedule.scheduleJob({hour: 4, minute: 0}, function() {
+    admin.dumpTimeEntry;
+});
+console.log("job scheduler: backupTimeEntry");
+schedule.scheduleJob({hour: 4, minute: 0}, function() {
+    admin.backupTimeEntry;
 });
