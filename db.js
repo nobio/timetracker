@@ -48,6 +48,7 @@ var TimeEntry = new schema({
     , latitude:     {type: Number, required: false}
 });
 mongoose.model('TimeEntry', TimeEntry);
+mongoose.model('TimeEntryBackup', TimeEntry);
 
 // StatisticsDay
 var StatsDay = new schema({

@@ -4,6 +4,7 @@ var fs = require('fs');
 var util = require('./util');
 
 var TimeEntry = mongoose.model('TimeEntry');
+var TimeEntryBackup = mongoose.model('TimeEntryBackup');
 var StatsDay = mongoose.model('StatsDay');
 
 var DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
@@ -293,12 +294,12 @@ exports.maintain = function(req, res) {
     });
     res.send(null);
 };
+
 /*
  * function to dump the mongodb to the local file system in order to be restored if needed
  *
  * curl -X POST http://localhost:30000/admin/dump/timeentry
  */
-
 exports.dumpTimeEntry = function(req, res) {
     TimeEntry.find(function(err, timeentries) {
         
@@ -317,6 +318,40 @@ exports.dumpTimeEntry = function(req, res) {
             }
         });
     });
+};
+
+/*
+ * function to backup  all TimeEntries into a backup table
+ *
+ * curl -X POST http://localhost:30000/admin/backup/timeentry
+ */
+exports.backupTimeEntry = function(req, res) {
+    TimeEntryBackup.remove({}, function(err) {
+        if(!err) {
+            console.log("TimeEntryBackup deleted");
+
+            TimeEntry.find(function(err, timeentries) {
+                timeentries.forEach(function(timeentry) {
+                    new TimeEntryBackup({
+                        _id : timeentry._id,
+                        entry_date : timeentry.entry_date,
+                        direction : timeentry.direction,
+                        last_changed : timeentry.last_changed,
+                        longitude : timeentry.longitude,
+                        latitude : timeentry.latitude
+                    }).save(function(err, timeentrybackup) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(timeentry._id);
+                        }
+                    });                
+                });
+                res.send({'response' : timeentries.length});
+             });
+        }
+    });
+    //res.send({'response':'backup done'});     
 };
 
 /*

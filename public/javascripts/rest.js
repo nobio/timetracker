@@ -56,7 +56,7 @@ function calculateStats() {
     stats.save({}, {
         wait:true,
         success:function(model, response) {
-            result.innerHTML = 'updated statistics: ' + response;
+            result.innerHTML = 'updated statistics: ' + JSON.stringify(response);
         },
         error: function(model, err) {
             alert("Error (" + err.status + "): " + err.responseText);

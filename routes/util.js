@@ -419,7 +419,7 @@ exports.removeDoublets = function(callback) {
             if(lastTimeentry !== undefined) {
                 if(moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 
                     && timeentry.direction == lastTimeentry.direction) {
-                    //timeentry.remove();
+                    timeentry.remove();
                     count++;
                     console.log("removing timeentry " + timeentry);
                 } else {
