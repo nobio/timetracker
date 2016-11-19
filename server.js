@@ -11,7 +11,6 @@ var routes = require('./routes');
 var admin = require('./routes/admin');
 var http = require('http');
 var path = require('path');
-var schedule = require('node-schedule');
 var moment = require('moment');
 
 var app = express();
@@ -84,40 +83,5 @@ http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 	console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
 
-// start the scheduler
-console.log("job scheduler: calcStats (every hour at ??:00)");
-//schedule.scheduleJob({minute: 0}, function() {
-schedule.scheduleJob('0 * * * *', function() {  // every hour at ??:00
-	console.log('scheduled task "calcStats" started')
-    admin.calcStats();
-});
-console.log("job scheduler: dumpTimeEntry (every day at 04:05)");
-//schedule.scheduleJob({hour: 4, minute: 0}, function() {
-//schedule.scheduleJob('5 4 * * *', function() {  // every day at 04:05
-schedule.scheduleJob('* * * * *', function() {  // every day at 04:05
-	console.log('scheduled task "dumpTimeEntry" started')
-    admin.dumpTimeEntry();
-});
-console.log("job scheduler: backupTimeEntry (every day at 04:10)");
-//schedule.scheduleJob({hour: 4, minute: 0}, function() {
-//schedule.scheduleJob('10 4 * * *', function() {  // every day at 04:10
-schedule.scheduleJob('* * * * *', function() {  // every day at 04:10
-	console.log('scheduled task "backupTimeEntry" started')
-    //admin.backupTimeEntry();
-});
-console.log("job scheduler: test");
-schedule.scheduleJob('* * * * *', function() {
-    console.log('schedule: ' + new Date());
-}); 
-
-
-/*
-# .---------------- minute (0 - 59)
-# |  .------------- hour (0 - 23)
-# |  |  .---------- day of month (1 - 31)
-# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
-# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
-# |  |  |  |  |
-# *  *  *  *  * user-name  command to be executed
-schedule.scheduleJob('0 17 ? * 0,4-6', function(){
-*/
+/* start scheduler */
+require('./routes/scheduler').scheduleTasks();
