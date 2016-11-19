@@ -85,24 +85,24 @@ http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 });
 
 // start the scheduler
-console.log("job scheduler: calcStats");
+console.log("job scheduler: calcStats (every hour at ??:00)");
 //schedule.scheduleJob({minute: 0}, function() {
 schedule.scheduleJob('0 * * * *', function() {  // every hour at ??:00
 	console.log('scheduled task "calcStats" started')
-    admin.calcStats;
+    admin.calcStats();
 });
-console.log("job scheduler: dumpTimeEntry");
+console.log("job scheduler: dumpTimeEntry (every day at 04:05)");
 //schedule.scheduleJob({hour: 4, minute: 0}, function() {
 schedule.scheduleJob('5 4 * * *', function() {  // every day at 04:05
 	console.log('scheduled task "dumpTimeEntry" started')
-    admin.dumpTimeEntry;
+    admin.dumpTimeEntry();
 });
-console.log("job scheduler: backupTimeEntry");
+console.log("job scheduler: backupTimeEntry (every day at 04:10)");
 //schedule.scheduleJob({hour: 4, minute: 0}, function() {
 //schedule.scheduleJob('10 4 * * *', function() {  // every day at 04:10
 schedule.scheduleJob('* * * * *', function() {  // every day at 04:10
 	console.log('scheduled task "bacupTimeEntry" started')
-    admin.backupTimeEntry;
+    admin.backupTimeEntry();
 });
 console.log("job scheduler: test");
 schedule.scheduleJob('* * * * *', function() {
