@@ -429,7 +429,7 @@ exports.removeDoublets = function(callback) {
                 lastTimeentry = timeentry;                    
             }
         });
-
-        callback(err, {'count_removed_doubletts':count});
+        console.log(count + ' doublets removed');
+        callback(err, count);
     });
 };
