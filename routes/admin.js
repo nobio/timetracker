@@ -347,7 +347,9 @@ exports.backupTimeEntry = function(req, res) {
                         }
                     });                
                 });
-                res.send({'response' : timeentries.length});
+                if(res) {
+                    res.send({'response' : timeentries.length});
+                }
              });
         }
     });
