@@ -93,7 +93,8 @@ schedule.scheduleJob('0 * * * *', function() {  // every hour at ??:00
 });
 console.log("job scheduler: dumpTimeEntry (every day at 04:05)");
 //schedule.scheduleJob({hour: 4, minute: 0}, function() {
-schedule.scheduleJob('5 4 * * *', function() {  // every day at 04:05
+//schedule.scheduleJob('5 4 * * *', function() {  // every day at 04:05
+schedule.scheduleJob('* * * * *', function() {  // every day at 04:05
 	console.log('scheduled task "dumpTimeEntry" started')
     admin.dumpTimeEntry();
 });
@@ -101,8 +102,8 @@ console.log("job scheduler: backupTimeEntry (every day at 04:10)");
 //schedule.scheduleJob({hour: 4, minute: 0}, function() {
 //schedule.scheduleJob('10 4 * * *', function() {  // every day at 04:10
 schedule.scheduleJob('* * * * *', function() {  // every day at 04:10
-	console.log('scheduled task "bacupTimeEntry" started')
-    admin.backupTimeEntry();
+	console.log('scheduled task "backupTimeEntry" started')
+    //admin.backupTimeEntry();
 });
 console.log("job scheduler: test");
 schedule.scheduleJob('* * * * *', function() {
