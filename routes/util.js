@@ -129,22 +129,17 @@ exports.getBusytimeByDate = function(dt, callback) {
     
     // first get all entries for this day....
     this.getTimeEntriesByDate(dt, function(err, timeentries) {
-        
         if (err) {
             callback(new Error('Error while reading Time Entry: ' + id + " " + err.message));
         } else {
             
             if (timeentries.length === 0) {
-                
                 callback(new Error('Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')'), 0);
-                
             } else if (timeentries.length % 2 !== 0) {
-                
                 callback(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0);
-                
             } else {
 
-                var busytime;
+                var busytime = 0;
                 for (var n = timeentries.length - 1; n > 0; n -= 2) {
                     // this must be a go-event
                     if (timeentries[n].direction !== 'go') {
@@ -153,13 +148,9 @@ exports.getBusytimeByDate = function(dt, callback) {
                     
                     var end = timeentries[n].entry_date;
                     var start = timeentries[n - 1].entry_date;
-                    var diff = moment.duration(moment(end).subtract(moment(start)));
-                    
-                    if (!busytime) {
-                        busytime = diff;
-                    } else {
-                        busytime.add(diff, 'millisecond');
-                    }
+
+                    busytime = busytime + (end - start);
+                    //console.log(dt + ": " + start + " -> " + end + "    = " + busytime + " (" + (busytime / 1000/60/60) + ")");
                     
                 }
                 
@@ -167,6 +158,7 @@ exports.getBusytimeByDate = function(dt, callback) {
                 if(timeentries.length === 2) {
                     busytime = busytime - DEFAULT_BREAK_TIME;
                 }
+                //console.log(dt + " => " + busytime + " " + (busytime/1000/60/60));
                 
                 callback(null, dt, busytime);
             }
