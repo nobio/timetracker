@@ -9,8 +9,7 @@ exports.scheduleTasks = function() {
 
     // start the scheduler
     console.log("job scheduler: calcStats (every hour at ??:00)");
-    //scheduler.scheduleJob({minute: 0}, function() {
-    scheduler.scheduleJob('0 * * * *', function() {  // every hour at ??:00
+    scheduler.scheduleJob({minute: 0}, function() {  // every hour at ??:00
         console.log('scheduled task "calcStats" started')
         admin.calcStats();
     });
