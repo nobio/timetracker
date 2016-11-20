@@ -342,8 +342,6 @@ exports.backupTimeEntry = function(req, res) {
                     }).save(function(err, timeentrybackup) {
                         if (err) {
                             console.log(err);
-                        } else {
-                            console.log(timeentry._id);
                         }
                     });                
                 });
