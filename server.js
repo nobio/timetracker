@@ -16,7 +16,7 @@ var moment = require('moment');
 var app = express();
 
 app.configure(function() {
-	app.set('host', process.env.IP   || process.env.OPENSHIFT_NODEJS_IP   || '0.0.0.0');
+	app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 	app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
@@ -25,7 +25,7 @@ app.configure(function() {
 	express.logger.format('mydate', function() {
 		return moment().format('YYYY-MM-DD HH:mm:ss SSS');
 	});
-	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));     
+	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
@@ -35,8 +35,8 @@ app.configure(function() {
 
 app.configure('development', function() {
 	app.use(express.errorHandler({
-		dumpExceptions : true,
-		showStack : true
+		dumpExceptions: true,
+		showStack: true
 	}));
 });
 
@@ -62,7 +62,7 @@ app.get('/entries', routes.getEntries);
 app.post('/geofence', routes.geofence);
 
 // admin stuff
-app.delete ('/entries', admin.deleteAllTimeEntries);
+app.delete('/entries', admin.deleteAllTimeEntries);
 app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
 app.get('/admin/maintain', admin.maintain);
 app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
@@ -78,9 +78,8 @@ app.get('/ping', admin.ping);
 app.get('/test', admin.test);
 
 // start the web service
-console.log('\nusage: node --dbenv=[local|openshift] server.js\n');
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
-	console.log("Express server listening on http://" + app.get('host') + ':' + app.get('port'));
+	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
 
 /* start scheduler */
