@@ -6,10 +6,11 @@
 require('./db');
 
 var express = require('express');
-var routes = require('./routes');
-// -> reades ./routes/index.js
+var routes = require('./routes'); // -> reades ./routes/index.js
 var admin = require('./routes/admin');
 var http = require('http');
+var https = require('https');
+var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 
@@ -40,10 +41,11 @@ app.configure('development', function() {
 	}));
 });
 
+/*
 app.configure('production', function() {
 	app.use(express.errorHandler());
 });
-
+*/
 // routes to jade templates
 app.get('/', routes.index);
 app.get('/admin', routes.admin);
@@ -78,9 +80,20 @@ app.get('/ping', admin.ping);
 app.get('/test', admin.test);
 
 // start the web service
+const ssl_options = {
+	key: fs.readFileSync('./ssl/key.pem'),
+	cert: fs.readFileSync('./ssl/cert.pem'),
+	passphrase: 'sk)s4$§uD53s+_s2Y§!Y'
+};
+
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
 	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
+
+https.createServer(ssl_options, app).listen(30001, app.get('host'), function() {
+	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
+});
+
 
 /* start scheduler */
 require('./routes/scheduler').scheduleTasks();
