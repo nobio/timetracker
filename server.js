@@ -9,8 +9,6 @@ var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
 var admin = require('./routes/admin');
 var http = require('http');
-var https = require('https');
-var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 
@@ -73,6 +71,7 @@ app.post('/admin/backup/timeentry', admin.backupTimeEntry);
 // statistics stuff
 app.put('/stats', admin.calcStats);
 app.get('/stats/:date', admin.getStatsDay);
+app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 app.delete('/stats', admin.deleteAllStatsDays);
 
 // maintain stuff
@@ -80,17 +79,7 @@ app.get('/ping', admin.ping);
 app.get('/test', admin.test);
 
 // start the web service
-const ssl_options = {
-	key: fs.readFileSync('./ssl/key.pem'),
-	cert: fs.readFileSync('./ssl/cert.pem'),
-	passphrase: 'sk)s4$§uD53s+_s2Y§!Y'
-};
-
 http.createServer(app).listen(app.get('port'), app.get('host'), function() {
-	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
-});
-
-https.createServer(ssl_options, app).listen(30001, app.get('host'), function() {
 	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
 
