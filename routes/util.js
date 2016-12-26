@@ -310,42 +310,61 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
 };
 
 exports.getStatsByTimeBox = function(timeUnit, callback) {
-    var timeboxedStatistics;
 
     StatsDay.find().sort({
-        date: -1
+        date: 1
     }).exec(function(err, stats) {
         if (err) {
-            callback(err, null)
+            callback(err);
         } else {
 
             if ('month' === timeUnit) {
-                //
+                callback(null, getStatsByTimeBoxTimeUnit(stats, 'gggg-MM'));
             } else if ('week' === timeUnit) {
-                callback(null, getStatsByTimeBoxWeek(stats));
+                callback(null, getStatsByTimeBoxTimeUnit(stats, 'gggg-ww'));
             } else if ('day' === timeUnit) {
                 callback(null, getStatsByTimeBoxDay(stats));
             } else if ('weekday' === timeUnit) {
-                //
+                callback(null, getStatsByTimeBoxTimeWeekDay(stats));
+            } else {
+                callback(new Error('time unit ' + timeUnit + ' invalid'));
             }
         }
 
     });
 }
 
-function getStatsByTimeBoxWeek(stats) {
+/* function of reduce 
+function add(a, b) {
+    return a + b;
+}
+*/
+function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
     var data = [{
         0: 0
     }];
+    var time_unit_stats = [];
 
+    var lastTimeUnit;
+    var actualTimeUnit;
     var idx = 0;
     stats.forEach(function(stat) {
-        data[idx] = {
-            working_time: stat.actual_working_time,
-            working_time_rounded_hours: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-            date: stat.date
-        };
-        idx++;
+        actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
+        if (lastTimeUnit != actualTimeUnit) {
+            // calculate statistics of last week
+            var sum = time_unit_stats.reduce((a, b) => a + b, 0); // reduce funciton
+            var avg = sum / time_unit_stats.length;
+            data[idx] = {
+                working_time: avg,
+                working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
+                date: stat.date
+            };
+            // reset to next week
+            lastTimeUnit = actualTimeUnit;
+            time_unit_stats = [];
+            idx++;
+        }
+        time_unit_stats.push(stat.actual_working_time);
     });
     return data;
 }
@@ -366,6 +385,63 @@ function getStatsByTimeBoxDay(stats) {
     });
     return data;
 }
+
+function getStatsByTimeBoxTimeWeekDay(stats) {
+    var data = [{
+        0: 0
+    }];
+    var time_data = {
+        "Mo": {
+            duration: 0,
+            count: 0
+        },
+        "Tu": {
+            duration: 0,
+            count: 0
+        },
+        "We": {
+            duration: 0,
+            count: 0
+        },
+        "Th": {
+            duration: 0,
+            count: 0
+        },
+        "Fr": {
+            duration: 0,
+            count: 0
+        },
+        "Sa": {
+            duration: 0,
+            count: 0
+        },
+        "Su": {
+            duration: 0,
+            count: 0
+        }
+    };
+    var time_unit_stats = [];
+
+    stats.forEach(function(stat) {
+        var timeUnit = moment(stat.date).format("dd");
+        time_data[timeUnit].duration += stat.actual_working_time;
+        time_data[timeUnit].count += 1;
+    });
+
+    // calculate statistics of last week
+    var idx = 0;
+    time_data.forEach(function(day) {
+        var avg = time_data[idx].duration / time_data[idx].count;
+        data[idx] = {
+            working_time: avg,
+            working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
+            date: time_data[idx]
+        };
+        idx++;
+    });
+    return data;
+}
+
 
 /*
  * returns the aggregated statistics for a given day
