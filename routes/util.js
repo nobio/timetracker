@@ -339,17 +339,18 @@ function add(a, b) {
     //console.log("a=" + a + ", b=" + b);
     return a + b;
 }
+
 function varianz(a, curr, idx, array) {
-    if(idx == array.length-1) {
-        var mean = (a + curr)/array.length;
+    if (idx == array.length - 1) {
+        var mean = (a + curr) / array.length;
         var tmp = 0;
         array.forEach(function(val) {
-            tmp += (val - mean)*(val - mean);
+            tmp += (val - mean) * (val - mean);
         });
         return Math.sqrt(tmp / array.length);
     }
 
-    return a + curr;    
+    return a + curr;
 }
 
 function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
@@ -365,8 +366,8 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
         actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
         if (lastTimeUnit != actualTimeUnit) {
             // calculate statistics of last week
-//            var sum = time_unit_stats.reduce((a, b) => a + b, 0); // reduce funciton; but not with version 0.10.5. It comes later...
-//            var sum = time_unit_stats.reduce(function(a, b) {return a + b;}, 0); // reduce function
+            //            var sum = time_unit_stats.reduce((a, b) => a + b, 0); // reduce funciton; but not with version 0.10.5. It comes later...
+            //            var sum = time_unit_stats.reduce(function(a, b) {return a + b;}, 0); // reduce function
             var sum = time_unit_stats.reduce(add, 0); // reduce function
             var avg = sum / time_unit_stats.length;
             var variance = time_unit_stats.reduce(varianz, 0);
@@ -460,6 +461,7 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
     data[6] = renderOneData(time_data.Su, "Su");
     return data;
 }
+
 function renderOneData(data, weekday) {
     // TODO: variance!!!!
     var avg = data.duration / data.count;
