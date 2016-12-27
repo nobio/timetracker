@@ -327,7 +327,7 @@ exports.getStatsByTimeBox = function(timeUnit, callback) {
             } else if ('weekday' === timeUnit) {
                 callback(null, getStatsByTimeBoxTimeWeekDay(stats));
             } else {
-                callback(new Error('time unit ' + timeUnit + ' invalid'));
+                callback(new Error('time unit \'' + timeUnit + '\' is invalid'));
             }
         }
 
@@ -450,8 +450,6 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
     });
 
     // calculate statistics of last week
-    console.log(time_data);
-    console.log(time_data.Fr);
     data[0] = renderOneData(time_data.Mo, "Mo");
     data[1] = renderOneData(time_data.Tu, "Tu");
     data[2] = renderOneData(time_data.We, "We");
