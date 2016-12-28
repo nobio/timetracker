@@ -20,6 +20,10 @@ Statistics = Backbone.Model.extend({
     urlRoot: '/stats',
 });
 
+StatisticsAggregated = Backbone.Model.extend({
+    urlRoot: '/statistics/aggregate',
+});
+
 Duration = Backbone.Model.extend({
     urlRoot: '/entries'
 });

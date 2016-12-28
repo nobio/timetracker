@@ -164,7 +164,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     }
 
-    var stats = new Statistics({'id': ""+nextDate}); // TimeEntry is a Backbone Model defined in layout.jade
+    var stats = new Statistics({'id': ""+nextDate}); // Statistics is a Backbone Model defined in layout.jade
     stats.fetch({ 
         data: {timeUnit: timeUnit},
         success:function(timerecord) {
@@ -184,3 +184,16 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
     return null;
 }
 
+function aggregatedStatistics(timeUnit) {
+    var aggStats = new StatisticsAggregated();
+    aggStats.fetch({
+        data: {timeUnit: timeUnit},
+        success:function(statistic_data) {
+            aggStatsVariable.setData(statistic_data.get("chart_data"));
+        },
+        error: function(model, err) {
+            console.log(model);
+            console.log(err);
+        }
+    });
+}

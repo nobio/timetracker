@@ -33,6 +33,10 @@ exports.stats = function(req, res) {
 	res.render('stats');
 }
 
+exports.statistics = function(req, res) {
+	res.render('statistics');
+}
+
 exports.geoloc = function(req, res) {
 	res.render('geoloc');
 }

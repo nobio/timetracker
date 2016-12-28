@@ -211,9 +211,8 @@ exports.setRandomTimeEntries = function(req, res) {
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = function(req, res) {
-    util.getStatsByTimeBox(req.param('timeUnit'), function(err, timeboxedStatistics) {
-
-        //console.log(err + " " + timeboxedStatistics);
+    var timeUnit = req.param('timeUnit');
+    util.getStatsByTimeBox(timeUnit, function(err, timeboxedStatistics) {
 
         if (err) {
             res.send({
@@ -221,16 +220,27 @@ exports.getStatsByTimeBox = function(req, res) {
             });
         } else {
             var chart_data = {
-                xScale: 'time',
-                yScale: 'linear',
-                type: 'bar',
-                main: [{
-                    data: timeboxedStatistics,
-                }]
+                "xScale": (('day' === timeUnit || 'week' === timeUnit) ? "time" : "ordinal"),
+                "yScale": "linear",
+                "yMin": "5",
+                "type": (('day' === timeUnit || 'week' === timeUnit) ? "line" : "bar"),
+                "main": [{
+                    "data": timeboxedStatistics.inner_data,
+                }],
+                "comp": [{
+                    "type": "line",
+                    "data": timeboxedStatistics.inner_comp,
+                }]                
             };
 
-            res.send(chart_data);
+            res.send({
+                actual_working_time: timeboxedStatistics.actual_working_time,
+                planned_working_time: timeboxedStatistics.planned_working_time,
+                average_working_time: timeboxedStatistics.average_working_time,
+                chart_data: chart_data
+            });
         }
+
     });
 }
 
@@ -257,28 +267,34 @@ exports.getStatsDay = function(req, res) {
     console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
 
     util.getStatsByRange(dtStart, dtEnd, function(err, calculatedBusyTime) {
+        if (err) {
+            res.send({
+                err: err.message
+            });
+        } else {
 
-        //console.log(calculatedBusyTime);
+            //console.log(calculatedBusyTime);
 
-        var chart_data = {
-            "xScale": ('day' === timeUnit ? "ordinal" : "time"),
-            "yScale": "linear",
-            "type": ('day' === timeUnit ? "bar" : "line-dotted"),
-            "main": [{
-                "data": calculatedBusyTime.inner_data,
-            }],
-            "comp": [{
-                "type": "line",
-                "data": calculatedBusyTime.inner_comp,
-            }]
-        };
+            var chart_data = {
+                "xScale": ('day' === timeUnit ? "ordinal" : "time"),
+                "yScale": "linear",
+                "type": ('day' === timeUnit ? "bar" : "line-dotted"),
+                "main": [{
+                    "data": calculatedBusyTime.inner_data,
+                }],
+                "comp": [{
+                    "type": "line",
+                    "data": calculatedBusyTime.inner_comp,
+                }]
+            };
 
-        res.send({
-            actual_working_time: calculatedBusyTime.actual_working_time,
-            planned_working_time: calculatedBusyTime.planned_working_time,
-            average_working_time: calculatedBusyTime.average_working_time,
-            chart_data: chart_data
-        });
+            res.send({
+                actual_working_time: calculatedBusyTime.actual_working_time,
+                planned_working_time: calculatedBusyTime.planned_working_time,
+                average_working_time: calculatedBusyTime.average_working_time,
+                chart_data: chart_data
+            });
+        }
     });
 };
 

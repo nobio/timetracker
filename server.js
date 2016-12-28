@@ -49,6 +49,7 @@ app.get('/', routes.index);
 app.get('/admin', routes.admin);
 app.get('/admin_item', routes.admin_item);
 app.get('/stats', routes.stats);
+app.get('/statistics', routes.statistics);
 app.get('/geo', routes.geoloc);
 
 // restful services
@@ -71,8 +72,8 @@ app.post('/admin/backup/timeentry', admin.backupTimeEntry);
 // statistics stuff
 app.put('/stats', admin.calcStats);
 app.get('/stats/:date', admin.getStatsDay);
-app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 app.delete('/stats', admin.deleteAllStatsDays);
+app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 
 // maintain stuff
 app.get('/ping', admin.ping);

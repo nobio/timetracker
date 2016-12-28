@@ -47,6 +47,9 @@ block content
     table
         tr
             td
+                a(href='/statistics') Aggregierte Statistiken
+        tr
+            td
                 input#datepicker(type='text' name='date')
                 input(type='button', id='examin', value='Auswertung...', onclick='getTimeEntriesByDate(moment($("#datepicker").val(), "DD.MM.YYYYY"));')
         tr
