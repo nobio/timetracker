@@ -329,7 +329,7 @@ exports.getStatsByTimeBox = function(timeUnit, callback) {
             } else {
                 callback(new Error('time unit \'' + timeUnit + '\' is invalid'));
             }
-    
+
             callback(null, {
                 actual_working_time: 0,
                 planned_working_time: 0,
@@ -383,13 +383,13 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
             data[idx] = {
                 "x": moment(stat.date).format('YYYY-MM-DD'),
                 "y": Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
-                /*
-                working_time: avg,
-                working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-                date: stat.date,
-                variance: variance,
-                variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100
-                */
+                    /*
+                    working_time: avg,
+                    working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
+                    date: stat.date,
+                    variance: variance,
+                    variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100
+                    */
             };
             // reset to next week
             lastTimeUnit = actualTimeUnit;
@@ -409,15 +409,15 @@ function getStatsByTimeBoxDay(stats) {
     var idx = 0;
     stats.forEach(function(stat) {
         data[idx] = {
-                "x": moment(stat.date).format('YYYY-MM-DD'),
-                "y": Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
-            /*
-            working_time: stat.actual_working_time,
-            working_time_rounded_hours: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-            date: stat.date,
-            variance: 0,
-            variance_rounded: 0.00
-            */
+            "x": moment(stat.date).format('YYYY-MM-DD'),
+            "y": Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
+                /*
+                working_time: stat.actual_working_time,
+                working_time_rounded_hours: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
+                date: stat.date,
+                variance: 0,
+                variance_rounded: 0.00
+                */
         };
         idx++;
     });
@@ -458,7 +458,6 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
             count: 0
         }
     };
-    var time_unit_stats = [];
 
     stats.forEach(function(stat) {
         var timeUnit = moment(stat.date).format("dd");
@@ -483,13 +482,13 @@ function renderOneData(data, weekday) {
     return {
         "x": weekday,
         "y": Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
-        /*
-        working_time: avg,
-        working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-        date: weekday,
-        variance: 0,
-        variance_rounded: 0.0
-        */
+            /*
+            working_time: avg,
+            working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
+            date: weekday,
+            variance: 0,
+            variance_rounded: 0.0
+            */
     };
 }
 

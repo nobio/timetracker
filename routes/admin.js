@@ -230,7 +230,7 @@ exports.getStatsByTimeBox = function(req, res) {
                 "comp": [{
                     "type": "line",
                     "data": timeboxedStatistics.inner_comp,
-                }]                
+                }]
             };
 
             res.send({
