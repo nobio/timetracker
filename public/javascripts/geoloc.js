@@ -15,9 +15,14 @@ if (navigator.geolocation) {
         var msg;
         switch(error.code) {
             case 0: msg = 'unknown error';
+                    break;
             case 1: msg = 'permission denied';
+                    break;
             case 2: msg = 'position unavailable (error response from locaton provider)';
+                    break;
             case 3: msg = 'timed out';
+                    break;
+            default: msg = 'unspecified error occured';
         }
         alert("Error occurred. Error code: " + error.code + " " + msg);
     });
