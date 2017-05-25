@@ -16,11 +16,11 @@ var DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
  *
  * curl -X DELETE http://localhost:30000/entries
  */
-exports.deleteAllTimeEntries = function(req, res) {
+exports.deleteAllTimeEntries = (req, res) => {
     var size;
-    TimeEntry.find(function(err, timeentries) {
+    TimeEntry.find((err, timeentries) => {
         size = timeentries.length;
-        timeentries.forEach(function(timeentry) {
+        timeentries.forEach((timeentry) => {
             console.log(timeentry);
             timeentry.remove();
         });
@@ -37,8 +37,8 @@ exports.deleteAllTimeEntries = function(req, res) {
  *
  * curl -X DELETE http://localhost:30000/stats
  */
-exports.deleteAllStatsDays = function(req, res) {
-    util.deleteAllStatsDays(function(err, result) {
+exports.deleteAllStatsDays = (req, res) => {
+    util.deleteAllStatsDays((err, result) => {
         if (err) {
             res.send(500, err);
         } else {
@@ -52,13 +52,13 @@ exports.deleteAllStatsDays = function(req, res) {
  *
  * curl -X PUT http://localhost:30000/stats
  */
-exports.calcStats = function(req, res) {
+exports.calcStats = (req, res) => {
     // first remove all doublets
-    util.removeDoublets(function(err, deletedDoublets) {
+    util.removeDoublets((err, deletedDoublets) => {
 
-        util.deleteAllStatsDays(function(err, result) {
+        util.deleteAllStatsDays((err, result) => {
 
-            util.getFirstTimeEntry(function(err, firstTimeentry) {
+            util.getFirstTimeEntry((err, firstTimeentry) => {
                 if (!firstTimeentry) {
                     res.send({
                         message: 'no entries in database'
@@ -66,7 +66,7 @@ exports.calcStats = function(req, res) {
                     return;
                 }
 
-                util.getLastTimeEntry(function(err, lastTimeentry) {
+                util.getLastTimeEntry((err, lastTimeentry) => {
 
                     var date = moment(firstTimeentry.age);
                     date.hours(0);
@@ -77,7 +77,7 @@ exports.calcStats = function(req, res) {
                         //console.log('calculating for day ' + date.format('YYYY-MM-DD'));
                         var dt = moment(date);
 
-                        util.getBusytimeByDate(dt, function(err, d, busytime) {
+                        util.getBusytimeByDate(dt, (err, d, busytime) => {
                             if (err) {
                                 // when this is not a working day, ignore it; otherwise set "isComplete" to false
                                 //console.log('****** ' + d + ': ' + err);
@@ -97,7 +97,7 @@ exports.calcStats = function(req, res) {
                                     }, {
                                         new: true
                                     },
-                                    function(err, statsday) {
+                                    (err, statsday) => {
                                         if (err) {
                                             //console.log(err);
                                         } else {
@@ -110,7 +110,7 @@ exports.calcStats = function(req, res) {
                                                     is_working_day: true,
                                                     is_complete: true,
                                                     last_changed: new Date()
-                                                }).save(function(err) {
+                                                }).save((err) => {
                                                     if (err) {
                                                         console.log(err);
                                                     }
@@ -147,7 +147,7 @@ exports.calcStats = function(req, res) {
  *
  * curl -X PUT http://localhost:30000/admin/rnd_entries
  */
-exports.setRandomTimeEntries = function(req, res) {
+exports.setRandomTimeEntries = (req, res) => {
 
     var DAY_IN_SECS = 60 * 60 * 24;
     var now = moment().unix();
@@ -181,7 +181,7 @@ exports.setRandomTimeEntries = function(req, res) {
                 entry_date: moment(1000 * start),
                 direction: 'enter',
                 isWorkingDay: false
-            }).save(function(err, timeentry) {
+            }).save((err, timeentry) => {
                 if (err) {
                     console.log(err);
                 }
@@ -191,7 +191,7 @@ exports.setRandomTimeEntries = function(req, res) {
                 entry_date: moment(1000 * end),
                 direction: 'go',
                 isWorkingDay: false
-            }).save(function(err, timeentry) {
+            }).save((err, timeentry) => {
                 if (err) {
                     console.log(err);
                 }
@@ -210,9 +210,9 @@ exports.setRandomTimeEntries = function(req, res) {
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=month
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
  */
-exports.getStatsByTimeBox = function(req, res) {
+exports.getStatsByTimeBox = (req, res) => {
     var timeUnit = req.param('timeUnit');
-    util.getStatsByTimeBox(timeUnit, function(err, timeboxedStatistics) {
+    util.getStatsByTimeBox(timeUnit, (err, timeboxedStatistics) => {
 
         if (err) {
             res.send({
@@ -249,7 +249,7 @@ exports.getStatsByTimeBox = function(req, res) {
  *
  *  curl -X GET http://localhost:30000/stats/1391295600000?timeUnit=month
  */
-exports.getStatsDay = function(req, res) {
+exports.getStatsDay = (req, res) => {
     var timeUnit = req.param('timeUnit');
     var dtStart = moment.unix(req.params.date / 1000);
     var dtEnd;
@@ -266,7 +266,7 @@ exports.getStatsDay = function(req, res) {
 
     console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
 
-    util.getStatsByRange(dtStart, dtEnd, function(err, calculatedBusyTime) {
+    util.getStatsByRange(dtStart, dtEnd, (err, calculatedBusyTime) => {
         if (err) {
             res.send({
                 err: err.message
@@ -303,7 +303,7 @@ exports.getStatsDay = function(req, res) {
  *
  * curl -X GET http://localhost:30000/admin/maintain
  */
-exports.maintain = function(req, res) {
+exports.maintain = (req, res) => {
     /*
      TimeEntry.update({
      $set : {
@@ -315,7 +315,7 @@ exports.maintain = function(req, res) {
      console.log(err + " " + numberAffected);
      });
      */
-    fs.readFile('timeentry_*.json', function(err, data) {
+    fs.readFile('timeentry_*.json', (err, data) => {
         if (err) {
             throw err;
         }
@@ -329,10 +329,10 @@ exports.maintain = function(req, res) {
  *
  * curl -X POST http://localhost:30000/admin/dump/timeentry
  */
-exports.dumpTimeEntry = function(req, res) {
-    TimeEntry.find(function(err, timeentries) {
+exports.dumpTimeEntry = (req, res) => {
+    TimeEntry.find((err, timeentries) => {
 
-        fs.stat('./dump', function(err, stats) {
+        fs.stat('./dump', (err, stats) => {
             if (err) {
                 fs.mkdirSync('./dump');
             }
@@ -354,13 +354,13 @@ exports.dumpTimeEntry = function(req, res) {
  *
  * curl -X POST http://localhost:30000/admin/backup/timeentry
  */
-exports.backupTimeEntry = function(req, res) {
-    TimeEntryBackup.remove({}, function(err) {
+exports.backupTimeEntry = (req, res) => {
+    TimeEntryBackup.remove({}, (err) => {
         if (!err) {
             console.log("TimeEntryBackup deleted");
 
-            TimeEntry.find(function(err, timeentries) {
-                timeentries.forEach(function(timeentry) {
+            TimeEntry.find((err, timeentries) => {
+                timeentries.forEach((timeentry) => {
                     new TimeEntryBackup({
                         _id: timeentry._id,
                         entry_date: timeentry.entry_date,
@@ -368,7 +368,7 @@ exports.backupTimeEntry = function(req, res) {
                         last_changed: timeentry.last_changed,
                         longitude: timeentry.longitude,
                         latitude: timeentry.latitude
-                    }).save(function(err, timeentrybackup) {
+                    }).save((err, timeentrybackup) => {
                         if (err) {
                             console.log(err);
                         }
@@ -390,7 +390,7 @@ exports.backupTimeEntry = function(req, res) {
  *
  * curl -X GET http://localhost:30000/ping
  */
-exports.ping = function(req, res) {
+exports.ping = (req, res) => {
     res.send({
         'response': 'pong'
     });
@@ -401,13 +401,13 @@ exports.ping = function(req, res) {
  *
  * curl -X GET http://localhost:30000/test
  */
-exports.test = function(req, res) {
+exports.test = (req, res) => {
     var lastTimeentry;
     var count = 0;
     TimeEntry.find().sort({
         entry_date: 1
-    }).exec(function(err, timeentries) {
-        timeentries.forEach(function(timeentry) {
+    }).exec((err, timeentries) => {
+        timeentries.forEach((timeentry) => {
             if (lastTimeentry !== undefined) {
                 if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
                     timeentry.direction == lastTimeentry.direction) {
