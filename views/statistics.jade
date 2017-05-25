@@ -1,0 +1,49 @@
+extends layout
+block content
+    link(rel="stylesheet" type="text/css" href='/stylesheets/xcharts.css' media='all')
+
+    script(src='/javascripts/xcharts.min.js', type='text/javascript')
+    script(src='/javascripts/d3.v3.min.js', type='text/javascript')
+    
+    script(type='text/javascript').
+        $(document).ready(function() {
+            var data = {
+              "xScale": "ordinal",
+              "yScale": "linear",
+              "main": ""
+            };
+            var opts = {
+                "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
+                "tickFormatX": function (x) { return d3.time.format('%d.%m')(x); },
+                "mouseover": function (d, i) {
+                        var pos = $(this).offset();
+                        $(tt).text(d3.time.format('%A, %d.%m.%Y')(d.x) + ': ' + d.y).css({top: topOffset + pos.top, left: pos.left + leftOffset}).show();
+                },
+                "mouseout": function (x) {
+                    $(tt).hide();
+                }
+            };
+            aggStatsVariable = new xChart('line-dotted', data, '#aggStats', opts);
+            aggregatedStatistics("month");
+        })
+
+    table#table_stats_day
+        th
+            input(type='radio', name='time_unit', value='day' onclick='aggregatedStatistics("day")')
+            | day
+        th
+            input(type='radio', name='time_unit', value='week' onclick='aggregatedStatistics("week")')
+            | week
+        th
+            input(type='radio', name='time_unit', value='month' checked onclick='aggregatedStatistics("month")')
+            | month
+        th
+            input(type='radio', name='time_unit', value='weekday' onclick='aggregatedStatistics("weekday")')
+            | week day
+
+    table
+        tr
+
+            td
+                figure#aggStats(style='width: 400px; height: 300px;')
+ 

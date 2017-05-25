@@ -1,0 +1,63 @@
+extends layout
+block content
+
+    script(type='text/javascript').
+
+        var entry;
+        function getURLParameter(param) {
+            var pageURL = window.location.search.substring(1);
+            var urlVariables = pageURL.split('&');
+            for (var i = 0; i < urlVariables.length; i++) {
+                var parameterName = urlVariables[i].split('=');
+                if (parameterName[0] == param) {
+                    return parameterName[1];
+                }
+            }
+        }
+
+        function saveEntry() {
+            entry.set('entry_date', moment($('#entry_date').val(), 'DD.MM.YYYY HH:mm'));
+            entry.save({done: window.location.href='/stats'});
+        }
+
+
+        $(document).ready(function() {
+            // initializing backbone models
+            var id = getURLParameter('id');
+            entry = new TimeEntry({id: id});
+                          
+            entry.fetch({
+                success: function() {
+                    $('#itemId').text(entry.attributes.id);
+                    $('#entry_date').val(moment(entry.attributes.entry_date).format('DD.MM.YYYY HH:mm'));
+                    $('#last_changed').text(moment(entry.attributes.last_changed).format('DD.MM.YYYY HH:mm'));
+                    $('#direction').text(entry.attributes.direction);
+                },
+                error: function(err) {
+                    alert("Error: " + err.toString());
+                }
+            });
+                          
+        })
+
+    h3 Edit Time Entry
+    div#itemId
+                        
+
+    table
+        tr
+            td Datum
+            td
+                input#entry_date(type='text')
+        tr
+            td Kommen
+            td
+                div#direction
+        tr
+            td Datum
+            td
+                div#last_changed
+        tr
+            td
+                input(type='button', value='übernehmen', onclick='saveEntry();')
+
