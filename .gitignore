@@ -13,6 +13,7 @@ results
 .idea
 .project
 .classpath
+.DS_Store
 npm-debug.log
 node_modules
 dump

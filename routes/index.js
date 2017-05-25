@@ -11,8 +11,8 @@ var TimeEntry = mongoose.model('TimeEntry');
 /*
  * calculates the number of entries and renders the index.jade by passing the size
  */
-exports.index = function(req, res) {
-	util.getNumberOfTimeEntries(function(err, size) {
+exports.index = (req, res) => {
+	util.getNumberOfTimeEntries((err, size) => {
 		console.log(size);
 		res.render('index', {
 			size : size
@@ -20,24 +20,24 @@ exports.index = function(req, res) {
 	});
 };
 
-exports.admin = function(req, res) {
+exports.admin = (req, res) => {
 	res.render('admin');
 }
 
-exports.admin_item = function(req, res) {
+exports.admin_item = (req, res) => {
 	res.render('admin_item');
     // http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
 }
 
-exports.stats = function(req, res) {
+exports.stats = (req, res) => {
 	res.render('stats');
 }
 
-exports.statistics = function(req, res) {
+exports.statistics = (req, res) => {
 	res.render('statistics');
 }
 
-exports.geoloc = function(req, res) {
+exports.geoloc = (req, res) => {
 	res.render('geoloc');
 }
 
@@ -48,11 +48,11 @@ exports.geoloc = function(req, res) {
 /*
  * creates a new TimeEntry; the date is "now" and the direction needs to be given
  */
-exports.createEntry = function(req, res) {
+exports.createEntry = (req, res) => {
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
 
-	util.createTimeEntry(direction, datetime, undefined, undefined, function(err, timeentry) {
+	util.createTimeEntry(direction, datetime, undefined, undefined, (err, timeentry) => {
 		if (err) {
 			res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 		} else {
@@ -64,10 +64,10 @@ exports.createEntry = function(req, res) {
 /*
  * deletes one time entry by it's id
  */
-exports.delete = function(req, res) {
+exports.delete = (req, res) => {
 	var id = req.params.id;
     
-	TimeEntry.findByIdAndRemove(id, function(err) {
+	TimeEntry.findByIdAndRemove(id, (err) => {
 		if (err) {
 			res.send(500, 'Error while deleting Time Entry: ' + id + " " + err.message);
 		} else {
@@ -85,7 +85,7 @@ exports.delete = function(req, res) {
  * curl -X GET http://localhost:30000/entries?dt=1393455600000
  * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
-exports.getEntries = function(req, res) {
+exports.getEntries = (req, res) => {
 	var filterByDate = req.param('dt');
 	var filterByBusy = req.param('busy');
 	
@@ -98,7 +98,7 @@ exports.getEntries = function(req, res) {
 		console.log("filter by busy: " + filterByBusy);
 		getBusyTime(filterByBusy,res);
 	} else {
-		TimeEntry.find(function(err, timeentries) {
+		TimeEntry.find((err, timeentries) => {
 			if (err) {
 				res.send(500, 'Error while reading Time Entries: ' + id + " " + err);
 			} else {
@@ -118,7 +118,7 @@ function getAllByDate(date, res) {
 	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
 	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     
-	util.getTimeEntriesByDate(dt, function(err, timeentries) {
+	util.getTimeEntriesByDate(dt, (err, timeentries) => {
         
 		if (err) {
 			res.send(500, err);
@@ -131,9 +131,9 @@ function getAllByDate(date, res) {
 /*
  * get one Time Entry by it's id
  */
-exports.getEntryById = function(req, res) {
+exports.getEntryById = (req, res) => {
     
-	TimeEntry.findById(req.params.id, function(err, timeentry) {
+	TimeEntry.findById(req.params.id, (err, timeentry) => {
 		if (err) {
 			res.send(500, 'Error while reading Time Entry: ' + req.params.id + " " + err);
 		} else {
@@ -145,10 +145,10 @@ exports.getEntryById = function(req, res) {
 /*
  * stores one Time Entry
  */
-exports.storeEntryById = function(req, res) {
+exports.storeEntryById = (req, res) => {
     console.log(req.params.id + ", " + req.body.direction + ", " + req.body.entry_date);
     
-    TimeEntry.findById(req.params.id, function(err, timeentry) {
+    TimeEntry.findById(req.params.id, (err, timeentry) => {
         console.log(err);
 		if (err) {
 			res.send(500, 'Error while reading Time Entry: ' + err);
@@ -159,7 +159,7 @@ exports.storeEntryById = function(req, res) {
             
             console.log(timeentry);
             
-            timeentry.save(function(err) {
+            timeentry.save(err => {
                 if (err) {
                     res.send(500, 'Error while saving Time Entry: '  + err);
                 } else {
@@ -179,7 +179,7 @@ exports.storeEntryById = function(req, res) {
 function getBusyTime(date, res) {
 	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
     
-	util.getBusytimeByDate(dt, function(err, d, busytime) {
+	util.getBusytimeByDate(dt, (err, d, busytime) => {
 		if (err) {
 			res.send(500, err.toString());
 		} else {
@@ -220,12 +220,12 @@ Work:
   trigger: 'exit‘ }
   
  */
-exports.geofence = function(req, res) {
+exports.geofence = (req, res) => {
     console.log(req.body);
    
     var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
     if(req.body.id == 'Work') {
-		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, function(err, timeentry) {
+		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, (err, timeentry) => {
 			if (err) {
 				res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 			} else {

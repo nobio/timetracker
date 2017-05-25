@@ -9,7 +9,7 @@ var DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
  * takes the date and removes all time components
  * date expected to be a moment object
  */
-exports.stripdownToDateBerlin = function(date) {
+exports.stripdownToDateBerlin = (date) => {
     var d = moment.tz(date / 1, 'Europe/Berlin');
     d.millisecond(0);
     d.second(0);
@@ -21,7 +21,7 @@ exports.stripdownToDateBerlin = function(date) {
 /*
  * checks if an object is empty; this is something different to undefined or null (sigh...)
  */
-exports.isEmpty = function(obj) {
+exports.isEmpty = (obj) => {
     return isEmpty(obj);
 };
 
@@ -34,7 +34,7 @@ function isEmpty(obj) {
     return true;
 };
 
-Number.prototype.toRad = function() {
+Number.prototype.toRad = () => {
     return this * Math.PI / 180;
 }
 
@@ -80,9 +80,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
  *   when direction == "go"    -> the last entry of this given day must be "enter"; if no entry exists or the last was "go" -> error
  *   dt is expected in ISO format
  */
-exports.validateRequest = function(direction, dt, longitude, latitude, callback) {
+exports.validateRequest = (direction, dt, longitude, latitude, callback) => {
 
-    this.getLastTimeEntryByDate(dt, function(err, last_entry) {
+    this.getLastTimeEntryByDate(dt, (err, last_entry) => {
         if (err) {
             callback(err);
             return;
@@ -129,10 +129,10 @@ exports.validateRequest = function(direction, dt, longitude, latitude, callback)
 };
 
 
-exports.getBusytimeByDate = function(dt, callback) {
+exports.getBusytimeByDate = (dt, callback) => {
 
     // first get all entries for this day....
-    this.getTimeEntriesByDate(dt, function(err, timeentries) {
+    this.getTimeEntriesByDate(dt, (err, timeentries) => {
         if (err) {
             callback(new Error('Error while reading Time Entry: ' + id + " " + err.message));
         } else {
@@ -175,7 +175,7 @@ exports.getBusytimeByDate = function(dt, callback) {
 /*
  * reads the last entry for a given date
  */
-exports.getLastTimeEntryByDate = function(dt, callback) {
+exports.getLastTimeEntryByDate = (dt, callback) => {
     var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
@@ -191,7 +191,7 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
         }
     }).skip(0).limit(1).sort({
         entry_date: -1
-    }).exec(function(err, docs) {
+    }).exec((err, docs) => {
         if (docs.length == 0) {
             callback(err);
         } else {
@@ -202,7 +202,7 @@ exports.getLastTimeEntryByDate = function(dt, callback) {
 /*
  * reads all time entries for a given date
  */
-exports.getTimeEntriesByDate = function(dt, callback) {
+exports.getTimeEntriesByDate = (dt, callback) => {
     //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
 
     var dtStart = moment(dt);
@@ -220,7 +220,7 @@ exports.getTimeEntriesByDate = function(dt, callback) {
         }
     }).skip(0).sort({
         entry_date: 1
-    }).exec(function(err, timeentries) {
+    }).exec((err, timeentries) => {
         if (err) {
             callback(err);
         } else {
@@ -232,16 +232,16 @@ exports.getTimeEntriesByDate = function(dt, callback) {
 /*
  * reads the number of all TimeEntries in database
  */
-exports.getNumberOfTimeEntries = function(callback) {
+exports.getNumberOfTimeEntries = (callback) => {
     return getNumberOfTimeEntries(callback);
 };
 
 /*
  * reads the number of all TimeEntries in database
  */
-getNumberOfTimeEntries = function(callback) {
+getNumberOfTimeEntries = (callback) => {
 
-    TimeEntry.find(function(err, timeentries) {
+    TimeEntry.find((err, timeentries) => {
         if (err) {
             callback(err);
         } else {
@@ -253,7 +253,7 @@ getNumberOfTimeEntries = function(callback) {
 /*
  * returns the aggregated statistics for a given time range defined by start and end
  */
-exports.getStatsByRange = function(dtStart, dtEnd, callback) {
+exports.getStatsByRange = (dtStart, dtEnd, callback) => {
     console.log(">>> searching data for date between $1 and $2", moment(dtStart).format('YYYY-MM-DD'), moment(dtEnd).format('YYYY-MM-DD'));
 
     StatsDay.find({
@@ -263,7 +263,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         }
     }).sort({
         date: -1
-    }).exec(function(err, stats) {
+    }).exec((err, stats) => {
         var innerData = [{
             0: 0
         }];
@@ -276,7 +276,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         var average_working_time = -1;
 
         // calculating actual working time
-        stats.forEach(function(stat) {
+        stats.forEach((stat) => {
             actual_working_time += stat.actual_working_time;
         });
         average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
@@ -284,7 +284,7 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
         // console.log("average_working_time = " + average_working_time);
         // console.log("length = " + stats.length);
 
-        stats.forEach(function(stat) {
+        stats.forEach((stat) => {
             //console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
             //actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
@@ -309,12 +309,12 @@ exports.getStatsByRange = function(dtStart, dtEnd, callback) {
     });
 };
 
-exports.getStatsByTimeBox = function(timeUnit, callback) {
+exports.getStatsByTimeBox = (timeUnit, callback) => {
     var data;
 
     StatsDay.find().sort({
         date: 1
-    }).exec(function(err, stats) {
+    }).exec((err, stats) => {
         if (err) {
             callback(err);
         } else {
@@ -353,7 +353,7 @@ function varianz(a, curr, idx, array) {
     if (idx == array.length - 1) {
         var mean = (a + curr) / array.length;
         var tmp = 0;
-        array.forEach(function(val) {
+        array.forEach((val) => {
             tmp += (val - mean) * (val - mean);
         });
         return Math.sqrt(tmp / array.length);
@@ -371,7 +371,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
     var lastTimeUnit;
     var actualTimeUnit;
     var idx = 0;
-    stats.forEach(function(stat) {
+    stats.forEach((stat) => {
         actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
         if (lastTimeUnit != actualTimeUnit) {
             // calculate statistics of last week
@@ -407,7 +407,7 @@ function getStatsByTimeBoxDay(stats) {
     }];
 
     var idx = 0;
-    stats.forEach(function(stat) {
+    stats.forEach((stat) => {
         data[idx] = {
             "x": moment(stat.date).format('YYYY-MM-DD'),
             "y": Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
@@ -459,7 +459,7 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
         }
     };
 
-    stats.forEach(function(stat) {
+    stats.forEach(stat => {
         var timeUnit = moment(stat.date).format("dd");
         time_data[timeUnit].duration += stat.actual_working_time;
         time_data[timeUnit].count += 1;
@@ -495,7 +495,7 @@ function renderOneData(data, weekday) {
 /*
  * returns the aggregated statistics for a given day
  */
-exports.getStatsByDate = function(date) {
+exports.getStatsByDate = (date) => {
 
     var actual_working_time = -1;
     var planned_working_time = -1;
@@ -507,8 +507,8 @@ exports.getStatsByDate = function(date) {
         }
     }).sort({
         date: -1
-    }).exec(function(err, stats) {
-        stats.forEach(function(stat) {
+    }).exec((err, stats) => {
+        stats.forEach(stat => {
             console.log(stat + " " + stat.actual_working_time + " " + stat.planned_working_time);
             actual_working_time += stat.actual_working_time;
             planned_working_time += stat.planned_working_time;
@@ -521,7 +521,7 @@ exports.getStatsByDate = function(date) {
     });
 };
 
-exports.getFirstTimeEntry = function(callback) {
+exports.getFirstTimeEntry = (callback) => {
     TimeEntry.aggregate([{
         $group: {
             _id: 0,
@@ -529,12 +529,12 @@ exports.getFirstTimeEntry = function(callback) {
                 $min: "$entry_date"
             }
         }
-    }]).exec(function(err, timeentries) {
+    }]).exec((err, timeentries) => {
         callback(err, timeentries[0]);
     });
 };
 
-exports.getLastTimeEntry = function(callback) {
+exports.getLastTimeEntry = (callback) => {
     TimeEntry.aggregate([{
         $group: {
             _id: 0,
@@ -542,16 +542,16 @@ exports.getLastTimeEntry = function(callback) {
                 $max: "$entry_date"
             }
         }
-    }]).exec(function(err, timeentries) {
+    }]).exec((err, timeentries) => {
         callback(err, timeentries[0]);
     });
 };
 
-exports.deleteAllStatsDays = function(callback) {
+exports.deleteAllStatsDays = (callback) => {
     var size;
-    StatsDay.find(function(err, statsdays) {
+    StatsDay.find((err, statsdays) => {
         size = statsdays.length;
-        statsdays.forEach(function(statsday) {
+        statsdays.forEach((statsday) => {
             //console.log('removing ' + statsday);
             statsday.remove();
         });
@@ -562,9 +562,9 @@ exports.deleteAllStatsDays = function(callback) {
     });
 };
 
-exports.createTimeEntry = function(direction, datetime, longitude, latitude, callback) {
+exports.createTimeEntry = (direction, datetime, longitude, latitude, callback) => {
 
-    this.validateRequest(direction, datetime, longitude, latitude, function(err) {
+    this.validateRequest(direction, datetime, longitude, latitude, (err) => {
 
         if (err) {
             console.log('exports.createTimeEntry received an error: ' + err);
@@ -575,10 +575,10 @@ exports.createTimeEntry = function(direction, datetime, longitude, latitude, cal
                 direction: direction,
                 longitude: longitude,
                 latitude: latitude
-            }).save(function(err, timeentry) {
+            }).save((err, timeentry) => {
                 // and now add the size to the mongoose-JSON (needs to be converted to an object first)
                 var t = timeentry.toObject();
-                getNumberOfTimeEntries(function(err, size) {
+                getNumberOfTimeEntries((err, size) => {
                     t.size = size;
                     if (err) {
                         callback(err);
@@ -593,13 +593,13 @@ exports.createTimeEntry = function(direction, datetime, longitude, latitude, cal
 
 };
 
-exports.removeDoublets = function(callback) {
+exports.removeDoublets = (callback) => {
     var lastTimeentry;
     var count = 0;
     TimeEntry.find().sort({
         entry_date: 1
-    }).exec(function(err, timeentries) {
-        timeentries.forEach(function(timeentry) {
+    }).exec((err, timeentries) => {
+        timeentries.forEach((timeentry) => {
             if (lastTimeentry !== undefined) {
                 if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
                     timeentry.direction == lastTimeentry.direction) {
