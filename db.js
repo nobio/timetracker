@@ -1,24 +1,6 @@
-/**
- * read the database url respcting the environment (local or openshift)
- */
-function dburl() {
-    var db_config = require('./db-conf.json');
-    /*        
-    console.log(">" + process.env.dbenv + "<");    
-    console.log(">" + process.execArgv + "<");    
-           
-    var dbconfig = (process.env.OPENSHIFT_APP_UUID || process.env.dbenv == 'openshift' ? db_config.openshift : db_config.local);
-    if(process.env.OPENSHIFT_APP_UUID || process.env.dbenv === 'openshift') {
-        dbconfig = db_config.openshift;
-    } else if (process.env.dbenv === 'local') {
-        dbconfig = db_config.local;
-    } else if (process.env.dbenv === 'jupiter') {
-        dbconfig = db_config.jupiter;
-    }
-    */
-    var dbconfig = db_config.mongolab;
-	return 'mongodb://' + dbconfig.user + ':' + dbconfig.password + '@' + dbconfig.uri;
-}
+var db_config = require('./db-conf.json');
+
+
 
 /**
  * adding the contains method to the String object
@@ -62,16 +44,12 @@ var StatsDay = new schema({
 mongoose.model('StatsDay', StatsDay);
 
 
-var mongodb_url = dburl();
+var mongodb_url = 'mongodb://' + db_config.mlab.user + ':' + db_config.mlab.password + '@' + db_config.mlab.uri;
+var monoddb_options = db_config.mlab.options;
 
-var options = {
-db: { native_parser: true },
-server: { poolSize: 2 },
-server: { socketOptions: { keepAlive: 1 } },
-replset: { socketOptions: { keepAlive: 1 } }
-}
-
-console.log('connecting to mongodb on ' + mongodb_url + ' with options ' + JSON.stringify(options));
-mongoose.connect(mongodb_url, options);
-console.log('connected to mongodb');
+console.log('connecting to mongodb on ' + mongodb_url + ' with options ' + JSON.stringify(monoddb_options));
+mongoose.connect(mongodb_url, monoddb_options).then(
+  () => { console.log("mongodb is ready to use.")},
+  err => { console.log("error while connecting mongodb:" + err) }
+);
 
