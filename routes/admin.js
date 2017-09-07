@@ -402,28 +402,57 @@ exports.ping = (req, res) => {
  * curl -X GET http://localhost:30000/test
  */
 exports.test = (req, res) => {
-    var lastTimeentry;
-    var count = 0;
-    TimeEntry.find().sort({
-        entry_date: 1
-    }).exec((err, timeentries) => {
-        timeentries.forEach((timeentry) => {
-            if (lastTimeentry !== undefined) {
-                if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
-                    timeentry.direction == lastTimeentry.direction) {
-                    //timeentry.remove();
-                    count++;
-                    console.log("removing timeentry " + timeentry);
-                } else {
-                    lastTimeentry = timeentry;
-                }
-            } else {
-                lastTimeentry = timeentry;
-            }
-        });
+    var entriesFromDate = [];
+    var firstDates = [];
+    var actualDate;
 
-        res.send({
-            'count_removed_doubletts': count
+    TimeEntry.find().sort({entry_date: 1})
+    .catch(err => res.send(err))
+    .then(timeentries => {
+        timeentries.forEach(timeEntry => {
+            var myDate = moment(timeEntry.entry_date).format('YYYY-MM-DD');
+            if(!actualDate) {
+                actualDate = myDate;
+            }
+            if(actualDate == myDate && timeEntry.direction == 'enter') {
+                entriesFromDate.push(timeEntry);
+            } else {
+                firstDates.push(entriesFromDate.reduce((mapped, value) => {
+                    var m = moment(mapped.entry_date).format('HH:mm');
+                    var v = moment(value.entry_date).format('HH:mm');
+                    //console.log(m + ' ' + v + ' -> ' + (m>v));  
+                    if(m < v) {
+                        return mapped;
+                    } else {
+                        return value;
+                    }
+                }));
+                entriesFromDate = [];
+                actualDate = undefined;
+            }
+            console.log(firstDates.length);
         });
+        console.log(firstDates);
+        res.send('Minimum:\n');
     });
 };
+
+/*
+exports.test = (req, res) => {
+    TimeEntry.find().sort({entry_date: 1})
+    .catch(err => res.send(err))
+    .then(timeentries => {
+        var mini = timeentries.reduce((mapped, value) => {
+            var m = moment(mapped.entry_date).format('HH:mm');
+            var v = moment(value.entry_date).format('HH:mm');
+            //console.log(m + ' ' + v + ' -> ' + (m>v));  
+            if(m < v) {
+                return mapped;
+            } else {
+                return value;
+            }
+        });
+        res.send('Minimum: ' + moment(mini.entry_date).format('HH:mm')  + '\n');
+    });
+};
+*/
