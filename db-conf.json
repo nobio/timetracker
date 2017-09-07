@@ -1,17 +1,20 @@
 {
-	"local" : {
-        "user"		: ""
-		, "password"	: ""
-		, "uri"			: "localhost:27017/timetrack"
-	}
-	, "jupiter" : {
-        "user"		: ""
-		, "password"	: ""
-		, "uri"			: "jupiter:27017/timetrack"
-	}
-	, "mongolab": {
-        "user"		: "nobio"
-		, "password"	: "1gR7hW2cPhtkRlv2"
-		, "uri"			: "ds061928.mongolab.com:61928/timetrack"
-	}
+  "mlab": {
+    "user": "nobio",
+    "password": "1gR7hW2cPhtkRlv2",
+    "uri": "ds061928.mlab.com:61928/timetrack",
+    "options": {
+      "db": {
+        "native_parser": true
+      },
+      "server": {
+        "socketOptions": {
+          "keepAlive": 1,
+          "socketTimeoutMS": 0
+        },
+        "poolSize": 2
+      },
+      "useMongoClient": true
+    }
+  }
 }

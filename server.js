@@ -14,14 +14,14 @@ var moment = require('moment');
 
 var app = express();
 
-app.configure(function() {
+app.configure(() => {
 	app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 	app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
-	express.logger.format('mydate', function() {
+	express.logger.format('mydate', () => {
 		return moment().format('YYYY-MM-DD HH:mm:ss SSS');
 	});
 	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));
@@ -32,7 +32,7 @@ app.configure(function() {
 	app.use(express.static(path.join(__dirname, 'public')));
 });
 
-app.configure('development', function() {
+app.configure('development', () => {
 	app.use(express.errorHandler({
 		dumpExceptions: true,
 		showStack: true
@@ -80,7 +80,7 @@ app.get('/ping', admin.ping);
 app.get('/test', admin.test);
 
 // start the web service
-http.createServer(app).listen(app.get('port'), app.get('host'), function() {
+http.createServer(app).listen(app.get('port'), app.get('host'), () => {
 	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
 });
 
