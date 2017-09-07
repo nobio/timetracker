@@ -8,6 +8,7 @@ require('./db');
 var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
 var admin = require('./routes/admin');
+var experimental = require('./routes/experimental');
 var http = require('http');
 var path = require('path');
 var moment = require('moment');
@@ -76,8 +77,8 @@ app.delete('/stats', admin.deleteAllStatsDays);
 app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 
 // maintain stuff
-app.get('/ping', admin.ping);
-app.get('/test', admin.test);
+app.get('/ping', experimental.ping);
+app.get('/experiment', experimental.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
