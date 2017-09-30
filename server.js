@@ -12,33 +12,25 @@ var experimental = require('./routes/experimental');
 var http = require('http');
 var path = require('path');
 var moment = require('moment');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
 var app = express();
 
-app.configure(() => {
-	app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-	app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
-	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');
-	app.use(express.favicon());
-	app.use(express.logger('dev'));
-	express.logger.format('mydate', () => {
-		return moment().format('YYYY-MM-DD HH:mm:ss SSS');
-	});
-	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));
-	app.use(express.bodyParser());
-	app.use(express.methodOverride());
-	app.use(app.router);
-	app.use(express.cookieParser());
-	app.use(express.static(path.join(__dirname, 'public')));
-});
+app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
+app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
+app.set('views', __dirname + '/views');
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'jade');
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-app.configure('development', () => {
-	app.use(express.errorHandler({
-		dumpExceptions: true,
-		showStack: true
-	}));
-});
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+
 
 /*
 app.configure('production', function() {

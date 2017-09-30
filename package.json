@@ -1,25 +1,38 @@
 {
-    "name"     : "Timetrack"
-    , "version"  : "1.5.0"
-    , "author"   : "Gernot H. Reichel <gernot.reichel@me.com>"
-    , "keywords" : ["mongodb", "mongoose", "doodle", "node", "node.js", "jade"]
-    , "private"  : true
-    , "scripts"  : {
-        "start"    : "node server"
+    "name": "Timetrack",
+    "version": "1.5.0",
+    "author": "Gernot H. Reichel <gernot.reichel@me.com>",
+    "keywords": [
+        "mongodb",
+        "mongoose",
+        "doodle",
+        "node",
+        "node.js",
+        "jade"
+    ],
+    "private": true,
+    "scripts": {
+        "start": "node server"
+    },
+    "dependencies": {
+        "express": "^4.15.4",
+        "jade": "~1.11.0",
+        "moment": ">=2.10.6",
+        "moment-timezone": "*",
+        "mongodb": "^2.2.31",
+        "mongoose": "^4.11.12",
+        "node-schedule": "^1.2.5",
+        "body-parser": "~1.17.1",
+        "cookie-parser": "~1.4.3",
+        "debug": "~2.6.3",
+        "morgan": "~1.8.1",
+        "serve-favicon": "~2.4.2"
+    },
+    "engines": {
+        "node": ">=0.6.19"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nobio/timetrack.git"
     }
-    , "dependencies": {
-        "express"  : "=3.1.0"
-        , "jade"     : ">=1.0.0"
-        , "mongodb"  : ">=2.0"
-        , "mongoose" : ">=4.0"
-        , "moment"   : ">=2.10.6"
-        , "moment-timezone": "*"
-        , "node-schedule" : "*"
-    }
-    , "engines": { "node": ">=0.6.19" }
-    , "repository": {
-        "type": "git"
-        , "url": "https://github.com/nobio/timetrack.git"
-    }
-    
 }
