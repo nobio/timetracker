@@ -337,7 +337,7 @@ exports.dumpTimeEntry = (req, res) => {
                 fs.mkdirSync('./dump');
             }
             var dumpFile = './dump/timeentry_' + moment().format('YYYY-MM-DD_HHmmss') + '.json';
-            fs.writeFileSync(dumpFile, timeentries)
+            fs.writeFileSync(dumpFile, JSON.stringify(timeentries, null, 2), "UTF8"); // use JSON.stringify for nice format of output
             console.log('saved ' + timeentries.length + ' items');
             if (res) {
                 res.send({
@@ -384,4 +384,3 @@ exports.backupTimeEntry = (req, res) => {
     });
     //res.send({'response':'backup done'});     
 };
-

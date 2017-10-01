@@ -24,9 +24,11 @@ app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000'
 app.set('views', __dirname + '/views');
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-app.use(logger('dev'));
+if (process.env.NODE_ENV !== 'production' /* or whatever env variable you want to use */) {
+    app.use(logger('dev'));
+}
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
