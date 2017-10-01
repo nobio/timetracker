@@ -15,7 +15,7 @@ exports.index = (req, res) => {
 	util.getNumberOfTimeEntries((err, size) => {
 		console.log(size);
 		res.render('index', {
-			size : size
+			size: size
 		});
 	});
 };
@@ -26,7 +26,7 @@ exports.admin = (req, res) => {
 
 exports.admin_item = (req, res) => {
 	res.render('admin_item');
-    // http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
+	// http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
 }
 
 exports.stats = (req, res) => {
@@ -51,22 +51,24 @@ exports.geoloc = (req, res) => {
 exports.createEntry = (req, res) => {
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
+	var longitude = req.body.longitude;
+	var latitude = req.body.latitude;
 
-	util.createTimeEntry(direction, datetime, undefined, undefined, (err, timeentry) => {
+	util.createTimeEntry(direction, datetime, longitude, latitude, (err, timeentry) => {
 		if (err) {
 			res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 		} else {
 			res.send(timeentry);
-		}		
+		}
 	});
-    
+
 }
 /*
  * deletes one time entry by it's id
  */
 exports.delete = (req, res) => {
 	var id = req.params.id;
-    
+
 	TimeEntry.findByIdAndRemove(id, (err) => {
 		if (err) {
 			res.send(500, 'Error while deleting Time Entry: ' + id + " " + err.message);
@@ -88,15 +90,15 @@ exports.delete = (req, res) => {
 exports.getEntries = (req, res) => {
 	var filterByDate = req.param('dt');
 	var filterByBusy = req.param('busy');
-	
-	if(filterByDate && filterByBusy) {
+
+	if (filterByDate && filterByBusy) {
 		console.log("filter by date and busy");
 		res.send(500, 'date and busy filter set; can only handle one of them');
-	} else if(filterByDate) {
+	} else if (filterByDate) {
 		getAllByDate(filterByDate, res);
-	} else if(filterByBusy) {
+	} else if (filterByBusy) {
 		console.log("filter by busy: " + filterByBusy);
-		getBusyTime(filterByBusy,res);
+		getBusyTime(filterByBusy, res);
 	} else {
 		TimeEntry.find((err, timeentries) => {
 			if (err) {
@@ -106,8 +108,8 @@ exports.getEntries = (req, res) => {
 			}
 		});
 	}
-	
-	
+
+
 }
 /*
  * lists all Time Entries for a given date (this particular day)
@@ -117,22 +119,22 @@ exports.getEntries = (req, res) => {
 function getAllByDate(date, res) {
 	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
 	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
-    
+
 	util.getTimeEntriesByDate(dt, (err, timeentries) => {
-        
+
 		if (err) {
 			res.send(500, err);
 		} else {
 			res.send(timeentries);
 		}
-        
+
 	});
 }
 /*
  * get one Time Entry by it's id
  */
 exports.getEntryById = (req, res) => {
-    
+
 	TimeEntry.findById(req.params.id, (err, timeentry) => {
 		if (err) {
 			res.send(500, 'Error while reading Time Entry: ' + req.params.id + " " + err);
@@ -140,35 +142,35 @@ exports.getEntryById = (req, res) => {
 			res.send(timeentry);
 		}
 	});
-    
+
 }
 /*
  * stores one Time Entry
  */
 exports.storeEntryById = (req, res) => {
-    console.log(req.params.id + ", " + req.body.direction + ", " + req.body.entry_date);
-    
-    TimeEntry.findById(req.params.id, (err, timeentry) => {
-        console.log(err);
+	console.log(req.params.id + ", " + req.body.direction + ", " + req.body.entry_date);
+
+	TimeEntry.findById(req.params.id, (err, timeentry) => {
+		console.log(err);
 		if (err) {
 			res.send(500, 'Error while reading Time Entry: ' + err);
 		} else {
-            timeentry.direction = req.body.direction;
-            timeentry.entry_date = moment(req.body.entry_date);
-            timeentry.last_changed = new Date();
-            
-            console.log(timeentry);
-            
-            timeentry.save(err => {
-                if (err) {
-                    res.send(500, 'Error while saving Time Entry: '  + err);
-                } else {
-                    res.send(timeentry);
-                }
-            });
+			timeentry.direction = req.body.direction;
+			timeentry.entry_date = moment(req.body.entry_date);
+			timeentry.last_changed = new Date();
+
+			console.log(timeentry);
+
+			timeentry.save(err => {
+				if (err) {
+					res.send(500, 'Error while saving Time Entry: ' + err);
+				} else {
+					res.send(timeentry);
+				}
+			});
 		}
 	});
-    
+
 }
 
 /*
@@ -178,13 +180,15 @@ exports.storeEntryById = (req, res) => {
  */
 function getBusyTime(date, res) {
 	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
-    
+
 	util.getBusytimeByDate(dt, (err, d, busytime) => {
 		if (err) {
 			res.send(500, err.toString());
 		} else {
-		var duration = ''+moment.duration(busytime)._milliseconds;  
-			res.send({duration: duration});
+			var duration = '' + moment.duration(busytime)._milliseconds;
+			res.send({
+				duration: duration
+			});
 		}
 	});
 }
@@ -217,23 +221,24 @@ Work:
   latitude: '49.448335',
   longitude: '11.091801',
   timestamp: '1477582315.800965',
-  trigger: 'exit‘ }
-  
+  trigger: 'exit‘ 
+}  
  */
 exports.geofence = (req, res) => {
-    console.log(req.body);
-   
-    var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
-    if(req.body.id == 'Work') {
+	console.log(req.body);
+
+	var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
+	if (req.body.id == 'Work') {
 		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, (err, timeentry) => {
 			if (err) {
 				res.send(500, 'Error while creating new  Time Entry: ' + err.message);
 			} else {
 				res.send(timeentry);
-			}		
-		});    			
-    } else {
-        res.send({message: "nothing to be entered"});
-    }
+			}
+		});
+	} else {
+		res.send({
+			message: "nothing to be entered"
+		});
+	}
 }
-
