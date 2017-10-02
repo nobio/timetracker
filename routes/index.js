@@ -49,6 +49,7 @@ exports.geoloc = (req, res) => {
  * creates a new TimeEntry; the date is "now" and the direction needs to be given
  */
 exports.createEntry = (req, res) => {
+	console.log(req.body);
 	var direction = req.body.direction;
 	var datetime = req.body.datetime;
 	var longitude = req.body.longitude;
