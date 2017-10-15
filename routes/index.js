@@ -243,3 +243,44 @@ exports.geofence = (req, res) => {
 		});
 	}
 }
+
+/**
+ * Is supposed to receives a location object 
+ * BackgroundGeolocationResponse
+
+Param	Type	Details
+locationId	number	
+ID of location as stored in DB (or null)
+serviceProvider	string	
+Service provider
+debug	boolean	
+true if location recorded as part of debug
+time	number	
+UTC time of this fix, in milliseconds since January 1, 1970.
+latitude	number	
+latitude, in degrees.
+longitude	number	
+longitude, in degrees.
+accuracy	number	
+estimated accuracy of this location, in meters.
+speed	number	
+speed if it is available, in meters/second over ground.
+altitude	number	
+altitude if available, in meters above the WGS 84 reference ellipsoid.
+altitudeAccuracy	number	
+accuracy of the altitude if available.
+bearing	number	
+bearing, in degrees.
+coords	Coordinates	
+A Coordinates object defining the current location
+timestamp	number	
+A timestamp representing the time at which the location was retrieved.
+
+curl -X POST -H "Content-Type: application/json" -d '{"locationId": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geolocation
+ */
+exports.backgroundGeolocation = (req, res) => {
+	console.log(req.body);	
+	res.send({
+		message: "I was just logging..."
+	});
+}

@@ -13,7 +13,7 @@ var http = require('http');
 var path = require('path');
 var moment = require('moment');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
@@ -25,10 +25,7 @@ app.set('views', __dirname + '/views');
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-
-if (process.env.NODE_ENV !== 'production' /* or whatever env variable you want to use */) {
-    app.use(logger('dev'));
-}
+app.use(morgan('[:date[web]] :remote-user ":method :url" - status: ":status"'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -56,6 +53,7 @@ app.get('/entries', routes.getEntries);
 
 // geofencing
 app.post('/geofence', routes.geofence);
+app.post('/geolocation', routes.backgroundGeolocation);
 
 // admin stuff
 app.delete('/entries', admin.deleteAllTimeEntries);
