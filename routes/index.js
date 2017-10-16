@@ -89,13 +89,14 @@ exports.delete = (req, res) => {
  * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
 exports.getEntries = (req, res) => {
-	var filterByDate = req.param('dt');
-	var filterByBusy = req.param('busy');
-
+	var filterByDate = req.query.dt;
+	var filterByBusy = req.query.busy;
+	
 	if (filterByDate && filterByBusy) {
 		console.log("filter by date and busy");
 		res.send(500, 'date and busy filter set; can only handle one of them');
 	} else if (filterByDate) {
+		console.log("filter by date: " + filterByDate);
 		getAllByDate(filterByDate, res);
 	} else if (filterByBusy) {
 		console.log("filter by busy: " + filterByBusy);
@@ -109,8 +110,6 @@ exports.getEntries = (req, res) => {
 			}
 		});
 	}
-
-
 }
 /*
  * lists all Time Entries for a given date (this particular day)
@@ -182,14 +181,13 @@ exports.storeEntryById = (req, res) => {
 function getBusyTime(date, res) {
 	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
 
-	util.getBusytimeByDate(dt, (err, d, busytime) => {
+	util.getBusytimeByDate(dt, (err, d, busytime) => {		
 		if (err) {
-			res.send(500, err.toString());
+			res.status(500).send(err.toString());
+			//res.send(500, err.toString());
 		} else {
 			var duration = '' + moment.duration(busytime)._milliseconds;
-			res.send({
-				duration: duration
-			});
+			res.send({ duration: duration });
 		}
 	});
 }
