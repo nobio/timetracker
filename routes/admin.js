@@ -250,7 +250,7 @@ exports.getStatsByTimeBox = (req, res) => {
  *  curl -X GET http://localhost:30000/stats/1391295600000?timeUnit=month
  */
 exports.getStatsDay = (req, res) => {
-    var timeUnit = req.param('timeUnit');
+    var timeUnit = req.query.timeUnit;
     var dtStart = moment.unix(req.params.date / 1000);
     var dtEnd;
 

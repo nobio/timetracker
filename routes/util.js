@@ -148,14 +148,14 @@ exports.getBusytimeByDate = (dt, callback) => {
                     // this must be a go-event
                     if (timeentries[n].direction !== 'go') {
                         callback(new Error('Die Reihenfolge der Kommen/Gehen-Einträge am ' + dt.format('DD.MM.YYYY') + ' scheint nicht zu stimmen.'), 0);
+                        return;
                     }
-
+                    
                     var end = timeentries[n].entry_date;
                     var start = timeentries[n - 1].entry_date;
 
                     busytime = busytime + (end - start);
                     //console.log(dt + ": " + start + " -> " + end + "    = " + busytime + " (" + (busytime / 1000/60/60) + ")");
-
                 }
 
                 // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
