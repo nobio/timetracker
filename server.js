@@ -16,6 +16,10 @@ var favicon = require('serve-favicon');
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+//require('log-timestamp');
+//require('log-timestamp')(function() { return '[' + new Date().toISOString() + '" message="%s"' });
+require('log-timestamp')(function() { return '[' + moment().format('ddd, D MMM YYYY hh:mm:ss Z') + '] - %s' });
+//[Tue, 17 Oct 2017 13:33:00 GMT]
 
 var app = express();
 
@@ -25,7 +29,7 @@ app.set('views', __dirname + '/views');
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(morgan('[:date[web]] :remote-user ":method :url" - status: ":status"'));
+app.use(morgan('[:date[web]] :remote-user :method :url - status: :status'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

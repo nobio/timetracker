@@ -28,7 +28,8 @@
         "cookie-parser": "~1.4.3",
         "debug": "~2.6.3",
         "morgan": "~1.8.1",
-        "serve-favicon": "~2.4.2"
+        "serve-favicon": "~2.4.2",
+        "log-timestamp": "*"
     },
     "engines": {
         "node": ">=0.6.19"
