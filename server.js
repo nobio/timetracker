@@ -60,8 +60,8 @@ app.post('/geofence', routes.geofence);
 app.post('/geolocation', routes.backgroundGeolocation);
 
 // admin stuff
-app.delete('/entries', admin.deleteAllTimeEntries);
-app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
+//app.delete('/entries', admin.deleteAllTimeEntries);
+//app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
 app.get('/admin/maintain', admin.maintain);
 app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
 app.post('/admin/backup/timeentry', admin.backupTimeEntry);
