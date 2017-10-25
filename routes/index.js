@@ -277,7 +277,7 @@ A timestamp representing the time at which the location was retrieved.
 curl -X POST -H "Content-Type: application/json" -d '{"locationId": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geolocation
  */
 exports.backgroundGeolocation = (req, res) => {
-	console.log(req.body);	
+	console.log(JSON.stringify(req.body));	
 	res.send({
 		message: "I was just logging..."
 	});
