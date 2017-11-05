@@ -4,7 +4,6 @@
     "password": "1gR7hW2cPhtkRlv2",
     "uri": "ds061928.mlab.com:61928/timetrack",
     "options": {
-      "nativeParser": true,
       "useMongoClient": true,
       "reconnectTries": 1000,
       "reconnectInterval": 500,
