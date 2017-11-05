@@ -12,7 +12,8 @@
 # 9 step: delete old application
 # -------------------------------------------------
 
-QNAP_HOST=admin@qnap-nas "source ~/.profile"
+QNAP_HOST=admin@192.168.178.46
+# "source ~/.profile"
 
 echo 
 # 1 step: Copy the whole project to tmp

@@ -4,17 +4,13 @@
     "password": "1gR7hW2cPhtkRlv2",
     "uri": "ds061928.mlab.com:61928/timetrack",
     "options": {
-      "db": {
-        "native_parser": true
-      },
-      "server": {
-        "socketOptions": {
-          "keepAlive": 1,
-          "socketTimeoutMS": 0
-        },
-        "poolSize": 2
-      },
-      "useMongoClient": true
+      "nativeParser": true,
+      "useMongoClient": true,
+      "reconnectTries": 1000,
+      "reconnectInterval": 500,
+      "poolSize": 5,
+      "keepAlive": 120,
+      "bufferMaxEntries": -1
     }
   }
 }

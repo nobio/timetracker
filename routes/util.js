@@ -1,3 +1,4 @@
+require("../db");
 var mongoose = require('mongoose');
 var moment = require('moment');
 var TimeEntry = mongoose.model('TimeEntry');
@@ -230,14 +231,14 @@ exports.getTimeEntriesByDate = (dt, callback) => {
 };
 
 exports.getTimeEntriesByDatePromise = (dt) => {
-    //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
     var dtEnd = moment(dtStart).add('days', '1');
 
-    //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    //console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     return new Promise((resolve, reject) => {
         TimeEntry.find({
             entry_date: {
@@ -248,8 +249,10 @@ exports.getTimeEntriesByDatePromise = (dt) => {
             entry_date: 1
         }).exec((err, timeentries) => {
             if (err) {
+                //console.log('Promise.reject')
                 reject(err);
             } else {
+                //console.log('Promise.resolve')
                 resolve(timeentries);
             }
         });            
