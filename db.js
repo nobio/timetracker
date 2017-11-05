@@ -52,3 +52,7 @@ mongoose.connect(mongodb_url, monoddb_options).then(
   () => { console.log("mongodb is ready to use.")},
   err => { console.log("error while connecting mongodb:" + err) }
 );
+mongoose.connection.close(
+    () => { console.log("mongodb is closed.")},
+    err => { console.log("error while closing connection mongodb:" + err) }      
+);

@@ -229,6 +229,33 @@ exports.getTimeEntriesByDate = (dt, callback) => {
     });
 };
 
+exports.getTimeEntriesByDatePromise = (dt) => {
+    //console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    var dtStart = moment(dt);
+    dtStart.hours(0);
+    dtStart.minutes(0);
+    dtStart.seconds(0);
+    var dtEnd = moment(dtStart).add('days', '1');
+
+    //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    return new Promise((resolve, reject) => {
+        TimeEntry.find({
+            entry_date: {
+                $gte: dtStart,
+                $lt: dtEnd
+            }
+        }).skip(0).sort({
+            entry_date: 1
+        }).exec((err, timeentries) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(timeentries);
+            }
+        });            
+    });
+};
+
 /*
  * reads the number of all TimeEntries in database
  */
@@ -617,3 +644,4 @@ exports.removeDoublets = (callback) => {
         callback(err, count);
     });
 };
+
