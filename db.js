@@ -58,9 +58,3 @@ exports.closeConnection = () => {
         err => { console.log("error while closing connection mongodb:" + err) }      
     );
 }
-/*
-mongoose.connection.close(
-    () => { console.log("mongodb is closed.")},
-    err => { console.log("error while closing connection mongodb:" + err) }      
-);
-*/
