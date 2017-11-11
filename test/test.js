@@ -44,7 +44,7 @@ describe('isEmpty', () => {
 //assert(Array.isArray([]), 'empty arrays are arrays');
 describe('test util.getBusytimeByDate()', () => {
     var db;
-    before(function () {
+    before(function() {
         console.log('BEFORE');
         db = require("../db");
     });
@@ -58,8 +58,23 @@ describe('test util.getBusytimeByDate()', () => {
         return util.getTimeEntriesByDatePromise(0).should.eventually.have.length(0);
     });
 
-    after(function () {
+    after(function() {
         console.log('AFTER');
+        db.closeConnection();
+    });
+});
+describe('test creation of new entry: post /entries -> util.createTimeEntry()', () => {
+    var db;
+    before(function() {
+        //console.log('BEFORE');
+        db = require("../db");
+    });
+    it('response array should have length of 0', () => {
+        return util.createTimeEntry();
+    });
+
+    after(function() {
+        //console.log('AFTER');
         db.closeConnection();
     });
 });
