@@ -12,7 +12,8 @@
 # 9 step: delete old application
 # -------------------------------------------------
 
-QNAP_HOST=admin@192.168.178.46
+#QNAP_HOST=admin@192.168.178.46
+QNAP_HOST=admin@qnap-nas
 # "source ~/.profile"
 
 echo 

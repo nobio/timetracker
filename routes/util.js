@@ -352,6 +352,8 @@ exports.getStatsByTimeBox = (timeUnit, callback) => {
                 data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
             } else if ('week' === timeUnit) {
                 data = getStatsByTimeBoxTimeUnit(stats, 'gggg-ww');
+            } else if ('year' === timeUnit) {
+                data = getStatsByTimeBoxTimeUnit(stats, 'gggg');
             } else if ('day' === timeUnit) {
                 data = getStatsByTimeBoxDay(stats);
             } else if ('weekday' === timeUnit) {
