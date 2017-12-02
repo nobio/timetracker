@@ -3,10 +3,11 @@
  */
 
 // mongoose setup
-require('./db');
+require('./db/db');
 
 var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
+var apiEntries = require('./routes/promise_based/api-entries');
 var admin = require('./routes/admin');
 var experimental = require('./routes/experimental');
 var http = require('http');
@@ -54,6 +55,13 @@ app.get('/entries/:id', routes.getEntryById);
 app.put('/entries/:id', routes.storeEntryById);
 app.delete('/entries/:id', routes.delete);
 app.get('/entries', routes.getEntries);
+// restful services for entries using Promises
+app.post('/api/entries', apiEntries.createEntry);
+app.get('/api/entries/:id', apiEntries.getEntryById);
+app.put('/api/entries/:id', apiEntries.storeEntryById);
+app.delete('/api/entries/:id', apiEntries.deleteEntry);
+app.get('/api/entries', apiEntries.getEntries);
+
 
 // geofencing
 app.post('/geofence', routes.geofence);

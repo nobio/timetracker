@@ -1,4 +1,3 @@
-//const db = require("../db");
 const util = require("../routes/util");
 const admin = require("../routes/admin");
 const route = require("../routes/index");
