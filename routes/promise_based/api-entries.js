@@ -18,8 +18,8 @@ exports.getEntryById = (req, res) => {
 
 /********************************************************************************
  * Reads all time entries
- * Read entries by date: getAllByDate
- * Read busy time: getBusyTime
+ * Read entries by date: getAllByDate -> List of Time Entry of the given day
+ * Read busy time: getBusyTime -> Busy Time of the given day (in ms)
  *
  * curl -X GET http://localhost:30000/api/entries
  * curl -X GET http://localhost:30000/api/entries?dt=1393455600000
@@ -34,13 +34,13 @@ exports.getEntries = (req, res) => {
     res.send(500, 'date and busy filter set; can only handle one of them')
   } else if (filterByDate) {
     console.log('filter by date: ' + filterByDate)
-    getAllByDate(filterByDate)
+    util.getAllByDate(filterByDate)
       .then(timeentries => res.send(timeentries))
       .catch(err => res.send(500, err))
   } else if (filterByBusy) {
     console.log('filter by busy: ' + filterByBusy)
-    getAllByDate(filterByBusy)
-      .then(getBusyTime)
+    util.getAllByDate(filterByBusy)
+      .then(util.getBusyTime)
       .then(busytime => res.send({'duration': busytime}))
       .catch(err => res.send(500, err))
   } else {
@@ -100,72 +100,4 @@ exports.deleteEntry = (req, res) => {
  * stores one Time Entry
  *******************************************************************************/
 exports.storeEntryById = (req, res) => {
-}
-
-/* =========================================================================== */
-/* =========================================================================== */
-/*                              PRIVATE METHODS                                */
-/* =========================================================================== */
-/* =========================================================================== */
-
-/**
- * lists all Time Entries for a given date (this particular day)
- * 
- * @returns Promise
- */
-function getAllByDate (date) {
-  var dtStart = util.stripdownToDateBerlin(moment.unix(date / 1000))
-  var dtEnd = moment(dtStart).add(1, 'days')
-  // console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'))
-
-  return new Promise((resolve, reject) => {
-    TimeEntry.find({
-      entry_date: {
-        $gte: dtStart,
-        $lt: dtEnd
-      }
-    }).skip(0).sort({
-      entry_date: 1
-    })
-      .then(timeentries => resolve(timeentries))
-      .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
-  })
-}
-
-/**
- * Reads the busy time of all entries for a given day
- * 
- * @returns Promise
- */
-function getBusyTime (timeentries) {
-  return new Promise((resolve, reject) => {
-
-    if (timeentries.length === 0) {
-      reject(new Error('Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')'), 0)
-    } else if (timeentries.length % 2 !== 0) {
-      reject(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0)
-    } else {
-      var busytime = 0
-      for (var n = timeentries.length - 1; n > 0; n -= 2) {
-        // this must be a go-event
-        if (timeentries[n].direction !== 'go') {
-          reject(new Error('Die Reihenfolge der Kommen/Gehen-Einträge am ' + dt.format('DD.MM.YYYY') + ' scheint nicht zu stimmen.'), 0)
-          return
-        }
-
-        var end = timeentries[n].entry_date
-        var start = timeentries[n - 1].entry_date
-
-        busytime = busytime + (end - start)
-      }
-
-      // when there have been only 2 entries we reduce the busytime by 45 minutes (default pause)
-      if (timeentries.length === 2) {
-        busytime = busytime - DEFAULT_BREAK_TIME
-      }
-      // console.log(dt + " => " + busytime + " " + (busytime/1000/60/60))
-
-      resolve(busytime)
-    }
-  })
 }

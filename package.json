@@ -13,7 +13,6 @@
     "private": true,
     "scripts": {
         "start": "node server",
-        "xxx": "node test/test",
         "test": "./node_modules/.bin/mocha --reporter spec"
     },
     "dependencies": {
