@@ -1,17 +1,15 @@
-var mongoose = require('mongoose')
 var moment = require('moment')
 var tz = require('moment-timezone')
 var util = require('./util')
-var TimeEntry = mongoose.model('TimeEntry')
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
 
 /********************************************************************************
  * Get one Time Entry by it's id
  * 
- * curl -X GET http://localhost:30000/entries/5a2100cf87f1f368d087696a
+ * curl -X GET http://localhost:30000/api/entries/5a2100cf87f1f368d087696a
  *******************************************************************************/
 exports.getEntryById = (req, res) => {
-  TimeEntry.findById(req.params.id)
+  util.findById(req.params.id)
     .then(timeentry => res.send(timeentry))
     .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
@@ -91,8 +89,14 @@ exports.createEntry = (req, res) => {
 exports.deleteEntry = (req, res) => {
   var id = req.params.id
 
-  TimeEntry.findByIdAndRemove(id)
-    .then(timeentry => res.send(timeentry))
+  util.deleteById(id)
+    .then(timeentry => {
+      if (timeentry === empty) {
+        res.send(500, 'Could not delete Time Entry with (id: ' + id + ') ' + err)
+      } else {
+        res.send(timeentry)
+      }
+    })
     .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
 

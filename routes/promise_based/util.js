@@ -7,9 +7,13 @@ console.log('util in promise realm was started')
 require('../../db/db')
 
 var mongoose = require('mongoose')
-var moment = require('moment')
 var TimeEntry = mongoose.model('TimeEntry')
+var moment = require('moment')
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
+
+exports.isEmpty = (obj) => {
+  return require('../util').isEmpty(obj)
+}
 
 /**
  * takes the date and removes all time components
@@ -17,12 +21,46 @@ const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
  */
 exports.stripdownToDateBerlin = (date) => {
   var d = moment.tz(date / 1, 'Europe/Berlin')
-  d.millisecond(0)
-  d.second(0)
-  d.minutes(0)
-  d.hours(0)
-
+  d.millisecond(0); d.second(0); d.minutes(0); d.hours(0)
   return d
+}
+
+/**
+ * finds one entry by it's id
+ * @param id unique id of an entry like 5a2100cf87f1f368d087696a
+ * @returns TimeEntry object like
+ * 
+ {
+   "direction" : "enter",
+   "latitude" : 49.448335,
+   "entry_date" : "2017-12-01T07:12:15.567Z",
+   "_id" : "5a2100cf87f1f368d087696a",
+   "longitude" : 11.091801,
+   "__v" : 0,
+   "last_changed" : "2017-12-01T07:12:15.623Z"
+}
+ */
+exports.findById = (id) => {
+  //console.log('entered findById ' + id)
+  return new Promise((resolve, reject) => {
+    TimeEntry.findById(id)
+      .then(timeentries => resolve(timeentries))
+      .catch(err => reject(err))
+  })
+}
+
+/**
+ * deletes one entry by it's id
+ * @param id unique id of an entry like 5a2100cf87f1f368d087696a
+ * @returns TimeEntry object that has been deleted
+ */
+exports.deleteById = (id) => {
+  //console.log('entered deleteById ' + id)
+  return new Promise((resolve, reject) => {
+    TimeEntry.findByIdAndRemove(id)
+      .then(timeentry => resolve(timeentry))
+      .catch(err => reject(err))
+  })
 }
 
 /**
