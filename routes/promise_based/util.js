@@ -50,6 +50,29 @@ exports.findById = (id) => {
 }
 
 /**
+ * Creates a new TimeEntry item in database
+ * 
+ * @param direction enter/go
+ * @param datetime (optional; default = now) the date (example: new Date() or moment(...)) of this TimeEntry
+ * @param longitude (optional) the longitude of this TimeEntry
+ * @param latitude (optional) the latitude of this TimeEntry
+ * @returns new TimeEntry object
+ */
+exports.save = (direction, datetime, longitude, latitude) => {
+  // console.log('entered save ' + id)
+  return new Promise((resolve, reject) => {
+    new TimeEntry({
+      entry_date: datetime,
+      direction: direction,
+      longitude: longitude,
+      latitude: latitude
+    }).save()
+      .then(timeEntry => resolve(timeEntry))
+      .catch(err => reject(err))
+  })
+}
+
+/**
  * deletes one entry by it's id
  * @param id unique id of an entry like 5a2100cf87f1f368d087696a
  * @returns TimeEntry object that has been deleted

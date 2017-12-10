@@ -72,12 +72,13 @@ exports.createEntry = (req, res) => {
   //   then(util.validateRequest).
   //   then(util.createTimeEntry).
   //   catch(err => {})
-  util.createTimeEntry(direction, datetime, longitude, latitude, (err, timeentry) => {
-    if (err) {
-      res.send(500, 'Error while creating new  Time Entry: ' + err.message)
-    } else {
-      res.send(timeentry)
+  util.createTimeEntry((direction, datetime, longitude, latitude) => {
+    if(datetime === undefined) {
+      datetime = new Date()
     }
+    util.save(direction, datetime, longitude, latitude)
+      .then(timeentry => res.send(timeentry))
+      .catch(err => res.send(500, 'Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
   })
 }
 

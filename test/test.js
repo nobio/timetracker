@@ -44,7 +44,7 @@ describe('isEmpty', () => {
 describe('test util.getBusytimeByDate()', () => {
   var db
   before(function () {
-    console.log('BEFORE')
+    //console.log('BEFORE')
     db = require('../db/db')
   })
   it('response array should have length of 0', () => {
