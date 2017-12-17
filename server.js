@@ -58,7 +58,7 @@ app.get('/entries', routes.getEntries);
 // restful services for entries using Promises
 app.post('/api/entries', apiEntries.createEntry);
 app.get('/api/entries/:id', apiEntries.getEntryById);
-app.put('/api/entries/:id', apiEntries.storeEntryById);
+app.put('/api/entries/:id', apiEntries.saveEntry);
 app.delete('/api/entries/:id', apiEntries.deleteEntry);
 app.get('/api/entries', apiEntries.getEntries);
 

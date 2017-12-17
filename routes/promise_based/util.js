@@ -91,29 +91,17 @@ exports.update = (id, direction, datetime, longitude, latitude) => {
         resolve(timeentry)
       }
     })
-    .catch(err => reject(err))
-    .catch
-  TimeEntry.findById(id, (err, timeentry) => {
-    console.log(err);
-    if (err) {
-      res.send(500, 'Error while reading Time Entry: ' + err);
-    } else {
+    .then(timeentry => {
+      console.log(timeentry)
       timeentry.direction = req.body.direction;
       timeentry.entry_date = moment(req.body.entry_date);
       timeentry.last_changed = new Date();
 
-      console.log(timeentry);
-
-      timeentry.save(err => {
-        if (err) {
-          res.send(500, 'Error while saving Time Entry: ' + err);
-        } else {
-          res.send(timeentry);
-        }
-      });
-    }
-  });
-
+      timeentry.save()
+        .then(timeentry => resolve(timeentry))
+        .catch(err => reject(err))
+    })
+    .catch(err => reject(err))
 }
 
 
