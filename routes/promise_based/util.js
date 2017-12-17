@@ -73,6 +73,51 @@ exports.save = (direction, datetime, longitude, latitude) => {
 }
 
 /**
+ * Stores an exisiting TimeEntry item in database
+ * 
+ * @param id unique identifier of an existing TimeEntry
+ * @param direction enter/go
+ * @param datetime (optional; default = now) the date (example: new Date() or moment(...)) of this TimeEntry
+ * @param longitude (optional) the longitude of this TimeEntry
+ * @param latitude (optional) the latitude of this TimeEntry
+ * @returns new TimeEntry object
+ */
+exports.update = (id, direction, datetime, longitude, latitude) => {
+  findById(id)
+    .then(timeentry => {
+      if (timeentry === undefined || timeentry === null) {
+        reject(new Error('Unable to update Time Entry for id (does not exist) : ' + id))
+      } else {
+        resolve(timeentry)
+      }
+    })
+    .catch(err => reject(err))
+    .catch
+  TimeEntry.findById(id, (err, timeentry) => {
+    console.log(err);
+    if (err) {
+      res.send(500, 'Error while reading Time Entry: ' + err);
+    } else {
+      timeentry.direction = req.body.direction;
+      timeentry.entry_date = moment(req.body.entry_date);
+      timeentry.last_changed = new Date();
+
+      console.log(timeentry);
+
+      timeentry.save(err => {
+        if (err) {
+          res.send(500, 'Error while saving Time Entry: ' + err);
+        } else {
+          res.send(timeentry);
+        }
+      });
+    }
+  });
+
+}
+
+
+/**
  * deletes one entry by it's id
  * @param id unique id of an entry like 5a2100cf87f1f368d087696a
  * @returns TimeEntry object that has been deleted
