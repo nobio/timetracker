@@ -1,6 +1,6 @@
 var moment = require('moment')
 var tz = require('moment-timezone')
-var util = require('./util')
+var util = require('./util-entries')
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
 
 /********************************************************************************
@@ -42,7 +42,7 @@ exports.getEntries = (req, res) => {
       .then(busytime => res.send({'duration': busytime}))
       .catch(err => res.send(500, err))
   } else {
-    TimeEntry.find()
+    util.getAll()
       .then(timeentry => res.send(timeentry))
       .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
   }
@@ -72,14 +72,26 @@ exports.createEntry = (req, res) => {
   //   then(util.validateRequest).
   //   then(util.createTimeEntry).
   //   catch(err => {})
-  util.createTimeEntry((direction, datetime, longitude, latitude) => {
-    if(datetime === undefined) {
-      datetime = new Date()
-    }
-    util.save(direction, datetime, longitude, latitude)
-      .then(timeentry => res.send(timeentry))
-      .catch(err => res.send(500, 'Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
-  })
+  util.create(direction, datetime, longitude, latitude)
+    .then(timeentry => res.send(timeentry))
+    .catch(err => res.send(500, 'Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
+}
+
+/********************************************************************************
+ * stores one Time Entry
+ *
+ * curl -X PUT -H "Content-Type: application/json" -d '{"direction":"enter", "latitude":"45", "longitude":"45"}' http://localhost:30000/api/entries/5a36aab25ba9cf154bd2a384
+ *******************************************************************************/
+exports.saveEntry = (req, res) => {
+  var id = req.params.id
+  var direction = req.body.direction
+  var datetime = req.body.datetime
+  var longitude = req.body.longitude
+  var latitude = req.body.latitude
+
+  util.update(undefined, id, direction, datetime, longitude, latitude)
+    .then(timeentry => res.send(timeentry))
+    .catch(err => res.send(500, 'Error while saving Time Entry: ' + id + ' ' + err))
 }
 
 /********************************************************************************
@@ -99,10 +111,4 @@ exports.deleteEntry = (req, res) => {
       }
     })
     .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
-}
-
-/********************************************************************************
- * stores one Time Entry
- *******************************************************************************/
-exports.storeEntryById = (req, res) => {
 }

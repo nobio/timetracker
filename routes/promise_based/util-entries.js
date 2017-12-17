@@ -3,7 +3,6 @@
  * Methods of this file must never be used from server.js directly rather than from api layer
  * 
  */
-console.log('util in promise realm was started')
 require('../../db/db')
 
 var mongoose = require('mongoose')
@@ -41,7 +40,7 @@ exports.stripdownToDateBerlin = (date) => {
 }
  */
 exports.findById = (id) => {
-  //console.log('entered findById ' + id)
+  // console.log('entered findById ' + id)
   return new Promise((resolve, reject) => {
     TimeEntry.findById(id)
       .then(timeentries => resolve(timeentries))
@@ -58,7 +57,7 @@ exports.findById = (id) => {
  * @param latitude (optional) the latitude of this TimeEntry
  * @returns new TimeEntry object
  */
-exports.save = (direction, datetime, longitude, latitude) => {
+exports.create = (direction, datetime, longitude, latitude) => {
   // console.log('entered save ' + id)
   return new Promise((resolve, reject) => {
     new TimeEntry({
@@ -73,37 +72,44 @@ exports.save = (direction, datetime, longitude, latitude) => {
 }
 
 /**
- * Stores an exisiting TimeEntry item in database
+ * Stores an existing TimeEntry item in database
  * 
- * @param id unique identifier of an existing TimeEntry
+ * @param id unique identifier of the Time Entry (to load)
  * @param direction enter/go
  * @param datetime (optional; default = now) the date (example: new Date() or moment(...)) of this TimeEntry
  * @param longitude (optional) the longitude of this TimeEntry
  * @param latitude (optional) the latitude of this TimeEntry
+ * 
  * @returns new TimeEntry object
  */
-exports.update = (id, direction, datetime, longitude, latitude) => {
-  findById(id)
-    .then(timeentry => {
-      if (timeentry === undefined || timeentry === null) {
-        reject(new Error('Unable to update Time Entry for id (does not exist) : ' + id))
-      } else {
-        resolve(timeentry)
-      }
-    })
-    .then(timeentry => {
-      console.log(timeentry)
-      timeentry.direction = req.body.direction;
-      timeentry.entry_date = moment(req.body.entry_date);
-      timeentry.last_changed = new Date();
+exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
+  // console.log('entered update with all parameters of Time Entry: ' + direction)
+  if (timeEntry != undefined) {
+    id = timeEntry.id
+    direction = timeEntry.direction
+    datetime = timeEntry.datetime
+    longitude = timeEntry.longitude
+    latitude = timeEntry.latitude
+  }
 
-      timeentry.save()
-        .then(timeentry => resolve(timeentry))
-        .catch(err => reject(err))
-    })
-    .catch(err => reject(err))
+  return new Promise((resolve, reject) => {
+    TimeEntry.findById(id)
+      .then(timeentry => {
+        // console.log(timeentry)
+        timeentry.direction = direction
+        timeentry.longitude = longitude
+        timeentry.latitude = latitude
+        timeentry.datetime = datetime
+        timeentry.last_changed = new Date()
+        // console.log(timeentry)
+
+        timeentry.save()
+          .then(timeEntry => resolve(timeEntry))
+          .catch(err => reject(err))
+      })
+      .catch(err => reject(err))
+  })
 }
-
 
 /**
  * deletes one entry by it's id
@@ -111,7 +117,7 @@ exports.update = (id, direction, datetime, longitude, latitude) => {
  * @returns TimeEntry object that has been deleted
  */
 exports.deleteById = (id) => {
-  //console.log('entered deleteById ' + id)
+  // console.log('entered deleteById ' + id)
   return new Promise((resolve, reject) => {
     TimeEntry.findByIdAndRemove(id)
       .then(timeentry => resolve(timeentry))
@@ -135,9 +141,7 @@ exports.getAllByDate = (date) => {
         $gte: dtStart,
         $lt: dtEnd
       }
-    }).skip(0).sort({
-      entry_date: 1
-    })
+    }).skip(0).sort({ entry_date: 1 })
       .then(timeentries => resolve(timeentries))
       .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
   })
@@ -178,5 +182,13 @@ exports.getBusyTime = (timeentries) => {
 
       resolve(busytime)
     }
+  })
+}
+
+exports.getAll = () => {
+  return new Promise((resolve, reject) => {
+    TimeEntry.find()
+      .then(timeentries => resolve(timeentries))
+      .catch(err => reject(err))
   })
 }

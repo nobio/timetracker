@@ -231,7 +231,7 @@ exports.getTimeEntriesByDate = (dt, callback) => {
 };
 
 exports.getTimeEntriesByDatePromise = (dt) => {
-    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    // console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);

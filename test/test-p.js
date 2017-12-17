@@ -1,7 +1,7 @@
 require('../db/db')
 const mongoose = require('mongoose')
 const TimeEntry = mongoose.model('TimeEntry')
-const util = require('../routes/promise_based/util')
+const util = require('../routes/promise_based/util-entries')
 
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
@@ -14,6 +14,7 @@ const should = chai.should()
 
 const moment = require('moment')
 require('moment-timezone')
+const DEFAULT_DATE = moment('1967-03-16')
 
 describe('isEmpty - Promise', () => {
   var testv
@@ -95,15 +96,22 @@ describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () 
     db = require('../db/db')
   })
 
-  it('should find one Time Entry by its id', () => {
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('_id'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('direction'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('longitude'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('latitude'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('__v'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('last_changed'))
-    expect(util.findById('5a2100cf87f1f368d087696a').should.eventually.have.property('entry_date'))
-    return util.findById('5a2100cf87f1f368d087696a').should.be.fulfilled
+  it('should find one Time Entry by its id', async () => {
+    //util.findById('5a2100cf87f1f368d087696a').then(timeentry => console.log(timeentry))
+    await util.findById('5a2100cf87f1f368d087696a')
+    .then(timeentry => {
+      //console.log(timeentry)
+      expect(timeentry).to.have.property('_id')
+      expect(timeentry).to.have.property('direction')
+      expect(timeentry).to.have.property('longitude')
+      expect(timeentry).to.have.property('latitude')
+      expect(timeentry).to.have.property('__v')
+      expect(timeentry).to.have.property('direction')
+      expect(timeentry.direction).to.equal('enter')
+      expect(timeentry).to.have.property('last_changed')
+      expect(timeentry).to.have.property('entry_date')
+    })
+    .catch(err => {throw err})
   })
   it('should not find a Time Entry by an invalid id', () => {
     return util.findById('********_invalid-id_********').should.be.rejectedWith(Error)
@@ -114,14 +122,14 @@ describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () 
   })
 })
 
-describe('test to create one TimeEntry:  -> util.save() - Promise', () => {
+describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   var db
   before(function () {
     db = require('../db/db')
   })
 
   it('create successfully a new TimeEntry', async () => {
-    await util.save('enter', moment('1967-03-16'))
+    await util.create('enter', DEFAULT_DATE)
       .then(timeEntry => {
         //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
@@ -133,6 +141,9 @@ describe('test to create one TimeEntry:  -> util.save() - Promise', () => {
         expect(timeEntry).to.have.property('entry_date')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
         expect(timeEntry).to.have.property('longitude')
+        expect(timeEntry).to.have.property('latitude')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('enter')
 
         return timeEntry._id
       })
@@ -152,13 +163,15 @@ describe('test to create one TimeEntry:  -> util.save() - Promise', () => {
       })
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)
+        clearAllEntries()        
+        throw err
       })
   })
 
   it('create successfully a new TimeEntry without datetime', async () => {
-    await util.save('enter')
+    await util.create('enter')
       .then(timeEntry => {
-        //console.log(timeEntry)
+        console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('_id')
         expect(timeEntry._id).to.not.be.empty
@@ -167,7 +180,10 @@ describe('test to create one TimeEntry:  -> util.save() - Promise', () => {
         expect(timeEntry).to.have.property('last_changed')
         expect(timeEntry).to.have.property('entry_date')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal(moment().format('YYYY-MM-DD'))
+        expect(timeEntry).to.have.property('latitude')
         expect(timeEntry).to.have.property('longitude')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('enter')
 
         return timeEntry._id
       })
@@ -186,16 +202,11 @@ describe('test to create one TimeEntry:  -> util.save() - Promise', () => {
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        console.log('no error should occure; instead: ' + err.message)
+        clearAllEntries()        
+        throw err
       })
   })
 
-  after(function () {
-    setTimeout(function () {
-      db.closeConnection()
-      callback()
-    }, 1000)
-  })
 })
 
 describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise', () => {
@@ -206,7 +217,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
 
   it('should delete one Time Entry by its id', async () => {
     // create new entry (which will be deleted later)
-    await util.save('enter', moment('1967-03-16'))
+    await util.create('enter', DEFAULT_DATE)
       .then(util.deleteById)
       .then(timeEntry => {
         //console.log(timeEntry)
@@ -217,6 +228,8 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
         expect(timeEntry).to.have.property('__v')
         expect(timeEntry).to.have.property('last_changed')
         expect(timeEntry).to.have.property('entry_date')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('enter')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
         expect(timeEntry).to.have.property('longitude')
 
@@ -227,26 +240,55 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        console.log('no error should occure; instead: ' + err.message)
+        clearAllEntries()        
+        throw err
       })
   })
 
-  after(function () {
-    setTimeout(function () {
-      db.closeConnection()
-      callback()
-    }, 1000)
-  })
 })
 
-describe('test to modify one TimeEntry:  -> util.save() - Promise', () => {
+describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   var db
   before(function () {
     db = require('../db/db')
   })
 
   it('modify successfully a new TimeEntry', async () => {
-    await util.save('enter', moment('1967-03-16'))
+    await util.create('enter', DEFAULT_DATE)
+      .then(timeEntry => {
+//        console.log(timeEntry)        
+        expect(timeEntry).to.not.be.undefined
+        expect(timeEntry).to.have.property('_id')
+        expect(timeEntry._id).to.not.be.empty
+        expect(timeEntry._id).to.not.be.a('string')
+        expect(timeEntry).to.have.property('__v')
+        expect(timeEntry).to.have.property('last_changed')
+        expect(timeEntry).to.have.property('entry_date')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('enter')
+        expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
+        expect(timeEntry).to.have.property('longitude')
+
+        timeEntry.direction = 'go'
+        return timeEntry
+      })
+      .then(util.update)
+      .then(timeEntry => {
+        expect(timeEntry).to.not.be.null
+        expect(timeEntry).to.not.be.undefined
+        expect(timeEntry).to.have.property('_id')
+        expect(timeEntry._id).to.not.be.empty
+        expect(timeEntry._id).to.not.be.a('string')
+        expect(timeEntry).to.have.property('__v')
+        expect(timeEntry).to.have.property('last_changed')
+        expect(timeEntry).to.have.property('entry_date')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('go')
+        expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
+        expect(timeEntry).to.have.property('longitude')
+        return timeEntry._id
+      })
+      .then(util.findById)
       .then(timeEntry => {
         //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
@@ -256,16 +298,12 @@ describe('test to modify one TimeEntry:  -> util.save() - Promise', () => {
         expect(timeEntry).to.have.property('__v')
         expect(timeEntry).to.have.property('last_changed')
         expect(timeEntry).to.have.property('entry_date')
+        expect(timeEntry).to.have.property('direction')
+        expect(timeEntry.direction).to.equal('go')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
         expect(timeEntry).to.have.property('longitude')
 
-        return timeEntry._id
-      })
-      .then(util.findById)
-      .then(timeEntry => {
-        expect(timeEntry).to.not.be.null
-
-        return timeEntry._id
+        return timeEntry._id        
       })
       .then(util.deleteById)  // delete entry and prove so
       .then(timeEntry => {
@@ -276,7 +314,7 @@ describe('test to modify one TimeEntry:  -> util.save() - Promise', () => {
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        console.log('no error should occure; instead: ' + err.message)
+        throw err
       })
   })
 
@@ -287,3 +325,17 @@ describe('test to modify one TimeEntry:  -> util.save() - Promise', () => {
     }, 1000)
   })
 })
+
+/**
+ * 
+ * @param {*} date date to delete all entries which might have stayed because of any error
+ */
+function clearAllEntries() {
+  util.getAllByDate(DEFAULT_DATE)
+  .then(timeentries => {
+    console.log('removing ' + timeentries.length + ' entries')
+    timeentries.forEach((timeentry) => {
+      util.deleteById(timeentry._id)
+  });
+}) 
+}
