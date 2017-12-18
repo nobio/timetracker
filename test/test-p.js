@@ -171,7 +171,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   it('create successfully a new TimeEntry without datetime', async () => {
     await util.create('enter')
       .then(timeEntry => {
-        console.log(timeEntry)
+        //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('_id')
         expect(timeEntry._id).to.not.be.empty
