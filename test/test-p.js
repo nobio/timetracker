@@ -68,7 +68,7 @@ describe('test stripdownToDateBerlin method', () => {
 // assert(Array.isArray([]), 'empty arrays are arrays')
 describe('test util.getBusyTime - Promise', () => {
   var db
-  before(function () {
+  before(function() {
     db = require('../db/db')
   })
 
@@ -85,50 +85,50 @@ describe('test util.getBusyTime - Promise', () => {
     return util.getAllByDate(0).should.eventually.have.length(0)
   })
 
-  after(function () {
+  after(function() {
     // db.closeConnection()
   })
 })
 
 describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () => {
   var db
-  before(function () {
+  before(function() {
     db = require('../db/db')
   })
 
-  it('should find one Time Entry by its id', async () => {
+  it('should find one Time Entry by its id', async() => {
     //util.findById('5a2100cf87f1f368d087696a').then(timeentry => console.log(timeentry))
     await util.findById('5a2100cf87f1f368d087696a')
-    .then(timeentry => {
-      //console.log(timeentry)
-      expect(timeentry).to.have.property('_id')
-      expect(timeentry).to.have.property('direction')
-      expect(timeentry).to.have.property('longitude')
-      expect(timeentry).to.have.property('latitude')
-      expect(timeentry).to.have.property('__v')
-      expect(timeentry).to.have.property('direction')
-      expect(timeentry.direction).to.equal('enter')
-      expect(timeentry).to.have.property('last_changed')
-      expect(timeentry).to.have.property('entry_date')
-    })
-    .catch(err => {throw err})
+      .then(timeentry => {
+        //console.log(timeentry)
+        expect(timeentry).to.have.property('_id')
+        expect(timeentry).to.have.property('direction')
+        expect(timeentry).to.have.property('longitude')
+        expect(timeentry).to.have.property('latitude')
+        expect(timeentry).to.have.property('__v')
+        expect(timeentry).to.have.property('direction')
+        expect(timeentry.direction).to.equal('enter')
+        expect(timeentry).to.have.property('last_changed')
+        expect(timeentry).to.have.property('entry_date')
+      })
+      .catch(err => { throw err })
   })
   it('should not find a Time Entry by an invalid id', () => {
     return util.findById('********_invalid-id_********').should.be.rejectedWith(Error)
   })
 
-  after(function () {
+  after(function() {
     // db.closeConnection()
   })
 })
 
 describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   var db
-  before(function () {
+  before(function() {
     db = require('../db/db')
   })
 
-  it('create successfully a new TimeEntry', async () => {
+  it('create successfully a new TimeEntry', async() => {
     await util.create('enter', DEFAULT_DATE)
       .then(timeEntry => {
         //console.log(timeEntry)
@@ -153,7 +153,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
 
         return timeEntry._id
       })
-      .then(util.deleteById)  // delete entry and prove so
+      .then(util.deleteById) // delete entry and prove so
       .then(timeEntry => {
         return timeEntry._id
       })
@@ -163,15 +163,15 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
       })
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)
-        clearAllEntries()        
+        clearAllEntries()
         throw err
       })
   })
 
-  it('create successfully a new TimeEntry without datetime', async () => {
+  it('create successfully a new TimeEntry without datetime', async() => {
     await util.create('enter')
       .then(timeEntry => {
-        console.log(timeEntry)
+        //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('_id')
         expect(timeEntry._id).to.not.be.empty
@@ -193,7 +193,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
 
         return timeEntry._id
       })
-      .then(util.deleteById)  // delete entry and prove so
+      .then(util.deleteById) // delete entry and prove so
       .then(timeEntry => {
         return timeEntry._id
       })
@@ -202,7 +202,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        clearAllEntries()        
+        clearAllEntries()
         throw err
       })
   })
@@ -211,11 +211,11 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
 
 describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise', () => {
   var db
-  before(function () {
+  before(function() {
     db = require('../db/db')
   })
 
-  it('should delete one Time Entry by its id', async () => {
+  it('should delete one Time Entry by its id', async() => {
     // create new entry (which will be deleted later)
     await util.create('enter', DEFAULT_DATE)
       .then(util.deleteById)
@@ -240,7 +240,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        clearAllEntries()        
+        clearAllEntries()
         throw err
       })
   })
@@ -249,14 +249,14 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
 
 describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   var db
-  before(function () {
+  before(function() {
     db = require('../db/db')
   })
 
-  it('modify successfully a new TimeEntry', async () => {
+  it('modify successfully a new TimeEntry', async() => {
     await util.create('enter', DEFAULT_DATE)
       .then(timeEntry => {
-//        console.log(timeEntry)        
+        //        console.log(timeEntry)        
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('_id')
         expect(timeEntry._id).to.not.be.empty
@@ -303,9 +303,9 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
         expect(timeEntry).to.have.property('longitude')
 
-        return timeEntry._id        
+        return timeEntry._id
       })
-      .then(util.deleteById)  // delete entry and prove so
+      .then(util.deleteById) // delete entry and prove so
       .then(timeEntry => {
         return timeEntry._id
       })
@@ -318,8 +318,8 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
       })
   })
 
-  after(function () {
-    setTimeout(function () {
+  after(function() {
+    setTimeout(function() {
       db.closeConnection()
       callback()
     }, 1000)
@@ -332,10 +332,10 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
  */
 function clearAllEntries() {
   util.getAllByDate(DEFAULT_DATE)
-  .then(timeentries => {
-    console.log('removing ' + timeentries.length + ' entries')
-    timeentries.forEach((timeentry) => {
-      util.deleteById(timeentry._id)
-  });
-}) 
+    .then(timeentries => {
+      console.log('removing ' + timeentries.length + ' entries')
+      timeentries.forEach((timeentry) => {
+        util.deleteById(timeentry._id)
+      });
+    })
 }
