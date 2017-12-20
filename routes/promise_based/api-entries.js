@@ -39,7 +39,7 @@ exports.getEntries = (req, res) => {
     console.log('filter by busy: ' + filterByBusy)
     util.getAllByDate(filterByBusy)
       .then(util.getBusyTime)
-      .then(busytime => res.send({'duration': busytime}))
+      .then(busytime => res.send({ 'duration': busytime }))
       .catch(err => res.send(500, err))
   } else {
     util.getAll()
@@ -104,11 +104,11 @@ exports.deleteEntry = (req, res) => {
 
   util.deleteById(id)
     .then(timeentry => {
-      if (timeentry === empty) {
-        res.send(500, 'Could not delete Time Entry with (id: ' + id + ') ' + err)
+      if (timeentry === undefined || timeentry === null) {
+        res.send(500, 'Could not delete Time Entry with (id: ' + id + ')')
       } else {
         res.send(timeentry)
       }
     })
-    .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
+    .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' - ' + err))
 }
