@@ -133,7 +133,7 @@ exports.deleteById = (id) => {
 exports.getAllByDate = (date) => {
   var dtStart = this.stripdownToDateBerlin(moment.unix(date / 1000))
   var dtEnd = moment(dtStart).add(1, 'days')
-  // console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'))
+  console.log('getAllByDate received date: ' + moment(dtStart).format('DD.MM.YYYY HH:mm:ss') + ' - ' + moment(dtEnd).format('DD.MM.YYYY HH:mm:ss'))
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
@@ -183,6 +183,37 @@ exports.getBusyTime = (timeentries) => {
       resolve(busytime)
     }
   })
+}
+
+/**
+ * reads the last entry for a given date
+ * 
+ * @param dt (*) Date to which the last entry is to be read; example: "2017-12-19T19:34:00.000Z"
+ * @returns Promise and then (resolve) last time entry of the given date
+ */
+exports.getLastTimeEntryByDate = (dt) => {
+  var dtStart = stripdownToDateBerlin(dt)
+  var dtEnd = moment(dtStart).add('days', '1')
+
+  console.log(dtStart.toDate() + '\n' + dtEnd.toDate())
+
+  return new Promise((resolve, reject) => {
+    TimeEntry.find({
+      entry_date: {
+        $gte: dtStart,
+        $lt: dtEnd
+      }
+    }).skip(0).limit(1).sort({ entry_date: -11 })
+      .then(timeentry => {
+        if (timeentry === undefined || timeentry.length == 0) {
+          reject(new Error('No Time Entry found for given date : ' + date))
+        } else {
+          resolve(timeentry)
+        }
+      })
+      .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
+  })
+
 }
 
 exports.getAll = () => {

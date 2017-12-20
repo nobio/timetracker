@@ -122,6 +122,43 @@ describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () 
   })
 })
 
+describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeEntryByDate(dt) - Promise', () => {
+  var db
+  before(function() {
+    db = require('../db/db')
+  })
+
+  it('create 2 TimeEntries and read the last of them', async() => {
+    const dtOne = util.stripdownToDateBerlin(DEFAULT_DATE)
+    const dtTwo = util.stripdownToDateBerlin(DEFAULT_DATE)
+    dtOne.hours(8)
+    dtTwo.hours(17)
+    
+    await util.create('enter', dtOne)
+      .then(util.create('go', dtTwo))
+      .then(util.getAllByDate(DEFAULT_DATE))
+      .then(timeentries => {
+        console.log(JSON.stringify(timeentries))
+        expect(timeentries).to.not.be.null
+        expect(timeentries).to.have.lengthOf(2);
+      })
+      /*
+      .then(util.getLastTimeEntryByDate(DEFAULT_DATE))
+      .then(timeEntry => {
+        console.log(timeEntry)
+        expect(timeEntry.entry_date).to.equal(DEFAULT_DATE + '17:14:00.000Z')
+      })
+      */
+      //.then(clearAllEntries)
+      .catch(err => {
+        console.log('no error should occure; instead: ' + err.message)
+        clearAllEntries()
+        throw err
+      })
+  })
+
+})
+
 describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   var db
   before(function() {

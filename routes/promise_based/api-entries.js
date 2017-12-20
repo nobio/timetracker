@@ -1,5 +1,3 @@
-var moment = require('moment')
-var tz = require('moment-timezone')
 var util = require('./util-entries')
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
 
@@ -57,7 +55,8 @@ exports.getEntries = (req, res) => {
  * @param longitude (optional)
  * @param latitude (optional)
  * 
- * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","entry_date":"2017-12-02T17:49:23.977Z","last_changed":"2017-12-02T17:49:23.977Z","datetime":"2017-12-02T17:49:00.000Z"}' http://localhost:30000/api/entries
+ * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","datetime":"2017-12-02T17:49:00.000Z"}' http://localhost:30000/api/entries
+ * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","datetime":"2017-12-02T17:49:00.000Z","longitude":45, "latitude":15}' http://localhost:30000/api/entries
  *******************************************************************************/
 exports.createEntry = (req, res) => {
   console.log(JSON.stringify(req.body))
