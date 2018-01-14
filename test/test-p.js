@@ -127,9 +127,8 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
     db = require('../db/db')
   })
 
-  it('create 2 TimeEntries and read the last of them', async() => {
+  it('check the last entry of a given date', async() => {
     const MY_DATE = moment('2018-01-12');
-    var lastEntry;
     
     await util.getLastTimeEntryByDate(MY_DATE)
       .then(timeEntry =>  {
@@ -138,8 +137,24 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('entry_date')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('2018-01-12')
-//        expect(moment(timeEntry.entry_date).format('HH:mm:ss')).to.equal('17:22:56')
         expect(moment(timeEntry.entry_date).format('mm:ss')).to.equal('22:56')
+        // should actually be 
+        // expect(moment(timeEntry.entry_date).format('HH:mm:ss')).to.equal('17:22:56')
+        // but timezone trouble on travis makes it difficult...
+      })
+      .catch(err => {
+        console.log('no error should occure; instead: ' + err.message)
+        throw err
+      })
+  })
+
+  it('last entry of an empty date (in the future) must be undefined', async () => {
+    const MY_DATE = moment('2050-01-01');
+    
+    await util.getLastTimeEntryByDate(MY_DATE)
+      .then(timeEntry =>  {
+        //console.log(timeEntry)        
+        expect(timeEntry).to.be.undefined
       })
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)

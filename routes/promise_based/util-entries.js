@@ -50,6 +50,12 @@ exports.findById = (id) => {
 
 /**
  * Creates a new TimeEntry item in database
+ * - validate
+ *   -> first read getLastTimeEntryByDate
+ *     -> if no entry of that day available the new time entry bust be "enter"
+ *     -> last entry must be older then x seconds (avoid double entries)
+ *     -> check last entry: must be opposite of the new one
+ * - create
  * 
  * @param direction enter/go
  * @param datetime (optional; default = now) the date (example: new Date() or moment(...)) of this TimeEntry
@@ -206,9 +212,11 @@ exports.getLastTimeEntryByDate = (dt) => {
     }).skip(0).limit(1).sort({ entry_date: -1 })
       .then(timeentry => {
         if (timeentry === undefined || timeentry.length == 0 || timeentry.length > 1) {
-          reject(new Error('No Time Entry found for given date : ' + date))
+          // reject(new Error('No Time Entry found for given date : ' + date))
+          resolve (undefined);
         } else if (timeentry.length > 1) {
-          reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))          
+          // reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))          
+          resolve (undefined);
         } else {
           resolve(timeentry[0])
         }

@@ -181,7 +181,7 @@ exports.getLastTimeEntryByDate = (dt, callback) => {
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -210,7 +210,7 @@ exports.getTimeEntriesByDate = (dt, callback) => {
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -236,7 +236,7 @@ exports.getTimeEntriesByDatePromise = (dt) => {
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     //console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     return new Promise((resolve, reject) => {
