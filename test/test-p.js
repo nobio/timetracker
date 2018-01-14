@@ -9,8 +9,7 @@ chai.use(chaiAsPromised)
 
 const expect = chai.expect
 const assert = chai.assert
-
-const should = chai.should()
+const should = chai.should
 
 const moment = require('moment')
 require('moment-timezone')
@@ -129,30 +128,19 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
   })
 
   it('create 2 TimeEntries and read the last of them', async() => {
-    const dtOne = util.stripdownToDateBerlin(DEFAULT_DATE)
-    const dtTwo = util.stripdownToDateBerlin(DEFAULT_DATE)
-    dtOne.hours(8)
-    dtTwo.hours(17)
+    const MY_DATE = moment('2018-01-12');
+    var lastEntry;
     
-    await util.create('enter', dtOne)
-      .then(util.create('go', dtTwo))
-      .then(util.getAllByDate(DEFAULT_DATE))
-      .then(timeentries => {
-        console.log(JSON.stringify(timeentries))
-        expect(timeentries).to.not.be.null
-        expect(timeentries).to.have.lengthOf(2);
+    await util.getLastTimeEntryByDate(MY_DATE)
+      .then(timeEntry =>  {
+        //console.log(timeEntry)        
+        expect(timeEntry).to.not.be.null
+        expect(timeEntry).to.not.be.undefined
+        expect(timeEntry).to.have.property('entry_date')
+        expect(timeEntry.entry_date + '').to.equal('Fri Jan 12 2018 17:22:56 GMT+0100 (CET)')
       })
-      /*
-      .then(util.getLastTimeEntryByDate(DEFAULT_DATE))
-      .then(timeEntry => {
-        console.log(timeEntry)
-        expect(timeEntry.entry_date).to.equal(DEFAULT_DATE + '17:14:00.000Z')
-      })
-      */
-      //.then(clearAllEntries)
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)
-        clearAllEntries()
         throw err
       })
   })
@@ -200,7 +188,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
       })
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)
-        clearAllEntries()
+        clearAllEntries(DEFAULT_DATE)
         throw err
       })
   })
@@ -239,7 +227,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        clearAllEntries()
+        clearAllEntries(DEFAULT_DATE)
         throw err
       })
   })
@@ -277,7 +265,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
         expect(timeEntry).to.be.null
       })
       .catch(err => {
-        clearAllEntries()
+        clearAllEntries(DEFAULT_DATE)
         throw err
       })
   })
@@ -367,8 +355,8 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
  * 
  * @param {*} date date to delete all entries which might have stayed because of any error
  */
-function clearAllEntries() {
-  util.getAllByDate(DEFAULT_DATE)
+function clearAllEntries(dt) {
+  util.getAllByDate(dt)
     .then(timeentries => {
       console.log('removing ' + timeentries.length + ' entries')
       timeentries.forEach((timeentry) => {

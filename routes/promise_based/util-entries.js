@@ -133,7 +133,7 @@ exports.deleteById = (id) => {
 exports.getAllByDate = (date) => {
   var dtStart = this.stripdownToDateBerlin(moment.unix(date / 1000))
   var dtEnd = moment(dtStart).add(1, 'days')
-  console.log('getAllByDate received date: ' + moment(dtStart).format('DD.MM.YYYY HH:mm:ss') + ' - ' + moment(dtEnd).format('DD.MM.YYYY HH:mm:ss'))
+  // console.log('getAllByDate received date: ' + moment(dtStart).format('DD.MM.YYYY HH:mm:ss') + ' - ' + moment(dtEnd).format('DD.MM.YYYY HH:mm:ss'))
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
@@ -189,13 +189,13 @@ exports.getBusyTime = (timeentries) => {
  * reads the last entry for a given date
  * 
  * @param dt (*) Date to which the last entry is to be read; example: "2017-12-19T19:34:00.000Z"
- * @returns Promise and then (resolve) last time entry of the given date
+ * @returns Promise and then (resolve) last time entry of the given date (no array, ony one TimeEntry)
  */
 exports.getLastTimeEntryByDate = (dt) => {
-  var dtStart = stripdownToDateBerlin(dt)
-  var dtEnd = moment(dtStart).add('days', '1')
+  var dtStart = this.stripdownToDateBerlin(dt)
+  var dtEnd = moment(dtStart).add(1, 'days')
 
-  console.log(dtStart.toDate() + '\n' + dtEnd.toDate())
+  // console.log(dtStart.toDate() + '\n' + dtEnd.toDate())
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
@@ -203,17 +203,18 @@ exports.getLastTimeEntryByDate = (dt) => {
         $gte: dtStart,
         $lt: dtEnd
       }
-    }).skip(0).limit(1).sort({ entry_date: -11 })
+    }).skip(0).limit(1).sort({ entry_date: -1 })
       .then(timeentry => {
-        if (timeentry === undefined || timeentry.length == 0) {
+        if (timeentry === undefined || timeentry.length == 0 || timeentry.length > 1) {
           reject(new Error('No Time Entry found for given date : ' + date))
+        } else if (timeentry.length > 1) {
+          reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))          
         } else {
-          resolve(timeentry)
+          resolve(timeentry[0])
         }
       })
       .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
   })
-
 }
 
 exports.getAll = () => {
@@ -222,4 +223,9 @@ exports.getAll = () => {
       .then(timeentries => resolve(timeentries))
       .catch(err => reject(err))
   })
+}
+
+exports.sleep = (delay) => {
+  console.log("I 'm going to sleep now for " + delay + ' ms')
+  return new Promise(resolve => setTimeout(resolve, delay))
 }
