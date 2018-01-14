@@ -3,7 +3,7 @@ sudo: false
 node_js:
   - "8.4.0"
 before_install:  
-  - npm install -g npm@latest
+  #- npm install -g npm@latest
 install:
   - npm install
 script:
