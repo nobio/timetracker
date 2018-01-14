@@ -138,7 +138,8 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
         expect(timeEntry).to.not.be.undefined
         expect(timeEntry).to.have.property('entry_date')
         expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('2018-01-12')
-        expect(moment(timeEntry.entry_date).format('HH:mm:ss')).to.equal('17:22:56')
+//        expect(moment(timeEntry.entry_date).format('HH:mm:ss')).to.equal('17:22:56')
+        expect(moment(timeEntry.entry_date).format('mm:ss')).to.equal('22:56')
       })
       .catch(err => {
         console.log('no error should occure; instead: ' + err.message)
