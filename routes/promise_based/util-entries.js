@@ -20,7 +20,10 @@ exports.isEmpty = (obj) => {
  */
 exports.stripdownToDateBerlin = (date) => {
   var d = moment.tz(date / 1, 'Europe/Berlin')
-  d.millisecond(0); d.second(0); d.minutes(0); d.hours(0)
+  d.millisecond(0);
+  d.second(0);
+  d.minutes(0);
+  d.hours(0)
   return d
 }
 
@@ -49,7 +52,7 @@ exports.findById = (id) => {
 }
 
 /**
- * Creates a new TimeEntry item in database
+ * Creates a new TimeEntry itemt in database
  * - validate
  *   -> first read getLastTimeEntryByDate
  *     -> if no entry of that day available the new time entry bust be "enter"
@@ -64,15 +67,48 @@ exports.findById = (id) => {
  * @returns new TimeEntry object
  */
 exports.create = (direction, datetime, longitude, latitude) => {
+  if (!datetime) {
+    datetime = moment();
+  }
   // console.log('entered save ' + id)
+  /*
+  this.getLastTimeEntryByDate(datetime)
+    .then(timeEntry => {
+        console.log("***********************************");
+        console.log(timeEntry);
+        console.log(direction);
+        console.log("***********************************");
+        // when this is the first entry of the day (timeEntry === undefined), the direction must be 'enter'
+        if (timeEntry === undefined) {
+        if (direction != 'enter') {
+          reject(new Error('first entry of the day must have direction \'enter\''))
+        }
+      }
+    })
+    .then(() => {
+*/
   return new Promise((resolve, reject) => {
-    new TimeEntry({
-      entry_date: datetime,
-      direction: direction,
-      longitude: longitude,
-      latitude: latitude
-    }).save()
-      .then(timeEntry => resolve(timeEntry))
+    this.getLastTimeEntryByDate(datetime)
+      .then(lastTimeEntry => {
+        //console.log("+++++++++++++++++++++++++++++++++");
+        //console.log(timeEntry);
+        //console.log("+++++++++++++++++++++++++++++++++");
+        if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
+          if (direction != 'enter') {
+            reject(new Error('first entry of the day must be an enter and not ' + direction))
+          }
+        } else if (lastTimeEntry.direction == direction) {
+          reject(new Error('this entry has direction ' + direction + ' but last entry has also direction ' + lastTimeEntry.direction))
+        }
+        new TimeEntry({
+            entry_date: datetime,
+            direction: direction,
+            longitude: longitude,
+            latitude: latitude
+          }).save()
+          .then(tEntry => resolve(tEntry))
+          .catch(err => reject(err))
+      })
       .catch(err => reject(err))
   })
 }
@@ -100,19 +136,18 @@ exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.findById(id)
-      .then(timeentry => {
+      .then(timeEntry => {
         // console.log(timeentry)
-        timeentry.direction = direction
-        timeentry.longitude = longitude
-        timeentry.latitude = latitude
-        timeentry.datetime = datetime
-        timeentry.last_changed = new Date()
+        timeEntry.direction = direction
+        timeEntry.longitude = longitude
+        timeEntry.latitude = latitude
+        timeEntry.datetime = datetime
+        timeEntry.last_changed = new Date()
         // console.log(timeentry)
-
-        timeentry.save()
-          .then(timeEntry => resolve(timeEntry))
-          .catch(err => reject(err))
+        return timeEntry;
       })
+      .then(timeEntry => timeEntry.save())
+      .then(timeEntry => resolve(timeEntry))
       .catch(err => reject(err))
   })
 }
@@ -143,11 +178,11 @@ exports.getAllByDate = (date) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-      entry_date: {
-        $gte: dtStart,
-        $lt: dtEnd
-      }
-    }).skip(0).sort({ entry_date: 1 })
+        entry_date: {
+          $gte: dtStart,
+          $lt: dtEnd
+        }
+      }).skip(0).sort({ entry_date: 1 })
       .then(timeentries => resolve(timeentries))
       .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
   })
@@ -205,23 +240,23 @@ exports.getLastTimeEntryByDate = (dt) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-      entry_date: {
-        $gte: dtStart,
-        $lt: dtEnd
-      }
-    }).skip(0).limit(1).sort({ entry_date: -1 })
+        entry_date: {
+          $gte: dtStart,
+          $lt: dtEnd
+        }
+      }).skip(0).limit(1).sort({ entry_date: -1 })
       .then(timeentry => {
         if (timeentry === undefined || timeentry.length == 0 || timeentry.length > 1) {
           // reject(new Error('No Time Entry found for given date : ' + date))
-          resolve (undefined);
+          resolve(undefined);
         } else if (timeentry.length > 1) {
           // reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))          
-          resolve (undefined);
+          resolve(undefined);
         } else {
           resolve(timeentry[0])
         }
       })
-      .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + date + ' (' + err.message + ')')))
+      .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + dt + ' (' + err.message + ')')))
   })
 }
 

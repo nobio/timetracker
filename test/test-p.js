@@ -129,9 +129,9 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
 
   it('check the last entry of a given date', async() => {
     const MY_DATE = moment('2018-01-12');
-    
+
     await util.getLastTimeEntryByDate(MY_DATE)
-      .then(timeEntry =>  {
+      .then(timeEntry => {
         //console.log(timeEntry)        
         expect(timeEntry).to.not.be.null
         expect(timeEntry).to.not.be.undefined
@@ -148,11 +148,11 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
       })
   })
 
-  it('last entry of an empty date (in the future) must be undefined', async () => {
+  it('last entry of an empty date (in the future) must be undefined', async() => {
     const MY_DATE = moment('2050-01-01');
-    
+
     await util.getLastTimeEntryByDate(MY_DATE)
-      .then(timeEntry =>  {
+      .then(timeEntry => {
         //console.log(timeEntry)        
         expect(timeEntry).to.be.undefined
       })
@@ -210,6 +210,23 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
       })
   })
 
+  it('create not successfully a new TimeEntry: first entry must not have direction "go"', async() => {
+    return expect(util.create('go', DEFAULT_DATE)).to.be.rejected
+  })
+
+  it('create not successfully: enter one entry with "enter" and then another one also with "enter"', async() => {
+    await util.create('enter', DEFAULT_DATE)
+      .then(timeEntry => {
+        return timeEntry._id
+      })
+      .then(expect(util.create('go', DEFAULT_DATE)).to.be.rejected)
+      .then(clearAllEntries(DEFAULT_DATE))
+      .catch(err => {
+        clearAllEntries(DEFAULT_DATE)
+        throw err
+      })
+  })
+
   it('create successfully a new TimeEntry without datetime', async() => {
     await util.create('enter')
       .then(timeEntry => {
@@ -249,7 +266,10 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
       })
   })
 
+
 })
+
+
 
 describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise', () => {
   var db
@@ -296,7 +316,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   })
 
   it('modify successfully a new TimeEntry', async() => {
-    await util.create('enter', DEFAULT_DATE)
+    await create('enter', DEFAULT_DATE)
       .then(timeEntry => {
         //        console.log(timeEntry)        
         expect(timeEntry).to.not.be.undefined
@@ -380,4 +400,21 @@ function clearAllEntries(dt) {
         util.deleteById(timeentry._id)
       });
     })
+}
+
+/**
+ * create a new TimeEntry regardless other entries. No checks will be performed - not like util.crea
+ */
+function create(direction, datetime, longitude, latitude) {
+  // console.log('entered save ' + id)
+  return new Promise((resolve, reject) => {
+    new TimeEntry({
+        entry_date: datetime,
+        direction: direction,
+        longitude: longitude,
+        latitude: latitude
+      }).save()
+      .then(timeEntry => resolve(timeEntry))
+      .catch(err => reject(err))
+  })
 }
