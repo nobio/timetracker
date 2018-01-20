@@ -279,24 +279,11 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
 
   it('should delete one Time Entry by its id', async() => {
     // create new entry (which will be deleted later)
-    await util.create('enter', DEFAULT_DATE)
-      .then(util.deleteById)
+    await create('enter', DEFAULT_DATE)
       .then(timeEntry => {
-        //console.log(timeEntry)
-        expect(timeEntry).to.not.be.undefined
-        expect(timeEntry).to.have.property('_id')
-        expect(timeEntry._id).to.not.be.empty
-        expect(timeEntry._id).to.not.be.a('string')
-        expect(timeEntry).to.have.property('__v')
-        expect(timeEntry).to.have.property('last_changed')
-        expect(timeEntry).to.have.property('entry_date')
-        expect(timeEntry).to.have.property('direction')
-        expect(timeEntry.direction).to.equal('enter')
-        expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16')
-        expect(timeEntry).to.have.property('longitude')
-
         return timeEntry._id
       })
+      .then(util.deleteById)
       .then(util.findById)
       .then(timeEntry => {
         expect(timeEntry).to.be.null
@@ -381,6 +368,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   })
 
   after(function() {
+    clearAllEntries(DEFAULT_DATE)
     setTimeout(function() {
       db.closeConnection()
       callback()
