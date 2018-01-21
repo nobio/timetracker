@@ -70,36 +70,30 @@ exports.create = (direction, datetime, longitude, latitude) => {
   if (!datetime) {
     datetime = moment();
   }
-  // console.log('entered save ' + id)
-  /*
-  this.getLastTimeEntryByDate(datetime)
-    .then(timeEntry => {
-        console.log("***********************************");
-        console.log(timeEntry);
-        console.log(direction);
-        console.log("***********************************");
-        // when this is the first entry of the day (timeEntry === undefined), the direction must be 'enter'
-        if (timeEntry === undefined) {
-        if (direction != 'enter') {
-          reject(new Error('first entry of the day must have direction \'enter\''))
-        }
-      }
-    })
-    .then(() => {
-*/
+
   return new Promise((resolve, reject) => {
     this.getLastTimeEntryByDate(datetime)
       .then(lastTimeEntry => {
-        //console.log("+++++++++++++++++++++++++++++++++");
         //console.log(timeEntry);
-        //console.log("+++++++++++++++++++++++++++++++++");
         if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
           if (direction != 'enter') {
             reject(new Error('first entry of the day must be an enter and not ' + direction))
           }
-        } else if (lastTimeEntry.direction == direction) {
-          reject(new Error('this entry has direction ' + direction + ' but last entry has also direction ' + lastTimeEntry.direction))
+  
+        } else {
+          if (lastTimeEntry.direction == direction) {  // entry already exists -> direction must be opposite
+            reject(new Error('this entry has direction ' + direction + ' but last entry has also direction ' + lastTimeEntry.direction))
+          }
+          const now = moment();
+          const entryDate = moment(lastTimeEntry.entry_date);
+          const timelapse = now - entryDate;
+          //console.log(timelapse + ' ms or ' + timelapse / 1000 + ' sec')
+          if(timelapse < 1000 * 1) {    // not longer than 1 sec
+            reject(new Error('this seems to be a double entry since the last item and this one are created within ' + timelapse + ' ms'));
+          }
         }
+        
+        // all checks successfully done, lets create the TimeEntry!
         new TimeEntry({
             entry_date: datetime,
             direction: direction,

@@ -266,7 +266,6 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
       })
   })
 
-
 })
 
 
@@ -371,7 +370,6 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
     clearAllEntries(DEFAULT_DATE)
     setTimeout(function() {
       db.closeConnection()
-      callback()
     }, 1000)
   })
 })
