@@ -65,12 +65,6 @@ exports.createEntry = (req, res) => {
   var longitude = req.body.longitude
   var latitude = req.body.latitude
 
-  // TODO: make util.createTimeEntry use Promise
-  // util.createTimeEntry -> util.validateRequest -> util.getLastTimeEntryByDate
-  // util.getLastTimeEntryByDate().
-  //   then(util.validateRequest).
-  //   then(util.createTimeEntry).
-  //   catch(err => {})
   util.create(direction, datetime, longitude, latitude)
     .then(timeentry => res.send(timeentry))
     .catch(err => res.send(500, 'Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
@@ -82,13 +76,16 @@ exports.createEntry = (req, res) => {
  * curl -X PUT -H "Content-Type: application/json" -d '{"direction":"enter", "latitude":"45", "longitude":"45"}' http://localhost:30000/api/entries/5a36aab25ba9cf154bd2a384
  *******************************************************************************/
 exports.saveEntry = (req, res) => {
-  var id = req.params.id
-  var direction = req.body.direction
-  var datetime = req.body.datetime
-  var longitude = req.body.longitude
-  var latitude = req.body.latitude
+  
+  const timeEntry = {
+    id: req.params.id,
+    direction: req.params.direction,
+    datetime: req.params.datetime,
+    longitude: req.params.longitude,
+    latitude: req.params.latitude,
+  };
 
-  util.update(undefined, id, direction, datetime, longitude, latitude)
+  util.update(timeEntry)
     .then(timeentry => res.send(timeentry))
     .catch(err => res.send(500, 'Error while saving Time Entry: ' + id + ' ' + err))
 }

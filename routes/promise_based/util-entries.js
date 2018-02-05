@@ -118,25 +118,22 @@ exports.create = (direction, datetime, longitude, latitude) => {
  * 
  * @returns new TimeEntry object
  */
-exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
-  // console.log('entered update with all parameters of Time Entry: ' + direction)
-  if (timeEntry != undefined) {
-    id = timeEntry.id
-    direction = timeEntry.direction
-    datetime = timeEntry.datetime
-    longitude = timeEntry.longitude
-    latitude = timeEntry.latitude
+//exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
+exports.update = (timeEntry) => {
+  //console.log('entered update with all parameters of Time Entry: ' + timeEntry)
+  if (!timeEntry) {
+    throw new Error('to update a record, the passed object must not be undefined');
   }
 
   return new Promise((resolve, reject) => {
-    TimeEntry.findById(id)
-      .then(timeEntry => {
+    TimeEntry.findById(timeEntry.id)
+      .then(te => {
         // console.log(timeentry)
-        timeEntry.direction = direction
-        timeEntry.longitude = longitude
-        timeEntry.latitude = latitude
-        timeEntry.datetime = datetime
-        timeEntry.last_changed = new Date()
+        te.direction = timeEntry.direction
+        te.longitude = timeEntry.longitude
+        te.latitude = timeEntry.latitude
+        te.datetime = timeEntry.datetime
+        te.last_changed = new Date()
         // console.log(timeentry)
         return timeEntry;
       })
