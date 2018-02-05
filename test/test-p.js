@@ -65,7 +65,7 @@ describe('test stripdownToDateBerlin method', () => {
 
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
-describe('test util.getBusyTime - Promise', () => {
+describe('test util.getAllByDate - Promise', () => {
   var db
   before(function() {
     db = require('../db/db')
@@ -82,6 +82,21 @@ describe('test util.getBusyTime - Promise', () => {
   })
   it('response array should have length of 0', () => {
     return util.getAllByDate(0).should.eventually.have.length(0)
+  })
+
+  after(function() {
+    // db.closeConnection()
+  })
+})
+
+describe('test util.getBusyTime - Promise', () => {
+  var db
+  before(function() {
+    db = require('../db/db')
+  })
+
+  it('should not have any entries', async () => {
+    await util.getBusyTime(DEFAULT_DATE).should.to.be.rejected;
   })
 
   after(function() {
