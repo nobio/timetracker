@@ -14,6 +14,34 @@ const should = chai.should
 const moment = require('moment')
 require('moment-timezone')
 const DEFAULT_DATE = moment('1967-03-16')
+const TWO_ENTRIES = 
+[
+  {
+     "last_changed" : "2014-02-27T07:37:02.543Z",
+     "entry_date" : "2014-02-27T07:37:00.000Z",
+     "__v" : 0,
+     "_id" : "530eeb1ea8ee5e0000000917",
+     "direction" : "enter"
+  },
+  {
+     "__v" : 0,
+     "last_changed" : "2014-02-27T15:55:56.607Z",
+     "entry_date" : "2014-02-27T15:55:00.000Z",
+     "_id" : "530f600ca8ee5e00000009f0",
+     "direction" : "go"
+  }
+]
+
+const ONE_ENTRY = 
+[
+  {
+     "last_changed" : "2014-02-27T07:37:02.543Z",
+     "entry_date" : "2014-02-27T07:37:00.000Z",
+     "__v" : 0,
+     "_id" : "530eeb1ea8ee5e0000000917",
+     "direction" : "enter"
+  }
+]
 
 describe('isEmpty - Promise', () => {
   var testv
@@ -92,12 +120,29 @@ describe('test util.getAllByDate - Promise', () => {
 describe('test util.getBusyTime - Promise', () => {
   var db
   before(function() {
-    db = require('../db/db')
+    db = require('../db/db');        
   })
 
   it('should not have any entries', async () => {
-    await util.getBusyTime(DEFAULT_DATE).should.to.be.rejected;
-  })
+    await util.getBusyTime({}).should.be.rejected;
+  });
+
+  it('should be rejected if only one entry', async () => {
+    await util.getBusyTime(ONE_ENTRY).should.be.rejected;
+  });
+
+  it('should be rejected if the second entry is not a go', async () => {
+    const ENTRIES = 
+    [
+      {"direction" : "enter"},
+      {"direction" : "enter"}
+    ]
+        
+    await util.getBusyTime(ENTRIES).should.be.rejected;
+  });
+  it('should not be rejected if the second entry is a go', async () => {
+    await util.getBusyTime(TWO_ENTRIES).should.not.be.rejected;
+  });
 
   after(function() {
     // db.closeConnection()
