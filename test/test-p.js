@@ -171,7 +171,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   })
 
   it('create successfully a new TimeEntry', async() => {
-    await util.create('enter', DEFAULT_DATE)
+    await util.create( {direction: 'enter', datetime: DEFAULT_DATE} )
       .then(timeEntry => {
         //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
@@ -215,7 +215,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   })
 
   it('create not successfully: enter one entry with "enter" and then another one also with "enter"', async() => {
-    await util.create('enter', DEFAULT_DATE)
+    await util.create(  {direction: 'enter', datetime: DEFAULT_DATE} )
       .then(timeEntry => {
         return timeEntry._id
       })
@@ -228,7 +228,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   })
 
   it('create successfully a new TimeEntry without datetime', async() => {
-    await util.create('enter')
+    await util.create( {direction: 'enter'} )
       .then(timeEntry => {
         //console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined
@@ -278,7 +278,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
 
   it('should delete one Time Entry by its id', async() => {
     // create new entry (which will be deleted later)
-    await create('enter', DEFAULT_DATE)
+    await create( {direction: 'enter', datetime: DEFAULT_DATE} )
       .then(timeEntry => {
         return timeEntry._id
       })
@@ -302,7 +302,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   })
 
   it('modify successfully a new TimeEntry', async() => {
-    await create('enter', DEFAULT_DATE)
+    await create( {direction: 'enter', datetime: DEFAULT_DATE} )
       .then(timeEntry => {
         //        console.log(timeEntry)        
         expect(timeEntry).to.not.be.undefined
@@ -364,6 +364,11 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
       .catch(err => {
         throw err
       })
+  }),
+  it('should throw exception when passing an undefined object', () => {
+    (function () {
+      util.update();
+    }).should.throw(Error);
   })
 
   after(function() {
@@ -391,14 +396,14 @@ function clearAllEntries(dt) {
 /**
  * create a new TimeEntry regardless other entries. No checks will be performed - not like util.crea
  */
-function create(direction, datetime, longitude, latitude) {
+function create(timeEntry) {
   // console.log('entered save ' + id)
   return new Promise((resolve, reject) => {
     new TimeEntry({
-        entry_date: datetime,
-        direction: direction,
-        longitude: longitude,
-        latitude: latitude
+        entry_date: timeEntry.datetime,
+        direction: timeEntry.direction,
+        longitude: timeEntry.longitude,
+        latitude: timeEntry.latitude
       }).save()
       .then(timeEntry => resolve(timeEntry))
       .catch(err => reject(err))

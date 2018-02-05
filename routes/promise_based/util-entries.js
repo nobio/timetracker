@@ -66,23 +66,28 @@ exports.findById = (id) => {
  * @param latitude (optional) the latitude of this TimeEntry
  * @returns new TimeEntry object
  */
-exports.create = (direction, datetime, longitude, latitude) => {
-  if (!datetime) {
-    datetime = moment();
+exports.create = (timeEntry) => {
+
+  if (!timeEntry) {
+    throw new Error('to update a record, the passed object must not be undefined');
+  }
+
+  if (!timeEntry.datetime) {
+    timeEntry.datetime = moment();
   }
 
   return new Promise((resolve, reject) => {
-    this.getLastTimeEntryByDate(datetime)
+    this.getLastTimeEntryByDate(timeEntry.datetime)
       .then(lastTimeEntry => {
         //console.log(timeEntry);
         if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
-          if (direction != 'enter') {
-            reject(new Error('first entry of the day must be an enter and not ' + direction))
+          if (timeEntry.direction != 'enter') {
+            reject(new Error('first entry of the day must be an enter and not ' + timeEntry.direction))
           }
   
         } else {
-          if (lastTimeEntry.direction == direction) {  // entry already exists -> direction must be opposite
-            reject(new Error('this entry has direction ' + direction + ' but last entry has also direction ' + lastTimeEntry.direction))
+          if (lastTimeEntry.direction == timeEntry.direction) {  // entry already exists -> direction must be opposite
+            reject(new Error('this entry has direction ' + timeEntry.direction + ' but last entry has also direction ' + lastTimeEntry.direction))
           }
           const now = moment();
           const entryDate = moment(lastTimeEntry.entry_date);
@@ -95,10 +100,10 @@ exports.create = (direction, datetime, longitude, latitude) => {
         
         // all checks successfully done, lets create the TimeEntry!
         new TimeEntry({
-            entry_date: datetime,
-            direction: direction,
-            longitude: longitude,
-            latitude: latitude
+            entry_date: timeEntry.datetime,
+            direction: timeEntry.direction,
+            longitude: timeEntry.longitude,
+            latitude: timeEntry.latitude
           }).save()
           .then(tEntry => resolve(tEntry))
           .catch(err => reject(err))
