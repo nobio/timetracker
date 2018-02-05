@@ -1,30 +1,26 @@
 {
     "name": "Timetracker",
-    "version": "1.6.0",
+    "version": "2.0.0",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
-    "keywords": [
-        "mongodb",
-        "mongoose",
-        "doodle",
-        "node",
-        "node.js",
-        "jade"
-    ],
     "private": true,
     "scripts": {
         "start": "node server",
-        "test": "./node_modules/.bin/mocha --reporter spec"
+        "test": "./node_modules/.bin/mocha --reporter spec",
+        "test-mon": "nodemon --exec ./node_modules/.bin/mocha --reporter spec"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^4.0.1",
+        "nodemon": "^1.14.11"
     },
     "dependencies": {
         "body-parser": "^1.18.2",
-        "chai": "^4.1.2",
-        "chai-as-promised": "^7.1.1",
         "cookie-parser": "^1.4.3",
         "debug": "^2.6.9",
         "express": "^4.16.2",
         "jade": "^1.11.0",
         "log-timestamp": "^0.1.2",
-        "mocha": "^4.0.1",
         "moment": "^2.20.0",
         "moment-timezone": "^0.5.14",
         "mongodb": "^2.2.33",
