@@ -12,6 +12,7 @@ logs
 results
 .idea
 .project
+.vscode
 .classpath
 .DS_Store
 npm-debug.log

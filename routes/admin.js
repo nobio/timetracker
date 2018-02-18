@@ -250,7 +250,7 @@ exports.getStatsByTimeBox = (req, res) => {
  *  curl -X GET http://localhost:30000/stats/1391295600000?timeUnit=month
  */
 exports.getStatsDay = (req, res) => {
-    var timeUnit = req.param('timeUnit');
+    var timeUnit = req.query.timeUnit;
     var dtStart = moment.unix(req.params.date / 1000);
     var dtEnd;
 
@@ -337,7 +337,7 @@ exports.dumpTimeEntry = (req, res) => {
                 fs.mkdirSync('./dump');
             }
             var dumpFile = './dump/timeentry_' + moment().format('YYYY-MM-DD_HHmmss') + '.json';
-            fs.writeFileSync(dumpFile, timeentries)
+            fs.writeFileSync(dumpFile, JSON.stringify(timeentries, null, 2), "UTF8"); // use JSON.stringify for nice format of output
             console.log('saved ' + timeentries.length + ' items');
             if (res) {
                 res.send({
@@ -383,47 +383,4 @@ exports.backupTimeEntry = (req, res) => {
         }
     });
     //res.send({'response':'backup done'});     
-};
-
-/*
- * ping functionality - resonses a pong ;-)
- *
- * curl -X GET http://localhost:30000/ping
- */
-exports.ping = (req, res) => {
-    res.send({
-        'response': 'pong'
-    });
-};
-
-/*
- * test and experiment endpoint
- *
- * curl -X GET http://localhost:30000/test
- */
-exports.test = (req, res) => {
-    var lastTimeentry;
-    var count = 0;
-    TimeEntry.find().sort({
-        entry_date: 1
-    }).exec((err, timeentries) => {
-        timeentries.forEach((timeentry) => {
-            if (lastTimeentry !== undefined) {
-                if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
-                    timeentry.direction == lastTimeentry.direction) {
-                    //timeentry.remove();
-                    count++;
-                    console.log("removing timeentry " + timeentry);
-                } else {
-                    lastTimeentry = timeentry;
-                }
-            } else {
-                lastTimeentry = timeentry;
-            }
-        });
-
-        res.send({
-            'count_removed_doubletts': count
-        });
-    });
 };

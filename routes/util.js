@@ -1,3 +1,4 @@
+require("../db");
 var mongoose = require('mongoose');
 var moment = require('moment');
 var TimeEntry = mongoose.model('TimeEntry');
@@ -148,14 +149,14 @@ exports.getBusytimeByDate = (dt, callback) => {
                     // this must be a go-event
                     if (timeentries[n].direction !== 'go') {
                         callback(new Error('Die Reihenfolge der Kommen/Gehen-Einträge am ' + dt.format('DD.MM.YYYY') + ' scheint nicht zu stimmen.'), 0);
+                        return;
                     }
-
+                    
                     var end = timeentries[n].entry_date;
                     var start = timeentries[n - 1].entry_date;
 
                     busytime = busytime + (end - start);
                     //console.log(dt + ": " + start + " -> " + end + "    = " + busytime + " (" + (busytime / 1000/60/60) + ")");
-
                 }
 
                 // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
@@ -226,6 +227,35 @@ exports.getTimeEntriesByDate = (dt, callback) => {
         } else {
             callback(err, timeentries);
         }
+    });
+};
+
+exports.getTimeEntriesByDatePromise = (dt) => {
+    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    var dtStart = moment(dt);
+    dtStart.hours(0);
+    dtStart.minutes(0);
+    dtStart.seconds(0);
+    var dtEnd = moment(dtStart).add('days', '1');
+
+    //console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
+    return new Promise((resolve, reject) => {
+        TimeEntry.find({
+            entry_date: {
+                $gte: dtStart,
+                $lt: dtEnd
+            }
+        }).skip(0).sort({
+            entry_date: 1
+        }).exec((err, timeentries) => {
+            if (err) {
+                //console.log('Promise.reject')
+                reject(err);
+            } else {
+                //console.log('Promise.resolve')
+                resolve(timeentries);
+            }
+        });            
     });
 };
 
@@ -322,6 +352,8 @@ exports.getStatsByTimeBox = (timeUnit, callback) => {
                 data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
             } else if ('week' === timeUnit) {
                 data = getStatsByTimeBoxTimeUnit(stats, 'gggg-ww');
+            } else if ('year' === timeUnit) {
+                data = getStatsByTimeBoxTimeUnit(stats, 'gggg');
             } else if ('day' === timeUnit) {
                 data = getStatsByTimeBoxDay(stats);
             } else if ('weekday' === timeUnit) {
@@ -619,3 +651,4 @@ exports.removeDoublets = (callback) => {
         callback(err, count);
     });
 };
+

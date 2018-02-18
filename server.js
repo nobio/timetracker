@@ -8,36 +8,32 @@ require('./db');
 var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
 var admin = require('./routes/admin');
+var experimental = require('./routes/experimental');
 var http = require('http');
 var path = require('path');
 var moment = require('moment');
+var favicon = require('serve-favicon');
+var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+//require('log-timestamp');
+//require('log-timestamp')(function() { return '[' + new Date().toISOString() + '" message="%s"' });
+require('log-timestamp')(function() { return '[' + moment().format('ddd, D MMM YYYY hh:mm:ss Z') + '] - %s' });
+//[Tue, 17 Oct 2017 13:33:00 GMT]
 
 var app = express();
 
-app.configure(() => {
-	app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-	app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
-	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');
-	app.use(express.favicon());
-	app.use(express.logger('dev'));
-	express.logger.format('mydate', () => {
-		return moment().format('YYYY-MM-DD HH:mm:ss SSS');
-	});
-	app.use(express.logger('[:mydate]:method :url :status :res[content-length] - :remote-addr - :response-time ms'));
-	app.use(express.bodyParser());
-	app.use(express.methodOverride());
-	app.use(app.router);
-	app.use(express.cookieParser());
-	app.use(express.static(path.join(__dirname, 'public')));
-});
+app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
+app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
+app.set('views', __dirname + '/views');
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'jade');
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(morgan('[:date[web]] :remote-user :method :url - status: :status'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-app.configure('development', () => {
-	app.use(express.errorHandler({
-		dumpExceptions: true,
-		showStack: true
-	}));
-});
 
 /*
 app.configure('production', function() {
@@ -61,10 +57,11 @@ app.get('/entries', routes.getEntries);
 
 // geofencing
 app.post('/geofence', routes.geofence);
+app.post('/geolocation', routes.backgroundGeolocation);
 
 // admin stuff
-app.delete('/entries', admin.deleteAllTimeEntries);
-app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
+//app.delete('/entries', admin.deleteAllTimeEntries);
+//app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
 app.get('/admin/maintain', admin.maintain);
 app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
 app.post('/admin/backup/timeentry', admin.backupTimeEntry);
@@ -76,8 +73,8 @@ app.delete('/stats', admin.deleteAllStatsDays);
 app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 
 // maintain stuff
-app.get('/ping', admin.ping);
-app.get('/test', admin.test);
+app.get('/ping', experimental.ping);
+app.get('/experiment', experimental.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
