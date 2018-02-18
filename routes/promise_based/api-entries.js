@@ -8,8 +8,8 @@ const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
  *******************************************************************************/
 exports.getEntryById = (req, res) => {
   util.findById(req.params.id)
-    .then(timeentry => res.send(timeentry))
-    .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
+    .then(timeentry => res.status(200).send(timeentry))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
 
 /********************************************************************************
@@ -27,22 +27,22 @@ exports.getEntries = (req, res) => {
 
   if (filterByDate && filterByBusy) {
     console.log('filter by date and busy')
-    res.send(500, 'date and busy filter set; can only handle one of them')
+    res.status(500).send('date and busy filter set; can only handle one of them')
   } else if (filterByDate) {
     console.log('filter by date: ' + filterByDate)
     util.getAllByDate(filterByDate)
-      .then(timeentries => res.send(timeentries))
-      .catch(err => res.send(500, err))
+      .then(timeentries => res.status(200).send(timeentries))
+      .catch(err => res.status(500).send(err))
   } else if (filterByBusy) {
     console.log('filter by busy: ' + filterByBusy)
     util.getAllByDate(filterByBusy)
       .then(util.getBusyTime)
-      .then(busytime => res.send({ 'duration': busytime }))
-      .catch(err => res.send(500, err))
+      .then(busytime => res.status(200).send({ 'duration': busytime }))
+      .catch(err => res.status(500).send(err))
   } else {
     util.getAll()
-      .then(timeentry => res.send(timeentry))
-      .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' ' + err))
+      .then(timeentry => res.status(200).send(timeentry))
+      .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
   }
 }
 
@@ -69,7 +69,7 @@ exports.createEntry = (req, res) => {
   }
 
   util.create(timeEntry)
-    .then(timeentry => res.send(timeentry))
+    .then(timeentry => res.status(200).send(timeentry))
     .catch(err => res.status(500).send('Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
 }
 
@@ -89,8 +89,8 @@ exports.saveEntry = (req, res) => {
   };
 
   util.update(timeEntry)
-    .then(timeentry => res.send(timeentry))
-    .catch(err => res.send(500, 'Error while saving Time Entry: ' + id + ' ' + err))
+    .then(timeentry => res.status(200).send(timeentry))
+    .catch(err => res.status(500).send('Error while saving Time Entry: ' + id + ' ' + err))
 }
 
 /********************************************************************************
@@ -104,10 +104,10 @@ exports.deleteEntry = (req, res) => {
   util.deleteById(id)
     .then(timeentry => {
       if (timeentry === undefined || timeentry === null) {
-        res.send(500, 'Could not delete Time Entry with (id: ' + id + ')')
+        res.status(500).send('Could not delete Time Entry with (id: ' + id + ')')
       } else {
-        res.send(timeentry)
+        res.status(200).send(timeentry)
       }
     })
-    .catch(err => res.send(500, 'Error while reading Time Entry: ' + req.params.id + ' - ' + err))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' - ' + err))
 }
