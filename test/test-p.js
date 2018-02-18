@@ -13,7 +13,7 @@ const should = chai.should
 
 const moment = require('moment')
 require('moment-timezone')
-const DEFAULT_DATE = moment('1967-03-16')
+const DEFAULT_DATE = moment('1967-03-16');
 const TWO_ENTRIES = 
 [
   {

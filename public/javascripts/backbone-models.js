@@ -1,6 +1,6 @@
 // defining Backbone models
 TimeEntry = Backbone.Model.extend({
-    urlRoot: '/entries',
+    urlRoot: '/api/entries',
     defaults: {
         direction: '',
         entry_date: new Date(),
@@ -13,7 +13,7 @@ TimeEntry = Backbone.Model.extend({
 
 TimeEntries = Backbone.Collection.extend({
     model: TimeEntry,
-    url: '/entries'
+    url: '/api/entries'
 });
 
 Statistics = Backbone.Model.extend({
@@ -25,6 +25,6 @@ StatisticsAggregated = Backbone.Model.extend({
 });
 
 Duration = Backbone.Model.extend({
-    urlRoot: '/entries'
+    urlRoot: '/api/entries'
 });
 

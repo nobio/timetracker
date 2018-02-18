@@ -164,7 +164,7 @@ exports.deleteById = (id) => {
 
 /**
  * lists all Time Entries for a given date (this particular day)
- * 
+ *  
  * @returns Promise
  */
 exports.getAllByDate = (date) => {
@@ -229,6 +229,10 @@ exports.getBusyTime = (timeentries) => {
  * @returns Promise and then (resolve) last time entry of the given date (no array, ony one TimeEntry)
  */
 exports.getLastTimeEntryByDate = (dt) => {
+
+  if(typeof(dt) === 'string') {
+    dt = moment(dt);
+  }
   var dtStart = this.stripdownToDateBerlin(dt)
   var dtEnd = moment(dtStart).add(1, 'days')
 

@@ -57,17 +57,20 @@ exports.getEntries = (req, res) => {
  * 
  * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","datetime":"2017-12-02T17:49:00.000Z"}' http://localhost:30000/api/entries
  * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","datetime":"2017-12-02T17:49:00.000Z","longitude":45, "latitude":15}' http://localhost:30000/api/entries
+ * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","entry_date":"2018-02-18T09:46:02.151Z","last_changed":"2018-02-18T09:46:02.151Z","datetime":"2018-02-18T09:46:00.000Z"}'  http://localhost:30000/api/entries
  *******************************************************************************/
 exports.createEntry = (req, res) => {
-  console.log(JSON.stringify(req.body))
-  var direction = req.body.direction
-  var datetime = req.body.datetime
-  var longitude = req.body.longitude
-  var latitude = req.body.latitude
+  console.log(JSON.stringify(req.body));
+  const timeEntry = {
+    direction: req.body.direction,
+    datetime: req.body.datetime,
+    longitude: req.body.longitude,
+    latitude: req.body.latitude
+  }
 
-  util.create(direction, datetime, longitude, latitude)
+  util.create(timeEntry)
     .then(timeentry => res.send(timeentry))
-    .catch(err => res.send(500, 'Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
+    .catch(err => res.status(500).send('Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
 }
 
 /********************************************************************************
