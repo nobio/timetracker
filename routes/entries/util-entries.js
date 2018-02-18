@@ -10,6 +10,9 @@ var TimeEntry = mongoose.model('TimeEntry')
 var moment = require('moment')
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
 
+/**
+ * function to check wheather an object is empty or not
+ */
 exports.isEmpty = (obj) => {
   return require('../util').isEmpty(obj)
 }

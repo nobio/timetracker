@@ -38,7 +38,7 @@ exports.getEntries = (req, res) => {
     util.getAllByDate(filterByBusy)
       .then(util.getBusyTime)
       .then(busytime => res.status(200).send({ 'duration': busytime }))
-      .catch(err => res.status(500).send(err))
+      .catch(err => res.status(500).send(err));
   } else {
     util.getAll()
       .then(timeentry => res.status(200).send(timeentry))
