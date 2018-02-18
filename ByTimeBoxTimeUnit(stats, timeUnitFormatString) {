@@ -1,0 +1,48 @@
+[1mdiff --git a/routes/util.js b/routes/util.js[m
+[1mindex 9e50a73..1881c7d 100644[m
+[1m--- a/routes/util.js[m
+[1m+++ b/routes/util.js[m
+[36m@@ -363,10 +363,12 @@[m [mfunction varianz(a, curr, idx, array) {[m
+ }[m
+ [m
+ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {[m
+[32m+[m[32m    console.log(stats);[m
+     var data = [{[m
+         0: 0[m
+     }];[m
+     var time_unit_stats = [];[m
+[32m+[m[32m    console.log(time_unit_stats.reduce(add, 0));[m
+ [m
+     var lastTimeUnit;[m
+     var actualTimeUnit;[m
+[36m@@ -379,19 +381,19 @@[m [mfunction getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {[m
+             //            var sum = time_unit_stats.reduce(function(a, b) {return a + b;}, 0); // reduce function[m
+             var sum = time_unit_stats.reduce(add, 0); // reduce function[m
+             var avg = sum / time_unit_stats.length;[m
+[31m-            var variance = time_unit_stats.reduce(varianz, 0);[m
+[32m+[m[32m            //var variance = time_unit_stats.reduce(varianz, 0);[m
+[32m+[m[32m            //console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD'));[m
+             data[idx] = {[m
+[31m-                "x": moment(stat.date).format('YYYY-MM-DD'),[m
+[31m-                "y": Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma[m
+[31m-                    /*[m
+[31m-                    working_time: avg,[m
+[31m-                    working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma[m
+[31m-                    date: stat.date,[m
+[31m-                    variance: variance,[m
+[31m-                    variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100[m
+[31m-                    */[m
+[32m+[m[32m                 x: moment(stat.date).format('YYYY-MM-DD')[m
+[32m+[m[32m                ,y: Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma[m
+             };[m
+[31m-            // reset to next week[m
+[32m+[m[32m/*[m
+[32m+[m[32m                ,working_time: avg[m
+[32m+[m[32m                ,working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma[m
+[32m+[m[32m                ,date: stat.date[m
+[32m+[m[32m                ,variance: variance[m
+[32m+[m[32m                ,variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100[m
+[32m+[m[32m*/            // reset to next week[m
+             lastTimeUnit = actualTimeUnit;[m
+             time_unit_stats = [];[m
+             idx++;[m

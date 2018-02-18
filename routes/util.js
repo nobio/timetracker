@@ -363,10 +363,12 @@ function varianz(a, curr, idx, array) {
 }
 
 function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
+    console.log(stats);
     var data = [{
         0: 0
     }];
     var time_unit_stats = [];
+    console.log(time_unit_stats.reduce(add, 0));
 
     var lastTimeUnit;
     var actualTimeUnit;
@@ -379,19 +381,19 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
             //            var sum = time_unit_stats.reduce(function(a, b) {return a + b;}, 0); // reduce function
             var sum = time_unit_stats.reduce(add, 0); // reduce function
             var avg = sum / time_unit_stats.length;
-            var variance = time_unit_stats.reduce(varianz, 0);
+            //var variance = time_unit_stats.reduce(varianz, 0);
+            //console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD'));
             data[idx] = {
-                "x": moment(stat.date).format('YYYY-MM-DD'),
-                "y": Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
-                    /*
-                    working_time: avg,
-                    working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-                    date: stat.date,
-                    variance: variance,
-                    variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100
-                    */
+                 x: moment(stat.date).format('YYYY-MM-DD')
+                ,y: Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
             };
-            // reset to next week
+/*
+                ,working_time: avg
+                ,working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
+                ,date: stat.date
+                ,variance: variance
+                ,variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100
+*/            // reset to next week
             lastTimeUnit = actualTimeUnit;
             time_unit_stats = [];
             idx++;
