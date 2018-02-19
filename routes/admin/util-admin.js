@@ -3,6 +3,7 @@ var fs = require("fs");
 
 var mongoose = require("mongoose");
 var TimeEntry = mongoose.model("TimeEntry");
+var TimeEntryBackup = mongoose.model("TimeEntryBackup");
 var moment = require("moment");
 
 /**
@@ -32,4 +33,27 @@ exports.dumpTimeEnties = () => {
         .catch(err => reject(err))  
     });
 }
-    
+
+exports.backupTimeEntries = () => {
+    return new Promise((resolve, reject) => {
+        let len = 0;
+        TimeEntryBackup.remove()
+        .then(() => TimeEntry.find())
+        .then(timeEntries => {
+            console.log(timeEntries.length);
+            len = timeEntries.length;
+            timeEntries.forEach((timeentry) => {
+                new TimeEntryBackup({
+                    _id: timeentry._id,
+                    entry_date: timeentry.entry_date,
+                    direction: timeentry.direction,
+                    last_changed: timeentry.last_changed,
+                    longitude: timeentry.longitude,
+                    latitude: timeentry.latitude
+                }).save();
+            })
+        })
+        .then(() => resolve({ 'backup-count': len }))
+        .catch(err => reject(err))
+    });    
+}    
