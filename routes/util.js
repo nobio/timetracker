@@ -1,4 +1,4 @@
-require("../db");
+require("../db/db");
 var mongoose = require('mongoose');
 var moment = require('moment');
 var TimeEntry = mongoose.model('TimeEntry');
@@ -181,7 +181,7 @@ exports.getLastTimeEntryByDate = (dt, callback) => {
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -210,7 +210,7 @@ exports.getTimeEntriesByDate = (dt, callback) => {
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     //    console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
 
@@ -231,12 +231,12 @@ exports.getTimeEntriesByDate = (dt, callback) => {
 };
 
 exports.getTimeEntriesByDatePromise = (dt) => {
-    console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+    // console.log('getTimeEntriesByDate received date: ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
     var dtStart = moment(dt);
     dtStart.hours(0);
     dtStart.minutes(0);
     dtStart.seconds(0);
-    var dtEnd = moment(dtStart).add('days', '1');
+    var dtEnd = moment(dtStart).add(1, 'days');
 
     //console.log(dtStart.toDate() + "\n" + dtEnd.toDate());
     return new Promise((resolve, reject) => {

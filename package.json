@@ -1,35 +1,31 @@
 {
     "name": "Timetracker",
-    "version": "1.6.0",
+    "version": "2.0.0",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
-    "keywords": [
-        "mongodb",
-        "mongoose",
-        "doodle",
-        "node",
-        "node.js",
-        "jade"
-    ],
     "private": true,
     "scripts": {
         "start": "node server",
-        "xxx": "node test/test",
-        "test": "./node_modules/.bin/mocha --reporter spec"
+        "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
+        "test-mon": "nodemon --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
+        "start-mon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^4.0.1",
+        "nodemon": "^1.15.0"
     },
     "dependencies": {
         "body-parser": "^1.18.2",
-        "chai": "^4.1.2",
-        "chai-as-promised": "^7.1.1",
         "cookie-parser": "^1.4.3",
         "debug": "^2.6.9",
         "express": "^4.16.2",
         "jade": "^1.11.0",
         "log-timestamp": "^0.1.2",
-        "mocha": "^4.0.1",
-        "moment": "^2.19.2",
+        "moment": "^2.20.0",
         "moment-timezone": "^0.5.14",
         "mongodb": "^2.2.33",
-        "mongoose": "^4.13.1",
+        "mongoose": "^4.13.7",
         "morgan": "^1.9.0",
         "node-schedule": "^1.2.5",
         "serve-favicon": "^2.4.5"

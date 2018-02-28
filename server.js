@@ -3,10 +3,12 @@
  */
 
 // mongoose setup
-require('./db');
+require('./db/db');
 
 var express = require('express');
 var routes = require('./routes'); // -> reades ./routes/index.js
+var apiEntries = require('./routes/entries/api-entries');
+var apiAdmin = require('./routes/admin/api-admin');
 var admin = require('./routes/admin');
 var experimental = require('./routes/experimental');
 var http = require('http');
@@ -48,12 +50,13 @@ app.get('/stats', routes.stats);
 app.get('/statistics', routes.statistics);
 app.get('/geo', routes.geoloc);
 
-// restful services
-app.post('/entries', routes.createEntry);
-app.get('/entries/:id', routes.getEntryById);
-app.put('/entries/:id', routes.storeEntryById);
-app.delete('/entries/:id', routes.delete);
-app.get('/entries', routes.getEntries);
+// restful services for entries using Promises
+app.post('/api/entries', apiEntries.createEntry);
+app.get('/api/entries/:id', apiEntries.getEntryById);
+app.put('/api/entries/:id', apiEntries.saveEntry);
+app.delete('/api/entries/:id', apiEntries.deleteEntry);
+app.get('/api/entries', apiEntries.getEntries);
+
 
 // geofencing
 app.post('/geofence', routes.geofence);
@@ -63,8 +66,11 @@ app.post('/geolocation', routes.backgroundGeolocation);
 //app.delete('/entries', admin.deleteAllTimeEntries);
 //app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
 app.get('/admin/maintain', admin.maintain);
-app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
-app.post('/admin/backup/timeentry', admin.backupTimeEntry);
+//app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
+//app.post('/admin/backup/timeentry', admin.backupTimeEntry);
+
+app.post('/api/admin/dump/timeentry', apiAdmin.dumpTimeEntries);
+app.post('/api/admin/backup/timeentry', apiAdmin.backupTimeEntries);
 
 // statistics stuff
 app.put('/stats', admin.calcStats);
