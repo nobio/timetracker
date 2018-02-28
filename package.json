@@ -5,8 +5,8 @@
     "private": true,
     "scripts": {
         "start": "node server",
-        "test": "./node_modules/.bin/mocha --reporter spec",
-        "test-mon": "nodemon --exec ./node_modules/.bin/mocha --reporter spec",
+        "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
+        "test-mon": "nodemon --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
         "start-mon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server"
     },
     "devDependencies": {
