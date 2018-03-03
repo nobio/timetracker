@@ -40,9 +40,10 @@ exports.backupTimeEntries = () => {
         TimeEntryBackup.remove()
         .then(() => TimeEntry.find())
         .then(timeEntries => {
-            console.log(timeEntries.length);
+            console.log(timeEntries.length + ' time entries foud to be backed up');
             len = timeEntries.length;
             timeEntries.forEach((timeentry) => {
+                //console.log('.')
                 new TimeEntryBackup({
                     _id: timeentry._id,
                     entry_date: timeentry.entry_date,
@@ -53,7 +54,7 @@ exports.backupTimeEntries = () => {
                 }).save();
             })
         })
-        .then(() => resolve({ 'backup-count': len }))
+        .then(() => resolve({ 'backup_count': len }))
         .catch(err => reject(err))
     });    
 }    
