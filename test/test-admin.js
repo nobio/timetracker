@@ -2,6 +2,7 @@ require('../db/db')
 const fs = require('fs')
 const mongoose = require('mongoose')
 const TimeEntry = mongoose.model('TimeEntry')
+const TimeEntryBackup = mongoose.model("TimeEntryBackup");
 const util = require('../routes/admin/util-admin')
 
 const chai = require('chai')
@@ -40,7 +41,7 @@ rmDir = function(dirPath, removeSelf) {
 };
 /***************************************************************/
 
-
+/*
 describe('test util.dumpTimeEnties - Promise', () => {
   var db
   before(function() {
@@ -59,6 +60,40 @@ describe('test util.dumpTimeEnties - Promise', () => {
       .then(filename => {
       	var data = fs.readFileSync(filename);
       	expect(data).to.not.be.empty
+      })
+      .catch(err => { throw err })
+
+  })
+
+  after(function() {
+    //db.closeConnection()
+  })
+})
+*/
+
+describe('test util.backupTimeEntries - Promise', () => {
+  var db
+  
+  before(function() {
+    db = require('../db/db')
+  })
+
+
+
+  it('backing up the productive database into a history-staging table', async () => {
+    var countBackups
+    await TimeEntryBackup.find()
+      .then(timeEntryBackups => {
+        countBackups = timeEntryBackups.length;
+        console.log(countBackups + ' rows found in backup table')
+        return;
+      })
+  	  .then(util.backupTimeEntries())
+      .then(result => {
+        console.log(result)
+       expect(result).to.not.be.undefined
+        //expect(result).to.have.property('filename')
+        return 
       })
       .catch(err => { throw err })
 

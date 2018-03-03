@@ -1,10 +1,10 @@
 require("../../db/db");
-var fs = require("fs");
+const fs = require("fs");
 
-var mongoose = require("mongoose");
-var TimeEntry = mongoose.model("TimeEntry");
-var TimeEntryBackup = mongoose.model("TimeEntryBackup");
-var moment = require("moment");
+const mongoose = require("mongoose");
+const TimeEntry = mongoose.model("TimeEntry");
+const TimeEntryBackup = mongoose.model("TimeEntryBackup");
+const moment = require("moment");
 
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
