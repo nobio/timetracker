@@ -4,43 +4,54 @@ var mongoose = require('mongoose')
 var TimeEntry = mongoose.model('TimeEntry')
 var moment = require('moment')
 
-exports.calcStats = () => {
-    return new Promise((resolve, reject) => {
-    });        
 /*
 exports.calcStats
 	removeDoulets
 		getFirstTimeEntry
 			getLastTimeEntry
-				getBusyTimeByDate
+                getBusyTimeByDate
+                    getAllByDate
 */
+
+exports.calcStats = () => {
+    
+    return new Promise((resolve, reject) => {
+        resolve('\ncalcStats is not implemented yet\n\n')
+    })
+    
+    //return this.removeDoublets();
 }
   
-// TODO: Promiseify!!!
-function removeDoublets() {
+
+exports.removeDoublets = () => {
     var lastTimeentry;
     var count = 0;
 
-    TimeEntry.find().sort({
-        entry_date: 1
-    }).exec((err, timeentries) => {
-        timeentries.forEach((timeentry) => {
-            if (lastTimeentry !== undefined) {
-                if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
-                    timeentry.direction == lastTimeentry.direction) {
-                    timeentry.remove();
-                    count++;
-                    console.log("removing timeentry " + timeentry);
+    return new Promise((resolve, reject) => {
+        TimeEntry.find().sort({
+            entry_date: 1
+        })
+        .then(timeEntries => {
+            timeEntries.forEach((timeentry) => {
+                if (lastTimeentry !== undefined) {
+                    if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
+                        timeentry.direction == lastTimeentry.direction) {
+                        timeentry.remove();
+                        count++;
+                        console.log("removing timeentry " + timeentry);
+                    } else {
+                        lastTimeentry = timeentry;
+                    }
                 } else {
                     lastTimeentry = timeentry;
                 }
-            } else {
-                lastTimeentry = timeentry;
-            }
-        });
-        console.log(count + ' doublets removed');
-        callback(err, count);
-    });
+            });
+            console.log(count + ' doublets removed');    
+            resolve({'removed': count})
+        })
+        .catch(err => reject(err))
+    });        
+
 };
 
 exports.getFirstTimeEntry = () => {
@@ -76,3 +87,6 @@ exports.getLastTimeEntry = () => {
         .catch(err => reject(new Error('Unable to read last Time Entry: ' + ' (' + err.message + ')')))
     });        
 };
+
+exports.getBusytimeByDate = (dt, callback) => {
+}    
