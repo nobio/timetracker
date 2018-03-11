@@ -6,20 +6,17 @@ var moment = require('moment')
 
 /*
 exports.calcStats
-	removeDoulets
-		getFirstTimeEntry
-			getLastTimeEntry
-                getBusyTimeByDate
-                    getAllByDate
+    removeDoulets
+        deleteAllStatsDays
+            getFirstTimeEntry
+                getLastTimeEntry
+                    getBusyTimeByDate
+                        getAllByDate
 */
 
 exports.calcStats = () => {
-    
-    return new Promise((resolve, reject) => {
-        resolve('\ncalcStats is not implemented yet\n\n')
-    })
-    
-    //return this.removeDoublets();
+    this.removeDoublets()
+    .then(doubs => deleteAllStatsDays())
 }
   
 
@@ -52,6 +49,21 @@ exports.removeDoublets = () => {
         .catch(err => reject(err))
     });        
 
+};
+
+exports.deleteAllStatsDays = () => {
+    var size;
+    return new Promise((resolve, reject) => {
+        StatsDay.find((err, statsdays) => {
+            size = statsdays.length;
+            statsdays.forEach((statsday) => {
+                //console.log('removing ' + statsday);
+                statsday.remove();
+            });
+            console.log('deleted ' + size + ' items');
+            { size: size };
+        });
+    })
 };
 
 exports.getFirstTimeEntry = () => {
