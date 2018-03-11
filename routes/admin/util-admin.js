@@ -36,7 +36,7 @@ exports.dumpTimeEnties = () => {
 
 exports.backupTimeEntries = () => {
     return new Promise((resolve, reject) => {
-        let len = 0;
+        var len = 0;
         TimeEntryBackup.remove()
         .then(() => TimeEntry.find())
         .then(timeEntries => {
