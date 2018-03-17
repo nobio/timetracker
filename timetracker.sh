@@ -14,13 +14,17 @@ case "$1" in
         stop)
                 echo "killing by searching for node processes" `/sbin/pidof node` >> $LOG
                 /bin/kill `/sbin/pidof node` >>$LOG
+                /bin/kill -9 `/sbin/pidof node` >>$LOG
 
                 echo "killing by searching for port $PORT" >> $LOG
-                for pid in `lsof -i :30000|grep -v PID|awk '{$1=""; print $2}'|sort -u`
+                for pid in `lsof -i :$PORT|grep -v PID|awk '{$1=""; print $2}'|sort -u`
                 do
                    echo killing process $pid >> $LOG; kill -9 $pid;
                    sleep 2
                 done
+
+                /bin/kill `ps -ef|grep 30000|grep -v 'grep'|awk '{$1=" "; print $3}'`
+                /bin/kill -9 `ps -ef|grep 30000|grep -v 'grep'|awk '{$1=" "; print $3}'`
                 ;;
         restart)
                 $0 stop
