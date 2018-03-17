@@ -128,26 +128,29 @@ exports.create = (timeEntry) => {
  */
 //exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
 exports.update = (timeEntry) => {
-  //console.log('entered update with all parameters of Time Entry: ' + timeEntry)
+
   if (!timeEntry) {
     throw new Error('to update a record, the passed object must not be undefined');
   }
 
   return new Promise((resolve, reject) => {
     TimeEntry.findById(timeEntry.id)
-      .then(te => {
-        // console.log(timeentry)
-        te.direction = timeEntry.direction
-        te.longitude = timeEntry.longitude
-        te.latitude = timeEntry.latitude
-        te.datetime = timeEntry.datetime
-        te.last_changed = new Date()
-        // console.log(timeentry)
-        return timeEntry;
-      })
-      .then(timeEntry => timeEntry.save())
-      .then(timeEntry => resolve(timeEntry))
-      .catch(err => reject(err))
+    .then(te => {
+      if(te === null) {
+        resolve(null);
+      }
+      te.direction = (timeEntry.direction === undefined) ? te.direction : timeEntry.direction
+      te.longitude = (timeEntry.longitude === undefined) ? te.longitude : timeEntry.longitude
+      te.latitude = (timeEntry.latitude === undefined) ? te.latitude : timeEntry.latitude
+      te.datetime = (timeEntry.datetime === undefined) ? te.datetime : timeEntry.datetime
+      te.entry_date = (timeEntry.entry_date === undefined) ? te.entry_date : timeEntry.entry_date
+      te.last_changed = new Date()
+      //console.log(te)
+      return te;
+    })
+    .then(te => te.save())
+    .then(te => resolve(te))
+    .catch(err => reject(err))
   })
 }
 

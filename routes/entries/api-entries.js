@@ -79,13 +79,15 @@ exports.createEntry = (req, res) => {
  * curl -X PUT -H "Content-Type: application/json" -d '{"direction":"enter", "latitude":"45", "longitude":"45"}' http://localhost:30000/api/entries/5a36aab25ba9cf154bd2a384
  *******************************************************************************/
 exports.saveEntry = (req, res) => {
-  
+  //console.log(JSON.stringify(req.body))
+  var id = req.params.id
   const timeEntry = {
     id: req.params.id,
-    direction: req.params.direction,
-    datetime: req.params.datetime,
-    longitude: req.params.longitude,
-    latitude: req.params.latitude,
+    direction: req.body.direction,
+    entry_date: req.body.entry_date,
+    datetime: req.body.datetime,
+    longitude: req.body.longitude,
+    latitude: req.body.latitude,
   };
 
   util.update(timeEntry)

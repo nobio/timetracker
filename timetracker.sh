@@ -23,8 +23,8 @@ case "$1" in
                    sleep 2
                 done
 
-                /bin/kill `ps -ef|grep 30000|grep -v 'grep'|awk '{$1=" "; print $3}'`
-                /bin/kill -9 `ps -ef|grep 30000|grep -v 'grep'|awk '{$1=" "; print $3}'`
+                /bin/kill `ps -ef|grep 30000|grep -v 'grep'|awk '{$2=" "; print $1}'`
+                /bin/kill -9 `ps -ef|grep 30000|grep -v 'grep'|awk '{$2=" "; print $1}'`
                 ;;
         restart)
                 $0 stop
