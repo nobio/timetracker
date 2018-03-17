@@ -5,19 +5,20 @@
 // mongoose setup
 require('./db/db');
 
-var express = require('express');
-var routes = require('./routes'); // -> reades ./routes/index.js
-var apiEntries = require('./routes/entries/api-entries');
-var apiAdmin = require('./routes/admin/api-admin');
-var admin = require('./routes/admin');
-var experimental = require('./routes/experimental');
-var http = require('http');
-var path = require('path');
-var moment = require('moment');
-var favicon = require('serve-favicon');
-var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const routes = require('./routes'); // -> reades ./routes/index.js
+const apiEntries = require('./routes/entries/api-entries');
+const apiAdmin = require('./routes/admin/api-admin');
+const apiStats = require('./routes/stats/api-stats');
+const admin = require('./routes/admin');
+const experimental = require('./routes/experimental');
+const http = require('http');
+const path = require('path');
+const moment = require('moment');
+const favicon = require('serve-favicon');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 //require('log-timestamp');
 //require('log-timestamp')(function() { return '[' + new Date().toISOString() + '" message="%s"' });
 require('log-timestamp')(function() { return '[' + moment().format('ddd, D MMM YYYY hh:mm:ss Z') + '] - %s' });
@@ -77,6 +78,11 @@ app.put('/stats', admin.calcStats);
 app.get('/stats/:date', admin.getStatsDay);
 app.delete('/stats', admin.deleteAllStatsDays);
 app.get('/statistics/aggregate', admin.getStatsByTimeBox);
+
+app.put('/api/stats', apiStats.calcStats);
+app.get('/api/stats/:date', apiStats.getStatsDay);
+app.delete('/api/stats', apiStats.deleteAllStatsDays);
+app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox);
 
 // maintain stuff
 app.get('/ping', experimental.ping);

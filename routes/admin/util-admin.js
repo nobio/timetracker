@@ -1,10 +1,10 @@
 require("../../db/db");
-var fs = require("fs");
+const fs = require("fs");
 
-var mongoose = require("mongoose");
-var TimeEntry = mongoose.model("TimeEntry");
-var TimeEntryBackup = mongoose.model("TimeEntryBackup");
-var moment = require("moment");
+const mongoose = require("mongoose");
+const TimeEntry = mongoose.model("TimeEntry");
+const TimeEntryBackup = mongoose.model("TimeEntryBackup");
+const moment = require("moment");
 
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
@@ -36,13 +36,14 @@ exports.dumpTimeEnties = () => {
 
 exports.backupTimeEntries = () => {
     return new Promise((resolve, reject) => {
-        let len = 0;
+        var len = 0;
         TimeEntryBackup.remove()
         .then(() => TimeEntry.find())
         .then(timeEntries => {
-            console.log(timeEntries.length);
+            console.log(timeEntries.length + ' time entries foud to be backed up');
             len = timeEntries.length;
             timeEntries.forEach((timeentry) => {
+                //console.log('.')
                 new TimeEntryBackup({
                     _id: timeentry._id,
                     entry_date: timeentry.entry_date,
@@ -53,7 +54,7 @@ exports.backupTimeEntries = () => {
                 }).save();
             })
         })
-        .then(() => resolve({ 'backup-count': len }))
+        .then(() => resolve({ 'backup_count': len }))
         .catch(err => reject(err))
     });    
 }    
