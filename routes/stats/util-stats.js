@@ -1,22 +1,23 @@
 require('../../db/db')
 
-var mongoose = require('mongoose')
-var TimeEntry = mongoose.model('TimeEntry')
-var moment = require('moment')
+const mongoose = require('mongoose')
+const TimeEntry = mongoose.model('TimeEntry')
+const StatsDay = mongoose.model('StatsDay')
+const moment = require('moment')
 
 /*
 exports.calcStats
-    removeDoulets
-        deleteAllStatsDays
-            getFirstTimeEntry
-                getLastTimeEntry
+    removeDoulets (ok)
+        deleteAllStatsDays (ok)
+            getFirstTimeEntry (ok)
+                getLastTimeEntry (ok)
                     getBusyTimeByDate
                         getAllByDate
 */
 
 exports.calcStats = () => {
     this.removeDoublets()
-    .then(doubs => deleteAllStatsDays())
+    .then(doubs => this.deleteAllStatsDays())
 }
   
 
@@ -61,7 +62,7 @@ exports.deleteAllStatsDays = () => {
                 statsday.remove();
             });
             console.log('deleted ' + size + ' items');
-            { size: size };
+            resolve({ size: size });
         });
     })
 };

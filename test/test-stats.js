@@ -2,6 +2,7 @@ require("../db/db");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const TimeEntry = mongoose.model("TimeEntry");
+const StatsDay = mongoose.model("StatsDay");
 const util = require("../routes/stats/util-stats");
 const utilTimeEntry = require("../routes/entries/util-entries");
 
@@ -62,7 +63,8 @@ describe("test util.removeDoublets - Promise", () => {
   });
 
   it("test for doubletts (should be no in)", async () => {
-    await util.removeDoublets()
+    await util
+      .removeDoublets()
       .then(result => {
         //console.log(result)
         expect(result).to.have.property("removed");
@@ -75,7 +77,9 @@ describe("test util.removeDoublets - Promise", () => {
 
   it("add a doublette and check if one has been removed", async () => {
     await createTimeEntry({ direction: "go", datetime: DEFAULT_DATE })
-      .then(result => createTimeEntry({ direction: "go", datetime: DEFAULT_DATE }))
+      .then(result =>
+        createTimeEntry({ direction: "go", datetime: DEFAULT_DATE })
+      )
       .then(result => util.removeDoublets())
       .then(result => {
         expect(result).to.have.property("removed");
@@ -89,11 +93,43 @@ describe("test util.removeDoublets - Promise", () => {
   after(function() {
     clearAllEntries(DEFAULT_DATE);
     setTimeout(function() {
-      db.closeConnection();
+      //db.closeConnection();
     }, 1000);
   });
 });
 
+describe("test util.deleteAllStatsDays - Promise", () => {
+  var db;
+  before(function() {
+    db = require("../db/db");
+  });
+
+  it("load StatsDays", async () => {
+    await StatsDay.find()
+    .then(statsDays => {
+      expect(statsDays).to.have.length > 0;
+    })
+    .catch(err => { throw err; });
+  });
+
+  it("delete StatsDays and check it", async () => {
+    await util.deleteAllStatsDays()
+    .then(result => {
+      //console.log(result)
+      expect(result).to.have.property("size");
+      expect(result.size).to.be.greaterThan(0);
+    }) 
+    .then(StatsDay.find())
+    .then(statsDays => {
+      expect(statsDays).to.be.undefined;
+    })
+    .catch(err => { throw err; });
+  });
+
+  after(function() {
+    db.closeConnection()
+  });
+});
 
 // ========================================================================================================
 /**
@@ -107,10 +143,11 @@ function createTimeEntry(timeEntry) {
       direction: timeEntry.direction,
       longitude: timeEntry.longitude,
       latitude: timeEntry.latitude,
-      signature: 'HARD_CODED'
-    }).save()
-    .then(timeEntry => resolve(timeEntry))
-    .catch(err => reject(err));
+      signature: "HARD_CODED"
+    })
+      .save()
+      .then(timeEntry => resolve(timeEntry))
+      .catch(err => reject(err));
   });
 }
 
@@ -122,7 +159,7 @@ function clearAllEntries(dt) {
   utilTimeEntry.getAllByDate(dt).then(timeentries => {
     console.log("removing " + timeentries.length + " entries");
     timeentries.forEach(timeentry => {
-        utilTimeEntry.deleteById(timeentry._id);
+      utilTimeEntry.deleteById(timeentry._id);
     });
   });
 }
