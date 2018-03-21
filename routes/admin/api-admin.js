@@ -3,7 +3,7 @@ var util = require("./util-admin");
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
  *
- * curl -X POST http://localhost:30000/api/admin/dump/timeentry
+ * curl -X POST http://localhost:30000/api/entries/dump
  */
 exports.dumpTimeEntries = (req, res) => {
     util.dumpTimeEnties()
@@ -14,7 +14,7 @@ exports.dumpTimeEntries = (req, res) => {
 /**
  * function to backup data in an extra backup table
  * 
- * curl -X POST http://localhost:30000/api/admin/backup/timeentry
+ * curl -X POST http://localhost:30000/api/entries/backup
  */
 exports.backupTimeEntries = (req, res) => {
     util.backupTimeEntries()

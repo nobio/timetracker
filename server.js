@@ -70,8 +70,8 @@ app.get('/admin/maintain', admin.maintain);
 //app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
 //app.post('/admin/backup/timeentry', admin.backupTimeEntry);
 
-app.post('/api/admin/dump/timeentry', apiAdmin.dumpTimeEntries);
-app.post('/api/admin/backup/timeentry', apiAdmin.backupTimeEntries);
+app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);
+app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
 
 // statistics stuff
 app.put('/stats', admin.calcStats);

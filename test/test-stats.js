@@ -127,7 +127,7 @@ describe("test util.deleteAllStatsDays - Promise", () => {
   });
 
   after(function() {
-    db.closeConnection()
+    //db.closeConnection()
   });
 });
 
