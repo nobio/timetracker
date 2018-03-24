@@ -86,18 +86,22 @@ exports.create = (timeEntry) => {
         if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
           if (timeEntry.direction != 'enter') {
             reject(new Error('first entry of the day must be an enter and not ' + timeEntry.direction))
+            return
           }
   
         } else {
           if (lastTimeEntry.direction == timeEntry.direction) {  // entry already exists -> direction must be opposite
             reject(new Error('this entry has direction ' + timeEntry.direction + ' but last entry has also direction ' + lastTimeEntry.direction))
+            return
           }
+          console.log('Fuck you!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
           const now = moment();
           const entryDate = moment(lastTimeEntry.entry_date);
           const timelapse = now - entryDate;
           //console.log(timelapse + ' ms or ' + timelapse / 1000 + ' sec')
           if(timelapse < 1000 * 1) {    // not longer than 1 sec
             reject(new Error('this seems to be a double entry since the last item and this one are created within ' + timelapse + ' ms'));
+            return
           }
         }
         
@@ -138,6 +142,7 @@ exports.update = (timeEntry) => {
     .then(te => {
       if(te === null) {
         resolve(null);
+        return
       }
       te.direction = (timeEntry.direction === undefined) ? te.direction : timeEntry.direction
       te.longitude = (timeEntry.longitude === undefined) ? te.longitude : timeEntry.longitude
@@ -200,8 +205,10 @@ exports.getBusyTime = (timeentries) => {
 
     if (timeentries.length === 0) {
       reject(new Error('Es gibt keine Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ')'), 0)
+      return
     } else if (timeentries.length % 2 !== 0) {
       reject(new Error('Bitte die Einträge für diesen Tag (' + dt.format('DD.MM.YYYY') + ') vervollständigen'), 0)
+      return
     } else {
       var busytime = 0
       for (var n = timeentries.length - 1; n > 0; n -= 2) {
@@ -255,11 +262,14 @@ exports.getLastTimeEntryByDate = (dt) => {
         if (timeentry === undefined || timeentry.length == 0 || timeentry.length > 1) {
           // reject(new Error('No Time Entry found for given date : ' + date))
           resolve(undefined);
+          return
         } else if (timeentry.length > 1) {
           // reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))          
           resolve(undefined);
+          return
         } else {
           resolve(timeentry[0])
+          return
         }
       })
       .catch(err => reject(new Error('Unable to read Time Entry for given date : ' + dt + ' (' + err.message + ')')))

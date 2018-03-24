@@ -70,7 +70,7 @@ exports.createEntry = (req, res) => {
 
   util.create(timeEntry)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send('Error while createing a new Time Entry: ' + req.params.id + ' ' + err))
+    .catch(err => res.status(500).send('Error while createing a new Time Entry: ' + err))
 }
 
 /********************************************************************************
