@@ -8,6 +8,13 @@ block content
         //- input(type='button', value='Delete all time entries', onclick='deleteAllTimeEntries();')
       td
         input(type='button', value='calculate busytime', onclick='calculateStats();')
+    tr
+      td
+        input(type='button', value='backup data to db', onclick='backupData();')
+    tr
+      td
+        input(type='button', value='dump data to file system', onclick='dumpData();')
+    tr
       td
         #result
         

@@ -57,10 +57,39 @@ function calculateStats() {
         wait:true,
         success:function(model, response) {
             result.innerHTML = 'updated statistics: ' + JSON.stringify(response);
+            alert('updated statistics: ' + JSON.stringify(response))
         },
         error: function(model, err) {
             alert("Error (" + err.status + "): " + err.responseText);
         }
+    });
+}
+
+function backupData() {
+    $.ajax({
+        type : 'POST',
+        url : '/api/entries/backup',
+        dataType : 'json'
+    }).done(function(response) {
+        result.innerHTML = 'data backuped ' + response.backup_count + ' time entries';
+        alert('data backuped ' + response.backup_count + ' time entries');
+    })
+    .error(function(err) {
+        alert("error: " + err.status + " (" + err + ")");
+    });
+}
+
+function dumpData() {
+    $.ajax({
+        type : 'POST',
+        url : '/api/entries/dump',
+        dataType : 'json'
+    }).done(function(response) {
+        result.innerHTML = 'data dumped ' + response.size + ' time entries to ' + response.filename;
+        alert('data dumped ' + response.size + ' time entries to ' + response.filename);
+    })
+    .error(function(err) {
+        alert("error: " + err.status + " (" + err + ")");
     });
 }
 
