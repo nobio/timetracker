@@ -88,23 +88,22 @@ exports.create = (timeEntry) => {
             reject(new Error('first entry of the day must be an enter and not ' + timeEntry.direction))
             return
           }
-  
+
         } else {
-          if (lastTimeEntry.direction == timeEntry.direction) {  // entry already exists -> direction must be opposite
+          if (lastTimeEntry.direction == timeEntry.direction) { // entry already exists -> direction must be opposite
             reject(new Error('this entry has direction ' + timeEntry.direction + ' but last entry has also direction ' + lastTimeEntry.direction))
             return
           }
-          console.log('Fuck you!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
           const now = moment();
           const entryDate = moment(lastTimeEntry.entry_date);
           const timelapse = now - entryDate;
           //console.log(timelapse + ' ms or ' + timelapse / 1000 + ' sec')
-          if(timelapse < 1000 * 1) {    // not longer than 1 sec
+          if (timelapse < 1000 * 1) { // not longer than 1 sec
             reject(new Error('this seems to be a double entry since the last item and this one are created within ' + timelapse + ' ms'));
             return
           }
         }
-        
+
         // all checks successfully done, lets create the TimeEntry!
         new TimeEntry({
             entry_date: timeEntry.datetime,
@@ -139,23 +138,23 @@ exports.update = (timeEntry) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.findById(timeEntry.id)
-    .then(te => {
-      if(te === null) {
-        resolve(null);
-        return
-      }
-      te.direction = (timeEntry.direction === undefined) ? te.direction : timeEntry.direction
-      te.longitude = (timeEntry.longitude === undefined) ? te.longitude : timeEntry.longitude
-      te.latitude = (timeEntry.latitude === undefined) ? te.latitude : timeEntry.latitude
-      te.datetime = (timeEntry.datetime === undefined) ? te.datetime : timeEntry.datetime
-      te.entry_date = (timeEntry.entry_date === undefined) ? te.entry_date : timeEntry.entry_date
-      te.last_changed = new Date()
-      //console.log(te)
-      return te;
-    })
-    .then(te => te.save())
-    .then(te => resolve(te))
-    .catch(err => reject(err))
+      .then(te => {
+        if (te === null) {
+          resolve(null);
+          return
+        }
+        te.direction = (timeEntry.direction === undefined) ? te.direction : timeEntry.direction
+        te.longitude = (timeEntry.longitude === undefined) ? te.longitude : timeEntry.longitude
+        te.latitude = (timeEntry.latitude === undefined) ? te.latitude : timeEntry.latitude
+        te.datetime = (timeEntry.datetime === undefined) ? te.datetime : timeEntry.datetime
+        te.entry_date = (timeEntry.entry_date === undefined) ? te.entry_date : timeEntry.entry_date
+        te.last_changed = new Date()
+        //console.log(te)
+        return te;
+      })
+      .then(te => te.save())
+      .then(te => resolve(te))
+      .catch(err => reject(err))
   })
 }
 
@@ -243,7 +242,7 @@ exports.getBusyTime = (timeentries) => {
  */
 exports.getLastTimeEntryByDate = (dt) => {
 
-  if(typeof(dt) === 'string') {
+  if (typeof(dt) === 'string') {
     dt = moment(dt);
   }
   var dtStart = this.stripdownToDateBerlin(dt)
