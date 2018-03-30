@@ -224,8 +224,7 @@ Work:
 }  
  */
 exports.geofence = (req, res) => {
-	console.log(req.body);
-
+	console.log(JSON.stringify(req.body));
 	var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
 	if (req.body.id == 'Work') {
 		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, (err, timeentry) => {

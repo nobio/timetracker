@@ -35,6 +35,7 @@ echo step \#3: create tar ball
 cd ../tmp
 tar cfz ../timetracker/timetracker.tgz .
 cd ../timetracker
+rm -rf ../tmp
 
 # 4 step: Copy tar ball to qnap
 echo step \#4: Copy tar ball to qnap
