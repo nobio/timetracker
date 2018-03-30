@@ -16,9 +16,13 @@ exports.calcStats
 */
 
 exports.calcStats = () => {
-    this.removeDoublets()
-    .then(doubs => this.deleteAllStatsDays())
-}
+    return new Promise((resolve, reject) => {
+        this.removeDoublets()
+        .then(doubs => this.deleteAllStatsDays())
+        .then(deleted => resolve(deleted))
+        .catch(err => reject(err))
+    })
+};
   
 
 exports.removeDoublets = () => {
@@ -43,13 +47,12 @@ exports.removeDoublets = () => {
                 } else {
                     lastTimeentry = timeentry;
                 }
-            });
-            console.log(count + ' doublets removed');    
-            resolve({'removed': count})
+            })
         })
-        .catch(err => reject(err))
-    });        
-
+        console.log(count + ' doublets removed');    
+        resolve({'removed': count})
+    })
+    .catch(err => reject(err))
 };
 
 exports.deleteAllStatsDays = () => {
