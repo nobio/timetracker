@@ -36,7 +36,7 @@ exports.removeDoublets = () => {
         .then(timeEntries => {
             timeEntries.forEach((timeentry) => {
                 if (lastTimeentry !== undefined) {
-                    if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) == 0 &&
+                    if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
                         timeentry.direction == lastTimeentry.direction) {
                         timeentry.remove();
                         count++;
