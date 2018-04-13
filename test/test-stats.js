@@ -77,9 +77,7 @@ describe("test util.removeDoublets - Promise", () => {
 
   it("add a doublette and check if one has been removed", async () => {
     await createTimeEntry({ direction: "go", datetime: DEFAULT_DATE })
-      .then(result =>
-        createTimeEntry({ direction: "go", datetime: DEFAULT_DATE })
-      )
+      .then(result => createTimeEntry({ direction: "go", datetime: DEFAULT_DATE }))
       .then(result => util.removeDoublets())
       .then(result => {
         expect(result).to.have.property("removed");
@@ -93,7 +91,7 @@ describe("test util.removeDoublets - Promise", () => {
   after(function() {
     clearAllEntries(DEFAULT_DATE);
     setTimeout(function() {
-      //db.closeConnection();
+      db.closeConnection();
     }, 1000);
   });
 });

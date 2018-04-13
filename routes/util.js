@@ -135,7 +135,7 @@ exports.getBusytimeByDate = (dt, callback) => {
     // first get all entries for this day....
     this.getTimeEntriesByDate(dt, (err, timeentries) => {
         if (err) {
-            callback(new Error('Error while reading Time Entry: ' + id + " " + err.message));
+            callback(new Error('Error while reading Time Entry: ' + err.message));
         } else {
 
             if (timeentries.length === 0) {
