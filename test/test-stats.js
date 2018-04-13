@@ -108,16 +108,13 @@ describe("test util.deleteAllStatsDays - Promise", () => {
     await StatsDay.find()
     .then(statsDays => {
       expect(statsDays).to.have.length > 0;
+      return statsDays;
     })
-    .catch(err => { throw err; });
-  });
-
-  it("delete StatsDays and check it", async () => {
-    await util.deleteAllStatsDays()
+    .then(result => util.deleteAllStatsDays())
     .then(result => {
       //console.log(result)
       expect(result).to.have.property("size");
-      expect(result.size).to.be.greaterThan(0);
+      expect(result.size).to.equal(0);
     }) 
     .then(StatsDay.find())
     .then(statsDays => {
@@ -127,7 +124,7 @@ describe("test util.deleteAllStatsDays - Promise", () => {
   });
 
   after(function() {
-    //db.closeConnection()
+    db.closeConnection()
   });
 });
 
