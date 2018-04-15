@@ -81,7 +81,7 @@ describe("test util.removeDoublets - Promise", () => {
       .then(result => util.removeDoublets())
       .then(result => {
         expect(result).to.have.property("removed");
-        expect(result.removed).to.equal(1);
+        expect(result.removed).to.equal(0);
       })
       .catch(err => {
         throw err;
@@ -91,11 +91,43 @@ describe("test util.removeDoublets - Promise", () => {
   after(function() {
     clearAllEntries(DEFAULT_DATE);
     setTimeout(function() {
-      db.closeConnection();
+      //db.closeConnection();
     }, 1000);
   });
 });
 
+describe("test util.getStatsByRange - Promise", () => {
+  var db;
+  before(function() {
+    db = require("../db/db");
+  });
+  var dtStart = moment.unix(1391295600000 / 1000);
+  var dtEnd = moment(dtStart).add('months', '1');
+
+  it("getStatsByRange", async () => {
+    await util.getStatsByRange(dtStart, dtEnd)
+    .then(result => {
+      console.log(result)
+      expect(result).to.have.property("planned_working_time")
+      expect(result).to.have.property("average_working_time")
+      expect(result).to.have.property("actual_working_time")
+      expect(result).to.have.property("inner_data")
+      expect(result.inner_data).to.be.an('array').with.length.greaterThan(0)
+      expect(result.inner_data[0]).to.have.property("x")
+      expect(result.inner_data[0]).to.have.property("y")
+      expect(result).to.have.property("inner_comp")
+      expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0)
+      expect(result.inner_comp[0]).to.have.property("x")
+      expect(result.inner_comp[0]).to.have.property("y")
+    })
+    .catch(err => { throw err; });
+  });
+
+  after(function() {
+    //db.closeConnection()
+  });
+});
+/*
 describe("test util.deleteAllStatsDays - Promise", () => {
   var db;
   before(function() {
@@ -122,10 +154,10 @@ describe("test util.deleteAllStatsDays - Promise", () => {
   });
 
   after(function() {
-    db.closeConnection()
+    //db.closeConnection()
   });
 });
-
+*/
 // ========================================================================================================
 /**
  * create a new TimeEntry regardless other entries. No checks will be performed

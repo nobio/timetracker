@@ -80,7 +80,7 @@ app.delete('/stats', admin.deleteAllStatsDays);
 app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 
 app.put('/api/stats', apiStats.calcStats);
-app.get('/api/stats/:date', apiStats.getStatsDay);
+app.get('/api/stats/:date', apiStats.getStats);
 app.delete('/api/stats', apiStats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox);
 
