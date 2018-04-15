@@ -96,18 +96,19 @@ describe("test util.removeDoublets - Promise", () => {
   });
 });
 
-describe("test util.getStatsByRange - Promise", () => {
+describe("test util.getStats and getStatsByRange - Promise", () => {
   var db;
   before(function() {
     db = require("../db/db");
   });
-  var dtStart = moment.unix(1391295600000 / 1000);
-  var dtEnd = moment(dtStart).add('months', '1');
 
   it("getStatsByRange", async () => {
+    var dtStart = moment.unix(1391295600000 / 1000);
+    var dtEnd = moment(dtStart).add('months', '1');
+
     await util.getStatsByRange(dtStart, dtEnd)
     .then(result => {
-      console.log(result)
+      //console.log(result)
       expect(result).to.have.property("planned_working_time")
       expect(result).to.have.property("average_working_time")
       expect(result).to.have.property("actual_working_time")
@@ -122,6 +123,33 @@ describe("test util.getStatsByRange - Promise", () => {
     })
     .catch(err => { throw err; });
   });
+
+  it("getStats", async () => {
+    await util.getStats('year', 1391295600000)
+    .then(result => {
+      //console.log(result)
+      expect(result).to.have.property("planned_working_time")
+      expect(result).to.have.property("average_working_time")
+      expect(result).to.have.property("actual_working_time")
+      expect(result).to.have.property("chart_data")
+      expect(result.chart_data).to.have.property("xScale")
+      expect(result.chart_data).to.have.property("yScale")
+      expect(result.chart_data).to.have.property("type")
+      expect(result.chart_data).to.have.property("main")
+      expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0)
+      expect(result.chart_data.main[0]).to.have.property("data")
+      expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0)
+      expect(result.chart_data.main[0].data[0]).to.have.property("x")
+      expect(result.chart_data.main[0].data[0]).to.have.property("y")
+      expect(result.chart_data).to.have.property("comp")
+      expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0)
+      expect(result.chart_data.comp[0]).to.have.property("data")
+      expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0)
+      expect(result.chart_data.comp[0].data[0]).to.have.property("x")
+      expect(result.chart_data.comp[0].data[0]).to.have.property("y")
+    })
+    .catch(err => { throw err; });
+  })
 
   after(function() {
     //db.closeConnection()
