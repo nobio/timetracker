@@ -17,41 +17,41 @@ exports.calcStats
 exports.calcStats = () => {
     return new Promise((resolve, reject) => {
         this.removeDoublets()
-        .then(doubs => this.deleteAllStatsDays())
-        .then(deleted => resolve(deleted))
-        .catch(err => reject(err))
+            .then(doubs => this.deleteAllStatsDays())
+            .then(deleted => resolve(deleted))
+            .catch(err => reject(err))
     })
 };
-  
+
 
 exports.removeDoublets = () => {
     var lastTimeentry;
     var count = 0;
 
     return new Promise((resolve, reject) => {
-        TimeEntry.find().sort({
-            entry_date: 1
+            TimeEntry.find().sort({
+                    entry_date: 1
+                })
+                .then(timeEntries => {
+                    timeEntries.forEach((timeentry) => {
+                        if (lastTimeentry !== undefined) {
+                            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
+                                timeentry.direction == lastTimeentry.direction) {
+                                timeentry.remove();
+                                count++;
+                                console.log("removing timeentry " + timeentry);
+                            } else {
+                                lastTimeentry = timeentry;
+                            }
+                        } else {
+                            lastTimeentry = timeentry;
+                        }
+                    })
+                })
+            console.log(count + ' doublets removed');
+            resolve({ 'removed': count })
         })
-        .then(timeEntries => {
-            timeEntries.forEach((timeentry) => {
-                if (lastTimeentry !== undefined) {
-                    if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
-                        timeentry.direction == lastTimeentry.direction) {
-                        timeentry.remove();
-                        count++;
-                        console.log("removing timeentry " + timeentry);
-                    } else {
-                        lastTimeentry = timeentry;
-                    }
-                } else {
-                    lastTimeentry = timeentry;
-                }
-            })
-        })
-        console.log(count + ' doublets removed');    
-        resolve({'removed': count})
-    })
-    .catch(err => reject(err))
+        .catch(err => reject(err))
 };
 
 exports.deleteAllStatsDays = () => {
@@ -72,47 +72,46 @@ exports.deleteAllStatsDays = () => {
 exports.getFirstTimeEntry = () => {
     return new Promise((resolve, reject) => {
         TimeEntry.aggregate([{
-            $group: {
-                _id: 0,
-                age: {
-                    $min: "$entry_date"
+                $group: {
+                    _id: 0,
+                    age: {
+                        $min: "$entry_date"
+                    }
                 }
-            }
-        }])
-        .then(timeentries => {
-            resolve(timeentries[0])
-        })
-        .catch(err => reject(new Error('Unable to read first Time Entry: ' + ' (' + err.message + ')')))
-    });        
+            }])
+            .then(timeentries => {
+                resolve(timeentries[0])
+            })
+            .catch(err => reject(new Error('Unable to read first Time Entry: ' + ' (' + err.message + ')')))
+    });
 };
 
 exports.getLastTimeEntry = () => {
     return new Promise((resolve, reject) => {
         TimeEntry.aggregate([{
-            $group: {
-                _id: 0,
-                age: {
-                    $max: "$entry_date"
+                $group: {
+                    _id: 0,
+                    age: {
+                        $max: "$entry_date"
+                    }
                 }
-            }
-        }])
-        .then(timeentries => {
-            resolve(timeentries[0])
-        })
-        .catch(err => reject(new Error('Unable to read last Time Entry: ' + ' (' + err.message + ')')))
-    });        
+            }])
+            .then(timeentries => {
+                resolve(timeentries[0])
+            })
+            .catch(err => reject(new Error('Unable to read last Time Entry: ' + ' (' + err.message + ')')))
+    });
 };
 
-exports.getBusytimeByDate = (dt, callback) => {
-}    
+exports.getBusytimeByDate = (dt, callback) => {}
 
 
 exports.getStats = (timeUnit, dtStart) => {
     //console.log(dtStart)
-  
+
     var dtStart = moment.unix(dtStart / 1000);
     var dtEnd;
-  
+
     if ('year' === timeUnit) {
         dtEnd = moment(dtStart).add('years', '1');
     } else if ('month' === timeUnit) {
@@ -154,7 +153,7 @@ exports.getStats = (timeUnit, dtStart) => {
 /*
  * returns the aggregated statistics for a given time range defined by start and end
  */
-exports.getStatsByRange = (dtStart, dtEnd,) => {
+exports.getStatsByRange = (dtStart, dtEnd, ) => {
     console.log(dtStart)
     //console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
     console.log(dtEnd)
@@ -167,7 +166,7 @@ exports.getStatsByRange = (dtStart, dtEnd,) => {
         }).sort({
             date: -1
         }).exec((err, stats) => {
-            if(err != undefined) {
+            if (err != undefined) {
                 reject(err);
                 return
             }

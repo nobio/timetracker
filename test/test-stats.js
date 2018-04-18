@@ -27,7 +27,7 @@ describe("test util.getFirstTimeEntry/getLastTimeEntry - Promise", () => {
     db = require("../db/db");
   });
 
-  it("getFirstTimeEntry", async () => {
+  it("getFirstTimeEntry", async() => {
     await util
       .getFirstTimeEntry()
       .then(result => {
@@ -39,7 +39,7 @@ describe("test util.getFirstTimeEntry/getLastTimeEntry - Promise", () => {
       });
   });
 
-  it("getLastTimeEntry", async () => {
+  it("getLastTimeEntry", async() => {
     await util
       .getLastTimeEntry()
       .then(result => {
@@ -62,7 +62,7 @@ describe("test util.removeDoublets - Promise", () => {
     db = require("../db/db");
   });
 
-  it("test for doubletts (should be no in)", async () => {
+  it("test for doubletts (should be no in)", async() => {
     await util
       .removeDoublets()
       .then(result => {
@@ -75,7 +75,7 @@ describe("test util.removeDoublets - Promise", () => {
       });
   });
 
-  it("add a doublette and check if one has been removed", async () => {
+  it("add a doublette and check if one has been removed", async() => {
     await createTimeEntry({ direction: "go", datetime: DEFAULT_DATE })
       .then(result => createTimeEntry({ direction: "go", datetime: DEFAULT_DATE }))
       .then(result => util.removeDoublets())
@@ -102,53 +102,53 @@ describe("test util.getStats and getStatsByRange - Promise", () => {
     db = require("../db/db");
   });
 
-  it("getStatsByRange", async () => {
+  it("getStatsByRange", async() => {
     var dtStart = moment.unix(1391295600000 / 1000);
     var dtEnd = moment(dtStart).add('months', '1');
 
     await util.getStatsByRange(dtStart, dtEnd)
-    .then(result => {
-      //console.log(result)
-      expect(result).to.have.property("planned_working_time")
-      expect(result).to.have.property("average_working_time")
-      expect(result).to.have.property("actual_working_time")
-      expect(result).to.have.property("inner_data")
-      expect(result.inner_data).to.be.an('array').with.length.greaterThan(0)
-      expect(result.inner_data[0]).to.have.property("x")
-      expect(result.inner_data[0]).to.have.property("y")
-      expect(result).to.have.property("inner_comp")
-      expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0)
-      expect(result.inner_comp[0]).to.have.property("x")
-      expect(result.inner_comp[0]).to.have.property("y")
-    })
-    .catch(err => { throw err; });
+      .then(result => {
+        //console.log(result)
+        expect(result).to.have.property("planned_working_time")
+        expect(result).to.have.property("average_working_time")
+        expect(result).to.have.property("actual_working_time")
+        expect(result).to.have.property("inner_data")
+        expect(result.inner_data).to.be.an('array').with.length.greaterThan(0)
+        expect(result.inner_data[0]).to.have.property("x")
+        expect(result.inner_data[0]).to.have.property("y")
+        expect(result).to.have.property("inner_comp")
+        expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0)
+        expect(result.inner_comp[0]).to.have.property("x")
+        expect(result.inner_comp[0]).to.have.property("y")
+      })
+      .catch(err => { throw err; });
   });
 
-  it("getStats", async () => {
+  it("getStats", async() => {
     await util.getStats('year', 1391295600000)
-    .then(result => {
-      //console.log(result)
-      expect(result).to.have.property("planned_working_time")
-      expect(result).to.have.property("average_working_time")
-      expect(result).to.have.property("actual_working_time")
-      expect(result).to.have.property("chart_data")
-      expect(result.chart_data).to.have.property("xScale")
-      expect(result.chart_data).to.have.property("yScale")
-      expect(result.chart_data).to.have.property("type")
-      expect(result.chart_data).to.have.property("main")
-      expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0)
-      expect(result.chart_data.main[0]).to.have.property("data")
-      expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0)
-      expect(result.chart_data.main[0].data[0]).to.have.property("x")
-      expect(result.chart_data.main[0].data[0]).to.have.property("y")
-      expect(result.chart_data).to.have.property("comp")
-      expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0)
-      expect(result.chart_data.comp[0]).to.have.property("data")
-      expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0)
-      expect(result.chart_data.comp[0].data[0]).to.have.property("x")
-      expect(result.chart_data.comp[0].data[0]).to.have.property("y")
-    })
-    .catch(err => { throw err; });
+      .then(result => {
+        //console.log(result)
+        expect(result).to.have.property("planned_working_time")
+        expect(result).to.have.property("average_working_time")
+        expect(result).to.have.property("actual_working_time")
+        expect(result).to.have.property("chart_data")
+        expect(result.chart_data).to.have.property("xScale")
+        expect(result.chart_data).to.have.property("yScale")
+        expect(result.chart_data).to.have.property("type")
+        expect(result.chart_data).to.have.property("main")
+        expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0)
+        expect(result.chart_data.main[0]).to.have.property("data")
+        expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0)
+        expect(result.chart_data.main[0].data[0]).to.have.property("x")
+        expect(result.chart_data.main[0].data[0]).to.have.property("y")
+        expect(result.chart_data).to.have.property("comp")
+        expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0)
+        expect(result.chart_data.comp[0]).to.have.property("data")
+        expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0)
+        expect(result.chart_data.comp[0].data[0]).to.have.property("x")
+        expect(result.chart_data.comp[0].data[0]).to.have.property("y")
+      })
+      .catch(err => { throw err; });
   })
 
   after(function() {
@@ -194,12 +194,12 @@ function createTimeEntry(timeEntry) {
   // console.log('entered save ' + id)
   return new Promise((resolve, reject) => {
     new TimeEntry({
-      entry_date: timeEntry.datetime,
-      direction: timeEntry.direction,
-      longitude: timeEntry.longitude,
-      latitude: timeEntry.latitude,
-      signature: "HARD_CODED"
-    })
+        entry_date: timeEntry.datetime,
+        direction: timeEntry.direction,
+        longitude: timeEntry.longitude,
+        latitude: timeEntry.latitude,
+        signature: "HARD_CODED"
+      })
       .save()
       .then(timeEntry => resolve(timeEntry))
       .catch(err => reject(err));

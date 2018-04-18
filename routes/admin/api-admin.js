@@ -7,8 +7,8 @@ var util = require("./util-admin");
  */
 exports.dumpTimeEntries = (req, res) => {
     util.dumpTimeEnties()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send('Error while dumping data: ' + err))
+        .then(response => res.status(200).send(response))
+        .catch(err => res.status(500).send('Error while dumping data: ' + err))
 };
 
 /**
@@ -18,6 +18,6 @@ exports.dumpTimeEntries = (req, res) => {
  */
 exports.backupTimeEntries = (req, res) => {
     util.backupTimeEntries()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send('Error while backup data: ' + err))
+        .then(response => res.status(200).send(response))
+        .catch(err => res.status(500).send('Error while backup data: ' + err))
 };

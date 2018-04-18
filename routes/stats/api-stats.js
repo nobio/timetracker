@@ -6,9 +6,9 @@ var util = require('./util-stats')
  * curl -X PUT http://localhost:30000/api/stats
  */
 exports.calcStats = (req, res) => {
-    util.calcStats()
-      .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
+  util.calcStats()
+    .then(timeentry => res.status(200).send(timeentry))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
 
 /**
@@ -22,8 +22,8 @@ exports.getStats = (req, res) => {
   var dtStart = req.params.date;
 
   util.getStats(timeUnit, dtStart)
-      .then(timeentries => res.status(200).send(timeentries))
-      .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
+    .then(timeentries => res.status(200).send(timeentries))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
 
 /**
@@ -33,9 +33,9 @@ exports.getStats = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/stats
  */
 exports.deleteAllStatsDays = (req, res) => {
-    util.findById(req.params.id)
-      .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
+  util.findById(req.params.id)
+    .then(timeentry => res.status(200).send(timeentry))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
 
 /** 
@@ -45,7 +45,7 @@ exports.deleteAllStatsDays = (req, res) => {
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
-    util.findById(req.params.id)
-      .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
+  util.findById(req.params.id)
+    .then(timeentry => res.status(200).send(timeentry))
+    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
 }
