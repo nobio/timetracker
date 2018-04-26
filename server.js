@@ -19,16 +19,13 @@ const favicon = require('serve-favicon');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-//require('log-timestamp');
-//require('log-timestamp')(function() { return '[' + new Date().toISOString() + '" message="%s"' });
-require('log-timestamp')(function() { return '[' + moment().format('ddd, D MMM YYYY hh:mm:ss Z') + '] - %s' });
-//[Tue, 17 Oct 2017 13:33:00 GMT]
+require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
-var app = express();
+const app = express();
 
 app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
-app.set('views', __dirname + '/views');
+app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'jade');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -40,7 +37,7 @@ app.use(cookieParser());
 
 /*
 app.configure('production', function() {
-	app.use(express.errorHandler());
+  app.use(express.errorHandler());
 });
 */
 // routes to jade templates
@@ -64,11 +61,11 @@ app.post('/geofence', routes.geofence);
 app.post('/geolocation', routes.backgroundGeolocation);
 
 // admin stuff
-//app.delete('/entries', admin.deleteAllTimeEntries);
-//app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
+// app.delete('/entries', admin.deleteAllTimeEntries);
+// app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
 app.get('/admin/maintain', admin.maintain);
-//app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
-//app.post('/admin/backup/timeentry', admin.backupTimeEntry);
+// app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
+// app.post('/admin/backup/timeentry', admin.backupTimeEntry);
 
 app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);
 app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
@@ -90,7 +87,7 @@ app.get('/experiment', experimental.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-	console.log("\nExpress server listening on http://" + app.get('host') + ':' + app.get('port'));
+  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 
