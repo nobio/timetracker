@@ -8,7 +8,8 @@
         "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
         "test-mon": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
         "start-mon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
-        "lint": "eslint --fix"
+        "lint-fix": "eslint --fix",
+        "lint": "eslint"
     },
     "devDependencies": {
         "babel-eslint": "~7.2.3",

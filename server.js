@@ -87,6 +87,7 @@ app.get('/experiment', experimental.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
+  // eslint-disable-next-line no-console
   console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
