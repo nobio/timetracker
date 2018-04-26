@@ -23,8 +23,8 @@ case "$1" in
                    sleep 2
                 done
 
-                /bin/kill `ps -ef|grep 30000|grep -v 'grep'|awk '{$2=" "; print $1}'`
                 /bin/kill -9 `ps -ef|grep 30000|grep -v 'grep'|awk '{$2=" "; print $1}'`
+                /bin/kill -9 `ps -ef|grep -v 'grep'|grep '/usr/sbin/rpc.mountd -p 30000 -F'`
                 ;;
         restart)
                 $0 stop

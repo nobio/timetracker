@@ -33,9 +33,9 @@ exports.getStats = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/stats
  */
 exports.deleteAllStatsDays = (req, res) => {
-  util.findById(req.params.id)
-    .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
+  util.deleteAllStatsDays()
+    .then(result => res.status(200).send(result))
+    .catch(err => res.status(500).send('Error while deleting Time Entries: ' + req.params.id + ' ' + err))
 }
 
 /** 

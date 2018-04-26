@@ -13,8 +13,9 @@
 # -------------------------------------------------
 
 #QNAP_HOST=admin@192.168.178.46
-#QNAP_HOST=admin@qnap-nas
-QNAP_HOST=admin@`ping -c 1 qnap-nas|grep "bytes from"|awk '{print $4}'|awk -F ":" '{print $1}'`
+QNAP_HOST=admin@qnap-nas
+#QNAP_HOST=admin@`ping -c 1 qnap-nas|grep "bytes from"|awk '{print $4}'|awk -F ":" '{print $1}'`
+#QNAP_HOST=admin@nobio.myhome-server.de
 # "source ~/.profile"
 
 echo 
