@@ -1,41 +1,39 @@
 const scheduler = require('node-schedule');
 const adminOld = require('./admin');
-const admin = require('./admin/util-admin')
+const admin = require('./admin/util-admin');
 
 /**
  * start scheduler to run tasks
  */
-exports.scheduleTasks = function() {
+exports.scheduleTasks = function () {
+  // start the scheduler
+  console.log('job scheduler: calcStats (every hour at ??:00)');
+  scheduler.scheduleJob({ minute: 0 }, () => { // every hour at ??:00
+    console.log('scheduled task "calcStats" started');
+    adminOld.calcStats();
+  });
 
+  console.log('job scheduler: dumpTimeEntry (every day at 04:05)');
+  scheduler.scheduleJob({ hour: 4, minute: 5 }, () => { // every day at 04:05
+    console.log('scheduled task "dumpTimeEntry" started');
+    admin.dumpTimeEnties();
+  });
 
-    // start the scheduler
-    console.log("job scheduler: calcStats (every hour at ??:00)");
-    scheduler.scheduleJob({minute: 0}, function() {  // every hour at ??:00
-        console.log('scheduled task "calcStats" started')
-        adminOld.calcStats();
-    });
+  console.log('job scheduler: backupTimeEntry (every hour at 10 past (??:10)');
+  scheduler.scheduleJob({ minute: 10 }, () => {
+    console.log('scheduled task "backupTimeEntry" started');
+    admin.backupTimeEntries();
+  });
 
-    console.log("job scheduler: dumpTimeEntry (every day at 04:05)");
-    scheduler.scheduleJob({hour: 4, minute: 5}, function() {  // every day at 04:05
-        console.log('scheduled task "dumpTimeEntry" started')
-        admin.dumpTimeEnties();
-    });
-
-    console.log("job scheduler: backupTimeEntry (every hour at 10 past (??:10)");
-    scheduler.scheduleJob({minute: 10}, function() {
-        console.log('scheduled task "backupTimeEntry" started')
-        admin.backupTimeEntries()
-    });
-
-    /*
+  /*
     console.log("job scheduler: test");
     scheduler.scheduleJob({}, function() {
         console.log('schedule: ' + new Date());
     });
-    */ 
+    */
 
 
-    /*
+  /*
     # .---------------- minute (0 - 59)
     # |  .------------- hour (0 - 23)
     # |  |  .---------- day of month (1 - 31)

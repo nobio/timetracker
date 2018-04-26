@@ -1,8 +1,8 @@
-var mongoose = require('mongoose');
-var moment = require('moment');
-var tz = require('moment-timezone');
-var util = require('./util');
-var TimeEntry = mongoose.model('TimeEntry');
+const mongoose = require('mongoose');
+const moment = require('moment');
+const tz = require('moment-timezone');
+const util = require('./util');
+const TimeEntry = mongoose.model('TimeEntry');
 
 /* ================================================================== */
 /* =========================== JADE/HTML ============================ */
@@ -12,34 +12,34 @@ var TimeEntry = mongoose.model('TimeEntry');
  * calculates the number of entries and renders the index.jade by passing the size
  */
 exports.index = (req, res) => {
-	util.getNumberOfTimeEntries((err, size) => {
-		console.log(size);
-		res.render('index', {
-			size: size
-		});
-	});
+  util.getNumberOfTimeEntries((err, size) => {
+    console.log(size);
+    res.render('index', {
+      size,
+    });
+  });
 };
 
 exports.admin = (req, res) => {
-	res.render('admin');
-}
+  res.render('admin');
+};
 
 exports.admin_item = (req, res) => {
-	res.render('admin_item');
-	// http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
-}
+  res.render('admin_item');
+  // http://localhost:30000/admin_item?id=537edec991c647b10f4f5a6f
+};
 
 exports.stats = (req, res) => {
-	res.render('stats');
-}
+  res.render('stats');
+};
 
 exports.statistics = (req, res) => {
-	res.render('statistics');
-}
+  res.render('statistics');
+};
 
 exports.geoloc = (req, res) => {
-	res.render('geoloc');
-}
+  res.render('geoloc');
+};
 
 /* ================================================================== */
 /* ============================== REST ============================== */
@@ -49,35 +49,34 @@ exports.geoloc = (req, res) => {
  * creates a new TimeEntry; the date is "now" and the direction needs to be given
  */
 exports.createEntry = (req, res) => {
-	console.log(JSON.stringify(req.body));
-	var direction = req.body.direction;
-	var datetime = req.body.datetime;
-	var longitude = req.body.longitude;
-	var latitude = req.body.latitude;
+  console.log(JSON.stringify(req.body));
+  const direction = req.body.direction;
+  const datetime = req.body.datetime;
+  const longitude = req.body.longitude;
+  const latitude = req.body.latitude;
 
-	util.createTimeEntry(direction, datetime, longitude, latitude, (err, timeentry) => {
-		if (err) {
-			res.send(500, 'Error while creating new  Time Entry: ' + err.message);
-		} else {
-			res.send(timeentry);
-		}
-	});
-
-}
+  util.createTimeEntry(direction, datetime, longitude, latitude, (err, timeentry) => {
+    if (err) {
+      res.send(500, `Error while creating new  Time Entry: ${err.message}`);
+    } else {
+      res.send(timeentry);
+    }
+  });
+};
 /*
  * deletes one time entry by it's id
  */
 exports.delete = (req, res) => {
-	var id = req.params.id;
+  const id = req.params.id;
 
-	TimeEntry.findByIdAndRemove(id, (err) => {
-		if (err) {
-			res.send(500, 'Error while deleting Time Entry: ' + id + " " + err.message);
-		} else {
-			res.send(id);
-		}
-	});
-}
+  TimeEntry.findByIdAndRemove(id, (err) => {
+    if (err) {
+      res.send(500, `Error while deleting Time Entry: ${id} ${err.message}`);
+    } else {
+      res.send(id);
+    }
+  });
+};
 
 /*
  * Reads all time entries
@@ -89,89 +88,84 @@ exports.delete = (req, res) => {
  * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
 exports.getEntries = (req, res) => {
-	var filterByDate = req.query.dt;
-	var filterByBusy = req.query.busy;
-	
-	if (filterByDate && filterByBusy) {
-		console.log("filter by date and busy");
-		res.send(500, 'date and busy filter set; can only handle one of them');
-	} else if (filterByDate) {
-		console.log("filter by date: " + filterByDate);
-		getAllByDate(filterByDate, res);
-	} else if (filterByBusy) {
-		console.log("filter by busy: " + filterByBusy);
-		getBusyTime(filterByBusy, res);
-	} else {
-		TimeEntry.find((err, timeentries) => {
-			if (err) {
-				res.send(500, 'Error while reading Time Entries: ' + id + " " + err);
-			} else {
-				res.send(timeentries);
-			}
-		});
-	}
-}
+  const filterByDate = req.query.dt;
+  const filterByBusy = req.query.busy;
+
+  if (filterByDate && filterByBusy) {
+    console.log('filter by date and busy');
+    res.send(500, 'date and busy filter set; can only handle one of them');
+  } else if (filterByDate) {
+    console.log(`filter by date: ${filterByDate}`);
+    getAllByDate(filterByDate, res);
+  } else if (filterByBusy) {
+    console.log(`filter by busy: ${filterByBusy}`);
+    getBusyTime(filterByBusy, res);
+  } else {
+    TimeEntry.find((err, timeentries) => {
+      if (err) {
+        res.send(500, `Error while reading Time Entries: ${id} ${err}`);
+      } else {
+        res.send(timeentries);
+      }
+    });
+  }
+};
 /*
  * lists all Time Entries for a given date (this particular day)
  *
  * curl -X GET http://localhost:30000/entries/dt/1451084400000
  */
 function getAllByDate(date, res) {
-	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
-	console.log('getAllByDate received date:               ' + moment(dt).format('DD.MM.YYYY HH:mm:ss'));
+  const dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
+  console.log(`getAllByDate received date:               ${moment(dt).format('DD.MM.YYYY HH:mm:ss')}`);
 
-	util.getTimeEntriesByDate(dt, (err, timeentries) => {
-
-		if (err) {
-			res.send(500, err);
-		} else {
-			res.send(timeentries);
-		}
-
-	});
+  util.getTimeEntriesByDate(dt, (err, timeentries) => {
+    if (err) {
+      res.send(500, err);
+    } else {
+      res.send(timeentries);
+    }
+  });
 }
 /*
  * get one Time Entry by it's id
  */
 exports.getEntryById = (req, res) => {
-
-	TimeEntry.findById(req.params.id, (err, timeentry) => {
-		if (err) {
-			res.send(500, 'Error while reading Time Entry: ' + req.params.id + " " + err);
-		} else {
-			res.send(timeentry);
-		}
-	});
-
-}
+  TimeEntry.findById(req.params.id, (err, timeentry) => {
+    if (err) {
+      res.send(500, `Error while reading Time Entry: ${req.params.id} ${err}`);
+    } else {
+      res.send(timeentry);
+    }
+  });
+};
 /*
  * stores one Time Entry
  */
 exports.storeEntryById = (req, res) => {
-	console.log(req.params.id + ", " + req.body.direction + ", " + req.body.entry_date);
+  console.log(`${req.params.id}, ${req.body.direction}, ${req.body.entry_date}`);
 
-	TimeEntry.findById(req.params.id, (err, timeentry) => {
-		console.log(err);
-		if (err) {
-			res.send(500, 'Error while reading Time Entry: ' + err);
-		} else {
-			timeentry.direction = req.body.direction;
-			timeentry.entry_date = moment(req.body.entry_date);
-			timeentry.last_changed = new Date();
+  TimeEntry.findById(req.params.id, (err, timeentry) => {
+    console.log(err);
+    if (err) {
+      res.send(500, `Error while reading Time Entry: ${err}`);
+    } else {
+      timeentry.direction = req.body.direction;
+      timeentry.entry_date = moment(req.body.entry_date);
+      timeentry.last_changed = new Date();
 
-			console.log(timeentry);
+      console.log(timeentry);
 
-			timeentry.save(err => {
-				if (err) {
-					res.send(500, 'Error while saving Time Entry: ' + err);
-				} else {
-					res.send(timeentry);
-				}
-			});
-		}
-	});
-
-}
+      timeentry.save((err) => {
+        if (err) {
+          res.send(500, `Error while saving Time Entry: ${err}`);
+        } else {
+          res.send(timeentry);
+        }
+      });
+    }
+  });
+};
 
 /*
  * Reads the busy time of all entries for a given day
@@ -179,17 +173,17 @@ exports.storeEntryById = (req, res) => {
  * curl -X GET http://localhost:30000/entries?busy=1393455600000
  */
 function getBusyTime(date, res) {
-	var dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
+  const dt = util.stripdownToDateBerlin(moment.unix(date / 1000));
 
-	util.getBusytimeByDate(dt, (err, d, busytime) => {		
-		if (err) {
-			res.status(500).send(err.toString());
-			//res.send(500, err.toString());
-		} else {
-			var duration = '' + moment.duration(busytime)._milliseconds;
-			res.send({ duration: duration });
-		}
-	});
+  util.getBusytimeByDate(dt, (err, d, busytime) => {
+    if (err) {
+      res.status(500).send(err.toString());
+      // res.send(500, err.toString());
+    } else {
+      const duration = `${moment.duration(busytime)._milliseconds}`;
+      res.send({ duration });
+    }
+  });
 }
 
 /*
@@ -199,20 +193,20 @@ function getBusyTime(date, res) {
     latitude: '49.51429653451733',
     longitude: '10.87531216443598',
     timestamp: '1401728167.886038',
-    trigger: 'exit' 
+    trigger: 'exit'
  }
- { 
+ {
     device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
     id: 'Work',
     latitude: '49.51429653451733',
     longitude: '10.87531216443598',
     timestamp: '1401729237.592610',
-    trigger: 'enter' 
+    trigger: 'enter'
  }
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geofence
 
-Work: 
+Work:
 { device: '4AB9FC83-510B-4FFD-9EBE-5051E4F5EA57',
   device_model: 'iPhone7,2',
   device_type: 'iOS',
@@ -220,64 +214,64 @@ Work:
   latitude: '49.448335',
   longitude: '11.091801',
   timestamp: '1477582315.800965',
-  trigger: 'exit‘ 
-}  
+  trigger: 'exit‘
+}
  */
 exports.geofence = (req, res) => {
-	console.log(JSON.stringify(req.body));
-	var direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
-	if (req.body.id == 'Work') {
-		util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, (err, timeentry) => {
-			if (err) {
-				res.send(500, 'Error while creating new  Time Entry: ' + err.message);
-			} else {
-				res.send(timeentry);
-			}
-		});
-	} else {
-		res.send({
-			message: "nothing to be entered"
-		});
-	}
-}
+  console.log(JSON.stringify(req.body));
+  const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
+  if (req.body.id == 'Work') {
+    util.createTimeEntry(direction, moment(), req.body.longitude, req.body.latitude, (err, timeentry) => {
+      if (err) {
+        res.send(500, `Error while creating new  Time Entry: ${err.message}`);
+      } else {
+        res.send(timeentry);
+      }
+    });
+  } else {
+    res.send({
+      message: 'nothing to be entered',
+    });
+  }
+};
 
 /**
- * Is supposed to receives a location object 
+ * Is supposed to receives a location object
  * BackgroundGeolocationResponse
 
 Param	Type	Details
-locationId	number	
+locationId	number
 ID of location as stored in DB (or null)
-serviceProvider	string	
+serviceProvider	string
 Service provider
-debug	boolean	
+debug	boolean
 true if location recorded as part of debug
-time	number	
+time	number
 UTC time of this fix, in milliseconds since January 1, 1970.
-latitude	number	
+latitude	number
 latitude, in degrees.
-longitude	number	
+longitude	number
 longitude, in degrees.
-accuracy	number	
+accuracy	number
 estimated accuracy of this location, in meters.
-speed	number	
+speed	number
 speed if it is available, in meters/second over ground.
-altitude	number	
+altitude	number
 altitude if available, in meters above the WGS 84 reference ellipsoid.
-altitudeAccuracy	number	
+altitudeAccuracy	number
 accuracy of the altitude if available.
-bearing	number	
+bearing	number
 bearing, in degrees.
-coords	Coordinates	
+coords	Coordinates
 A Coordinates object defining the current location
-timestamp	number	
+timestamp	number
 A timestamp representing the time at which the location was retrieved.
 
 curl -X POST -H "Content-Type: application/json" -d '{"locationId": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geolocation
  */
 exports.backgroundGeolocation = (req, res) => {
-	console.log(JSON.stringify(req.body));	
-	res.send({
-		message: "I was just logging..."
-	});
-}
+  console.log(JSON.stringify(req.body));
+  res.send({
+    message: 'I was just logging...',
+  });
+};
