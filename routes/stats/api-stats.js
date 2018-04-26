@@ -1,4 +1,4 @@
-var util = require('./util-stats')
+const util = require('./util-stats');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -8,8 +8,8 @@ var util = require('./util-stats')
 exports.calcStats = (req, res) => {
   util.calcStats()
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
-}
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+};
 
 /**
  * returns the aggregated statistics for a given time day
@@ -18,13 +18,13 @@ exports.calcStats = (req, res) => {
  *  curl -X GET http://localhost:30000/api/stats/1391295600000?timeUnit=month
  */
 exports.getStats = (req, res) => {
-  var timeUnit = req.query.timeUnit;
-  var dtStart = req.params.date;
+  const timeUnit = req.query.timeUnit;
+  const dtStart = req.params.date;
 
   util.getStats(timeUnit, dtStart)
     .then(timeentries => res.status(200).send(timeentries))
-    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
-}
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+};
 
 /**
  * deletes all StatsDay-items from database. This should only be used during development time
@@ -35,10 +35,10 @@ exports.getStats = (req, res) => {
 exports.deleteAllStatsDays = (req, res) => {
   util.deleteAllStatsDays()
     .then(result => res.status(200).send(result))
-    .catch(err => res.status(500).send('Error while deleting Time Entries: ' + req.params.id + ' ' + err))
-}
+    .catch(err => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`));
+};
 
-/** 
+/**
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=day
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=week
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=month
@@ -47,5 +47,5 @@ exports.deleteAllStatsDays = (req, res) => {
 exports.getStatsByTimeBox = (req, res) => {
   util.findById(req.params.id)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send('Error while reading Time Entry: ' + req.params.id + ' ' + err))
-}
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+};
