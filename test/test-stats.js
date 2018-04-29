@@ -21,14 +21,14 @@ const DEFAULT_DATE = moment('1967-03-16');
 /** ************************************************************ */
 /** ************************************************************ */
 
-describe('test util.getFirstTimeEntry/getLastTimeEntry - Promise', () => {
+describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry - Promise', () => {
   let db;
   before(() => {
     db = require('../db/db');
   });
 
   it('getFirstTimeEntry', async () => {
-    await util
+    await utilTimeEntry
       .getFirstTimeEntry()
       .then((result) => {
         expect(result).to.have.property('_id');
@@ -40,7 +40,7 @@ describe('test util.getFirstTimeEntry/getLastTimeEntry - Promise', () => {
   });
 
   it('getLastTimeEntry', async () => {
-    await util
+    await utilTimeEntry
       .getLastTimeEntry()
       .then((result) => {
         expect(result).to.have.property('_id');
@@ -56,14 +56,14 @@ describe('test util.getFirstTimeEntry/getLastTimeEntry - Promise', () => {
   });
 });
 
-describe('test util.removeDoublets - Promise', () => {
+describe('utilTimeEntry util.removeDoublets - Promise', () => {
   let db;
   before(() => {
     db = require('../db/db');
   });
 
   it('test for doubletts (should be no in)', async () => {
-    await util
+    await utilTimeEntry
       .removeDoublets()
       .then((result) => {
         // console.log(result)
@@ -78,7 +78,7 @@ describe('test util.removeDoublets - Promise', () => {
   it('add a doublette and check if one has been removed', async () => {
     await createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE })
       .then(result => createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE }))
-      .then(result => util.removeDoublets())
+      .then(result => utilTimeEntry.removeDoublets())
       .then((result) => {
         expect(result).to.have.property('removed');
         expect(result.removed).to.equal(0);
