@@ -262,6 +262,66 @@ exports.getLastTimeEntryByDate = (dt) => {
   });
 };
 
+exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
+  TimeEntry.aggregate([{
+    $group: {
+      _id: 0,
+      age: {
+        $min: '$entry_date',
+      },
+    },
+  }])
+    .then((timeentries) => {
+      resolve(timeentries[0]);
+    })
+    .catch(err => reject(new Error(`${'Unable to read first Time Entry: ' + ' ('}${err.message})`)));
+});
+
+exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
+  TimeEntry.aggregate([{
+    $group: {
+      _id: 0,
+      age: {
+        $max: '$entry_date',
+      },
+    },
+  }])
+    .then((timeentries) => {
+      resolve(timeentries[0]);
+    })
+    .catch(err => reject(new Error(`${'Unable to read last Time Entry: ' + ' ('}${err.message})`)));
+});
+
+exports.removeDoublets = () => {
+  let lastTimeentry;
+  let count = 0;
+
+  return new Promise((resolve, reject) => {
+    TimeEntry.find().sort({
+      entry_date: 1,
+    })
+      .then((timeEntries) => {
+        timeEntries.forEach((timeentry) => {
+          if (lastTimeentry !== undefined) {
+            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
+                timeentry.direction == lastTimeentry.direction) {
+              timeentry.remove();
+              count++;
+              console.log(`removing timeentry ${timeentry}`);
+            } else {
+              lastTimeentry = timeentry;
+            }
+          } else {
+            lastTimeentry = timeentry;
+          }
+        });
+      });
+    console.log(`${count} doublets removed`);
+    resolve({ removed: count });
+  })
+    .catch(err => reject(err));
+};
+
 exports.getAll = () => new Promise((resolve, reject) => {
   TimeEntry.find()
     .then(timeentries => resolve(timeentries))
