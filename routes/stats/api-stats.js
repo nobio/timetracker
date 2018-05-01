@@ -8,7 +8,7 @@ const util = require('./util-stats');
 exports.calcStats = (req, res) => {
   util.calcStats()
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${err}`));
 };
 
 /**

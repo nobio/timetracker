@@ -7,7 +7,7 @@
         "start": "node server",
         "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
         "test-mon": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
-        "start-mon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
+        "nodemon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint"
     },

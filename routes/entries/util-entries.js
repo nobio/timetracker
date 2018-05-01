@@ -7,6 +7,7 @@ require('../../db/db');
 
 const moment = require('moment');
 const mongoose = require('mongoose');
+
 const TimeEntry = mongoose.model('TimeEntry');
 
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
@@ -185,7 +186,16 @@ exports.getAllByDate = (date) => {
         $lt: dtEnd,
       },
     }).skip(0).sort({ entry_date: 1 })
-      .then(timeentries => resolve(timeentries))
+      .then((timeentries) => {
+        if (timeentries.length === 0) {
+          // /reject(new Error(`Es gibt keine Einträge für diesen Tag (${date.format('DD.MM.YYYY')})`), 1);
+          resolve([]);
+        } else if (timeentries.length % 2 !== 0) {
+          reject(new Error(`Bitte die Einträge für diesen Tag (${date.format('DD.MM.YYYY')}) vervollständigen`), 0);
+        } else {
+          resolve(timeentries);
+        }
+      })
       .catch(err => reject(new Error(`Unable to read Time Entry for given date : ${date} (${err.message})`)));
   });
 };
@@ -196,8 +206,10 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.getBusyTime = timeentries => new Promise((resolve, reject) => {
+  console.log(timeentries);
   if (timeentries.length === 0) {
-    reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
+    // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
+    resolve([]);
   } else if (timeentries.length % 2 !== 0) {
     reject(new Error(`Bitte die Einträge für diesen Tag (${dt.format('DD.MM.YYYY')}) vervollständigen`), 0);
   } else {

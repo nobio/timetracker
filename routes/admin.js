@@ -82,39 +82,41 @@ exports.calcStats = (req, res) => {
                 // update the StatsDay entry for this day
                 // console.log('busy time at ' + d.format('YYYY-MM-DD') + ': ' + moment.duration(busytime).hours() + ':' + moment.duration(busytime).minutes());
 
-                StatsDay.findOneAndUpdate({
-                  date: d,
-                }, {
+                StatsDay.findOneAndUpdate(
+                  {
+                    date: d,
+                  }, {
                   //                    date: d,
-                  actual_working_time: busytime / 1,
-                  planned_working_time: DEFAULT_WORKING_TIME,
-                  is_working_day: true,
-                  is_complete: true,
-                  last_changed: new Date(),
-                }, {
-                  new: true,
-                },
-                (err, statsday) => {
-                  if (err) {
+                    actual_working_time: busytime / 1,
+                    planned_working_time: DEFAULT_WORKING_TIME,
+                    is_working_day: true,
+                    is_complete: true,
+                    last_changed: new Date(),
+                  }, {
+                    new: true,
+                  },
+                  (err, statsday) => {
+                    if (err) {
                     // console.log(err);
-                  } else {
+                    } else {
                     // console.log('successfully updated record for day ' + moment(d).format('YYYY-MM-DD') + ' ' + statsday);
-                    if (statsday == null) {
-                      new StatsDay({
-                        date: d,
-                        actual_working_time: busytime / 1,
-                        planned_working_time: DEFAULT_WORKING_TIME,
-                        is_working_day: true,
-                        is_complete: true,
-                        last_changed: new Date(),
-                      }).save((err) => {
-                        if (err) {
-                          console.log(err);
-                        }
-                      });
+                      if (statsday == null) {
+                        new StatsDay({
+                          date: d,
+                          actual_working_time: busytime / 1,
+                          planned_working_time: DEFAULT_WORKING_TIME,
+                          is_working_day: true,
+                          is_complete: true,
+                          last_changed: new Date(),
+                        }).save((err) => {
+                          if (err) {
+                            console.log(err);
+                          }
+                        });
+                      }
                     }
-                  }
-                });
+                  },
+                );
               }
             });
 
