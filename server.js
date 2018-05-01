@@ -76,7 +76,7 @@ app.get('/stats/:date', admin.getStatsDay);
 app.delete('/stats', admin.deleteAllStatsDays);
 app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 
-app.put('/api/stats', apiStats.calcStats); // under construction
+app.put('/api/stats', apiStats.calcStats); // done
 app.get('/api/stats/:date', apiStats.getStats); // done
 app.delete('/api/stats', apiStats.deleteAllStatsDays); // done
 app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // not started yet
