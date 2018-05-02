@@ -9,15 +9,9 @@ const moment = require('moment');
 const DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
-/*
-exports.calcStats
-    removeDoulets (ok)
-        deleteAllStatsDays (ok)
-            getFirstTimeEntry (ok)
-                getLastTimeEntry (ok)
-                    getBusyTimeByDate
-                        getAllByDate
-*/
+/**
+ * Orchestrate the calculation of statistics
+ */
 exports.calcStats = () => {
   let firstEntry;
   let deletedDoublets;
@@ -39,6 +33,13 @@ exports.calcStats = () => {
   });
 };
 
+/**
+ * This is the real calculation of statistice. The method searches the first entry point and
+ * iterates day by day until the last time entry and calculates for each day the statistics
+ * 
+ * @param {*} firstEntry the first entry in database
+ * @param {*} lastEntry  the last entry in database
+ */
 exports.calculateStatistics = (firstEntry, lastEntry) =>
   new Promise((resolve, reject) => {
     // let date = moment(firstEntry.age);
@@ -93,6 +94,14 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
     });
   });
 
+/**
+ * Calculates the time of "busyness" for the given day; 
+ * must start with an 'enter' and must end with a 'go'. If only two entries (enter-go) a default value (midday break)
+ * will be added (DEFAULT_BREAK_TIME);
+ * if there are enter-go-enter-go(-enter-go....enter-go) entries the time span between two enter and go will be calculated and added.
+ * 
+ * @param {*} dt calculate the busytime for given date 
+ */
 exports.getBusytimeByDate = dt =>
   new Promise((resolve, reject) => {
     // console.log(`getBusytimeByDate: ${dt}`);
@@ -128,6 +137,9 @@ exports.getBusytimeByDate = dt =>
       .catch(err => reject(err));
   });
 
+/**
+ * clears the MongoDB collection for statistics
+ */
 exports.deleteAllStatsDays = () =>
   new Promise((resolve, reject) => {
     let size;
@@ -189,8 +201,11 @@ exports.getStats = (timeUnit, dtStart) => {
   });
 };
 
-/*
+/**
  * returns the aggregated statistics for a given time range defined by start and end
+ * 
+ * @param {*} dtStart 
+ * @param {*} dtEnd 
  */
 exports.getStatsByRange = (dtStart, dtEnd) =>
   // console.log(dtStart);
