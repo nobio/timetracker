@@ -36,7 +36,7 @@ exports.calcStats = () => {
 /**
  * This is the real calculation of statistice. The method searches the first entry point and
  * iterates day by day until the last time entry and calculates for each day the statistics
- * 
+ *
  * @param {*} firstEntry the first entry in database
  * @param {*} lastEntry  the last entry in database
  */
@@ -95,12 +95,12 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
   });
 
 /**
- * Calculates the time of "busyness" for the given day; 
+ * Calculates the time of "busyness" for the given day;
  * must start with an 'enter' and must end with a 'go'. If only two entries (enter-go) a default value (midday break)
  * will be added (DEFAULT_BREAK_TIME);
  * if there are enter-go-enter-go(-enter-go....enter-go) entries the time span between two enter and go will be calculated and added.
- * 
- * @param {*} dt calculate the busytime for given date 
+ *
+ * @param {*} dt calculate the busytime for given date
  */
 exports.getBusytimeByDate = dt =>
   new Promise((resolve, reject) => {
@@ -203,9 +203,9 @@ exports.getStats = (timeUnit, dtStart) => {
 
 /**
  * returns the aggregated statistics for a given time range defined by start and end
- * 
- * @param {*} dtStart 
- * @param {*} dtEnd 
+ *
+ * @param {*} dtStart
+ * @param {*} dtEnd
  */
 exports.getStatsByRange = (dtStart, dtEnd) =>
   // console.log(dtStart);
@@ -275,3 +275,8 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
         });
       });
   });
+
+exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
+  resolve({'status':timeUnit})
+});
+

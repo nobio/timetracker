@@ -39,13 +39,13 @@ exports.deleteAllStatsDays = (req, res) => {
 };
 
 /**
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=day
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=week
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=month
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=day
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=week
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=month
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
-  util.findById(req.params.id)
+  util.getStatsByTimeBox(req.query.timeUnit)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+    .catch(err => res.status(500).send(`Error while reading statistics: ${req.params.id} ${err}`));
 };

@@ -79,7 +79,7 @@ app.get('/statistics/aggregate', admin.getStatsByTimeBox);
 app.put('/api/stats', apiStats.calcStats); // done
 app.get('/api/stats/:date', apiStats.getStats); // done
 app.delete('/api/stats', apiStats.deleteAllStatsDays); // done
-app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // not started yet
+app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // under construction
 
 // maintain stuff
 app.get('/ping', experimental.ping);
