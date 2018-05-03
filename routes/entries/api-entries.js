@@ -10,7 +10,7 @@ const util = require('./util-entries');
 exports.getEntryById = (req, res) => {
   util.findById(req.params.id)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
 };
 
 /** ******************************************************************************
@@ -39,11 +39,11 @@ exports.getEntries = (req, res) => {
     util.getAllByDate(filterByBusy)
       .then(util.calculateBusyTime)
       .then(busytime => res.status(200).send({ duration: busytime }))
-      .catch(err => res.status(500).send(err));
+      .catch(err => res.status(500).send(err.message));
   } else {
     util.getAll()
       .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+      .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
   }
 };
 
@@ -71,7 +71,7 @@ exports.createEntry = (req, res) => {
 
   util.create(timeEntry)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err}`));
+    .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
 };
 
 /** ******************************************************************************
@@ -93,7 +93,7 @@ exports.saveEntry = (req, res) => {
 
   util.update(timeEntry)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while saving Time Entry: ${id} ${err}`));
+    .catch(err => res.status(500).send(`Error while saving Time Entry: ${id} ${err.message}`));
 };
 
 /** ******************************************************************************
@@ -112,5 +112,5 @@ exports.deleteEntry = (req, res) => {
         res.status(200).send(timeentry);
       }
     })
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err}`));
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err.message}`));
 };
