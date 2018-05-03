@@ -187,14 +187,18 @@ exports.getAllByDate = (date) => {
       },
     }).skip(0).sort({ entry_date: 1 })
       .then((timeentries) => {
+        /*
         if (timeentries.length === 0) {
           // /reject(new Error(`Es gibt keine Einträge für diesen Tag (${date.format('DD.MM.YYYY')})`), 1);
           resolve([]);
         } else if (timeentries.length % 2 !== 0) {
-          reject(new Error(`Bitte die Einträge für diesen Tag (${date.format('DD.MM.YYYY')}) vervollständigen`), 0);
+          // reject(new Error(`Bitte die Einträge für diesen Tag (${date.format('DD.MM.YYYY')}) vervollständigen`), 0);
+          resolve(timeentries);
         } else {
           resolve(timeentries);
         }
+        */
+        resolve(timeentries);
       })
       .catch(err => reject(new Error(`Unable to read Time Entry for given date : ${date} (${err.message})`)));
   });
@@ -205,13 +209,13 @@ exports.getAllByDate = (date) => {
  * @param list of time entry objects (usually 2) from getAllByDate method
  * @returns Promise
  */
-exports.getBusyTime = timeentries => new Promise((resolve, reject) => {
+exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
   console.log(timeentries);
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
   } else if (timeentries.length % 2 !== 0) {
-    reject(new Error(`Bitte die Einträge für diesen Tag (${dt.format('DD.MM.YYYY')}) vervollständigen`), 0);
+    reject(new Error('Bitte die Einträge für vervollständigen'), 0);
   } else {
     let busytime = 0;
     for (let n = timeentries.length - 1; n > 0; n -= 2) {
