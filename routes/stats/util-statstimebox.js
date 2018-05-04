@@ -98,7 +98,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
         x: moment(lastTimeUnit).format('YYYY-MM-DD'),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
-      console.log(JSON.stringify(data[idx]) + " " + stat.date)
+      
       // reset to next week
       lastTimeUnit = actualTimeUnit;
       time_unit_stats = [];

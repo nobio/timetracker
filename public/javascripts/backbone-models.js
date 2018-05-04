@@ -17,11 +17,11 @@ TimeEntries = Backbone.Collection.extend({
 });
 
 Statistics = Backbone.Model.extend({
-    urlRoot: '/stats',
+    urlRoot: '/api/stats',
 });
 
 StatisticsAggregated = Backbone.Model.extend({
-    urlRoot: '/statistics/aggregate',
+    urlRoot: '/api/statistics/aggregate',
 });
 
 Duration = Backbone.Model.extend({

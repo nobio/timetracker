@@ -71,11 +71,6 @@ app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);
 app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
 
 // statistics stuff
-app.put('/stats', admin.calcStats);
-app.get('/stats/:date', admin.getStatsDay);
-app.delete('/stats', admin.deleteAllStatsDays);
-app.get('/statistics/aggregate', admin.getStatsByTimeBox);
-
 app.put('/api/stats', apiStats.calcStats); // done
 app.get('/api/stats/:date', apiStats.getStats); // done
 app.delete('/api/stats', apiStats.deleteAllStatsDays); // done
