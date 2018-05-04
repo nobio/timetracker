@@ -1,4 +1,5 @@
 const util = require('./util-stats');
+const utilTimebox = require('./util-statstimebox');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -39,13 +40,36 @@ exports.deleteAllStatsDays = (req, res) => {
 };
 
 /**
- * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=day
- * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=week
- * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=month
- * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=weekday
+ * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=day
+ * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=week
+ * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=month
+ * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
-  util.getStatsByTimeBox(req.query.timeUnit)
-    .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading statistics: ${req.params.id} ${err}`));
+  const timeUnit = req.param('timeUnit');
+
+  utilTimebox.getStatsByTimeBox(timeUnit)
+    .then((timeboxedStatistics) => {
+      const chart_data = {
+        xScale: ((timeUnit === 'day' || timeUnit === 'week') ? 'time' : 'ordinal'),
+        yScale: 'linear',
+        yMin: '5',
+        type: ((timeUnit === 'day' || timeUnit === 'week') ? 'line' : 'bar'),
+        main: [{
+          data: timeboxedStatistics.inner_data,
+        }],
+        comp: [{
+          type: 'line',
+          data: timeboxedStatistics.inner_comp,
+        }],
+      };
+
+      res.send({
+        actual_working_time: timeboxedStatistics.actual_working_time,
+        planned_working_time: timeboxedStatistics.planned_working_time,
+        average_working_time: timeboxedStatistics.average_working_time,
+        chart_data,
+      });
+    })
+    .catch(err => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`));
 };

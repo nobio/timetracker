@@ -30,24 +30,15 @@ function renderOneData(data, weekday) {
   return {
     x: weekday,
     y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-  /*
-          working_time: avg,
-          working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-          date: weekday,
-          variance: 0,
-          variance_rounded: 0.0
-          */
   };
 }
 
-exports.getStatsByTimeBox = (timeUnit, callback) => {
+exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
   let data;
 
-  StatsDay.find().sort({
-    date: 1,
-  }).exec((err, stats) => {
+  StatsDay.find().sort({ date: 1 }).exec((err, stats) => {
     if (err) {
-      callback(err);
+      reject(err);
     } else {
       if (timeUnit === 'month') {
         data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
@@ -60,10 +51,10 @@ exports.getStatsByTimeBox = (timeUnit, callback) => {
       } else if (timeUnit === 'weekday') {
         data = getStatsByTimeBoxTimeWeekDay(stats);
       } else {
-        callback(new Error(`time unit '${timeUnit}' is invalid`));
+        reject(new Error(`time unit '${timeUnit}' is invalid`));
       }
 
-      callback(null, {
+      resolve({
         actual_working_time: 0,
         planned_working_time: 0,
         average_working_time: 1,
@@ -72,16 +63,21 @@ exports.getStatsByTimeBox = (timeUnit, callback) => {
       });
     }
   });
-};
+});
 
 
+/**
+ * calculates the timeboxed stats for a time unit given by a format
+ * @param {*} stats
+ * @param {*} timeUnitFormatString 'gggg-MM', 'ggg-ww', 'gggg'
+ */
 function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
-  console.log(stats);
+
   const data = [{
     0: 0,
   }];
   let time_unit_stats = [];
-  console.log(time_unit_stats.reduce(add, 0));
+  //console.log(time_unit_stats.reduce(add, 0));
 
   let lastTimeUnit;
   let actualTimeUnit;
@@ -89,9 +85,6 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
   stats.forEach((stat) => {
     actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
     if (lastTimeUnit != actualTimeUnit) {
-      // calculate statistics of last week
-      //            var sum = time_unit_stats.reduce((a, b) => a + b, 0); // reduce funciton; but not with version 0.10.5. It comes later...
-      //            var sum = time_unit_stats.reduce(function(a, b) {return a + b;}, 0); // reduce function
       const sum = time_unit_stats.reduce(add, 0); // reduce function
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
@@ -100,13 +93,8 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
         x: moment(stat.date).format('YYYY-MM-DD'),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
-      /*
-                ,working_time: avg
-                ,working_time_rounded_hours: Math.round(avg / 60 / 60 / 1000 * 100) / 100 //rounding 2 digits after comma
-                ,date: stat.date
-                ,variance: variance
-                ,variance_rounded: Math.round(variance / 60 / 60 / 1000 * 100) / 100
-*/ // reset to next week
+
+      // reset to next week
       lastTimeUnit = actualTimeUnit;
       time_unit_stats = [];
       idx++;
@@ -116,6 +104,10 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
   return data;
 }
 
+/**
+ * calculates the timeboxed value for day
+ * @param {*} stats
+ */
 function getStatsByTimeBoxDay(stats) {
   const data = [{
     0: 0,
@@ -126,19 +118,16 @@ function getStatsByTimeBoxDay(stats) {
     data[idx] = {
       x: moment(stat.date).format('YYYY-MM-DD'),
       y: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-      /*
-       working_time: stat.actual_working_time,
-       working_time_rounded_hours: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, //rounding 2 digits after comma
-       date: stat.date,
-       variance: 0,
-       variance_rounded: 0.00
-       */
     };
     idx++;
   });
   return data;
 }
 
+/**
+ * calculates the timboxed stats by week day
+ * @param {*} stats
+ */
 function getStatsByTimeBoxTimeWeekDay(stats) {
   const data = [{
     0: 0,
@@ -188,5 +177,6 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
   data[4] = renderOneData(time_data.Fr, 'Fr');
   data[5] = renderOneData(time_data.Sa, 'Sa');
   data[6] = renderOneData(time_data.Su, 'Su');
+
   return data;
 }

@@ -1,7 +1,6 @@
 require('../../db/db');
 
 const utilEntry = require('../entries/util-entries');
-const utilTimebox = require('./util-statstimebox');
 const mongoose = require('mongoose');
 
 const StatsDay = mongoose.model('StatsDay');
@@ -101,40 +100,39 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
  *
  * @param {*} dt calculate the busytime for given date
  */
-exports.getBusytimeByDate = dt =>
-  new Promise((resolve, reject) => {
-    // console.log(`getBusytimeByDate: ${dt}`);
-    // first get all entries for this day....
-    utilEntry
-      .getAllByDate(dt)
-      .then((timeentries) => {
-        let busytime = 0;
-        for (let n = timeentries.length - 1; n > 0; n -= 2) {
-          // this must be a go-event
-          if (timeentries[n].direction !== 'go') {
-            reject(
-              new Error(`Die Reihenfolge der Kommen/Gehen-Einträge am ${dt.format('DD.MM.YYYY')} scheint nicht zu stimmen.`),
-              0,
-            );
-            return;
-          }
-
-          const end = timeentries[n].entry_date;
-          const start = timeentries[n - 1].entry_date;
-
-          busytime += end - start;
-          // console.log(`${dt}: ${start} -> ${end}    = ${busytime} (${busytime / 1000 / 60 / 60})`);
+exports.getBusytimeByDate = dt => new Promise((resolve, reject) => {
+  // console.log(`getBusytimeByDate: ${dt}`);
+  // first get all entries for this day....
+  utilEntry
+    .getAllByDate(dt)
+    .then((timeentries) => {
+      let busytime = 0;
+      for (let n = timeentries.length - 1; n > 0; n -= 2) {
+        // this must be a go-event
+        if (timeentries[n].direction !== 'go') {
+          reject(
+            new Error(`Die Reihenfolge der Kommen/Gehen-Einträge am ${dt.format('DD.MM.YYYY')} scheint nicht zu stimmen.`),
+            0,
+          );
+          return;
         }
-        // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
-        if (timeentries.length === 2) {
-          busytime -= DEFAULT_BREAK_TIME;
-        }
-        // console.log(`${dt} => ${busytime} ${busytime / 1000 / 60 / 60}`);
 
-        resolve({ busytime });
-      })
-      .catch(err => reject(err));
-  });
+        const end = timeentries[n].entry_date;
+        const start = timeentries[n - 1].entry_date;
+
+        busytime += end - start;
+        // console.log(`${dt}: ${start} -> ${end}    = ${busytime} (${busytime / 1000 / 60 / 60})`);
+      }
+      // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
+      if (timeentries.length === 2) {
+        busytime -= DEFAULT_BREAK_TIME;
+      }
+      // console.log(`${dt} => ${busytime} ${busytime / 1000 / 60 / 60}`);
+
+      resolve({ busytime });
+    })
+    .catch(err => reject(err));
+});
 
 /**
  * clears the MongoDB collection for statistics
@@ -266,33 +264,3 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
         });
       });
   });
-
-exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
-  const timeUnit = req.param('timeUnit');
-  utilTimebox.getStatsByTimeBox(timeUnit, (err, timeboxedStatistics) => {
-    if (err) {
-      reject(err);
-    } else {
-      const chart_data = {
-        xScale: ((timeUnit === 'day' || timeUnit === 'week') ? 'time' : 'ordinal'),
-        yScale: 'linear',
-        yMin: '5',
-        type: ((timeUnit === 'day' || timeUnit === 'week') ? 'line' : 'bar'),
-        main: [{
-          data: timeboxedStatistics.inner_data,
-        }],
-        comp: [{
-          type: 'line',
-          data: timeboxedStatistics.inner_comp,
-        }],
-      };
-
-      resolve({
-        actual_working_time: timeboxedStatistics.actual_working_time,
-        planned_working_time: timeboxedStatistics.planned_working_time,
-        average_working_time: timeboxedStatistics.average_working_time,
-        chart_data,
-      });
-    }
-  });
-});
