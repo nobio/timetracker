@@ -1,6 +1,7 @@
 require('../../db/db');
 
 const utilEntry = require('../entries/util-entries');
+const utilTimebox = require('./util-statstimebox');
 const mongoose = require('mongoose');
 
 const StatsDay = mongoose.model('StatsDay');
@@ -51,20 +52,18 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
       this.getBusytimeByDate(dt)
         .then((busytime) => {
           StatsDay.findOneAndUpdate(
-            { date: dt },
-            {
+            { date: dt }, {
               actual_working_time: busytime.busytime / 1,
               planned_working_time: DEFAULT_WORKING_TIME,
               is_working_day: true,
               is_complete: true,
               last_changed: new Date(),
-            },
-            { new: true },
+            }, { new: true },
             (err, statsday) => {
               if (err) {
                 console.err(err);
               } else {
-                // console.log('successfully updated record for day ' + moment(dt).format('YYYY-MM-DD') + ' ' + statsday);
+              // console.log('successfully updated record for day ' + moment(dt).format('YYYY-MM-DD') + ' ' + statsday);
                 if (statsday == null) {
                   new StatsDay({
                     date: dt,
@@ -179,17 +178,13 @@ exports.getStats = (timeUnit, dtStart) => {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
         yScale: 'linear',
         type: timeUnit === 'day' ? 'bar' : 'line-dotted',
-        main: [
-          {
-            data: calculatedBusyTime.inner_data,
-          },
-        ],
-        comp: [
-          {
-            type: 'line',
-            data: calculatedBusyTime.inner_comp,
-          },
-        ],
+        main: [{
+          data: calculatedBusyTime.inner_data,
+        }],
+        comp: [{
+          type: 'line',
+          data: calculatedBusyTime.inner_comp,
+        }],
       };
       resolve({
         actual_working_time: calculatedBusyTime.actual_working_time,
@@ -226,16 +221,12 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
           reject(err);
           return;
         }
-        const innerData = [
-          {
-            0: 0,
-          },
-        ];
-        const innerComp = [
-          {
-            0: 0,
-          },
-        ];
+        const innerData = [{
+          0: 0,
+        }];
+        const innerComp = [{
+          0: 0,
+        }];
         let idx = 0;
         let actual_working_time = -1;
         let planned_working_time = -1;
@@ -277,6 +268,31 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
   });
 
 exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
-  resolve({'status':timeUnit})
-});
+  const timeUnit = req.param('timeUnit');
+  utilTimebox.getStatsByTimeBox(timeUnit, (err, timeboxedStatistics) => {
+    if (err) {
+      reject(err);
+    } else {
+      const chart_data = {
+        xScale: ((timeUnit === 'day' || timeUnit === 'week') ? 'time' : 'ordinal'),
+        yScale: 'linear',
+        yMin: '5',
+        type: ((timeUnit === 'day' || timeUnit === 'week') ? 'line' : 'bar'),
+        main: [{
+          data: timeboxedStatistics.inner_data,
+        }],
+        comp: [{
+          type: 'line',
+          data: timeboxedStatistics.inner_comp,
+        }],
+      };
 
+      resolve({
+        actual_working_time: timeboxedStatistics.actual_working_time,
+        planned_working_time: timeboxedStatistics.planned_working_time,
+        average_working_time: timeboxedStatistics.average_working_time,
+        chart_data,
+      });
+    }
+  });
+});
