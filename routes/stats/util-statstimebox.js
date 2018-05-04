@@ -40,6 +40,7 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
     if (err) {
       reject(err);
     } else {
+
       if (timeUnit === 'month') {
         data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
       } else if (timeUnit === 'week') {
@@ -79,21 +80,25 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
   let time_unit_stats = [];
   //console.log(time_unit_stats.reduce(add, 0));
 
-  let lastTimeUnit;
+  let lastTimeUnit = moment(stats[0].date).format(timeUnitFormatString);
   let actualTimeUnit;
   let idx = 0;
+  let lastHash = stats[stats.length - 1]._id;
+
   stats.forEach((stat) => {
     actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
-    if (lastTimeUnit != actualTimeUnit) {
+    //console.log(actualTimeUnit)
+
+    if (lastTimeUnit != actualTimeUnit || lastHash === stat._id) {
       const sum = time_unit_stats.reduce(add, 0); // reduce function
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
       // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD'));
       data[idx] = {
-        x: moment(stat.date).format('YYYY-MM-DD'),
+        x: moment(lastTimeUnit).format('YYYY-MM-DD'),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
-
+      console.log(JSON.stringify(data[idx]) + " " + stat.date)
       // reset to next week
       lastTimeUnit = actualTimeUnit;
       time_unit_stats = [];
