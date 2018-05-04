@@ -210,7 +210,7 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
-  console.log(timeentries);
+  //console.log(timeentries);
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
