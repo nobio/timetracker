@@ -46,7 +46,7 @@ exports.deleteAllStatsDays = (req, res) => {
  * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
-  const timeUnit = req.param('timeUnit');
+  const timeUnit = req.query.timeUnit;
 
   utilTimebox.getStatsByTimeBox(timeUnit)
     .then((timeboxedStatistics) => {
