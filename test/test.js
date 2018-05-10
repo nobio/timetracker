@@ -1,5 +1,4 @@
-const util = require('../routes/util');
-const admin = require('../routes/admin');
+const utilEntries = require('../routes/entries/util-entries');
 const route = require('../routes/index');
 
 const chai = require('chai');
@@ -13,61 +12,45 @@ chai.should();
 describe('isEmpty', () => {
   let testv;
   it('should return false when the value is a string', () => {
-    testv = util.isEmpty('Test');
+    testv = utilEntries.isEmpty('Test');
     expect(testv).to.be.false;
   });
   it('should return true when the value is a numeric value', () => {
-    testv = util.isEmpty(123);
+    testv = utilEntries.isEmpty(123);
     expect(testv).to.be.true;
   });
   it('should return true when the value is a boolean value', () => {
-    testv = util.isEmpty(true);
+    testv = utilEntries.isEmpty(true);
     expect(testv).to.be.true;
-    testv = util.isEmpty(false);
+    testv = utilEntries.isEmpty(false);
     expect(testv).to.be.true;
   });
   it('should return true when the value is emtpy value', () => {
-    testv = util.isEmpty();
+    testv = utilEntries.isEmpty();
     expect(testv).to.be.true;
   });
   it('should return true when the value is undefined value', () => {
-    testv = util.isEmpty(undefined);
+    testv = utilEntries.isEmpty(undefined);
     expect(testv).to.be.true;
   });
   it('should return false when the value is an array', () => {
-    testv = util.isEmpty(['a', 'b']);
+    testv = utilEntries.isEmpty(['a', 'b']);
     expect(testv).to.be.false;
   });
 });
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
-describe('test util.getBusytimeByDate()', () => {
+describe('test utilEntries.getBusytimeByDate()', () => {
   let db;
   before(() => {
     // console.log('BEFORE')
     db = require('../db/db');
   });
-  it('response array should have length of 0', () => util.getTimeEntriesByDatePromise(-1).should.eventually.have.length(0));
-  it('response array should have length of 2', () => util.getTimeEntriesByDatePromise(1393455600000).should.eventually.have.length(2));
-  it('response array should have length of 0', () => util.getTimeEntriesByDatePromise(0).should.eventually.have.length(0));
+  it('response array should have length of 0', () => utilEntries.getAllByDate(-1).should.eventually.have.length(0));
+  it('response array should have length of 2', () => utilEntries.getAllByDate(1393455600000).should.eventually.have.length(2));
+  it('response array should have length of 0', () => utilEntries.getAllByDate(0).should.eventually.have.length(0));
 
   after(() => {
     db.closeConnection();
-  });
-});
-describe('test creation of new entry: post /entries -> util.createTimeEntry()', () => {
-  let db;
-  before(() => {
-    db = require('../db/db');
-  });
-  it('response array should have length of 0', () => util.createTimeEntry());
-
-  after(() => {
-    after(() => {
-      setTimeout(() => {
-        db.closeConnection();
-        callback();
-      }, 1000);
-    });
   });
 });

@@ -50,38 +50,22 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
       const dt = moment(date);
       this.getBusytimeByDate(dt)
         .then((busytime) => {
-          StatsDay.findOneAndUpdate(
-            { date: dt }, {
+          if (busytime && busytime.busytime != 0) {
+
+            new StatsDay({
+              date: dt,
               actual_working_time: busytime.busytime / 1,
               planned_working_time: DEFAULT_WORKING_TIME,
               is_working_day: true,
               is_complete: true,
               last_changed: new Date(),
-            }, { new: true },
-            (err, statsday) => {
+            }).save((err) => {
               if (err) {
-                console.err(err);
-              } else {
-              // console.log('successfully updated record for day ' + moment(dt).format('YYYY-MM-DD') + ' ' + statsday);
-                if (statsday == null) {
-                  new StatsDay({
-                    date: dt,
-                    actual_working_time: busytime.busytime / 1,
-                    planned_working_time: DEFAULT_WORKING_TIME,
-                    is_working_day: true,
-                    is_complete: true,
-                    last_changed: new Date(),
-                  }).save((err) => {
-                    if (err) {
-                      reject(err);
-                    }
-                  });
-                }
+                reject(err);
               }
-            },
-          );
+            });
+          }
         })
-        // .catch(err => reject(err));
         .catch(err => console.log(err));
       date = date.add('1', 'day');
       // console.log(`> ${date}`);

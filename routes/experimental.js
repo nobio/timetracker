@@ -73,3 +73,88 @@ exports.test = (req, res) => {
     });
 };
 */
+
+/*
+ * deletes all TimeEntry-items from database. This should only be used during development time
+ * and later either deleted or put behind some special user privileges
+ *
+ * curl -X DELETE http://localhost:30000/entries
+ */
+/*
+exports.deleteAllTimeEntries = (req, res) => {
+  let size;
+  TimeEntry.find((err, timeentries) => {
+    size = timeentries.length;
+    timeentries.forEach((timeentry) => {
+      console.log(timeentry);
+      timeentry.remove();
+    });
+    console.log(`deleted ${size} items`);
+    res.send({
+      size,
+    });
+  });
+};
+*/
+
+/*
+ * creates random Time Entries; supposed to be used after cleaning the TimeEntry table
+ *
+ * curl -X PUT http://localhost:30000/admin/rnd_entries
+ */
+/*
+exports.setRandomTimeEntries = (req, res) => {
+  const DAY_IN_SECS = 60 * 60 * 24;
+  const now = moment().unix();
+  const today = now - (now % DAY_IN_SECS);
+
+  console.log(today);
+
+  for (let t = today - 18 * DAY_IN_SECS; t < today + 180 * DAY_IN_SECS; t += DAY_IN_SECS) {
+    const dt = moment(t);
+    console.log(`${t}: ${dt.format('DD.MM.YYYY HH:mm:ss')}`);
+
+    const countEntries = 1 + Math.floor(Math.random() * 3);
+    console.log(`Anzahl Eiträge: ${countEntries * 2}`);
+
+    let pointer = t + 60 * 60 * 5;
+    // 5 hours offset per day
+    for (let i = 0; i < countEntries; i++) {
+      let varianz = Math.floor(Math.random() * 60 * 60 * 4);
+      // random range +/- 60 min
+      const start = pointer + varianz - 60 * 60;
+
+      varianz += Math.floor(Math.random() * 60 * 60 * 4);
+      // random range +/- 30 min
+      const end = start + varianz - 60 * 60;
+
+      console.log(`Start: ${moment(1000 * start).format('DD.MM.YYYY HH:mm:ss')} - End: ${moment(1000 * end).format('DD.MM.YYYY HH:mm:ss')}`);
+      pointer = end + 61 * 60;
+
+      new TimeEntry({
+        entry_date: moment(1000 * start),
+        direction: 'enter',
+        isWorkingDay: false,
+      }).save((err, timeentry) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      new TimeEntry({
+        entry_date: moment(1000 * end),
+        direction: 'go',
+        isWorkingDay: false,
+      }).save((err, timeentry) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
+  }
+
+  res.send({
+    now: today,
+  });
+};
+*/

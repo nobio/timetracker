@@ -10,7 +10,6 @@ const routes = require('./routes'); // -> reades ./routes/index.js
 const apiEntries = require('./routes/entries/api-entries');
 const apiAdmin = require('./routes/admin/api-admin');
 const apiStats = require('./routes/stats/api-stats');
-const admin = require('./routes/admin');
 const experimental = require('./routes/experimental');
 const http = require('http');
 const path = require('path');
@@ -61,12 +60,6 @@ app.post('/geofence', routes.geofence);
 app.post('/geolocation', routes.backgroundGeolocation);
 
 // admin stuff
-// app.delete('/entries', admin.deleteAllTimeEntries);
-// app.put('/admin/rnd_entries', admin.setRandomTimeEntries);
-app.get('/admin/maintain', admin.maintain);
-// app.post('/admin/dump/timeentry', admin.dumpTimeEntry);
-// app.post('/admin/backup/timeentry', admin.backupTimeEntry);
-
 app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);
 app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
 
@@ -74,11 +67,13 @@ app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
 app.put('/api/stats', apiStats.calcStats); // done
 app.get('/api/stats/:date', apiStats.getStats); // done
 app.delete('/api/stats', apiStats.deleteAllStatsDays); // done
-app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // under construction
+app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // done
 
 // maintain stuff
-app.get('/ping', experimental.ping);
+app.get('/ping', experimental.ping); // todo
 app.get('/experiment', experimental.experiment);
+// app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
+// app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {

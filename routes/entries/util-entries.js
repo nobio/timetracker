@@ -15,7 +15,15 @@ const DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
 /**
  * function to check wheather an object is empty or not
  */
-exports.isEmpty = obj => require('../util').isEmpty(obj);
+exports.isEmpty = obj => isEmpty(obj);
+function isEmpty(obj) {
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 /**
  * takes the date and removes all time components
@@ -27,6 +35,7 @@ exports.stripdownToDateBerlin = (date) => {
   d.second(0);
   d.minutes(0);
   d.hours(0);
+  //console.log(d.format('YYYY-MM-DD HH:mm:ss'))
   return d;
 };
 
@@ -104,11 +113,11 @@ exports.create = (timeEntry) => {
 
         // all checks successfully done, lets create the TimeEntry!
         new TimeEntry({
-            entry_date: timeEntry.datetime,
-            direction: timeEntry.direction,
-            longitude: timeEntry.longitude,
-            latitude: timeEntry.latitude,
-          }).save()
+          entry_date: timeEntry.datetime,
+          direction: timeEntry.direction,
+          longitude: timeEntry.longitude,
+          latitude: timeEntry.latitude,
+        }).save()
           .then(tEntry => resolve(tEntry))
           .catch(err => reject(err));
       })
@@ -181,11 +190,11 @@ exports.getAllByDate = (date) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-        entry_date: {
-          $gte: dtStart,
-          $lt: dtEnd,
-        },
-      }).skip(0).sort({ entry_date: 1 })
+      entry_date: {
+        $gte: dtStart,
+        $lt: dtEnd,
+      },
+    }).skip(0).sort({ entry_date: 1 })
       .then((timeentries) => {
         /*
         if (timeentries.length === 0) {
@@ -210,7 +219,7 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
-  //console.log(timeentries);
+  // console.log(timeentries);
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
@@ -221,7 +230,7 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
     for (let n = timeentries.length - 1; n > 0; n -= 2) {
       // this must be a go-event
       if (timeentries[n].direction !== 'go') {
-        reject(new Error(`Die Reihenfolge der Kommen/Gehen-Einträge scheint nicht zu stimmen.`), 0);
+        reject(new Error('Die Reihenfolge der Kommen/Gehen-Einträge scheint nicht zu stimmen.'), 0);
         return;
       }
 
@@ -241,6 +250,21 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
   }
 });
 
+exports.getAll = () => new Promise((resolve, reject) => {
+  TimeEntry.find()
+    .then(timeentries => resolve(timeentries))
+    .catch(err => reject(err.message));
+});
+
+/*
+ * reads the number of all TimeEntries in database
+ */
+exports.count = () => new Promise((resolve, reject) => {
+  TimeEntry.find()
+    .then(timeentries => resolve(timeentries.length))
+    .catch(err => reject(err.message));
+});
+
 /**
  * reads the last entry for a given date
  *
@@ -248,7 +272,7 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
  * @returns Promise and then (resolve) last time entry of the given date (no array, ony one TimeEntry)
  */
 exports.getLastTimeEntryByDate = (dt) => {
-  if (typeof(dt) === 'string') {
+  if (typeof (dt) === 'string') {
     dt = moment(dt);
   }
   const dtStart = this.stripdownToDateBerlin(dt);
@@ -258,11 +282,11 @@ exports.getLastTimeEntryByDate = (dt) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-        entry_date: {
-          $gte: dtStart,
-          $lt: dtEnd,
-        },
-      }).skip(0).limit(1).sort({ entry_date: -1 })
+      entry_date: {
+        $gte: dtStart,
+        $lt: dtEnd,
+      },
+    }).skip(0).limit(1).sort({ entry_date: -1 })
       .then((timeentry) => {
         if (timeentry === undefined || timeentry.length === 0 || timeentry.length > 1) {
           // reject(new Error('No Time Entry found for given date : ' + date))
@@ -280,13 +304,13 @@ exports.getLastTimeEntryByDate = (dt) => {
 
 exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
   TimeEntry.aggregate([{
-      $group: {
-        _id: 0,
-        age: {
-          $min: '$entry_date',
-        },
+    $group: {
+      _id: 0,
+      age: {
+        $min: '$entry_date',
       },
-    }])
+    },
+  }])
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
@@ -295,13 +319,13 @@ exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
 
 exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
   TimeEntry.aggregate([{
-      $group: {
-        _id: 0,
-        age: {
-          $max: '$entry_date',
-        },
+    $group: {
+      _id: 0,
+      age: {
+        $max: '$entry_date',
       },
-    }])
+    },
+  }])
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
@@ -313,36 +337,30 @@ exports.removeDoublets = () => {
   let count = 0;
 
   return new Promise((resolve, reject) => {
-      TimeEntry.find().sort({
-          entry_date: 1,
-        })
-        .then((timeEntries) => {
-          timeEntries.forEach((timeentry) => {
-            if (lastTimeentry !== undefined) {
-              if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
-                timeentry.direction == lastTimeentry.direction) {
-                timeentry.remove();
-                count++;
-                console.log(`removing timeentry ${timeentry}`);
-              } else {
-                lastTimeentry = timeentry;
-              }
+    TimeEntry.find().sort({
+      entry_date: 1,
+    })
+      .then((timeEntries) => {
+        timeEntries.forEach((timeentry) => {
+          if (lastTimeentry !== undefined) {
+            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
+              timeentry.direction == lastTimeentry.direction) {
+              timeentry.remove();
+              count++;
+              console.log(`removing timeentry ${timeentry}`);
             } else {
               lastTimeentry = timeentry;
             }
-          });
+          } else {
+            lastTimeentry = timeentry;
+          }
         });
-      console.log(`${count} doublets removed`);
-      resolve({ removed: count });
-    })
-    .catch(err => reject(err));
+      })
+      .catch(err => reject(err));
+    console.log(`${count} doublets removed`);
+    resolve({ removed: count });
+  });
 };
-
-exports.getAll = () => new Promise((resolve, reject) => {
-  TimeEntry.find()
-    .then(timeentries => resolve(timeentries))
-    .catch(err => reject(err));
-});
 
 exports.sleep = (delay) => {
   console.log(`I 'm going to sleep now for ${delay} ms`);

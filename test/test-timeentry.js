@@ -106,11 +106,11 @@ describe('test util.getBusyTime - Promise', () => {
   });
 
   it('should not have any entries', async () => {
-    await util.getBusyTime({}).should.be.rejected;
+    await util.calculateBusyTime({}).should.be.rejected;
   });
 
   it('should be rejected if only one entry', async () => {
-    await util.getBusyTime(ONE_ENTRY).should.be.rejected;
+    await util.calculateBusyTime(ONE_ENTRY).should.be.rejected;
   });
 
   it('should be rejected if the second entry is not a go', async () => {
@@ -120,10 +120,10 @@ describe('test util.getBusyTime - Promise', () => {
       { direction: 'enter' },
     ];
 
-    await util.getBusyTime(ENTRIES).should.be.rejected;
+    await util.calculateBusyTime(ENTRIES).should.be.rejected;
   });
   it('should not be rejected if the second entry is a go', async () => {
-    await util.getBusyTime(TWO_ENTRIES).should.not.be.rejected;
+    await util.calculateBusyTime(TWO_ENTRIES).should.not.be.rejected;
   });
 
   after(() => {
