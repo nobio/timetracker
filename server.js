@@ -7,9 +7,9 @@ require('./db/db');
 
 const express = require('express');
 const routes = require('./routes'); // -> reades ./routes/index.js
-const apiEntries = require('./routes/entries/api-entries');
-const apiAdmin = require('./routes/admin/api-admin');
-const apiStats = require('./routes/stats/api-stats');
+const apiEntries = require('./routes/entries');
+const apiAdmin = require('./routes/admin');
+const apiStats = require('./routes/stats');
 const experimental = require('./routes/experimental');
 const http = require('http');
 const path = require('path');
