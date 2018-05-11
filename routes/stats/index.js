@@ -1,5 +1,6 @@
 const util = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
+const utilHistogram = require('./util-histogram');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -72,4 +73,21 @@ exports.getStatsByTimeBox = (req, res) => {
       });
     })
     .catch(err => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`));
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/statisitcs/histogram/60
+ * curl -X GET http://localhost:30000/api/statisitcs/histogram/60?direction=enter
+ * curl -X GET http://localhost:30000/api/statisitcs/histogram/60?direction=go
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.histogram = (req, res) => {
+  const interval = req.params.interval;
+  const direction = req.query.direction
+
+  utilHistogram.getHistogramByTimeUnit(interval, direction)
+    .then(data => res.send(data))
+    .catch(err => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`));
 };

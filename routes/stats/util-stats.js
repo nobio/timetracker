@@ -51,7 +51,6 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
       this.getBusytimeByDate(dt)
         .then((busytime) => {
           if (busytime && busytime.busytime != 0) {
-
             new StatsDay({
               date: dt,
               actual_working_time: busytime.busytime / 1,

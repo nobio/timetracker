@@ -45,7 +45,7 @@ app.get('/admin', routes.admin);
 app.get('/admin_item', routes.admin_item);
 app.get('/stats', routes.stats);
 app.get('/statistics', routes.statistics);
-app.get('/geo', routes.geoloc);
+app.get('/geo', routes.geoloc); // todo
 
 // restful services for entries using Promises
 app.post('/api/entries', apiEntries.createEntry);
@@ -57,17 +57,17 @@ app.get('/api/entries', apiEntries.getEntries);
 
 // geofencing
 app.post('/api/geofence', apiEntries.geofence);
-app.post('/geofence', apiEntries.geofence);
 
 // admin stuff
 app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);
 app.post('/api/entries/backup', apiAdmin.backupTimeEntries);
 
 // statistics stuff
-app.put('/api/stats', apiStats.calcStats); // done
-app.get('/api/stats/:date', apiStats.getStats); // done
-app.delete('/api/stats', apiStats.deleteAllStatsDays); // done
-app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox); // done
+app.put('/api/stats', apiStats.calcStats);
+app.get('/api/stats/:date', apiStats.getStats);
+app.delete('/api/stats', apiStats.deleteAllStatsDays);
+app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox);
+app.get('/api/statisitcs/histogram/:interval', apiStats.histogram)
 
 // maintain stuff
 app.get('/ping', experimental.ping); // todo
