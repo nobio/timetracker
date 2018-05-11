@@ -56,8 +56,8 @@ app.get('/api/entries', apiEntries.getEntries);
 
 
 // geofencing
-app.post('/geofence', routes.geofence);
-app.post('/geolocation', routes.backgroundGeolocation);
+app.post('/api/geofence', apiEntries.geofence);
+app.post('/geofence', apiEntries.geofence);
 
 // admin stuff
 app.post('/api/entries/dump', apiAdmin.dumpTimeEntries);

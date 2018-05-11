@@ -114,3 +114,52 @@ exports.deleteEntry = (req, res) => {
     })
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err.message}`));
 };
+
+/*
+  {
+    device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
+    id: 'Work',
+    latitude: '49.51429653451733',
+    longitude: '10.87531216443598',
+    timestamp: '1401728167.886038',
+    trigger: 'exit'
+ }
+ {
+    device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',
+    id: 'Work',
+    latitude: '49.51429653451733',
+    longitude: '10.87531216443598',
+    timestamp: '1401729237.592610',
+    trigger: 'enter'
+ }
+}
+ */
+/** ******************************************************************************
+ * takes an event triggered by Geofancy and creates und certain circumstances a new Time Entry
+ *
+ * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geofence
+ * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Home", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/geofence
+ * 
+ ****************************************************************************** */
+exports.geofence = (req, res) => {
+  
+  console.log(JSON.stringify(req.body));
+  
+  const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
+  if (req.body.id === 'Work') {
+    const timeEntry = {
+      direction,
+      longitude: req.body.longitude,
+      latitude: req.body.latitude,
+    };
+
+    util.create(timeEntry)
+      .then(timeentry => res.status(200).send(timeentry))
+      .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
+
+  } else {
+    res.send({
+      message: 'no geofence entry made; id must be \'Work\')',
+    });
+  }
+};
