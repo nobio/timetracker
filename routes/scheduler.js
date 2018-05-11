@@ -1,5 +1,6 @@
 const scheduler = require('node-schedule');
 const admin = require('./admin/util-admin');
+const stats = require('./stats/util-stats')
 
 /**
  * start scheduler to run tasks
@@ -9,7 +10,7 @@ exports.scheduleTasks = function () {
   console.log('job scheduler: calcStats (every hour at ??:00)');
   scheduler.scheduleJob({ minute: 0 }, () => { // every hour at ??:00
     console.log('scheduled task "calcStats" started');
-    admin.calcStats();
+    stats.calcStats();
   });
 
   console.log('job scheduler: dumpTimeEntry (every day at 04:05)');
