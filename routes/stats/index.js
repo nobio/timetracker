@@ -76,9 +76,9 @@ exports.getStatsByTimeBox = (req, res) => {
 };
 
 /**
- * curl -X GET http://localhost:30000/api/statisitcs/histogram/60
- * curl -X GET http://localhost:30000/api/statisitcs/histogram/60?direction=enter
- * curl -X GET http://localhost:30000/api/statisitcs/histogram/60?direction=go
+ * curl -X GET http://localhost:30000/api/statistics/histogram/60
+ * curl -X GET http://localhost:30000/api/statistics/histogram/60?direction=enter
+ * curl -X GET http://localhost:30000/api/statistics/histogram/60?direction=go
  * 
  * @param {*} req 
  * @param {*} res 

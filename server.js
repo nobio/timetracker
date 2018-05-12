@@ -67,7 +67,7 @@ app.put('/api/stats', apiStats.calcStats);
 app.get('/api/stats/:date', apiStats.getStats);
 app.delete('/api/stats', apiStats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox);
-app.get('/api/statisitcs/histogram/:interval', apiStats.histogram)
+app.get('/api/statistics/histogram/:interval', apiStats.histogram)
 
 // maintain stuff
 app.get('/ping', experimental.ping); // todo

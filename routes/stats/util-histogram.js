@@ -15,7 +15,7 @@ exports.getHistogramByTimeUnit = (interval, direction) => new Promise((resolve, 
   // prepare data structure regarding the interval. I.e. if interval = 60 (min) we create a structure with 24 entries (1440 min / 60 min = 24)
   for (let t = 0; t < numberElementsPerHour; t++) {
     data.push({
-      time: moment(1000 * t * interval),
+      time: moment(1000 * 60 * t * interval),
       histValue: 0.0,
     });
   }
