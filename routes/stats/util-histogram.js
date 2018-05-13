@@ -10,6 +10,10 @@ const utilEntry = require('../entries/util-entries');
  * @param {String} direction: undefined (both), enter, go
  */
 exports.getHistogramByTimeUnit = (interval, direction) => new Promise((resolve, reject) => {
+  if(interval < 1) {
+    reject(new Error("interval must not be less 1"));
+    return;
+  }
   const data = [];
   const numberElementsPerHour = 1440 / interval;
   // prepare data structure regarding the interval. I.e. if interval = 60 (min) we create a structure with 24 entries (1440 min / 60 min = 24)
