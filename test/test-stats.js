@@ -1,6 +1,7 @@
 require('../db/db');
 const fs = require('fs');
 const mongoose = require('mongoose');
+
 const TimeEntry = mongoose.model('TimeEntry');
 const StatsDay = mongoose.model('StatsDay');
 const util = require('../routes/stats/util-stats');
@@ -11,6 +12,7 @@ const utilHistogram = require('../routes/stats/util-histogram');
 const chai = require('chai');
 
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
@@ -19,6 +21,7 @@ const should = chai.should;
 
 const moment = require('moment');
 require('moment-timezone');
+
 const DEFAULT_DATE = moment('1967-03-16');
 
 /** ************************************************************ */
@@ -168,67 +171,65 @@ describe('test utilHistogram.getHistogramByTimeUnit - Promise', () => {
   it('utilHistogram with interval 240', async () => {
     await utilHistogram.getHistogramByTimeUnit(240)
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(6) //1440 / 240
+        expect(result).to.be.an('array').with.lengthOf(6); // 1440 / 240
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
       })
       .catch((err) => { throw err; });
   });
   it('utilHistogram with interval 1', async () => {
-    await utilHistogram.getHistogramByTimeUnit(1) 
+    await utilHistogram.getHistogramByTimeUnit(1)
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(1440) // numbers of minutes in one day
+        expect(result).to.be.an('array').with.lengthOf(1440); // numbers of minutes in one day
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
       })
       .catch((err) => { throw err; });
   });
   it('utilHistogram with interval 1440', async () => {
-    await utilHistogram.getHistogramByTimeUnit(1440)  // numbers of minutes in one day
+    await utilHistogram.getHistogramByTimeUnit(1440) // numbers of minutes in one day
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(1)
+        expect(result).to.be.an('array').with.lengthOf(1);
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
       })
       .catch((err) => { throw err; });
   });
-  it('should throw exception when passing an invertval less 1', () => {
-    return expect(utilHistogram.getHistogramByTimeUnit(0)).to.be.rejected
-  });
+  it('should throw exception when passing an invertval less 1', () => expect(utilHistogram.getHistogramByTimeUnit(0)).to.be.rejected);
   it('utilHistogram with interval 60 with go', async () => {
-    await utilHistogram.getHistogramByTimeUnit(60, 'go')  // numbers of minutes in one day
+    await utilHistogram.getHistogramByTimeUnit(60, 'go') // numbers of minutes in one day
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24)
+        expect(result).to.be.an('array').with.lengthOf(24);
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
       })
       .catch((err) => { throw err; });
   });
   it('utilHistogram with interval 60 with enter', async () => {
-    await utilHistogram.getHistogramByTimeUnit(60, 'enter')  // numbers of minutes in one day
+    await utilHistogram.getHistogramByTimeUnit(60, 'enter') // numbers of minutes in one day
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24)
+        expect(result).to.be.an('array').with.lengthOf(24);
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
       })
       .catch((err) => { throw err; });
   });
   it('utilHistogram with interval 60 with invalid direction', async () => {
-    await utilHistogram.getHistogramByTimeUnit(60, 'XXXX')  // numbers of minutes in one day
+    await utilHistogram.getHistogramByTimeUnit(60, 'XXXX') // numbers of minutes in one day
       .then((result) => {
-        //console.log(result)
+        // console.log(result)
         expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24)
+        expect(result).to.be.an('array').with.lengthOf(24);
         expect(result[0]).to.have.property('time');
         expect(result[0]).to.have.property('histValue');
         expect(result[0].histValue).to.equal(0);
@@ -250,32 +251,30 @@ describe('test utilTimebox.getStatsByTimeBox - Promise', () => {
 
   it('getStatsByTimeBox with year', async () => {
     await utilTimebox.getStatsByTimeBox('year')
-      .then((result) => {checkTimeboxResult(result)})
+      .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
   it('getStatsByTimeBox with month', async () => {
     await utilTimebox.getStatsByTimeBox('month')
-      .then((result) => {checkTimeboxResult(result)})
+      .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
   it('getStatsByTimeBox with week', async () => {
     await utilTimebox.getStatsByTimeBox('week')
-      .then((result) => {checkTimeboxResult(result)})
+      .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
   it('getStatsByTimeBox with day', async () => {
     await utilTimebox.getStatsByTimeBox('day')
-      .then((result) => {checkTimeboxResult(result)})
+      .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
   it('getStatsByTimeBox with weekday', async () => {
     await utilTimebox.getStatsByTimeBox('weekday')
-      .then((result) => {checkTimeboxResult(result)})
+      .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
-  it('should throw exception when passing an invalid timeUnit', () => {
-    return expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected
-  });
+  it('should throw exception when passing an invalid timeUnit', () => expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected);
 
   after(() => {
     // db.closeConnection()
