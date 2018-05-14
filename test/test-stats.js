@@ -241,6 +241,47 @@ describe('test utilHistogram.getHistogramByTimeUnit - Promise', () => {
     // db.closeConnection()
   });
 });
+
+describe('test utilTimebox.getStatsByTimeBox - Promise', () => {
+  let db;
+  before(() => {
+    db = require('../db/db');
+  });
+
+  it('getStatsByTimeBox with year', async () => {
+    await utilTimebox.getStatsByTimeBox('year')
+      .then((result) => {checkTimeboxResult(result)})
+      .catch((err) => { throw err; });
+  });
+  it('getStatsByTimeBox with month', async () => {
+    await utilTimebox.getStatsByTimeBox('month')
+      .then((result) => {checkTimeboxResult(result)})
+      .catch((err) => { throw err; });
+  });
+  it('getStatsByTimeBox with week', async () => {
+    await utilTimebox.getStatsByTimeBox('week')
+      .then((result) => {checkTimeboxResult(result)})
+      .catch((err) => { throw err; });
+  });
+  it('getStatsByTimeBox with day', async () => {
+    await utilTimebox.getStatsByTimeBox('day')
+      .then((result) => {checkTimeboxResult(result)})
+      .catch((err) => { throw err; });
+  });
+  it('getStatsByTimeBox with weekday', async () => {
+    await utilTimebox.getStatsByTimeBox('weekday')
+      .then((result) => {checkTimeboxResult(result)})
+      .catch((err) => { throw err; });
+  });
+  it('should throw exception when passing an invalid timeUnit', () => {
+    return expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected
+  });
+
+  after(() => {
+    // db.closeConnection()
+  });
+});
+
 /*
 describe("test util.deleteAllStatsDays - Promise", () => {
   var db;
@@ -303,5 +344,17 @@ function clearAllEntries(dt) {
       utilTimeEntry.deleteById(timeentry._id);
     });
   });
+}
+
+function checkTimeboxResult(result) {
+  expect(result).to.have.property('planned_working_time');
+  expect(result).to.have.property('average_working_time');
+  expect(result).to.have.property('actual_working_time');
+  expect(result).to.have.property('inner_data');
+  expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
+  expect(result.inner_data[0]).to.have.property('x');
+  expect(result.inner_data[0]).to.have.property('y');
+  expect(result).to.have.property('inner_comp');
+  expect(result.inner_comp).to.be.empty;
 }
 // ========================================================================================================
