@@ -66,7 +66,7 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
           }
         })
         .catch(err => console.log(err));
-      date = date.add('1', 'day');
+      date = date.add(1, 'day');
       // console.log(`> ${date}`);
     }
     resolve({
@@ -141,13 +141,13 @@ exports.getStats = (timeUnit, dtStart) => {
   let dtEnd;
 
   if (timeUnit === 'year') {
-    dtEnd = moment(dtStart).add('years', '1');
+    dtEnd = moment(dtStart).add(1, 'years');
   } else if (timeUnit === 'month') {
-    dtEnd = moment(dtStart).add('months', '1');
+    dtEnd = moment(dtStart).add(1, 'months');
   } else if (timeUnit === 'week') {
-    dtEnd = moment(dtStart).add('weeks', '1');
+    dtEnd = moment(dtStart).add(1, 'weeks');
   } else if (timeUnit === 'day') {
-    dtEnd = moment(dtStart).add('days', '1');
+    dtEnd = moment(dtStart).add(1, 'days');
   }
 
   // console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());

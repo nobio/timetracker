@@ -110,7 +110,7 @@ describe('test util.getStats and getStatsByRange - Promise', () => {
 
   it('getStatsByRange', async () => {
     const dtStart = moment.unix(1391295600000 / 1000);
-    const dtEnd = moment(dtStart).add('months', '1');
+    const dtEnd = moment(dtStart).add(1, 'months');
 
     await util.getStatsByRange(dtStart, dtEnd)
       .then((result) => {
