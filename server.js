@@ -10,7 +10,7 @@ const routes = require('./routes'); // -> reades ./routes/index.js
 const apiEntries = require('./routes/entries');
 const apiAdmin = require('./routes/admin');
 const apiStats = require('./routes/stats');
-const experimental = require('./routes/experimental');
+const apiMisc = require('./routes/misc');
 const http = require('http');
 const path = require('path');
 const moment = require('moment');
@@ -70,8 +70,8 @@ app.get('/api/statistics/aggregate', apiStats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', apiStats.histogram)
 
 // maintain stuff
-app.get('/ping', experimental.ping); // todo
-app.get('/experiment', experimental.experiment);
+app.get('/api/ping', apiMisc.ping);
+app.get('/api/experiment', apiMisc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
