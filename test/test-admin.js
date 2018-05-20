@@ -1,4 +1,4 @@
-require('../db/db');
+require('../db');
 const fs = require('fs');
 const mongoose = require('mongoose');
 const TimeEntry = mongoose.model('TimeEntry');
@@ -43,7 +43,7 @@ rmDir = function (dirPath, removeSelf) {
 describe('test util.dumpTimeEnties - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
     rmDir('./dump');
   });
 
@@ -71,7 +71,7 @@ describe('test util.backupTimeEntries - Promise', () => {
   let db;
 
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('backing up the productive database into a history-staging table', async () => {

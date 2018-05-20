@@ -44,7 +44,7 @@ describe('test utilEntries.getBusytimeByDate()', () => {
   let db;
   before(() => {
     // console.log('BEFORE')
-    db = require('../db/db');
+    db = require('../db');
   });
   it('response array should have length of 0', () => utilEntries.getAllByDate(-1).should.eventually.have.length(0));
   it('response array should have length of 2', () => utilEntries.getAllByDate(1393455600000).should.eventually.have.length(2));

@@ -1,4 +1,4 @@
-require('../db/db');
+require('../db');
 const mongoose = require('mongoose');
 const TimeEntry = mongoose.model('TimeEntry');
 const util = require('../routes/entries/util-entries');
@@ -86,7 +86,7 @@ describe('test stripdownToDateBerlin method', () => {
 describe('test util.getAllByDate - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('response array should have length of 0', () => util.getAllByDate(-1).should.eventually.have.length(0));
@@ -102,7 +102,7 @@ describe('test util.getAllByDate - Promise', () => {
 describe('test util.getBusyTime - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('should not have any entries', async () => {
@@ -134,7 +134,7 @@ describe('test util.getBusyTime - Promise', () => {
 describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('should find one Time Entry by its id', async () => {
@@ -164,7 +164,7 @@ describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () 
 describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeEntryByDate(dt) - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('check the last entry of a given date', async () => {
@@ -206,7 +206,7 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
 describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('create successfully a new TimeEntry', async () => {
@@ -302,7 +302,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
 describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('should delete one Time Entry by its id', async () => {
@@ -324,7 +324,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
 describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('modify successfully a new TimeEntry', async () => {

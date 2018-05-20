@@ -1,4 +1,4 @@
-require('../db/db');
+require('../db');
 const fs = require('fs');
 const mongoose = require('mongoose');
 
@@ -30,7 +30,7 @@ const DEFAULT_DATE = moment('1967-03-16');
 describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('getFirstTimeEntry', async () => {
@@ -65,7 +65,7 @@ describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry - Promise', () =
 describe('utilTimeEntry util.removeDoublets - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('test for doubletts (should be no in)', async () => {
@@ -105,7 +105,7 @@ describe('utilTimeEntry util.removeDoublets - Promise', () => {
 describe('test util.getStats and getStatsByRange - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('getStatsByRange', async () => {
@@ -165,7 +165,7 @@ describe('test util.getStats and getStatsByRange - Promise', () => {
 describe('test utilHistogram.getHistogramByTimeUnit - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('utilHistogram with interval 240', async () => {
@@ -246,7 +246,7 @@ describe('test utilHistogram.getHistogramByTimeUnit - Promise', () => {
 describe('test utilTimebox.getStatsByTimeBox - Promise', () => {
   let db;
   before(() => {
-    db = require('../db/db');
+    db = require('../db');
   });
 
   it('getStatsByTimeBox with year', async () => {
@@ -285,7 +285,7 @@ describe('test utilTimebox.getStatsByTimeBox - Promise', () => {
 describe("test util.deleteAllStatsDays - Promise", () => {
   var db;
   before(function() {
-    db = require("../db/db");
+    db = require("../db");
   });
 
   it("load StatsDays", async () => {

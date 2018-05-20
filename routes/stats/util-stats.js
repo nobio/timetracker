@@ -1,4 +1,4 @@
-require('../../db/db');
+require('../../db');
 
 const utilEntry = require('../entries/util-entries');
 const mongoose = require('mongoose');

@@ -3,7 +3,7 @@
  * Methods of this file must never be used from server.js directly rather than from api layer
  *
  */
-require('../../db/db');
+require('../../db');
 
 const moment = require('moment');
 const mongoose = require('mongoose');
