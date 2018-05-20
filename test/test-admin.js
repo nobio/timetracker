@@ -3,7 +3,7 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
-const util = require('../routes/admin/util-admin');
+const util = require('../api/admin/util-admin');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');

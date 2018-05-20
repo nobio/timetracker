@@ -6,11 +6,11 @@
 require('./db');
 
 const express = require('express');
-const routes = require('./routes'); // -> reades ./routes/index.js
-const apiEntries = require('./routes/entries');
-const apiAdmin = require('./routes/admin');
-const apiStats = require('./routes/stats');
-const apiMisc = require('./routes/misc');
+const web = require('./web');
+const apiEntries = require('./api/entries');
+const apiAdmin = require('./api/admin');
+const apiStats = require('./api/stats');
+const apiMisc = require('./api/misc');
 const http = require('http');
 const path = require('path');
 const moment = require('moment');
@@ -40,12 +40,12 @@ app.configure('production', function() {
 });
 */
 // routes to jade templates
-app.get('/', routes.index);
-app.get('/admin', routes.admin);
-app.get('/admin_item', routes.admin_item);
-app.get('/stats', routes.stats);
-app.get('/statistics', routes.statistics);
-app.get('/geo', routes.geoloc); // todo
+app.get('/', web.index);
+app.get('/admin', web.admin);
+app.get('/admin_item', web.admin_item);
+app.get('/stats', web.stats);
+app.get('/statistics', web.statistics);
+app.get('/geo', web.geoloc); // todo
 
 // restful services for entries using Promises
 app.post('/api/entries', apiEntries.createEntry);
@@ -82,4 +82,4 @@ http.createServer(app).listen(app.get('port'), app.get('host'), () => {
 
 
 /* start scheduler */
-require('./routes/scheduler').scheduleTasks();
+require('./api/scheduler').scheduleTasks();

@@ -1,7 +1,7 @@
 require('../db');
 const mongoose = require('mongoose');
 const TimeEntry = mongoose.model('TimeEntry');
-const util = require('../routes/entries/util-entries');
+const util = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
