@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const tz = require('moment-timezone');
-const util = require('./entries/util-entries');
+const util = require('../api/entries/util-entries');
 
 const TimeEntry = mongoose.model('TimeEntry');
 

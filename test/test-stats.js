@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const StatsDay = mongoose.model('StatsDay');
-const util = require('../routes/stats/util-stats');
-const utilTimeEntry = require('../routes/entries/util-entries');
-const utilTimebox = require('../routes/stats/util-statstimebox');
-const utilHistogram = require('../routes/stats/util-histogram');
+const util = require('../api/stats/util-stats');
+const utilTimeEntry = require('../api/entries/util-entries');
+const utilTimebox = require('../api/stats/util-statstimebox');
+const utilHistogram = require('../api/stats/util-histogram');
 
 const chai = require('chai');
 

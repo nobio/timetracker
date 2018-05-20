@@ -1,5 +1,4 @@
-const utilEntries = require('../routes/entries/util-entries');
-const route = require('../routes/index');
+const utilEntries = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
