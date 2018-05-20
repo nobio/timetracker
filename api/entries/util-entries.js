@@ -35,7 +35,7 @@ exports.stripdownToDateBerlin = (date) => {
   d.second(0);
   d.minutes(0);
   d.hours(0);
-  //console.log(d.format('YYYY-MM-DD HH:mm:ss'))
+  // console.log(d.format('YYYY-MM-DD HH:mm:ss'))
   return d;
 };
 
@@ -214,12 +214,14 @@ exports.getAllByDate = (date) => {
 };
 
 /**
- * Reads the busy time of all entries for a given day
+ * Reads the busy time and pause time of all entries for a given day
+ *
  * @param list of time entry objects (usually 2) from getAllByDate method
  * @returns Promise
  */
 exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
   // console.log(timeentries);
+
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
@@ -227,6 +229,8 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
     reject(new Error('Bitte die Einträge für vervollständigen'), 0);
   } else {
     let busytime = 0;
+    let pause = 0;
+
     for (let n = timeentries.length - 1; n > 0; n -= 2) {
       // this must be a go-event
       if (timeentries[n].direction !== 'go') {
@@ -236,20 +240,33 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
 
       const end = timeentries[n].entry_date;
       const start = timeentries[n - 1].entry_date;
-
       busytime += (end - start);
+
+      if (n > 2) {
+        pause += (start - timeentries[n - 2].entry_date);
+      }
     }
 
     // when there have been only 2 entries we reduce the busytime by 45 minutes (default pause)
     if (timeentries.length === 2) {
       busytime -= DEFAULT_BREAK_TIME;
+      pause = DEFAULT_BREAK_TIME;
     }
-    // console.log(dt + " => " + busytime + " " + (busytime/1000/60/60))
 
-    resolve(busytime);
+    const duration = timeentries[timeentries.length - 1].entry_date - timeentries[0].entry_date;
+
+    resolve({
+      duration,
+      busytime,
+      pause,
+      count: timeentries.length,
+    });
   }
 });
 
+/**
+ * Reads all TimeEntry items from database
+ */
 exports.getAll = () => new Promise((resolve, reject) => {
   TimeEntry.find()
     .then(timeentries => resolve(timeentries))

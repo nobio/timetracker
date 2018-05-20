@@ -96,7 +96,7 @@ function dumpData() {
 function getTimeEntriesByDate(dt) {
 
     result.innerHTML = '';
-    getBusyTime(dt, function(err, duration) {
+    getBusyTime(dt, function(err, busy) {
 
         if (err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
@@ -107,8 +107,13 @@ function getTimeEntriesByDate(dt) {
             data: { dt: ""+dt }, 
             success: function(timeentries) {
                 var html = 'Anwesenheit: ';
-                if (duration) {
-                    html += moment(duration - 60 * 60 * 1000).format('HH:mm:ss') + ' Stunden';
+                if (busy && !busy.isEmpty({})) {
+                    let duration = moment(busy.attributes.duration - 60 * 60 * 1000).format('HH:mm');
+                    let busytime = moment(busy.attributes.busytime - 60 * 60 * 1000).format('HH:mm');
+                    let pausetime = moment(busy.attributes.pause - 60 * 60 * 1000).format('HH:mm');
+                    html += 'Anwesenheit: ' + duration + ', Arbeit: ' + busytime + ', Pausen: ' + pausetime;
+                } else {
+                    html += 'Ruhetag'
                 }
                 html += '<table><th>Datum</th>';
                 html += '<th>Zeit</th>';
@@ -143,8 +148,8 @@ function getBusyTime(dt, callback) {
     var duration = new Duration();
     duration.fetch({
         data: {busy: ""+dt},
-        success: function(d) {
-            callback(null, d.get("duration"));
+        success: function(busy) {
+            callback(null, busy);
         },
         error: function(model, err) {
             callback(err);
