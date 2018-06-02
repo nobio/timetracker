@@ -10,6 +10,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 RUN npm i npm@latest -g
+RUN node --version
 RUN npm install
 # If you are building your code for production
 # RUN npm install --only=production
