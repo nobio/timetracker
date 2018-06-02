@@ -1,0 +1,10 @@
+.git
+Dockerfile
+.DS_Store
+.gitignore
+README.md
+.es*
+.travis.yml
+dump
+node_modules
+bin
