@@ -1,5 +1,7 @@
 .git
 Dockerfile
+docker-compose.yml
+.dockerignore
 .DS_Store
 .gitignore
 README.md

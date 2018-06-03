@@ -8,5 +8,5 @@ WORKDIR=./
 TARGETDIR=/share/CACHEDEV1_DATA/homes/admin/Projects/timetracker-docker
 
 rsync -avp --delete $WORKDIR $QNAP_HOST:$TARGETDIR --exclude node_modules --exclude dump --exclude .git
-ssh -t $QNAP_HOST $TARGETDIR/bin/docker-build.sh
+#ssh -t $QNAP_HOST $TARGETDIR/bin/docker-build.sh
 echo ...done

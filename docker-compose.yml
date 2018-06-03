@@ -1,0 +1,22 @@
+version: "3"
+services:
+  node-app:
+    container_name: timetracker
+    restart: always
+    build: .
+    image: nobio/timetracker
+    volumes:
+      - ./dump:/usr/src/app/dump
+    ports:
+      - "30030:30000"
+    links:
+      - mongo
+    #depends_on:
+    #  - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data
+    ports:
+      - "27017:27017"

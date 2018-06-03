@@ -60,3 +60,7 @@ CMD [ "npm", "start" ]
 
 # --- exec Linux command inside a container
 # docker exec -it <container-hash> <linux-command>
+# docker exec -it <container-hash> /bin/bash
+
+# --- delete all containers and images (tabula rasa)
+# docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker rmi $(docker images -q)
