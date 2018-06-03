@@ -5,7 +5,10 @@ services:
     restart: always
     build: .
     image: nobio/timetracker
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
     volumes:
+      # in-host:in-container
       - ./dump:/usr/src/app/dump
     ports:
       - "30030:30000"
@@ -17,6 +20,7 @@ services:
     container_name: mongo
     image: mongo
     volumes:
-      - ./data:/data
+      # in-host:in-container
+      - ./data:/data/db
     ports:
       - "27017:27017"

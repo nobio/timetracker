@@ -64,3 +64,21 @@ CMD [ "npm", "start" ]
 
 # --- delete all containers and images (tabula rasa)
 # docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker rmi $(docker images -q)
+
+
+
+
+# --- build with docker-compose
+# docker-compose build
+
+# --- start
+# docker-compose up -d
+
+# -- stop
+# docker-compose down
+
+# --- rebuild
+# docker-compose down; docker-compose build; docker-compose up -d
+
+# --- logging
+# docker-compose logs -f

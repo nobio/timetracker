@@ -61,14 +61,14 @@ const StatsDay = new schema({
 });
 mongoose.model('StatsDay', StatsDay);
 
-const mongodb_url =
-`mongodb://${
-  db_config.mlab.user
-}:${
-  db_config.mlab.password
-}@${
-  db_config.mlab.uri}`;
 const monoddb_options = db_config.mlab.options;
+let mongodb_url = process.env.MONGO_URL;  // try to use environment variable, perhaps given by container
+/*
+if(!mongodb_url) {
+  mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
+}
+*/
+mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 
 console.log(
   `connecting to mongodb on ${
