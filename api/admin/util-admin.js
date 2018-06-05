@@ -36,7 +36,7 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
   TimeEntryBackup.remove()
     .then(() => TimeEntry.find())
     .then((timeEntries) => {
-      console.log(`${timeEntries.length} time entries foud to be backed up`);
+      console.log(`${timeEntries.length} time entries found to be backed up`);
       len = timeEntries.length;
       timeEntries.forEach((timeentry) => {
         // console.log('.')
