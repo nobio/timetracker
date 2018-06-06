@@ -64,7 +64,7 @@ CMD [ "npm", "start" ]
 
 # --- delete all containers and images (tabula rasa)
 # docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker rmi $(docker images -q)
-docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker rmi $(docker images -q); docker volume rm $(docker volume list -q);
+# docker stop $(docker ps -a -q); docker rm $(docker ps -a -q); docker rmi $(docker images -q); docker volume rm $(docker volume list -q);
 
 
 
