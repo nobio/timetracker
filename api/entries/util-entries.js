@@ -90,7 +90,7 @@ exports.create = (timeEntry) => {
   return new Promise((resolve, reject) => {
     this.getLastTimeEntryByDate(timeEntry.datetime)
       .then((lastTimeEntry) => {
-        // console.log(timeEntry);
+        console.log(JSON.stringify(timeEntry));
         if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
           if (timeEntry.direction != 'enter') {
             reject(new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`));
@@ -101,14 +101,17 @@ exports.create = (timeEntry) => {
             reject(new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`));
             return;
           }
+          /*
           const now = moment();
           const entryDate = moment(lastTimeEntry.entry_date);
           const timelapse = now - entryDate;
-          // console.log(timelapse + ' ms or ' + timelapse / 1000 + ' sec')
+
+          //console.log(timelapse + ' ms or ' + timelapse / 1000/60/60 + ' sec')
           if (timelapse < 1000 * 1) { // not longer than 1 sec
-            reject(new Error(`this seems to be a double entry since the last item and this one are created within ${timelapse} ms`));
+            reject(new Error(`it seems to be a double entry since the last item and this one are created within ${timelapse} ms`));
             return;
           }
+          */
         }
 
         // all checks successfully done, lets create the TimeEntry!
