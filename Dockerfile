@@ -39,7 +39,8 @@ CMD [ "npm", "start" ]
 
 # --- start docker container
 # docker run -p 30030:30000 -d nobio/timetracker
-# docker run --restart=always -p 30030:30000 -d nobio/timetracker
+# docker run --restart=always --name timetracker -p 30030:30000 -d nobio/timetracker
+# docker start timetracker
 
 # --- stop running container
 # docker container stop <container-id>
