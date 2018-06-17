@@ -54,13 +54,14 @@ exports.stripdownToDateBerlin = (date) => {
    "last_changed" : "2017-12-01T07:12:15.623Z"
 }
  */
-exports.findById = id =>
+exports.findById = id => {
   // console.log('entered findById ' + id)
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     TimeEntry.findById(id)
       .then(timeentries => resolve(timeentries))
       .catch(err => reject(err));
   });
+}
 
 
 /**
