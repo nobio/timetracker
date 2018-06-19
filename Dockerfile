@@ -84,3 +84,11 @@ CMD [ "npm", "start" ]
 
 # --- logging
 # docker-compose logs -f
+
+
+
+# ---- exporting / loading image
+# docker save -o <path>/<image-name>matrix-data.tar image-name
+# docker save -o ./timetracker.tar timetracker
+# docker load -i <path to copied image file>
+# docker load -i timetracker
