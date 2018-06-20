@@ -1,5 +1,5 @@
 #FROM node:carbon
-FROM node:8
+FROM node:9
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -84,3 +84,7 @@ CMD [ "npm", "start" ]
 
 # --- logging
 # docker-compose logs -f
+
+
+
+# export TMPDIR=/some_new_path_with_room
