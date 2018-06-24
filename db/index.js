@@ -63,12 +63,11 @@ mongoose.model('StatsDay', StatsDay);
 
 const monoddb_options = db_config.options;
 let mongodb_url = process.env.MONGO_URL;  // try to use environment variable, perhaps given by container
-/*
 if(!mongodb_url) {
+  console.error('overwriting mongodb_url')
   mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 }
-*/
-mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
+//mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 
 console.log(
   `connecting to mongodb on ${
