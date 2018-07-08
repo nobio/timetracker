@@ -7,6 +7,8 @@ const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 
 const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 const MONGO_URL_TARGET = MONGO_URL_DOCKER;
+//const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
+//const MONGO_URL_TARGET = MONGO_URL_MLAB;
 
 
 const migrationData = [];
@@ -25,7 +27,7 @@ const TimeEntry = new schema({
     latitude: { type: Number, required: false },
 });
 
-const TIME_ENTRY_MODEL = mongoose.model('TimeEntry', TimeEntry);
+const TIME_ENTRY_MODEL_SOURCE = mongoose.model('TimeEntry', TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
 
 /**
@@ -35,7 +37,7 @@ function getDataFromSource() {
     return new Promise((resolve, reject) => {
         mongoose.connect(MONGO_URL_SOURCE, { useNewUrlParser: true });
 
-        TIME_ENTRY_MODEL.find()
+        TIME_ENTRY_MODEL_SOURCE.find()
             .then((timeEntries) => {
                 mongoose.connection.close();
                 resolve(timeEntries);

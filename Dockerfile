@@ -7,10 +7,14 @@ WORKDIR /usr/src/app
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
+RUN npm i npm@latest -g
+
 COPY package*.json ./
 
-RUN npm i npm@latest -g
 RUN npm install
+
+RUN npm audit fix
+
 # If you are building your code for production
 # RUN npm install --only=production
 
@@ -79,7 +83,7 @@ CMD [ "npm", "start" ]
 # docker-compose down
 
 # --- rebuild
-# docker-compose down; docker-compose build; docker-compose up -d
+# docker-compose down; docker-compose build; docker-compose up -d; docker-compose logs -f
 
 # --- logging
 # docker-compose logs -f
