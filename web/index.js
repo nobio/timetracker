@@ -10,7 +10,7 @@ const TimeEntry = mongoose.model('TimeEntry');
 /* ================================================================== */
 
 /*
- * calculates the number of entries and renders the index.jade by passing the size
+ * calculates the number of entries and renders the index.pug by passing the size
  */
 exports.index = (req, res) => {
   util.count()
