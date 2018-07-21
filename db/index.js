@@ -5,7 +5,6 @@ const db_config = {
     uri: 'ds061928.mlab.com:61928/timetrack',
   },
   options: {
-    useMongoClient: true,
     reconnectTries: 1000,
     reconnectInterval: 500,
     poolSize: 5,

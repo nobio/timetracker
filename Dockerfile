@@ -93,3 +93,5 @@ CMD [ "npm", "start" ]
 # docker save -o ./timetracker.tar timetracker
 # docker load -i <path to copied image file>
 # docker load -i timetracker
+
+# docker network inspect $(docker network ls -q) |grep -i gateway
