@@ -12,7 +12,7 @@ function timeentry(direction, datetime) {
         dt = moment(datetime, 'DD.MM.YYYY HH:mm').toISOString();
     }
 
-    var entry = new TimeEntry(); // TimeEntry is a Backbone Model defined in layout.jade
+    var entry = new TimeEntry(); // TimeEntry is a Backbone Model defined in layout.pug
     entry.save({'direction': direction, 'datetime': dt}, {
         wait:true,
         success:function(model, timeentry) {
@@ -102,7 +102,7 @@ function getTimeEntriesByDate(dt) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
         
-        var entries = new TimeEntries(); // TimeEntry is a Backbone Model defined in layout.jade
+        var entries = new TimeEntries(); // TimeEntry is a Backbone Model defined in layout.pug
         entries.fetch({
             data: { dt: ""+dt }, 
             success: function(timeentries) {
@@ -159,7 +159,7 @@ function getBusyTime(dt, callback) {
 }
 
 function deleteTimeEntryById(id) {
-    var entry = new TimeEntry({'id': id}); // TimeEntry is a Backbone Model defined in layout.jade
+    var entry = new TimeEntry({'id': id}); // TimeEntry is a Backbone Model defined in layout.pug
     entry.destroy({
         wait:true,
         success:function(model, response) {
@@ -198,7 +198,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     }
 
-    var stats = new Statistics({'id': ""+nextDate}); // Statistics is a Backbone Model defined in layout.jade
+    var stats = new Statistics({'id': ""+nextDate}); // Statistics is a Backbone Model defined in layout.pug
     stats.fetch({ 
         data: {timeUnit: timeUnit},
         success:function(timerecord) {
