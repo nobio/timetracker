@@ -10,8 +10,8 @@ const utilEntry = require('../entries/util-entries');
  * @param {String} direction: undefined (both), enter, go
  */
 exports.getHistogramByTimeUnit = (interval, direction) => new Promise((resolve, reject) => {
-  if(interval < 1) {
-    reject(new Error("interval must not be less 1"));
+  if (interval < 1) {
+    reject(new Error('interval must not be less 1'));
     return;
   }
   const data = [];
@@ -58,9 +58,9 @@ function calculateHistogram(timeEntries, interval, direction, data) {
 
 /**
  * counts the minute from a given date string (ignores the day, month, year but also seconds and miliseconds)
- * @param {*} entryDate 
+ * @param {*} entryDate
  */
 function getTimeInMinutes(entryDate) {
-    let t = moment(entryDate);
-    return t.hours() * 60 + t.minutes();
+  const t = moment(entryDate);
+  return t.hours() * 60 + t.minutes();
 }

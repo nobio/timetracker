@@ -1,6 +1,6 @@
 const scheduler = require('node-schedule');
 const admin = require('./admin/util-admin');
-const stats = require('./stats/util-stats')
+const stats = require('./stats/util-stats');
 
 /**
  * start scheduler to run tasks

@@ -139,10 +139,9 @@ exports.deleteEntry = (req, res) => {
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/api/geofence
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Home", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/api/geofence
- * 
+ *
  ****************************************************************************** */
 exports.geofence = (req, res) => {
-
   console.log(JSON.stringify(req.body));
 
   const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
@@ -156,7 +155,6 @@ exports.geofence = (req, res) => {
     util.create(timeEntry)
       .then(timeentry => res.status(200).send(timeentry))
       .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
-
   } else {
     res.status(500).send({
       message: 'no geofence entry made; id must be \'Work\')',
