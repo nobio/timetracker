@@ -67,7 +67,8 @@ app.put('/api/stats', api_stats.calcStats);
 app.get('/api/stats/:date', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
-app.get('/api/statistics/histogram/:interval', api_stats.histogram)
+app.get('/api/statistics/histogram/:interval', api_stats.histogram);
+app.get('/api/statistics/breaktime', api_stats.breaktime);
 
 // maintain stuff
 app.get('/api/ping', api_misc.ping);

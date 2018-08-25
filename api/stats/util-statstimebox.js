@@ -89,6 +89,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
 
     if (lastTimeUnit != actualTimeUnit || lastHash === stat._id) {
       const sum = time_unit_stats.reduce(add, 0); // reduce function
+      // const sum = time_unit_stats.reduce((total, value) => total + value);
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
       // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD'));

@@ -1,6 +1,7 @@
 const util = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');
+const utilBreaktime = require('./util-breaktime');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -88,6 +89,22 @@ exports.histogram = (req, res) => {
   const direction = req.query.direction;
 
   utilHistogram.getHistogramByTimeUnit(interval, direction)
-    .then(data => res.send(data))
+    .then(data => res.status(200).send(data))
     .catch(err => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`));
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/statistics/breaktime
+ * curl -X GET http://localhost:30000/api/statistics/breaktime?real=true
+ * curl -X GET http://localhost:30000/api/statistics/breaktime?real=false
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+exports.breaktime = (req, res) => {
+  const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
+
+  utilBreaktime.getBreakTime(realCalc)
+    .then(data => res.status(200).send(data))
+    .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalculatedOnly (${realCalculatedOnly}): ${err.message}`));
 };
