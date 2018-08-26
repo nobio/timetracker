@@ -2,7 +2,11 @@ const moment = require('moment');
 const utilEntry = require('../entries/util-entries');
 
 const DEFAULT_BREAK_TIME = 45 * 60; // 45 min in seconds
-
+const COUNT_MINUTES = 120; // 120 minutes for histogram (0..120)
+/**
+ * get an array of break times; format of one item: {time: t, breakTime: 0.0}
+ * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc 
+ */
 exports.getBreakTime = realCalc => new Promise((resolve, reject) => {
   utilEntry.getAll()
     .then(this.getAllTimeEntriesGroupedByDate)
@@ -12,6 +16,10 @@ exports.getBreakTime = realCalc => new Promise((resolve, reject) => {
     .catch(err => reject(err));
 });
 
+/**
+ * create a Map with the date as key and an array of entry_dates as value (entry_date in unix timestamp)
+ * @param {all time entries sorted by entry_date} timeEntries 
+ */
 exports.getAllTimeEntriesGroupedByDate = timeEntries => new Promise((resolve, reject) => {
   try {
     const datesFromArray = timeEntries.reduce((acc, timeEntry) => {
@@ -34,6 +42,13 @@ exports.getAllTimeEntriesGroupedByDate = timeEntries => new Promise((resolve, re
   }
 });
 
+/**
+ * prepare the array from getAllTimeEntriesGroupedByDate method and calculate for each item in 
+ * this map a break time from the array of entry_dates
+ * 
+ * @param {all time entries sorted by entry_date} timeEntries 
+ * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc 
+ */
 exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, reject) => {
   const breakTimes = [];
   for (const timeItem of timeEntries.values()) {
@@ -64,10 +79,15 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
   resolve(breakTimes);
 });
 
+/**
+ * calculate a historgram; key is the minute (0..120) and valus is the number of counts for this minute
+ *  
+ * @param {*} preparedBreakTimes 
+ */
 exports.calculateHistogram = preparedBreakTimes => new Promise((resolve, reject) => {
-  // prepare data structure regarding the interval. I.e. if interval = 60 (min) we create a structure with 24 entries (1440 min / 60 min = 24)
+  // prepare data structure regarding the interval.
   const breakTimes = [];
-  const numberElements = 120; // 0 min - 120 min (max 2 hours break should be enough)
+  const numberElements = COUNT_MINUTES; // 0 min - 120 min (max 2 hours break should be enough)
   for (let t = 0; t < numberElements; t++) {
     breakTimes.push({
       time: t, // t in minutes
@@ -75,8 +95,10 @@ exports.calculateHistogram = preparedBreakTimes => new Promise((resolve, reject)
     });
   }
 
+  // iterating over preparedBreakTimes but not manipulating this array rather than the array breakTimes; 
+  // ok, could have been done also in a classic way using the iterator and loops...
   preparedBreakTimes.reduce((acc, index) => {
-    if (index <= 120) {
+    if (index <= COUNT_MINUTES) { // ignore longer breaks
       breakTimes[index].breakTime++;
     }
     return acc;
