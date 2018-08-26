@@ -95,7 +95,7 @@ exports.histogram = (req, res) => {
 
 /**
  * curl -X GET http://localhost:30000/api/statistics/breaktime
- * curl -X GET http://localhost:30000/api/statistics/breaktime?real=true
+ * curl - X GET http: //localhost:30000/api/statistics/breaktime?real=true
  * curl -X GET http://localhost:30000/api/statistics/breaktime?real=false
  *
  * @param {*} req
@@ -106,5 +106,5 @@ exports.breaktime = (req, res) => {
 
   utilBreaktime.getBreakTime(realCalc)
     .then(data => res.status(200).send(data))
-    .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalculatedOnly (${realCalculatedOnly}): ${err.message}`));
+    .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
 };

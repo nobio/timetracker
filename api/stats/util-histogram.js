@@ -45,7 +45,7 @@ function calculateHistogram(timeEntries, interval, direction, data) {
 
   return new Promise((resolve, reject) => {
     timeEntries.forEach((timeEntry) => {
-      if (!direction || (direction && direction === timeEntry.direction)) {
+      if (!direction || (direction && (direction === timeEntry.direction))) {
         tm = getTimeInMinutes(timeEntry.entry_date);
         idx = (tm / interval | 0);
         data[idx].histValue++;
