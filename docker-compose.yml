@@ -1,10 +1,10 @@
 version: "3"
 services:
-  node-app:
+  timetracker:
     container_name: timetracker
     restart: always
-    build: .
-    image: nobio/timetracker
+    # build: .
+    image: nobio/timetracker:latest
     environment:
       - MONGO_URL=mongodb://mongo:27017/timetracker
       #- MONGO_URL=mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack

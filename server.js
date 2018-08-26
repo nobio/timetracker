@@ -72,6 +72,7 @@ app.get('/api/statistics/breaktime', api_stats.breaktime);
 
 // maintain stuff
 app.get('/api/ping', api_misc.ping);
+app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);

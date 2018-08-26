@@ -14,6 +14,18 @@ exports.ping = (req, res) => {
   });
 };
 
+/**
+ * returns version information
+ * 
+ * curl -X GET http://localhost:30000/api/version
+ */
+exports.version = (req, res) => {
+  res.send({
+    version: '1.0.0',
+    build_time: new Date()
+  });
+};
+
 /*
  * test and experiment endpoint
  *
