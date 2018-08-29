@@ -24,10 +24,13 @@ let minor_version = parseInt(versions[1]);
 let build_version = parseInt(versions[2]);
 if (arg == 'ma') {
   major_version++;
+  minor_version = 0;
+  build_version = 0;
   modified = true;
 }
 if (arg == 'mi') {
   minor_version++;
+  build_version = 0;
   modified = true;
 }
 if (!arg || arg == '' || arg == 'b') {
