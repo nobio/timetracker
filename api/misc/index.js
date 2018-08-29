@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const TimeEntry = mongoose.model('TimeEntry');
+const packageJson = require('../../package.json');
 
 /**
  * exposes a ping endpoint and respones with pong
@@ -9,21 +10,25 @@ const TimeEntry = mongoose.model('TimeEntry');
  * curl -X GET http://localhost:30000/api/ping
  */
 exports.ping = (req, res) => {
-  res.send({
+  res.status(200).send({
     response: 'pong',
   });
 };
 
 /**
  * returns version information
- * 
+ *
  * curl -X GET http://localhost:30000/api/version
  */
 exports.version = (req, res) => {
-  res.send({
-    version: '1.0.0',
-    build_time: new Date()
-  });
+  if (packageJson) {
+    res.status(200).send({
+      version: packageJson.version,
+      last_build: packageJson.last_build,
+    });
+  } else {
+    res.status(500).send('no package.json found');
+  }
 };
 
 /*
@@ -44,7 +49,7 @@ exports.experiment = (req, res) => {
         if (!actualDate) {
           actualDate = myDate;
         }
-        if (actualDate == myDate && timeEntry.direction == 'enter') {
+        if (actualDate === myDate && timeEntry.direction === 'enter') {
           entriesFromDate.push(timeEntry);
         } else {
           firstDates.push(entriesFromDate.reduce((mapped, value) => {
