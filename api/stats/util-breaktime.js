@@ -11,7 +11,7 @@ exports.getBreakTime = realCalc => new Promise((resolve, reject) => {
   utilEntry.getAll()
     .then(this.getAllTimeEntriesGroupedByDate)
     .then(timeEntries => this.prepareBreakTimes(timeEntries, realCalc))
-    .then(this.calculateHistogram)
+    .then(preparedBreakTimes => this.calculateHistogram(preparedBreakTimes, realCalc))
     .then(breakTimes => resolve(breakTimes))
     .catch(err => reject(err));
 });
@@ -84,7 +84,7 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
  *  
  * @param {*} preparedBreakTimes 
  */
-exports.calculateHistogram = preparedBreakTimes => new Promise((resolve, reject) => {
+exports.calculateHistogram = (preparedBreakTimes, realCalc) => new Promise((resolve, reject) => {
   // prepare data structure regarding the interval.
   const breakTimes = [];
   const numberElements = COUNT_MINUTES; // 0 min - 120 min (max 2 hours break should be enough)
@@ -98,7 +98,7 @@ exports.calculateHistogram = preparedBreakTimes => new Promise((resolve, reject)
   // iterating over preparedBreakTimes but not manipulating this array rather than the array breakTimes; 
   // ok, could have been done also in a classic way using the iterator and loops...
   preparedBreakTimes.reduce((acc, index) => {
-    if (index <= COUNT_MINUTES) { // ignore longer breaks
+    if (index <= COUNT_MINUTES && !(realCalc && index == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
       breakTimes[index].breakTime++;
     }
     return acc;

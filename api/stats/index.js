@@ -95,7 +95,7 @@ exports.histogram = (req, res) => {
 
 /**
  * curl -X GET http://localhost:30000/api/statistics/breaktime
- * curl -X GET http: //localhost:30000/api/statistics/breaktime?real=true
+ * curl -X GET http://localhost:30000/api/statistics/breaktime?real=true
  * curl -X GET http://localhost:30000/api/statistics/breaktime?real=false
  *
  * @param {*} req
