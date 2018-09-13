@@ -94,17 +94,24 @@ exports.histogram = (req, res) => {
 };
 
 /**
- * curl -X GET http://localhost:30000/api/statistics/breaktime
- * curl -X GET http://localhost:30000/api/statistics/breaktime?real=true
- * curl -X GET http://localhost:30000/api/statistics/breaktime?real=false
+ * curl -X GET http://localhost:30000/api/statistics/breaktime/10
+ * curl -X GET http://localhost:30000/api/statistics/breaktime/10?real=true
+ * curl -X GET http://localhost:30000/api/statistics/breaktime/10?real=false
  *
  * @param {*} req
  * @param {*} res
  */
 exports.breaktime = (req, res) => {
+  const interval = parseInt(req.params.interval);
   const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
 
-  utilBreaktime.getBreakTime(realCalc)
-    .then(data => res.status(200).send(data))
-    .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
+  if (!interval || '0' == interval) {
+    res.status(500).send('invalid interval; must be numeric and > 0');
+  } else {
+
+    utilBreaktime.getBreakTime(interval, realCalc)
+      .then(data => res.status(200).send(data))
+      .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
+
+  }
 };

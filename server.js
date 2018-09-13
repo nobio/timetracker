@@ -68,7 +68,7 @@ app.get('/api/stats/:date', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
-app.get('/api/statistics/breaktime', api_stats.breaktime);
+app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
 
 // maintain stuff
 app.get('/api/ping', api_misc.ping);
@@ -79,7 +79,7 @@ app.get('/api/experiment', api_misc.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
+   console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 
