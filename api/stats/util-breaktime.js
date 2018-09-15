@@ -87,7 +87,6 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
 exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Promise((resolve, reject) => {
   // prepare data structure regarding the interval.
   let breakTimes = [];
-  console.log('>>> ' + interval)
 
   for (let t = 0; t <= COUNT_MINUTES; t += interval) {
     breakTimes.push({
@@ -101,8 +100,8 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
   // "index" is the break time in minutes
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
     let idx = parseInt((breakTimeMin - 1) / interval);
-    if (idx < breakTimes.length && !(realCalc && breakTimeMin == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
-      console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
+    if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
+      //console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
       breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
     }
     return acc;
