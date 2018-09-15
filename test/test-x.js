@@ -24,6 +24,52 @@ const moment = require('moment');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
+const TIME_ENTRIES_01 = [
+  {
+    direction: 'enter',
+    entry_date: '2014-02-20T07:00:00.00Z'
+  },
+  {
+    direction: 'go',
+    entry_date: '2014-02-20T11:00:00.000Z'
+  },
+  {
+    direction: 'enter',
+    entry_date: '2014-02-20T11:50:00.899Z'
+  },
+  {
+    direction: 'go',
+    entry_date: '2014-02-20T17:00:00.000Z'
+  }
+]
+
+const TIME_ENTRIES_02 = [
+  {
+    direction: 'enter',
+    entry_date: '2014-02-20T07:00:00.00Z'
+  },
+  {
+    direction: 'go',
+    entry_date: '2014-02-20T11:00:00.000Z'
+  },
+  {
+    direction: 'enter',
+    entry_date: '2014-02-20T11:50:00.899Z'
+  },
+  {
+    direction: 'go',
+    entry_date: '2014-02-20T17:00:00.000Z'
+  },
+  {
+    direction: 'enter',
+    entry_date: '2014-02-21T06:00:00.000Z'
+  },
+  {
+    direction: 'go',
+    entry_date: '2014-02-21T16:00:00.000Z'
+  }
+]
+
 
 /** ************************************************************ */
 /** ************************************************************ */
@@ -34,35 +80,16 @@ describe('test util-breaktime - Promise', () => {
     db = require('../db');
   });
 
-  const timeEntries = [
-    {
-      direction: 'enter',
-      entry_date: '2014-02-20T06:46:33.899Z'
-    },
-    {
-      direction: 'go',
-      entry_date: '2014-02-20T11:00:00.000Z'
-    },
-    {
-      direction: 'enter',
-      entry_date: '2014-02-20T11:46:00.899Z'
-    },
-    {
-      direction: 'go',
-      entry_date: '2014-02-20T17:00:00.000Z'
-    }
-  ]
-
-  it('getAllTimeEntriesGroupedByDate', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(timeEntries)
+  it('getAllTimeEntriesGroupedByDate one day', async () => {
+    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then((result) => {
         expect(result).to.be.a('map')
         const ar = result.get('20.02.2014');
         expect(ar).to.be.an('array')
         expect(ar).to.have.lengthOf(4)
-        expect(ar[0]).to.equal('1392878793');
+        expect(ar[0]).to.equal('1392879600');
         expect(ar[1]).to.equal('1392894000');
-        expect(ar[2]).to.equal('1392896760');
+        expect(ar[2]).to.equal('1392897000');
         expect(ar[3]).to.equal('1392915600');
       })
       .catch((err) => {
@@ -70,7 +97,56 @@ describe('test util-breaktime - Promise', () => {
       });
   });
 
+  it('getAllTimeEntriesGroupedByDateTowDays', async () => {
+    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+      .then((result) => {
+        expect(result).to.be.a('map')
+        let ar = result.get('20.02.2014');
+        expect(ar).to.be.an('array')
+        expect(ar).to.have.lengthOf(4)
+        expect(ar[0]).to.equal('1392879600');
+        expect(ar[1]).to.equal('1392894000');
+        expect(ar[2]).to.equal('1392897000');
+        expect(ar[3]).to.equal('1392915600');
 
+        ar = result.get('21.02.2014');
+        expect(ar).to.be.an('array')
+        expect(ar).to.have.lengthOf(2)
+        expect(ar[0]).to.equal('1392962400');
+        expect(ar[1]).to.equal('1392998400');
+      })
+      .catch((err) => {
+        throw err;
+      });
+  });
+
+
+  it('prepareBreakTimes one day', async () => {
+    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+      .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
+      .then(result => {
+        expect(result).to.be.an('array');
+        expect(result).to.have.lengthOf(1)
+        expect(result[0]).to.equal(50)
+      })
+      .catch((err) => {
+        throw err;
+      });
+  });
+
+  it('prepareBreakTimes two days', async () => {
+    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+      .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
+      .then(result => {
+        expect(result).to.be.an('array');
+        expect(result).to.have.lengthOf(2)
+        expect(result[0]).to.equal(50)
+        expect(result[1]).to.equal(45)
+      })
+      .catch((err) => {
+        throw err;
+      });
+  });
   after(() => {
     db.closeConnection()
   });
