@@ -105,7 +105,7 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
     const idx = parseInt((breakTimeMin - 1) / interval);
     if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
-      console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
+      // console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
       breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
     }
     return acc;
