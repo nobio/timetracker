@@ -1,29 +1,12 @@
-require('../db');
-const fs = require('fs');
-const mongoose = require('mongoose');
-
-const TimeEntry = mongoose.model('TimeEntry');
-const StatsDay = mongoose.model('StatsDay');
-const util = require('../api/stats/util-stats');
-const utilTimeEntry = require('../api/entries/util-entries');
-const utilTimebox = require('../api/stats/util-statstimebox');
-const utilHistogram = require('../api/stats/util-histogram');
 const utilBreaktime = require('../api/stats/util-breaktime');
 
 const chai = require('chai');
-
 const chaiAsPromised = require('chai-as-promised');
-
 chai.use(chaiAsPromised);
-
 const expect = chai.expect;
 const assert = chai.assert;
 const should = chai.should;
 
-const moment = require('moment');
-require('moment-timezone');
-
-const DEFAULT_DATE = moment('1967-03-16');
 const TIME_ENTRIES_01 = [
   {
     direction: 'enter',
@@ -75,11 +58,6 @@ const TIME_ENTRIES_02 = [
 /** ************************************************************ */
 
 describe('test util-breaktime - Promise', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
   it('getAllTimeEntriesGroupedByDate one day', async () => {
     await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then((result) => {
@@ -250,9 +228,4 @@ describe('test util-breaktime - Promise', () => {
       });
   });
 
-  after(() => {
-    db.closeConnection();
-  });
 });
-
-// ========================================================================================================
