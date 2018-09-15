@@ -5,7 +5,7 @@ const DEFAULT_BREAK_TIME = 45 * 60; // 45 min in seconds
 const COUNT_MINUTES = 120; // 120 minutes for histogram (0..120)
 /**
  * get an array of break times; format of one item: {time: t, breakTime: 0.0}
- * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc 
+ * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc
  */
 exports.getBreakTime = (interval, realCalc) => new Promise((resolve, reject) => {
   utilEntry.getAll()
@@ -18,23 +18,23 @@ exports.getBreakTime = (interval, realCalc) => new Promise((resolve, reject) => 
 
 /**
  * create a Map with the date as key and an array of entry_dates as value (entry_date in unix timestamp)
- * @param {all time entries sorted by entry_date} timeEntries 
+ * @param {all time entries sorted by entry_date} timeEntries
  */
 exports.getAllTimeEntriesGroupedByDate = timeEntries => new Promise((resolve, reject) => {
   try {
     const datesFromArray = timeEntries.reduce((acc, timeEntry) => {
-        const date_time = moment(timeEntry.entry_date).locale('de');
-        const dt = date_time.format('L'); // key
-        const time = date_time.format('X'); // value as Unix-Timestamp in seconds
-        const item = acc.get(dt);
-        if (item) {
-          item.push(time);
-        } else {
-          acc.set(dt, [time]);
-        }
+      const date_time = moment(timeEntry.entry_date).locale('de');
+      const dt = date_time.format('L'); // key
+      const time = date_time.format('X'); // value as Unix-Timestamp in seconds
+      const item = acc.get(dt);
+      if (item) {
+        item.push(time);
+      } else {
+        acc.set(dt, [time]);
+      }
 
-        return acc;
-      }, new Map(), //  optional initial value (here mandandory)
+      return acc;
+    }, new Map(), //  optional initial value (here mandandory)
     );
     resolve(datesFromArray);
   } catch (err) {
@@ -43,11 +43,11 @@ exports.getAllTimeEntriesGroupedByDate = timeEntries => new Promise((resolve, re
 });
 
 /**
- * prepare the array from getAllTimeEntriesGroupedByDate method and calculate for each item in 
+ * prepare the array from getAllTimeEntriesGroupedByDate method and calculate for each item in
  * this map a break time from the array of entry_dates
- * 
- * @param {all time entries sorted by entry_date} timeEntries 
- * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc 
+ *
+ * @param {all time entries sorted by entry_date} timeEntries
+ * @param {true if only the 'real' values count; false if by default a 45 min break should be calculated} realCalc
  */
 exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, reject) => {
   const breakTimes = [];
@@ -81,12 +81,12 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
 
 /**
  * calculate a historgram; key is the minute (0..120) and valus is the number of counts for this minute
- *  
- * @param {*} preparedBreakTimes 
+ *
+ * @param {*} preparedBreakTimes
  */
 exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Promise((resolve, reject) => {
   // prepare data structure regarding the interval.
-  let breakTimes = [];
+  const breakTimes = [];
 
   for (let t = 0; t <= COUNT_MINUTES; t += interval) {
     breakTimes.push({
@@ -95,13 +95,13 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
     });
   }
 
-  // iterating over preparedBreakTimes but not manipulating this array rather than the array breakTimes; 
+  // iterating over preparedBreakTimes but not manipulating this array rather than the array breakTimes;
   // ok, could have been done also in a classic way using the iterator and loops...
   // "index" is the break time in minutes
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
-    let idx = parseInt((breakTimeMin - 1) / interval);
+    const idx = parseInt((breakTimeMin - 1) / interval);
     if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
-      //console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
+      // console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
       breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
     }
     return acc;
