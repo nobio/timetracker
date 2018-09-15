@@ -2,6 +2,7 @@ const utilEntries = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;

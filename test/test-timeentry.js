@@ -1,10 +1,12 @@
 require('../db');
 const mongoose = require('mongoose');
+
 const TimeEntry = mongoose.model('TimeEntry');
 const util = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
@@ -13,6 +15,7 @@ const should = chai.should;
 
 const moment = require('moment');
 require('moment-timezone');
+
 const DEFAULT_DATE = moment('1967-03-16');
 const TWO_ENTRIES =
 [
