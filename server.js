@@ -12,23 +12,26 @@ const api_admin = require('./api/admin');
 const api_stats = require('./api/stats');
 const api_misc = require('./api/misc');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 const moment = require('moment');
 const favicon = require('serve-favicon');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const app = express();
 
 app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
+app.set('ssl-port', '30443');
 app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(morgan('[:date[web]] (:user-agent, :remote-addr, :response-time ms) :method :url - status: :status'));
+app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
 //app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -79,7 +82,15 @@ app.get('/api/experiment', api_misc.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-   console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
+  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
+});
+
+const options = {
+  key: fs.readFileSync('keys/key.pem'),
+  cert: fs.readFileSync('keys/cert.pem')
+};
+https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
+  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 
