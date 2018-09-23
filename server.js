@@ -22,11 +22,16 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
+const options = {
+  key: fs.readFileSync('keys/key.pem'),
+  cert: fs.readFileSync('keys/cert.pem')
+};
+
 const app = express();
 
 app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
-app.set('ssl-port', '30443');
+app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
@@ -82,15 +87,11 @@ app.get('/api/experiment', api_misc.experiment);
 
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('port')}`);
+  console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
-const options = {
-  key: fs.readFileSync('keys/key.pem'),
-  cert: fs.readFileSync('keys/cert.pem')
-};
 https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
-  console.log(`\nExpress server listening on http://${app.get('host')}:${app.get('ssl-port')}`);
+  console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 
