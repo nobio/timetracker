@@ -5,10 +5,10 @@ const schema = mongoose.Schema;
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
 const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 
-const MONGO_URL_SOURCE = MONGO_URL_MLAB;
-const MONGO_URL_TARGET = MONGO_URL_DOCKER;
-//const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
-//const MONGO_URL_TARGET = MONGO_URL_MLAB;
+//const MONGO_URL_SOURCE = MONGO_URL_MLAB;
+//const MONGO_URL_TARGET = MONGO_URL_DOCKER;
+const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
+const MONGO_URL_TARGET = MONGO_URL_MLAB;
 
 
 const migrationData = [];
@@ -28,7 +28,8 @@ const TimeEntry = new schema({
 });
 
 const TIME_ENTRY_MODEL_SOURCE = mongoose.model('TimeEntry', TimeEntry);
-const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
+//const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
+const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
 
 /**
  * Reads data from source data source and returns an json array
