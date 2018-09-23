@@ -28,11 +28,11 @@ app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(morgan('[:date[web]] :remote-user :method :url - status: :status'));
+app.use(morgan('[:date[web]] (:user-agent, :remote-addr, :response-time ms) :method :url - status: :status'));
+//app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 
 /*
 app.configure('production', function() {
