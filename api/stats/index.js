@@ -105,13 +105,11 @@ exports.breaktime = (req, res) => {
   const interval = parseInt(req.params.interval);
   const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
 
-  if (!interval || '0' == interval) {
+  if (!interval || interval == '0') {
     res.status(500).send('invalid interval; must be numeric and > 0');
   } else {
-
     utilBreaktime.getBreakTime(interval, realCalc)
       .then(data => res.status(200).send(data))
       .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
-
   }
 };

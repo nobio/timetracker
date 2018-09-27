@@ -10,8 +10,14 @@ const packageJson = require('../../package.json');
  * curl -X GET http://localhost:30000/api/ping
  */
 exports.ping = (req, res) => {
+  var ip = (req.headers['x-forwarded-for'] ||
+  req.connection.remoteAddress ||
+  req.socket.remoteAddress ||
+  req.connection.socket.remoteAddress).split(",")[0];
+
   res.status(200).send({
     response: 'pong',
+    client_ip: ip
   });
 };
 
