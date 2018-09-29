@@ -10,6 +10,8 @@ const db_config = {
     poolSize: 5,
     keepAlive: 120,
     bufferMaxEntries: -1,
+    useCreateIndex: true,
+    useNewUrlParser: true,
   },
 };
 

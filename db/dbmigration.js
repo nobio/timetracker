@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
+mongoose.set('useNewUrlParser', true);
 
 const schema = mongoose.Schema;
 
@@ -37,7 +38,7 @@ const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
  */
 function getDataFromSource() {
     return new Promise((resolve, reject) => {
-        mongoose.connect(MONGO_URL_SOURCE, { useNewUrlParser: true });
+        mongoose.connect(MONGO_URL_SOURCE);
 
         TIME_ENTRY_MODEL_SOURCE.find()
             .then((timeEntries) => {
@@ -52,7 +53,7 @@ function getDataFromSource() {
 }
 
 function deleteAllTarget() {
-    mongoose.connect(MONGO_URL_TARGET, { useNewUrlParser: true });
+    mongoose.connect(MONGO_URL_TARGET);
 
     return new Promise((resolve, reject) => {
         TIME_ENTRY_MODEL_TARGET.remove()
