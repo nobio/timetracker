@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 
 const schema = mongoose.Schema;
 
@@ -82,12 +83,13 @@ function storeDataToTarget(timeEntries) {
                 latitude: timeentry.latitude,
             }).save()
                 .then(doc => {
+                    console.log('saved: ObjectId(\'' + timeentry._id + '\')')
                     n++;
                     if (n >= timeEntries.length) { mongoose.connection.close(); }
                 })
                 .catch(err => {
+                    console.error(err.message);
                     n++;
-                    console.log(err.message);
                     if (n >= timeEntries.length) { mongoose.connection.close(); }
                     //reject(err);
                 });
