@@ -12,9 +12,6 @@ const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
 const MONGO_URL_TARGET = MONGO_URL_MLAB;
 
-
-const migrationData = [];
-
 /* ==================================================================== */
 
 // Schema
