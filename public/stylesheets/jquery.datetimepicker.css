@@ -1,6 +1,6 @@
 .xdsoft_datetimepicker{
 	box-shadow: 0px 5px 15px -5px rgba(0, 0, 0, 0.506);
-	background: #FFFFFF;
+	background: rgb(184, 184, 184);
 	border-bottom: 1px solid #BBBBBB;
 	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #CCCCCC;
@@ -125,7 +125,7 @@
 .xdsoft_datetimepicker  .xdsoft_timepicker .xdsoft_time_box >div >div{
 	background: #F5F5F5;
 	border-top:1px solid #DDDDDD;
-	color: #666666;
+	color: #c46014;
 	font-size: 12px;
 	text-align: center;
 	border-collapse:collapse;
