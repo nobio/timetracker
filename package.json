@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "14.6.6",
-    "last_build": "2018-09-23T16:42:04.461Z",
+    "version": "14.6.7",
+    "last_build": "2018-10-01T06:43:40.734Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -13,7 +13,8 @@
         "nodemon": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
-        "build": "node ./bin/build.js"
+        "build": "node ./bin/build.js",
+        "backup": "node db/dbmigration"
     },
     "devDependencies": {
         "chai": "^4.2.0",
