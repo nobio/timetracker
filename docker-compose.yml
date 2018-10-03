@@ -26,3 +26,11 @@ services:
       - ./data:/data/db
     ports:
       - "27017:27017"
+  mongo-admin:
+    container_name: mongo-admin
+    image: nobio/mongo-admin:latest
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - "30031:3001"
