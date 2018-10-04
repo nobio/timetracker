@@ -75,38 +75,9 @@ block content
         th
             input(type='radio', name='time_unit', value='year', onclick='$("#month_to_display").val(moment().format("YYYY")); nextStatsDay($("#table_stats_day"), $("#month_to_display"), $("input[name=time_unit]:checked").val(), "0");')
             | year
-
-    table
         tr
-            td
-                table
-                    tr
-                        td 
-                            |Planned time:
-                        td
-                            span#plannedTime
-                            |  hours
-                    tr
-                        td
-                            |Actual time:
-                        td
-                            span#actualTime
-                            |  hours
-                    tr
-                        td
-                            |Difference:
-                        td
-                            span#diffTime
-                            |  hours
-                    tr
-                        td
-                            |Average:
-                        td
-                            span#averageTime
-                            |  hours
-
-            td
-                figure#busyChart(style='width: 400px; height: 300px;')
+            td(colspan="7")
+                figure#busyChart(style='width: 100%; height: 300px;')
 
         
             
