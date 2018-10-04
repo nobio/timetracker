@@ -10,7 +10,7 @@ const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
-exports.dumpTimeEnties = () => new Promise((resolve, reject) => {
+exports.dumpTimeEntries = () => new Promise((resolve, reject) => {
   TimeEntry.find()
     .then((timeEntries) => {
       fs.stat('./dump', (err) => {
