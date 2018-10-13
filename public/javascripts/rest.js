@@ -202,12 +202,13 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
     stats.fetch({ 
         data: {timeUnit: timeUnit},
         success:function(timerecord) {
+            busyChartVariable.setData(timerecord.get("chart_data"));
+            /*
             plannedTime.innerHTML = Math.round(timerecord.get("planned_working_time") / 1000 / 60 / 60 * 100) / 100;
             actualTime.innerHTML = Math.round(timerecord.get("actual_working_time") / 1000 / 60 / 60 * 100) / 100;
             averageTime.innerHTML = Math.round(timerecord.get("average_working_time") * 100) / 100;
-            diffTime.innerHTML = Math.round((timerecord.get("actual_working_time") - timerecord.get("planned_working_time")) / 1000 / 60 / 60 * 100) / 100;
-            
-            busyChartVariable.setData(timerecord.get("chart_data"));
+            diffTime.innerHTML = Math.round((timerecord.get("actual_working_time") - timerecord.get("planned_working_time")) / 1000 / 60 / 60 * 100) / 100;            
+            */
         },
         error: function(model, err) {
             console.log(model);
