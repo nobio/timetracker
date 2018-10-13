@@ -13,6 +13,7 @@ services:
       - ./dump:/usr/src/app/dump
     ports:
       - "30030:30000"
+      - "30043:30443"
     links:
       - mongo
     depends_on:

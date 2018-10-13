@@ -21,7 +21,7 @@ RUN npm audit fix
 # Bundle app source
 COPY . .
 
-EXPOSE 30000
+EXPOSE 30000 30443
 CMD [ "npm", "start" ]
 
 
