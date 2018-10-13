@@ -50,7 +50,7 @@ describe('test util.dumpTimeEnties - Promise', () => {
   });
 
   it('dumping the database should lead to a new file in /dump', async () => {
-  	await util.dumpTimeEnties()
+  	await util.dumpTimeEntries()
       .then((result) => {
         console.log();
         expect(result).to.have.property('size');
