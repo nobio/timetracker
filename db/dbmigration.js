@@ -5,7 +5,8 @@ mongoose.set('useNewUrlParser', true);
 const schema = mongoose.Schema;
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
 
 //const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 //const MONGO_URL_TARGET = MONGO_URL_DOCKER;
@@ -35,10 +36,12 @@ const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
  */
 function getDataFromSource() {
     return new Promise((resolve, reject) => {
+        console.log('connecting to source database')
         mongoose.connect(MONGO_URL_SOURCE);
 
         TIME_ENTRY_MODEL_SOURCE.find()
             .then((timeEntries) => {
+                console.log('closing source database')
                 mongoose.connection.close();
                 resolve(timeEntries);
             })
@@ -50,6 +53,7 @@ function getDataFromSource() {
 }
 
 function deleteAllTarget() {
+    console.log('connecting to target database')
     mongoose.connect(MONGO_URL_TARGET);
 
     return new Promise((resolve, reject) => {
@@ -66,6 +70,7 @@ function deleteAllTarget() {
  */
 function storeDataToTarget(timeEntries) {
     let n = 0;
+    console.log('connecting to target database')
     mongoose.connect(MONGO_URL_TARGET, { useNewUrlParser: true });
     return new Promise((resolve, reject) => {
 
