@@ -2,9 +2,6 @@
  * Module dependencies.
  */
 
-// mongoose setup
-require('./db');
-
 const express = require('express');
 const web = require('./web');
 const api_entries = require('./api/entries');
