@@ -16,7 +16,7 @@ exports.scheduleTasks = function () {
   console.log('job scheduler: dumpTimeEntry (every day at 04:05)');
   scheduler.scheduleJob({ hour: 4, minute: 5 }, () => { // every day at 04:05
     console.log('scheduled task "dumpTimeEntry" started');
-    admin.dumpTimeEnties();
+    admin.dumpTimeEntries();
   });
 
   console.log('job scheduler: backupTimeEntry (every hour at 10 past (??:10)');
