@@ -117,11 +117,11 @@ exports.create = (timeEntry) => {
 
         // all checks successfully done, lets create the TimeEntry!
         new TimeEntry({
-            entry_date: timeEntry.datetime,
-            direction: timeEntry.direction,
-            longitude: timeEntry.longitude,
-            latitude: timeEntry.latitude,
-          }).save()
+          entry_date: timeEntry.datetime,
+          direction: timeEntry.direction,
+          longitude: timeEntry.longitude,
+          latitude: timeEntry.latitude,
+        }).save()
           .then(tEntry => resolve(tEntry))
           .catch(err => reject(err));
       })
@@ -194,11 +194,11 @@ exports.getAllByDate = (date) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-        entry_date: {
-          $gte: dtStart,
-          $lt: dtEnd,
-        },
-      }).skip(0).sort({ entry_date: 1 })
+      entry_date: {
+        $gte: dtStart,
+        $lt: dtEnd,
+      },
+    }).skip(0).sort({ entry_date: 1 })
       .then((timeentries) => {
         /*
         if (timeentries.length === 0) {
@@ -293,7 +293,7 @@ exports.count = () => new Promise((resolve, reject) => {
  * @returns Promise and then (resolve) last time entry of the given date (no array, ony one TimeEntry)
  */
 exports.getLastTimeEntryByDate = (dt) => {
-  if (typeof(dt) === 'string') {
+  if (typeof (dt) === 'string') {
     dt = moment(dt);
   }
   const dtStart = this.stripdownToDateBerlin(dt);
@@ -303,11 +303,11 @@ exports.getLastTimeEntryByDate = (dt) => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
-        entry_date: {
-          $gte: dtStart,
-          $lt: dtEnd,
-        },
-      }).skip(0).limit(1).sort({ entry_date: -1 })
+      entry_date: {
+        $gte: dtStart,
+        $lt: dtEnd,
+      },
+    }).skip(0).limit(1).sort({ entry_date: -1 })
       .then((timeentry) => {
         if (timeentry === undefined || timeentry.length === 0 || timeentry.length > 1) {
           // reject(new Error('No Time Entry found for given date : ' + date))
@@ -325,13 +325,13 @@ exports.getLastTimeEntryByDate = (dt) => {
 
 exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
   TimeEntry.aggregate([{
-      $group: {
-        _id: 0,
-        age: {
-          $min: '$entry_date',
-        },
+    $group: {
+      _id: 0,
+      age: {
+        $min: '$entry_date',
       },
-    }])
+    },
+  }])
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
@@ -340,13 +340,13 @@ exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
 
 exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
   TimeEntry.aggregate([{
-      $group: {
-        _id: 0,
-        age: {
-          $max: '$entry_date',
-        },
+    $group: {
+      _id: 0,
+      age: {
+        $max: '$entry_date',
       },
-    }])
+    },
+  }])
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
@@ -359,8 +359,8 @@ exports.removeDoublets = () => {
 
   return new Promise((resolve, reject) => {
     TimeEntry.find().sort({
-        entry_date: 1,
-      })
+      entry_date: 1,
+    })
       .then((timeEntries) => {
         timeEntries.forEach((timeentry) => {
           if (lastTimeentry !== undefined) {
