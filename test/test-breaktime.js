@@ -2,6 +2,7 @@ const utilBreaktime = require('../api/stats/util-breaktime');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const assert = chai.assert;
@@ -227,5 +228,4 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-
 });
