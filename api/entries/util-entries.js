@@ -200,8 +200,6 @@ exports.getAllByDate = (date) => {
         },
       }).skip(0).sort({ entry_date: 1 })
       .then((timeentries) => {
-        console.log('getAllByDate received date: ' + moment(dtStart).format('YYYY-MM-DD HH:mm:ss') + ' - ' + moment(dtEnd).format('YYYY-MM-DD HH:mm:ss') + '....' + timeentries)
-
         /*
         if (timeentries.length === 0) {
           // /reject(new Error(`Es gibt keine Einträge für diesen Tag (${date.format('DD.MM.YYYY')})`), 1);

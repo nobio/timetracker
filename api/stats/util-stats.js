@@ -51,7 +51,6 @@ exports.calculateStatistics = (firstEntry, lastEntry) =>
       this.getBusytimeByDate(dt)
         .then((busytime) => {
           if (busytime && busytime.busytime != 0) {
-            console.log(JSON.stringify(dt) + ' => ' + JSON.stringify(busytime));
             new StatsDay({
               date: dt,
               actual_working_time: busytime.busytime / 1,
@@ -101,7 +100,6 @@ exports.getBusytimeByDate = dt => new Promise((resolve, reject) => {
           return;
         }
 
-        console.log(JSON.stringify(timeentries));
         const end = timeentries[n].entry_date;
         const start = timeentries[n - 1].entry_date;
 

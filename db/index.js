@@ -30,16 +30,13 @@ if (!String.prototype.contains) {
 console.log('init database');
 
 const mongoose = require('mongoose');
-
 const schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 // TimeEntry
 const directions = 'enter go'.split(' ');
 const TimeEntry = new schema({
-  entry_date: {
-    type: Date, required: true, default: Date.now, index: true,
-  },
+  entry_date: { type: Date, required: true, default: Date.now, index: true },
   direction: { type: String, enum: directions, required: true },
   last_changed: { type: Date, default: Date.now, required: true },
   longitude: { type: Number, required: false },
@@ -66,17 +63,19 @@ const StatsDay = new schema({
 mongoose.model('StatsDay', StatsDay);
 
 const monoddb_options = db_config.options;
-let mongodb_url = process.env.MONGO_URL; // try to use environment variable, perhaps given by container
-if (!mongodb_url) {
-  console.error('overwriting mongodb_url');
+let mongodb_url = process.env.MONGO_URL;  // try to use environment variable, perhaps given by container
+if(!mongodb_url) {
+  console.error('overwriting mongodb_url')
   mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 }
-// mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
+//mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 
-console.log(`connecting to mongodb on ${
-  mongodb_url
-} with options ${
-  JSON.stringify(monoddb_options)}`);
+console.log(
+  `connecting to mongodb on ${
+    mongodb_url
+  } with options ${
+    JSON.stringify(monoddb_options)}`,
+);
 mongoose.connect(mongodb_url, monoddb_options).then(
   () => {
     console.log('mongodb is ready to use.');
