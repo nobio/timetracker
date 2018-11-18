@@ -3,7 +3,7 @@ sudo: required #is required to use docker service in travis
 language: node_js #can be any language, just php for example
 node_js:
   - "8.9.3"
-  
+
 services:
   - docker 
 
@@ -18,8 +18,11 @@ after_success:
   - docker --version  # document the version travis is using
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
   - docker build -t nobio/timetracker:$COMMIT .
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
+
+  #- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
+  - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
   - docker images
+  
   - docker tag $IMAGE_NAME:$COMMIT $REPO:$TAG
   - docker tag $IMAGE_NAME:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
   - docker push $IMAGE_NAME
