@@ -9,7 +9,7 @@ env:
   global:
     - IMAGE_NAME=$DOCKER_USERNAME/timetracker
 
-    script:
+script:
   - npm test
 
 after_success:
@@ -21,5 +21,3 @@ after_success:
   - docker tag $IMAGE_NAME:$COMMIT $REPO:$TAG
   - docker tag $IMAGE_NAME:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
   - docker push $IMAGE_NAME
-
-language: node_js
