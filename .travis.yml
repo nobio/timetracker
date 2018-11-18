@@ -17,6 +17,7 @@ script:
 after_success:
   - docker --version  # document the version travis is using
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - echo $TAG
   - docker build -t nobio/timetracker:$COMMIT .
 
   #- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
