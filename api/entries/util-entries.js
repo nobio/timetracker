@@ -39,6 +39,19 @@ exports.stripdownToDateBerlin = (date) => {
   // console.log(d.format('YYYY-MM-DD HH:mm:ss'))
   return d;
 };
+/**
+ * takes the date and removes all time components
+ * date expected to be a moment object
+ */
+exports.stripdownToDateUTC = (date) => {
+  const d = moment.tz(date / 1, 'WET');
+  d.millisecond(0);
+  d.second(0);
+  d.minutes(0);
+  d.hours(0);
+  // console.log(d.format('YYYY-MM-DD HH:mm:ss'))
+  return d;
+};
 
 /**
  * finds one entry by it's id
