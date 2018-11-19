@@ -38,6 +38,7 @@ after_success:
   - if [ $TRAVIS_BRANCH == "master" ]; then
         docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
         docker push $IMAGE_NAME:$VERSION;
+        docker push $IMAGE_NAME:latest;
     else
       docker push $IMAGE_NAME:$TAG;
     fi;
