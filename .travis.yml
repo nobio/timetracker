@@ -11,14 +11,21 @@ env:
   global:
     - IMAGE_NAME=$DOCKER_USERNAME/timetracker
 
+before_script:
+  - if [ $TRAVIS_BRANCH == "master" ]; then
+        export TAG=latest
+    else
+        export TAG=$TRAVIS_BRANCH-DEV
+    fi
+
+  - echo $TAG
+  
 script:
   - npm test
 
 after_success:
   - docker --version  # document the version travis is using
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
-  - echo $TAG
-  - docker build -t nobio/timetracker:$TAG .
+  - docker build -t $IMAGE_NAME:$TAG .
 
   #- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
   - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
