@@ -42,7 +42,6 @@ after_success:
       docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
       docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
       docker push $IMAGE_NAME:$VERSION;
-      # ----------------
       docker push $IMAGE_NAME:$TAG;
     fi;
   
