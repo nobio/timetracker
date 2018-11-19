@@ -12,6 +12,10 @@ env:
     - IMAGE_NAME=$DOCKER_USERNAME/timetracker
 
 before_script:
+  # version
+  - VERSION=`cat VERSION`
+  -echo $VERSION
+
   - if [ $TRAVIS_BRANCH == "master" ]; then
         export TAG=latest;
     else
@@ -31,6 +35,9 @@ after_success:
   - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
   - docker images
   
-  - docker tag $IMAGE_NAME:$TAG $REPO:$TAG
-  - docker tag $IMAGE_NAME:$TAG $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - if [ $TRAVIS_BRANCH == "master" ]; then
+        docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION
+        docker push $IMAGE_NAME:$VERSION    
+    fi;
+  - docker push $IMAGE_NAME:$TAG
   - docker push $IMAGE_NAME
