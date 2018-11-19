@@ -13,10 +13,10 @@ env:
 
 before_script:
   - if [ $TRAVIS_BRANCH == "master" ]; then
-        export TAG=latest
+        export TAG=latest;
     else
-        export TAG=$TRAVIS_BRANCH-DEV
-    fi
+        export TAG=$TRAVIS_BRANCH-DEV;
+    fi;
 
   - echo $TAG
   
