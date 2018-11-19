@@ -19,7 +19,7 @@ before_script:
   - if [ $TRAVIS_BRANCH == "master" ]; then
         export TAG=latest;
     else
-        export TAG=$TRAVIS_BRANCH-DEV;
+        export TAG=_$TRAVIS_BRANCH-DEV;
     fi;
 
   - echo $TAG
@@ -39,10 +39,7 @@ after_success:
         docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
         docker push $IMAGE_NAME:$VERSION;
     else
-      docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
-      docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
-      docker push $IMAGE_NAME:$VERSION;
       docker push $IMAGE_NAME:$TAG;
     fi;
   
-  - docker push $IMAGE_NAME
+  # - docker push $IMAGE_NAME
