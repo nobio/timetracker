@@ -36,8 +36,8 @@ after_success:
   - docker images
   
   - if [ $TRAVIS_BRANCH == "master" ]; then
-        docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION
-        docker push $IMAGE_NAME:$VERSION    
+        docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
+        docker push $IMAGE_NAME:$VERSION;
     fi;
   - docker push $IMAGE_NAME:$TAG
   - docker push $IMAGE_NAME
