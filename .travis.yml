@@ -14,7 +14,7 @@ env:
 before_script:
   # version
   - VERSION=`cat VERSION`
-  -echo $VERSION
+  - echo $VERSION
 
   - if [ $TRAVIS_BRANCH == "master" ]; then
         export TAG=latest;
