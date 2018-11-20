@@ -42,5 +42,5 @@ after_success:
     else
       docker push $IMAGE_NAME:$TAG;
     fi;
-  
+
   # - docker push $IMAGE_NAME
