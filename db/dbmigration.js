@@ -58,7 +58,7 @@ function deleteAllTarget() {
 
     return new Promise((resolve, reject) => {
         TIME_ENTRY_MODEL_TARGET.remove()
-            .then(() => resolve('ok'))
+            .then(() => resolve('deletion ok'))
             .catch((err) => reject(err));
     });
 }
@@ -105,6 +105,18 @@ function storeDataToTarget(timeEntries) {
 }
 
 // start the migration...
+/*
+deleteAllTarget()
+    .then(result => {
+        console.log(result)
+        process.exit(0)
+    })
+    .catch((err) => {
+        console.log(err);
+        console.log('***********************************************************************')
+        process.exit(-1);
+    });
+*/
 getDataFromSource()
     .then(storeDataToTarget)
     .then(msg => console.log(msg))
