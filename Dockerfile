@@ -84,6 +84,8 @@ CMD [ "npm", "start" ]
 
 # --- rebuild
 # docker-compose down; docker-compose build; docker-compose up -d; docker-compose logs -f
+# docker-compose down; docker-compose pull; docker-compose build; docker-compose up -d; docker-compose logs -f
+
 
 # --- logging
 # docker-compose logs -f
