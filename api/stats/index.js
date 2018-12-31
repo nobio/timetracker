@@ -42,10 +42,10 @@ exports.deleteAllStatsDays = (req, res) => {
 };
 
 /**
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=day
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=week
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=month
- * curl -X GET http://localhost:30000/statistics/aggregate?timeUnit=weekday
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=day
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=week
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=month
+ * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
   const timeUnit = req.query.timeUnit;

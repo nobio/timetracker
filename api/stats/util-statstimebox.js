@@ -24,12 +24,40 @@ function varianz(a, curr, idx, array) {
   return a + curr;
 }
 
-function renderOneData(data, weekday) {
-  // TODO: variance!!!!
-  const avg = data.duration / data.count;
+/**
+ * Examples:
+ * data: {
+      duration: 0,
+      count: 0,
+      average: 0,
+      rawData: [],
+    }
+    weekDay: 'Mo'
+ */
+function renderOneData(data, weekDay) {
+
+  // calculate duration (=sum over all workingTimes) and count
+  let tmpData = data.rawData.reduce(function({ count, sum }, workingTime) {
+    return {
+      count: count + 1,
+      sum: sum + workingTime
+    }
+  }, { count: 0, sum: 0 });
+
+  // calculate the average working time for this week day
+  tmpData.avg = tmpData.sum / tmpData.count;
+
+  // map to an array with quadratic distances from average
+  const distances = data.rawData.map(x => (Math.pow((x - tmpData.avg), 2)));
+  tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count); // varianz = sum of qudaratic distances / count; deviation = sqrt (varianz)
+
+  //console.log(JSON.stringify(tmpData));
+
   return {
-    x: weekday,
-    y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    x: weekDay,
+    y: Math.round(tmpData.avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    n: tmpData.count,
+    dev: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
   };
 }
 
@@ -138,39 +166,32 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
   }];
   const time_data = {
     Mo: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     Tu: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     We: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     Th: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     Fr: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     Sa: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
     Su: {
-      duration: 0,
-      count: 0,
+      rawData: [],
     },
   };
 
-  stats.forEach((stat) => {
-    const timeUnit = moment(stat.date).format('dd');
-    time_data[timeUnit].duration += stat.actual_working_time;
-    time_data[timeUnit].count += 1;
+  // prepare data array: sort all working times to the corresponding week day
+  stats.forEach(stat => {
+    const timeUnit = moment.tz(stat.date, "Europe/Berlin").format('dd');
+    time_data[timeUnit].rawData.push(stat.actual_working_time);
   });
 
   // calculate statistics of last week
