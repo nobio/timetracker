@@ -43,13 +43,13 @@ exports.calcStats = () => {
 exports.calculateStatistics = (firstEntry, lastEntry) =>
   new Promise((resolve, reject) => {
     let date = utilEntry.stripdownToDateUTC(firstEntry.age);
-    
+
     while (date <= moment(lastEntry.age)) {
       // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
       const dt = moment(date);
       this.getBusytimeByDate(dt)
         .then((busytime) => {
-          //console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+          // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
           if (busytime && busytime.busytime != 0) {
             new StatsDay({
               date: dt,

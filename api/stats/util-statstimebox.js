@@ -35,14 +35,11 @@ function varianz(a, curr, idx, array) {
     weekDay: 'Mo'
  */
 function renderOneData(data, weekDay) {
-
   // calculate duration (=sum over all workingTimes) and count
-  let tmpData = data.rawData.reduce(function({ count, sum }, workingTime) {
-    return {
-      count: count + 1,
-      sum: sum + workingTime
-    }
-  }, { count: 0, sum: 0 });
+  const tmpData = data.rawData.reduce(({ count, sum }, workingTime) => ({
+    count: count + 1,
+    sum: sum + workingTime,
+  }), { count: 0, sum: 0 });
 
   // calculate the average working time for this week day
   tmpData.avg = tmpData.sum / tmpData.count;
@@ -51,7 +48,7 @@ function renderOneData(data, weekDay) {
   const distances = data.rawData.map(x => (Math.pow((x - tmpData.avg), 2)));
   tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count); // varianz = sum of qudaratic distances / count; deviation = sqrt (varianz)
 
-  //console.log(JSON.stringify(tmpData));
+  // console.log(JSON.stringify(tmpData));
 
   return {
     x: weekDay,
@@ -120,9 +117,9 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
       // const sum = time_unit_stats.reduce((total, value) => total + value);
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
-      // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD'));
+      //console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD') + " / " + lastTimeUnit + " / " + moment(lastTimeUnit).format('YYYY-MM-DD'));
       data[idx] = {
-        x: moment(lastTimeUnit).format('YYYY-MM-DD'),
+        x: moment(lastTimeUnit).format(timeUnitFormatString),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
 
@@ -189,19 +186,19 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
   };
 
   // prepare data array: sort all working times to the corresponding week day
-  stats.forEach(stat => {
-    const timeUnit = moment.tz(stat.date, "Europe/Berlin").format('dd');
+  stats.forEach((stat) => {
+    const timeUnit = moment.tz(stat.date, 'Europe/Berlin').format('dd');
     time_data[timeUnit].rawData.push(stat.actual_working_time);
   });
 
   // calculate statistics of last week
   data[0] = renderOneData(time_data.Mo, 'Mo');
-  data[1] = renderOneData(time_data.Tu, 'Tu');
-  data[2] = renderOneData(time_data.We, 'We');
-  data[3] = renderOneData(time_data.Th, 'Th');
+  data[1] = renderOneData(time_data.Tu, 'Di');
+  data[2] = renderOneData(time_data.We, 'Mi');
+  data[3] = renderOneData(time_data.Th, 'Do');
   data[4] = renderOneData(time_data.Fr, 'Fr');
-  data[5] = renderOneData(time_data.Sa, 'Sa');
-  data[6] = renderOneData(time_data.Su, 'Su');
+  //data[5] = renderOneData(time_data.Sa, 'Sa');
+  //data[6] = renderOneData(time_data.Su, 'Su');
 
   return data;
 }
