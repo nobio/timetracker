@@ -1,5 +1,5 @@
 const utilEntries = require('../api/entries/util-entries');
-const utilGlobal = require('../api/global_util');
+const g_util = require('../api/global_util');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -41,13 +41,13 @@ describe('isEmpty', () => {
 });
 
 describe('test global_util.sendMessage() - just like that...', async () => {
-  await utilGlobal.sendMessage('I am unit testing, just like that...')
+  await g_util.sendMessage('I am unit testing, just like that...')
     .then() 
     .catch((err) => { throw (err); });
 });
 
 describe('test global_util.sendMessage() - as promise', async () => {
-  await utilGlobal.sendMessage('I am unit testing as promise...')
+  await g_util.sendMessage('I am unit testing as promise...')
     .then((result) => {
       expect(result).to.not.be.undefined
       expect(result).to.have.property('ok');
