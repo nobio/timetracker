@@ -40,14 +40,15 @@ describe('isEmpty', () => {
   });
 });
 
-describe('test global_util.sendMessage() - just like that...', async () => {
-  await g_util.sendMessage('I am unit testing, just like that...')
+describe('test global_util.sendMessage()', () => {
+  it('should work just fine', async () => {
+    await g_util.sendMessage('I am unit testing, just like that...')
     .then() 
     .catch((err) => { throw (err); });
-});
+  });
 
-describe('test global_util.sendMessage() - as promise', async () => {
-  await g_util.sendMessage('I am unit testing as promise...')
+  it('should work just fine as promise', async () => {
+    await g_util.sendMessage('I am unit testing as promise...')
     .then((result) => {
       expect(result).to.not.be.undefined
       expect(result).to.have.property('ok');
@@ -69,6 +70,7 @@ describe('test global_util.sendMessage() - as promise', async () => {
     .catch((err) => {
       throw err
     })
+  });
 })
 
 // assert('foo' !== 'bar', 'foo is not bar')
