@@ -1,4 +1,5 @@
 const utilEntries = require('../api/entries/util-entries');
+const utilGlobal = require('../api/global_util');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -38,19 +39,52 @@ describe('isEmpty', () => {
     expect(testv).to.be.false;
   });
 });
+
+describe('test global_util.sendMessage() - just like that...', async () => {
+  await utilGlobal.sendMessage('I am unit testing, just like that...')
+    .then() 
+    .catch((err) => { throw (err); });
+});
+
+describe('test global_util.sendMessage() - as promise', async () => {
+  await utilGlobal.sendMessage('I am unit testing as promise...')
+    .then((result) => {
+      expect(result).to.not.be.undefined
+      expect(result).to.have.property('ok');
+      expect(result.ok).to.equal(true)
+      expect(result).to.have.property('channel');
+      expect(result.channel).to.equal('CF5UTDCJE')
+      expect(result).to.have.property('message');
+      expect(result.message).to.have.property('type');
+      expect(result.message.type).to.equal('message');
+      expect(result.message).to.have.property('subtype');
+      expect(result.message.subtype).to.equal('bot_message');
+      expect(result.message).to.have.property('ts');
+      expect(result.message.ts).to.not.be.empty;
+      expect(result.message).to.have.property('username');
+      expect(result.message.username).to.equal('Nobio Tech');
+      expect(result.message).to.have.property('bot_id');
+      expect(result.message.bot_id).to.not.be.empty;
+    })
+    .catch((err) => {
+      throw err
+    })
+})
+
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
 describe('test utilEntries.getBusytimeByDate()', () => {
-  let db;
+  let db
   before(() => {
     // console.log('BEFORE')
-    db = require('../db');
-  });
-  it('response array should have length of 0', () => utilEntries.getAllByDate(-1).should.eventually.have.length(0));
-  it('response array should have length of 2', () => utilEntries.getAllByDate(1393455600000).should.eventually.have.length(2));
-  it('response array should have length of 0', () => utilEntries.getAllByDate(0).should.eventually.have.length(0));
+    db = require('../db')
+  })
+  it('response array should have length of 0', () => utilEntries.getAllByDate(-1).should.eventually.have.length(0))
+  it('response array should have length of 2', () => utilEntries.getAllByDate(1393455600000).should.eventually.have.length(2))
+  it('response array should have length of 0', () => utilEntries.getAllByDate(0).should.eventually.have.length(0))
 
   after(() => {
-    db.closeConnection();
-  });
-});
+    db.closeConnection()
+  })
+})
+ 
