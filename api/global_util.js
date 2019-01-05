@@ -23,7 +23,7 @@ const DEFAULT_SLACK_RESPONSE = {
  */
 exports.sendMessage = message => new Promise((resolve, reject) => {
   const web = new WebClient(SLACK_TOKEN)
-  const msg = '(' + moment().format('HH:mm:ss') + ') ' + message
+  const msg = '(' + moment.tz('Europe/Berlin').format('HH:mm:ss') + ') ' + message;
   console.log(msg)
 
   // if no SLACK_TOKEN was found then lets just return the default slack response (test cases...)
