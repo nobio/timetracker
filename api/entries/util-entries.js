@@ -4,7 +4,7 @@
  *
  */
 require('../../db');
-
+const g_util = require('../global_util');
 const moment = require('moment');
 const mongoose = require('mongoose');
 
@@ -136,6 +136,7 @@ exports.create = (timeEntry) => {
           latitude: timeEntry.latitude,
         }).save()
           .then(tEntry => resolve(tEntry))
+          .then(g_util.sendMessage('created new time entry ' + JSON.stringify(timeEntry)))
           .catch(err => reject(err));
       })
       .catch(err => reject(err));
@@ -191,6 +192,7 @@ exports.deleteById = id =>
   new Promise((resolve, reject) => {
     TimeEntry.findByIdAndRemove(id)
       .then(timeentry => resolve(timeentry))
+      .then(g_util.sendMessage('deleted time entry ' + id))
       .catch(err => reject(err));
   });
 

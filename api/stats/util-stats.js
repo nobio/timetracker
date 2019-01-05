@@ -1,4 +1,5 @@
 require('../../db');
+const g_util = require('../global_util');
 
 const utilEntry = require('../entries/util-entries');
 const mongoose = require('mongoose');
@@ -29,6 +30,7 @@ exports.calcStats = () => {
       .then(firstTimeEntry => utilEntry.getLastTimeEntry())
       .then(lastEntry => this.calculateStatistics(firstEntry, lastEntry))
       .then(result => resolve(result))
+      .then(g_util.sendMessage('statistics have been calculated'))
       .catch(err => reject(err));
   });
 };
