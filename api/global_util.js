@@ -1,7 +1,7 @@
 const moment = require('moment');
 
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
-const SLACK_TOKEN = 'xoxp-403948417110-402765462469-518735029302-63fc3b3a9f16d3deac703588780c1ae6';
+const SLACK_TOKEN = process.env.SLACK_TOKEN;
 // This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID
 const CONVERSATION_ID = '#timetracker';
 
