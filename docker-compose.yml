@@ -8,7 +8,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo:27017/timetracker
       #- MONGO_URL=mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack
-      - SLACK_TOKEN=xoxp-403948417110-402765462469-516597951536-c0aae7afa95b752bea9f814c8879fdae
+      - SLACK_TOKEN=xoxp-403948417110-402765462469-517167133924-64fe6afc18efe714a83551115d89b42a
     volumes:
       # in-host:in-container
       - ./dump:/usr/src/app/dump
