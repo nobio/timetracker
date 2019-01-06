@@ -13,8 +13,8 @@ exports.scheduleTasks = function () {
     stats.calcStats();
   });
 
-  console.log('job scheduler: dumpTimeEntry (every day at 04:05)');
-  scheduler.scheduleJob({ hour: 4, minute: 5 }, () => { // every day at 04:05
+  console.log('job scheduler: dumpTimeEntry (every day at 12:05)');
+  scheduler.scheduleJob({ hour: 12, minute: 5 }, () => { // every day at 12:05
     console.log('scheduled task "dumpTimeEntry" started');
     admin.dumpTimeEntries();
   });
