@@ -1,4 +1,5 @@
 require('../../db');
+const g_util = require('../global_util');
 const fs = require('fs');
 
 const moment = require('moment');
@@ -28,6 +29,7 @@ exports.dumpTimeEntries = () => new Promise((resolve, reject) => {
         });
       });
     })
+    .then(g_util.sendMessage('data has been dumped to file system'))
     .catch(err => reject(err));
 });
 
@@ -51,5 +53,6 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
       });
     })
     .then(() => resolve({ backup_count: len }))
+    .then(g_util.sendMessage('statistics have been backed up to database table'))
     .catch(err => reject(err));
 });
