@@ -1,4 +1,5 @@
 require('../../db');
+const g_util = require('../global_util');
 
 const utilEntry = require('../entries/util-entries');
 const mongoose = require('mongoose');
@@ -29,6 +30,7 @@ exports.calcStats = () => {
       .then(firstTimeEntry => utilEntry.getLastTimeEntry())
       .then(lastEntry => this.calculateStatistics(firstEntry, lastEntry))
       .then(result => resolve(result))
+      .then(g_util.sendMessage('statistics have been calculated'))
       .catch(err => reject(err));
   });
 };
@@ -43,13 +45,13 @@ exports.calcStats = () => {
 exports.calculateStatistics = (firstEntry, lastEntry) =>
   new Promise((resolve, reject) => {
     let date = utilEntry.stripdownToDateUTC(firstEntry.age);
-    
+
     while (date <= moment(lastEntry.age)) {
       // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
       const dt = moment(date);
       this.getBusytimeByDate(dt)
         .then((busytime) => {
-          //console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+          // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
           if (busytime && busytime.busytime != 0) {
             new StatsDay({
               date: dt,

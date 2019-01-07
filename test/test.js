@@ -1,4 +1,5 @@
 const utilEntries = require('../api/entries/util-entries');
+const g_util = require('../api/global_util');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -38,6 +39,45 @@ describe('isEmpty', () => {
     expect(testv).to.be.false;
   });
 });
+
+describe('test global_util.sendMessage()', () => {
+
+  it('should work just fine', async () => {
+    await g_util.sendMessage('I am unit testing, just like that...')
+      .then()
+      .catch((err) => { throw (err); });
+  });
+
+  it('should work just fine as promise', async () => {
+
+    await g_util.sendMessage('I am unit testing as promise...')
+      .then((result) => {
+        expect(result).to.not.be.undefined;
+        expect(result).to.be.string;
+        /*
+        expect(result).to.have.property('ok');
+        expect(result.ok).to.equal(true);
+        expect(result).to.have.property('channel');
+        expect(result.channel).to.equal('CF5UTDCJE');
+        expect(result).to.have.property('message');
+        expect(result.message).to.have.property('type');
+        expect(result.message.type).to.equal('message');
+        expect(result.message).to.have.property('subtype');
+        expect(result.message.subtype).to.equal('bot_message');
+        expect(result.message).to.have.property('ts');
+        expect(result.message.ts).to.not.be.empty;
+        expect(result.message).to.have.property('username');
+        expect(result.message.username).to.equal('Nobio Tech');
+        expect(result.message).to.have.property('bot_id');
+        expect(result.message.bot_id).to.not.be.empty;
+        */
+      })
+      .catch((err) => {
+        throw err;
+      });
+  });
+});
+
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
 describe('test utilEntries.getBusytimeByDate()', () => {
@@ -54,3 +94,4 @@ describe('test utilEntries.getBusytimeByDate()', () => {
     db.closeConnection();
   });
 });
+
