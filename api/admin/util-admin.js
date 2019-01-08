@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
+const Toggle = mongoose.model('Toggle');
 
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
@@ -56,3 +57,30 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
     .then(g_util.sendMessage('statistics have been backed up to database table'))
     .catch(err => reject(err));
 });
+
+// ============================= TOGGLES ====================================
+exports.getAllToggles = () => new Promise((resolve, reject) => {
+  Toggle.find()
+    .then(result => resolve(result))
+    .catch(err => reject(err))
+})
+
+exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
+  new Toggle({
+      name: name,
+      toggle: toggle
+    }).save()
+    .then(toggle => resolve(toggle))
+    .catch(err => reject(err));
+});
+
+exports.deleteToggle = (id) => new Promise((resolve, reject) => {
+  Toggle.findByIdAndRemove(id)
+    .then(toggle => resolve(toggle))
+    .catch(err => reject(err));
+})
+exports.deleteTestToggles = () => new Promise((resolve, reject) => {
+  Toggle.deleteMany({ 'name': 'TEST/i' })
+    .then(result => resolve(result))
+    .catch(err => reject(err));
+})

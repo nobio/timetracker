@@ -68,7 +68,7 @@ const Toggle = new schema({
   name: { type: String, required: true, index: true, unique: true },
   toggle: { type: Boolean, required: true, default: false, index: false, },
 });
-mongoose.model('Toogle', Toggle);
+mongoose.model('Toggle', Toggle);
 
 
 const monoddb_options = db_config.options;
