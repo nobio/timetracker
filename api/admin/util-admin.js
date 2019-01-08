@@ -73,9 +73,9 @@ exports.getToggle = (id) => new Promise((resolve, reject) => {
 
 exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
   new Toggle({
-      name: name,
-      toggle: toggle
-    }).save()
+    name: name,
+    toggle: toggle
+  }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
 });
@@ -85,8 +85,13 @@ exports.deleteToggle = (id) => new Promise((resolve, reject) => {
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
 })
+
 exports.deleteTestToggles = () => new Promise((resolve, reject) => {
-  Toggle.deleteMany({ 'name': 'TEST/i' })
+  Toggle.deleteMany({ name: /TEST-TOGGLE/ })
+    .then(result => {
+      console.log(result);
+      return result;
+    })
     .then(result => resolve(result))
     .catch(err => reject(err));
 })

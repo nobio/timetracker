@@ -52,7 +52,7 @@ exports.getToggleById = (req, res) => {
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":true}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
-exports.saveToggle = (req, res) => {}
+exports.saveToggle = (req, res) => { }
 
 /**
  * creates a new toggle with unique name
@@ -78,6 +78,12 @@ exports.deleteToggle = (req, res) => {
   const id = req.params.id;
 
   util.deleteToggle(id)
-    .then(response => res.status(200).send(response))
+    .then((toggle) => {
+      if (toggle === undefined || toggle === null) {
+        res.status(500).send(`Could not delete Toggle with (id: ${id})`)
+      } else {
+        res.status(200).send(toggle)
+      }
+    })
     .catch(err => res.status(500).send(`Error while deleting existing toggle: ${err}`));
 }
