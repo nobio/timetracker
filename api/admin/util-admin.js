@@ -88,10 +88,6 @@ exports.deleteToggle = (id) => new Promise((resolve, reject) => {
 
 exports.deleteTestToggles = () => new Promise((resolve, reject) => {
   Toggle.deleteMany({ name: /TEST-TOGGLE/ })
-    .then(result => {
-      console.log(result);
-      return result;
-    })
     .then(result => resolve(result))
     .catch(err => reject(err));
 })
