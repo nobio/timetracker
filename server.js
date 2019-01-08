@@ -21,7 +21,7 @@ require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')
 
 const options = {
   key: fs.readFileSync('keys/key.pem'),
-  cert: fs.readFileSync('keys/cert.pem')
+  cert: fs.readFileSync('keys/cert.pem'),
 };
 
 const app = express();
@@ -34,14 +34,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'pug');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
-//app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
+// app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(function (req, res, next) {
-  console.log('▶ headers: ' + JSON.stringify(req.headers));
-  console.log('▶ params:' + JSON.stringify(req.params));
-  console.log('▶ body:' + JSON.stringify(req.body));
+app.use((req, res, next) => {
+  console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
+  console.log(`▶ params:${JSON.stringify(req.params)}`);
+  console.log(`▶ body:${JSON.stringify(req.body)}`);
   next();
 });
 /*
@@ -71,6 +71,9 @@ app.post('/api/geofence', api_entries.geofence);
 // admin stuff
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
+app.get('/api/toggles', api_admin.getAllToggles);
+app.get('/api/toggles/:id', api_admin.getToggleById);
+app.put('/api/toggles/:id', api_admin.saveToggle);
 
 // statistics stuff
 app.put('/api/stats', api_stats.calcStats);
@@ -87,7 +90,7 @@ app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
-if(process.env.SLACK_TOKEN) {
+if (process.env.SLACK_TOKEN) {
   console.log('using Slack to notify');
 } else {
   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');

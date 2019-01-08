@@ -21,3 +21,25 @@ exports.backupTimeEntries = (req, res) => {
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while backup data: ${err}`));
 };
+
+/**
+ * read the list of all toggles
+ * 
+ * curl -X GET http://localhost:30000/api/toggles
+ */
+exports.getAllToggles = (req, res) => {}
+
+/**
+ * read one toggle by its ID
+ * 
+ * curl -X GET http://localhost:30000/api/toggles/1234567890
+ */
+exports.getToggleById = (req, res) => {}
+
+/**
+ * update the value of a toggle
+ * 
+ * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":true}' http://localhost:30000/api/toggles/1234567890
+ * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false}' http://localhost:30000/api/toggles/1234567890
+ */
+exports.saveToggle = (req, res) => {}
