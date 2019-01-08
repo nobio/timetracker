@@ -65,6 +65,12 @@ exports.getAllToggles = () => new Promise((resolve, reject) => {
     .catch(err => reject(err))
 })
 
+exports.getToggle = (id) => new Promise((resolve, reject) => {
+  Toggle.findById(id)
+    .then(result => resolve(result))
+    .catch(err => reject(err))
+})
+
 exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
   new Toggle({
       name: name,

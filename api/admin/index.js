@@ -38,7 +38,13 @@ exports.getAllToggles = (req, res) => {
  * 
  * curl -X GET http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
-exports.getToggleById = (req, res) => {}
+exports.getToggleById = (req, res) => {
+  const id = req.params.id;
+
+  util.getToggle(id)
+    .then(response => res.status(200).send(response))
+    .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
+}
 
 /**
  * update the value of a toggle
@@ -74,6 +80,4 @@ exports.deleteToggle = (req, res) => {
   util.deleteToggle(id)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while deleting existing toggle: ${err}`));
-
-
 }
