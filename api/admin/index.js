@@ -43,3 +43,10 @@ exports.getToggleById = (req, res) => {}
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false}' http://localhost:30000/api/toggles/1234567890
  */
 exports.saveToggle = (req, res) => {}
+
+/**
+ * creates a new toggle with unique name
+ * 
+ * curl -X POST  -H "Content-Type: application/json" -d '{"name":"Create Entry", toggle":true}' http://localhost:30000/api/toggles
+ */
+exports.createToggle = (req, res) => ]

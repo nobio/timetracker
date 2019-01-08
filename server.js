@@ -20,8 +20,8 @@ const fs = require('fs');
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const options = {
-  key: fs.readFileSync('keys/key.pem'),
-  cert: fs.readFileSync('keys/cert.pem'),
+   key: fs.readFileSync('keys/key.pem'),
+   cert: fs.readFileSync('keys/cert.pem'),
 };
 
 const app = express();
@@ -39,10 +39,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use((req, res, next) => {
-  console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
-  console.log(`▶ params:${JSON.stringify(req.params)}`);
-  console.log(`▶ body:${JSON.stringify(req.body)}`);
-  next();
+   console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
+   console.log(`▶ params:${JSON.stringify(req.params)}`);
+   console.log(`▶ body:${JSON.stringify(req.body)}`);
+   next();
 });
 /*
 app.configure('production', function() {
@@ -74,6 +74,7 @@ app.post('/api/entries/backup', api_admin.backupTimeEntries);
 app.get('/api/toggles', api_admin.getAllToggles);
 app.get('/api/toggles/:id', api_admin.getToggleById);
 app.put('/api/toggles/:id', api_admin.saveToggle);
+app.post('/api/toggles', api_admin.createToggle);
 
 // statistics stuff
 app.put('/api/stats', api_stats.calcStats);
@@ -91,17 +92,17 @@ app.get('/api/experiment', api_misc.experiment);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
 if (process.env.SLACK_TOKEN) {
-  console.log('using Slack to notify');
+   console.log('using Slack to notify');
 } else {
-  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
+   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
 }
 // start the web service
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
+   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
-  console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
+   console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 
