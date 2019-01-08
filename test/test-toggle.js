@@ -58,3 +58,48 @@ describe('test util.createToggle - Promise', () => {
   //db.closeConnection()
  });
 });
+
+describe('test util.getAllToggles - Promise', () => {
+ let db;
+ before(() => {
+  db = require('../db');
+ });
+
+ it('load all toggles', async() => {
+  await util.getAllToggles()
+   .then((result) => {
+    expect(result).to.be.an('array');
+    expect(result[0]).not.to.be.empty
+    expect(result[0]).to.have.property('toggle');
+    expect(result[0]).to.have.property('name');
+   })
+   .catch((err) => { throw err; });
+ });
+
+ after(() => {
+  // db.closeConnection()
+ });
+});
+
+describe('test util.getToggle - Promise', () => {
+ let db;
+ before(() => {
+  db = require('../db');
+ });
+
+ it('load one toggle', async() => {
+  await util.getAllToggles()
+   .then((result) => util.getToggle(result[0]._id))
+   .then((result) => {
+    expect(result).to.have.property('toggle');
+    expect(result).to.have.property('name');
+   })
+   .catch((err) => { throw err; });
+ });
+
+ it('load one not existing toggle; should fail', async() => expect(util.getToggle('12345')).to.be.rejected);
+
+ after(() => {
+  // db.closeConnection()
+ });
+});
