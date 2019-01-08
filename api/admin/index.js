@@ -49,4 +49,4 @@ exports.saveToggle = (req, res) => {}
  * 
  * curl -X POST  -H "Content-Type: application/json" -d '{"name":"Create Entry", toggle":true}' http://localhost:30000/api/toggles
  */
-exports.createToggle = (req, res) => ]
+exports.createToggle = (req, res) => {}
