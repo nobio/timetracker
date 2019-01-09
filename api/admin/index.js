@@ -52,7 +52,14 @@ exports.getToggleById = (req, res) => {
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":true}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
-exports.saveToggle = (req, res) => { }
+exports.saveToggle = (req, res) => {
+  const id = req.params.id;
+  const toggle = req.body.toggle;
+
+  util.updateToggle(id, toggle)
+    .then(response => res.status(200).send(response))
+    .catch(err => res.status(500).send(`Error while saving toggle: ${err}`));
+}
 
 /**
  * creates a new toggle with unique name

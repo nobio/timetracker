@@ -73,9 +73,9 @@ exports.getToggle = (id) => new Promise((resolve, reject) => {
 
 exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
   new Toggle({
-    name: name,
-    toggle: toggle
-  }).save()
+      name: name,
+      toggle: toggle
+    }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
 });
@@ -91,3 +91,19 @@ exports.deleteTestToggles = () => new Promise((resolve, reject) => {
     .then(result => resolve(result))
     .catch(err => reject(err));
 })
+
+exports.updateToggle = (id, toggle) => new Promise((resolve, reject) => {
+  console.log(id + " " + toggle)
+  Toggle.findById(id)
+    .then((tog) => {
+      if (tog === null) {
+        resolve(null);
+        return;
+      }
+      tog.toggle = (toggle === undefined) ? false : toggle;
+      return tog;
+    })
+    .then(tog => tog.save())
+    .then(tog => resolve(tog))
+    .catch(err => reject(err));
+});
