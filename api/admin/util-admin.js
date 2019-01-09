@@ -88,7 +88,7 @@ exports.loadNotificationToggles = () => new Promise((resolve, reject) => {
     //console.log('notificaiton toggles already loaded...')
     resolve(true)
   } else {
-    //console.log('loading notificaiton toggles...')
+    console.log('loading notificaiton toggles...')
     this.getAllToggles()
       .then(toggleArray => {
         toggleArray.forEach(tg => {

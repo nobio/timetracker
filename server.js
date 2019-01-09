@@ -93,12 +93,16 @@ app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
+/* load notification toggles */
+require('./api/admin/util-admin').loadNotificationToggles();
+
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');
 } else {
    console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
 }
-// start the web service
+
+/* start the web service */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
    console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
@@ -106,7 +110,6 @@ http.createServer(app).listen(app.get('port'), app.get('host'), () => {
 https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
    console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
-
 
 /* start scheduler */
 require('./api/scheduler').scheduleTasks();
