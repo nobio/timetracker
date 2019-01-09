@@ -21,7 +21,7 @@ describe('test util.createToggle - Promise', () => {
  });
 
  it('creating a new toggle with name, that does not exist without toggle value', async() => {
-  const toggleName = 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+  const toggleName = getToggleTestName();
 
   await util.createToggle(toggleName)
    .then((result) => {
@@ -34,7 +34,7 @@ describe('test util.createToggle - Promise', () => {
  });
 
  it('creating a new toggle with name, that does not exist with given toggle value', async() => {
-  const toggleName = 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+  const toggleName = getToggleTestName();
 
   await util.createToggle(toggleName, true)
    .then((result) => {
@@ -109,7 +109,7 @@ describe('test util.updateToggle - Promise', () => {
  });
 
  it('update existing toggle', async() => {
-  const toggleName = 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+  const toggleName = getToggleTestName();
 
   await util.createToggle(toggleName, false)
    .then(newToggle => {
@@ -141,7 +141,7 @@ describe('test util.updateToggle - Promise', () => {
 });
 
 describe('test util.deleteToggle - Promise', () => {
- const toggleName = 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+ const toggleName = getToggleTestName();
 
  let db;
  before(() => {
@@ -177,3 +177,7 @@ describe('test util.deleteToggle - Promise', () => {
   //db.closeConnection()
  });
 });
+
+function getToggleTestName() {
+ return 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+}

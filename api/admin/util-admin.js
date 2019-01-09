@@ -9,6 +9,15 @@ const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 const Toggle = mongoose.model('Toggle');
 
+const NOTIFICATION_TOGGLES = {
+  'name': 'CREATE_ENTRY',
+  'name': 'DELETE_ENTRY',
+  'name': 'BACKUP_DB',
+  'name': 'DUMP_FS',
+  'name': 'RECALCULATE'
+
+};
+
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
@@ -62,6 +71,19 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
 exports.getAllToggles = () => new Promise((resolve, reject) => {
   Toggle.find()
     .then(result => resolve(result))
+    .catch(err => reject(err))
+})
+
+exports.getNotificationToggles = () => new Promise((resolve, reject) => {
+  this.getAllToggles()
+    .then(toggleArray => {
+      let nfToggles = {};
+      toggleArray.forEach(toggle => {
+        const a = NOTIFICATION_TOGGLES.find(toggle.name);
+        console.log(a);
+      })
+      resolve(nfToggles);
+    })
     .catch(err => reject(err))
 })
 
