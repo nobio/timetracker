@@ -10,13 +10,20 @@ const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 const Toggle = mongoose.model('Toggle');
 
 const NOTIFICATION_TOGGLES = {
-  'name': 'CREATE_ENTRY',
-  'name': 'DELETE_ENTRY',
-  'name': 'BACKUP_DB',
-  'name': 'DUMP_FS',
-  'name': 'RECALCULATE'
-
+  'CREATE_ENTRY': false,
+  'DELETE_ENTRY': false,
+  'BACKUP_DB': false,
+  'DUMP_FS': false,
+  'RECALCULATE': false,
 };
+let notificationsLoaded = false;
+/*
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"CREATE_ENTRY", "toggle":true}' http://localhost:30000/api/toggles
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "toggle":true}' http://localhost:30000/api/toggles
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true}' http://localhost:30000/api/toggles
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"DUMP_FS", "toggle":true}' http://localhost:30000/api/toggles
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"RECALCULATE", "toggle":true}' http://localhost:30000/api/toggles
+*/
 
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
@@ -74,17 +81,24 @@ exports.getAllToggles = () => new Promise((resolve, reject) => {
     .catch(err => reject(err))
 })
 
-exports.getNotificationToggles = () => new Promise((resolve, reject) => {
-  this.getAllToggles()
-    .then(toggleArray => {
-      let nfToggles = {};
-      toggleArray.forEach(toggle => {
-        const a = NOTIFICATION_TOGGLES.find(toggle.name);
-        console.log(a);
+exports.loadNotificationToggles = () => new Promise((resolve, reject) => {
+  //console.log('notificationsLoaded: ' + notificationsLoaded)
+
+  if (notificationsLoaded) {
+    //console.log('notificaiton toggles already loaded...')
+    resolve(true)
+  } else {
+    //console.log('loading notificaiton toggles...')
+    this.getAllToggles()
+      .then(toggleArray => {
+        toggleArray.forEach(tg => {
+          NOTIFICATION_TOGGLES[tg.name] = tg.toggle;
+        })
+        notificationsLoaded = true
+        resolve(true);
       })
-      resolve(nfToggles);
-    })
-    .catch(err => reject(err))
+      .catch(err => reject(err))
+  }
 })
 
 exports.getToggle = (id) => new Promise((resolve, reject) => {
@@ -92,12 +106,17 @@ exports.getToggle = (id) => new Promise((resolve, reject) => {
     .then(result => resolve(result))
     .catch(err => reject(err))
 })
+exports.getToggleNyName = (name) => new Promise((resolve, reject) => {
+  this.loadNotificationToggles()
+    .then(resolve(NOTIFICATION_TOGGLES[name]))
+    .catch(err => reject(err))
+})
 
 exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
   new Toggle({
-      name: name,
-      toggle: toggle
-    }).save()
+    name: name,
+    toggle: toggle
+  }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
 });
