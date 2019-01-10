@@ -13,6 +13,7 @@ const assert = chai.assert;
 const should = chai.should;
 
 const util = require('../api/admin/util-admin');
+const g_util = require('../api/global_util');
 
 describe('test util.createToggle - Promise', () => {
   let db;
@@ -146,30 +147,9 @@ describe('test to load notification toggles', () => {
     db = require('../db');
   });
   it('just load notification toggle', async () => {
-    await util.loadNotificationToggles()
+    await g_util.loadNotificationToggles()
       .then((result) => {
         expect(result).to.be.true;
-      })
-      .catch((err) => { throw err; });
-  });
-  it('test to load notification toggle by existing name', async () => {
-    await util.getToggleNyName('CREATE_ENTRY')
-      .then((result) => {
-        expect(result).to.be.true;
-      })
-      .catch((err) => { throw err; });
-  });
-  it('test to load notification toggle by a not existing name', async () => {
-    await util.getToggleNyName('xxx')
-      .then((result) => {
-        expect(result).to.be.undefined;
-      })
-      .catch((err) => { throw err; });
-  });
-  it('test to load notification toggle without any name (null)', async () => {
-    await util.getToggleNyName()
-      .then((result) => {
-        expect(result).to.be.undefined;
       })
       .catch((err) => { throw err; });
   });

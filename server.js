@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-
+require('./db');
 const express = require('express');
 const web = require('./web');
 const api_entries = require('./api/entries');
@@ -94,7 +94,7 @@ app.get('/api/experiment', api_misc.experiment);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
 /* load notification toggles */
-require('./api/admin/util-admin').loadNotificationToggles();
+require('./api/global_util').loadNotificationToggles();
 
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');

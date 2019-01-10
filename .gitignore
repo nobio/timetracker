@@ -19,5 +19,5 @@ npm-debug.log
 node_modules
 dump
 ./Dockerfile
-docker-compose.yml
+./docker-compose.yml
 *.xcodeproj

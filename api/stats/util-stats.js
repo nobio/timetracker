@@ -30,7 +30,7 @@ exports.calcStats = () => {
       .then(firstTimeEntry => utilEntry.getLastTimeEntry())
       .then(lastEntry => this.calculateStatistics(firstEntry, lastEntry))
       .then(result => resolve(result))
-      .then(g_util.sendMessage('statistics have been calculated'))
+      .then(g_util.sendMessage('RECALCULATE'))
       .catch(err => reject(err));
   });
 };

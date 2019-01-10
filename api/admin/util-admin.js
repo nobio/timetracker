@@ -9,22 +9,6 @@ const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 const Toggle = mongoose.model('Toggle');
 
-const NOTIFICATION_TOGGLES = {
-  'CREATE_ENTRY': false,
-  'DELETE_ENTRY': false,
-  'BACKUP_DB': false,
-  'DUMP_FS': false,
-  'RECALCULATE': false,
-};
-let notificationsLoaded = false;
-/*
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"CREATE_ENTRY", "toggle":true}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "toggle":true}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"DUMP_FS", "toggle":true}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"RECALCULATE", "toggle":true}' http://localhost:30000/api/toggles
-*/
-
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
@@ -46,7 +30,7 @@ exports.dumpTimeEntries = () => new Promise((resolve, reject) => {
         });
       });
     })
-    .then(g_util.sendMessage('data has been dumped to file system'))
+    .then(g_util.sendMessage('DUMP_FS'))
     .catch(err => reject(err));
 });
 
@@ -70,7 +54,7 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
       });
     })
     .then(() => resolve({ backup_count: len }))
-    .then(g_util.sendMessage('statistics have been backed up to database table'))
+    .then(g_util.sendMessage('BACKUP_DB'))
     .catch(err => reject(err));
 });
 
@@ -78,63 +62,38 @@ exports.backupTimeEntries = () => new Promise((resolve, reject) => {
 exports.getAllToggles = () => new Promise((resolve, reject) => {
   Toggle.find()
     .then(result => resolve(result))
-    .catch(err => reject(err))
-})
+    .catch(err => reject(err));
+});
 
-exports.loadNotificationToggles = () => new Promise((resolve, reject) => {
-  //console.log('notificationsLoaded: ' + notificationsLoaded)
-
-  if (notificationsLoaded) {
-    //console.log('notificaiton toggles already loaded...')
-    resolve(true)
-  } else {
-    console.log('loading notificaiton toggles...')
-    this.getAllToggles()
-      .then(toggleArray => {
-        toggleArray.forEach(tg => {
-          NOTIFICATION_TOGGLES[tg.name] = tg.toggle;
-        })
-        notificationsLoaded = true
-        resolve(true);
-      })
-      .catch(err => reject(err))
-  }
-})
-
-exports.getToggle = (id) => new Promise((resolve, reject) => {
+exports.getToggle = id => new Promise((resolve, reject) => {
   Toggle.findById(id)
     .then(result => resolve(result))
-    .catch(err => reject(err))
-})
-exports.getToggleNyName = (name) => new Promise((resolve, reject) => {
-  this.loadNotificationToggles()
-    .then(resolve(NOTIFICATION_TOGGLES[name]))
-    .catch(err => reject(err))
-})
+    .catch(err => reject(err));
+});
 
 exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
   new Toggle({
-    name: name,
-    toggle: toggle
+    name,
+    toggle,
   }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
 });
 
-exports.deleteToggle = (id) => new Promise((resolve, reject) => {
+exports.deleteToggle = id => new Promise((resolve, reject) => {
   Toggle.findByIdAndRemove(id)
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
-})
+});
 
 exports.deleteTestToggles = () => new Promise((resolve, reject) => {
   Toggle.deleteMany({ name: /TEST-TOGGLE/ })
     .then(result => resolve(result))
     .catch(err => reject(err));
-})
+});
 
 exports.updateToggle = (id, toggle) => new Promise((resolve, reject) => {
-  console.log(id + " " + toggle)
+  console.log(`${id} ${toggle}`);
   Toggle.findById(id)
     .then((tog) => {
       if (tog === null) {

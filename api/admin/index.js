@@ -24,18 +24,18 @@ exports.backupTimeEntries = (req, res) => {
 
 /**
  * read the list of all toggles
- * 
+ *
  * curl -X GET http://localhost:30000/api/toggles
  */
 exports.getAllToggles = (req, res) => {
   util.getAllToggles()
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading all toggles: ${err}`));
-}
+};
 
 /**
  * read one toggle by its ID
- * 
+ *
  * curl -X GET http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
 exports.getToggleById = (req, res) => {
@@ -44,11 +44,11 @@ exports.getToggleById = (req, res) => {
   util.getToggle(id)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
-}
+};
 
 /**
  * update the value of a toggle
- * 
+ *
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":true}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
@@ -59,11 +59,11 @@ exports.saveToggle = (req, res) => {
   util.updateToggle(id, toggle)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while saving toggle: ${err}`));
-}
+};
 
 /**
  * creates a new toggle with unique name
- * 
+ *
  * curl -X POST  -H "Content-Type: application/json" -d '{"name":"Create Entry", "toggle":true}' http://localhost:30000/api/toggles
  */
 exports.createToggle = (req, res) => {
@@ -73,7 +73,7 @@ exports.createToggle = (req, res) => {
   util.createToggle(name, toggle)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while creating new toggle: ${err}`));
-}
+};
 
 
 /**
@@ -87,10 +87,10 @@ exports.deleteToggle = (req, res) => {
   util.deleteToggle(id)
     .then((toggle) => {
       if (toggle === undefined || toggle === null) {
-        res.status(500).send(`Could not delete Toggle with (id: ${id})`)
+        res.status(500).send(`Could not delete Toggle with (id: ${id})`);
       } else {
-        res.status(200).send(toggle)
+        res.status(200).send(toggle);
       }
     })
     .catch(err => res.status(500).send(`Error while deleting existing toggle: ${err}`));
-}
+};
