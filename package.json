@@ -1,52 +1,52 @@
 {
-    "name": "timetracker",
-    "version": "14.6.8",
-    "last_build": "2018-10-01T06:43:40.734Z",
-    "author": "Gernot H. Reichel <gernot.reichel@me.com>",
-    "private": true,
-    "scripts": {
-        "start": "node server",
-        "start-dbmlab": "MONGO_URL=mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack npm start",
-        "start-dbdocker1": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
-        "start-dbdocker2": "MONGO_URL=mongodb://192.168.178.46:27017/timetracker npm start",
-        "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
-        "test-mon": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
-        "serve": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
-        "lint-fix": "eslint --fix",
-        "lint": "eslint",
-        "build": "node ./bin/build.js",
-        "backup": "node db/dbmigration"
-    },
-    "devDependencies": {
-        "chai": "^4.2.0",
-        "chai-as-promised": "^7.1.1",
-        "eslint": "^4.19.1",
-        "eslint-config-airbnb-base": "^12.1.0",
-        "eslint-plugin-import": "^2.14.0",
-        "mocha": "^4.0.1",
-        "nodemon": "1.17.5"
-    },
-    "dependencies": {
-        "@slack/client": "^4.8.0",
-        "body-parser": "^1.18.3",
-        "cookie-parser": "^1.4.3",
-        "debug": "^2.6.9",
-        "express": "^4.16.4",
-        "log-timestamp": "^0.1.2",
-        "moment": "^2.23.0",
-        "moment-timezone": "^0.5.23",
-        "mongodb": "3.0.10",
-        "mongoose": "^5.3.2",
-        "morgan": "^1.9.1",
-        "node-schedule": "^1.3.1",
-        "pug": "^2.0.3",
-        "serve-favicon": "^2.5.0"
-    },
-    "engines": {
-        "node": "^8.9.3"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/nobio/timetrack.git"
-    }
+  "name": "timetracker",
+  "version": "3.3.2",
+  "last_build": "2019-01-13 14:25:14",
+  "author": "Gernot H. Reichel <gernot.reichel@me.com>",
+  "private": true,
+  "scripts": {
+    "start": "node server",
+    "start-dbmlab": "MONGO_URL=mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack npm start",
+    "start-dbdocker1": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
+    "start-dbdocker2": "MONGO_URL=mongodb://192.168.178.46:27017/timetracker npm start",
+    "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
+    "test-mon": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
+    "serve": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
+    "lint-fix": "eslint --fix",
+    "lint": "eslint",
+    "build": "node ./bin/build.js",
+    "backup": "node db/dbmigration"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "mocha": "^4.0.1",
+    "nodemon": "1.17.5"
+  },
+  "dependencies": {
+    "@slack/client": "^4.8.0",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.9",
+    "express": "^4.16.4",
+    "log-timestamp": "^0.1.2",
+    "moment": "^2.23.0",
+    "moment-timezone": "^0.5.23",
+    "mongodb": "3.0.10",
+    "mongoose": "^5.3.2",
+    "morgan": "^1.9.1",
+    "node-schedule": "^1.3.1",
+    "pug": "^2.0.3",
+    "serve-favicon": "^2.5.0"
+  },
+  "engines": {
+    "node": "^8.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nobio/timetrack.git"
+  }
 }
