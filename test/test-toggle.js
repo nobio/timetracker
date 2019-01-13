@@ -30,6 +30,8 @@ describe('test util.createToggle - Promise', () => {
         expect(result.toggle).to.equal(false); // Default value is "false"
         expect(result).to.have.property('name');
         expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('generic message');
       })
       .catch((err) => { throw err; });
   });
@@ -43,6 +45,23 @@ describe('test util.createToggle - Promise', () => {
         expect(result.toggle).to.equal(true); // Default value is "false"
         expect(result).to.have.property('name');
         expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('generic message');
+      })
+      .catch((err) => { throw err; });
+  });
+
+  it('creating a new toggle with name, notification text that does not exist with given toggle value', async () => {
+    const toggleName = getToggleTestName();
+
+    await util.createToggle(toggleName, true, 'DELETE_ME')
+      .then((result) => {
+        expect(result).to.have.property('toggle');
+        expect(result.toggle).to.equal(true); // Default value is "false"
+        expect(result).to.have.property('name');
+        expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('DELETE_ME');
       })
       .catch((err) => { throw err; });
   });
@@ -98,6 +117,28 @@ describe('test util.getToggle - Promise', () => {
 
   it('load one not existing toggle; should fail', async () => expect(util.getToggle('12345')).to.be.rejected);
 
+  it('test to load notification toggle by existing name', async () => {		
+    await util.getToggleByName('CREATE_ENTRY')		
+      .then((result) => {		
+        expect(result.name).to.equal('CREATE_ENTRY');		
+      })		
+      .catch((err) => { throw err; });		
+  });		
+  it('test to load notification toggle by a not existing name', async () => {		
+    await util.getToggleByName('xxx')		
+      .then((result) => {		
+        expect(result).to.be.null;		
+      })		
+      .catch((err) => { throw err; });		
+  });		
+  it('test to load notification toggle without any name (null)', async () => {		
+    await util.getToggleByName()		
+      .then((result) => {		
+        expect(result).to.be.null;		
+      })		
+      .catch((err) => { throw err; });		
+  });
+
   after(() => {
     // db.closeConnection()
   });
@@ -111,17 +152,36 @@ describe('test util.updateToggle - Promise', () => {
 
   it('update existing toggle', async () => {
     const toggleName = getToggleTestName();
+    notification = 'DELETE_ME'
 
-    await util.createToggle(toggleName, false)
+    await util.createToggle(toggleName, false, notification)
       .then(newToggle => {
         expect(newToggle.toggle).to.equal(false)
         return newToggle._id;
       })
-      .then(id => util.updateToggle(id, true))
+      .then(id => util.updateToggle(id, true, notification + '_TOO'))
       .then(toggle => util.getToggle(toggle._id))
       .then(result => {
         expect(result).not.to.be.null;
         expect(result.toggle).to.equal(true)
+        expect(result.notification).to.equal(notification + '_TOO')
+      })
+      .catch((err) => { throw err; });
+  });
+  it('update existing toggle but only notification text', async () => {
+    const toggleName = getToggleTestName();
+    notification = 'DELETE_ME'
+
+    await util.createToggle(toggleName, false, notification)
+      .then(newToggle => {
+        expect(newToggle.toggle).to.equal(false)
+        return newToggle._id;
+      })
+      .then(id => util.updateToggle(id, undefined, notification + '_TOO'))
+      .then(toggle => util.getToggle(toggle._id))
+      .then(result => {
+        expect(result).not.to.be.null;
+        expect(result.notification).to.equal(notification + '_TOO')
       })
       .catch((err) => { throw err; });
   });
@@ -140,24 +200,6 @@ describe('test util.updateToggle - Promise', () => {
   });
 });
 
-
-describe('test to load notification toggles', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-  it('just load notification toggle', async () => {
-    await g_util.loadNotificationToggles()
-      .then((result) => {
-        expect(result).to.be.true;
-      })
-      .catch((err) => { throw err; });
-  });
-
-  after(() => {
-    //db.closeConnection()
-  });
-});
 
 describe('test util.deleteToggle - Promise', () => {
   const toggleName = getToggleTestName();
@@ -191,8 +233,11 @@ describe('test util.deleteToggle - Promise', () => {
 
   after(() => {
     util.deleteTestToggles()
-      .then(result => console.log(JSON.stringify(result)))
-    //db.closeConnection()
+      .then(result => {
+        console.log(JSON.stringify(result))
+      })
+      //.then(result => db.closeConnection())
+      .catch(err => console.log(err))
   });
 });
 

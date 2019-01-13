@@ -67,6 +67,7 @@ mongoose.model('StatsDay', StatsDay);
 const Toggle = new schema({
   name: { type: String, required: true, index: true, unique: true },
   toggle: { type: Boolean, required: true, default: false, index: false, },
+  notification: { type: String, required: true, default: 'generic message', index: false, unique: false },
 });
 mongoose.model('Toggle', Toggle);
 

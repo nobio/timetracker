@@ -71,10 +71,17 @@ exports.getToggle = id => new Promise((resolve, reject) => {
     .catch(err => reject(err));
 });
 
-exports.createToggle = (name, toggle) => new Promise((resolve, reject) => {
+exports.getToggleByName = name => new Promise((resolve, reject) => {
+  Toggle.findOne({name: name})
+    .then(result => resolve(result))
+    .catch(err => reject(err));
+});
+
+exports.createToggle = (name, toggle, notification) => new Promise((resolve, reject) => {
   new Toggle({
     name,
     toggle,
+    notification
   }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
@@ -88,19 +95,19 @@ exports.deleteToggle = id => new Promise((resolve, reject) => {
 
 exports.deleteTestToggles = () => new Promise((resolve, reject) => {
   Toggle.deleteMany({ name: /TEST-TOGGLE/ })
-    .then(result => resolve(result))
+    .then(resolve('all test tokens deleted'))
     .catch(err => reject(err));
 });
 
-exports.updateToggle = (id, toggle) => new Promise((resolve, reject) => {
-  console.log(`${id} ${toggle}`);
+exports.updateToggle = (id, toggle, notification) => new Promise((resolve, reject) => {
   Toggle.findById(id)
     .then((tog) => {
       if (tog === null) {
         resolve(null);
         return;
       }
-      tog.toggle = (toggle === undefined) ? false : toggle;
+      tog.toggle = (toggle === undefined || toggle === null) ? tog.toggle : toggle;  // maybe, only notification is pased
+      tog.notification = (notification === undefined || notification === null) ? '' : notification;
       return tog;
     })
     .then(tog => tog.save())

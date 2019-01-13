@@ -38,12 +38,14 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - st
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+/*
 app.use((req, res, next) => {
    console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
    console.log(`▶ params:${JSON.stringify(req.params)}`);
    console.log(`▶ body:${JSON.stringify(req.body)}`);
    next();
 });
+*/
 /*
 app.configure('production', function() {
   app.use(express.errorHandler());
@@ -74,6 +76,7 @@ app.post('/api/entries/backup', api_admin.backupTimeEntries);
 
 app.get('/api/toggles', api_admin.getAllToggles);
 app.get('/api/toggles/:id', api_admin.getToggleById);
+app.get('/api/toggles/name/:name', api_admin.getToggleByName);
 app.put('/api/toggles/:id', api_admin.saveToggle);
 app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
@@ -92,9 +95,6 @@ app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
-
-/* load notification toggles */
-require('./api/global_util').loadNotificationToggles();
 
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');
