@@ -8,16 +8,6 @@ const SLACK_TOKEN = process.env.SLACK_TOKEN
 const CONVERSATION_ID = '#timetracker'
 const { WebClient } = require('@slack/client')
 /*
-const NOTIFICATION_TOGGLES = {
-  CREATE_ENTRY: { toggle: false, notification: 'created new time entry' },
-  DELETE_ENTRY: { toggle: false, notification: 'delete time entry' },
-  BACKUP_DB: { toggle: false, notification: 'statistics have been backed up to database table' },
-  DUMP_FS: { toggle: false, notification: 'data has been dumped to file system' },
-  RECALCULATE: { toggle: false, notification: 'statistics have been calculated' },
-}
-let notificationsLoaded = false
-*/
-/*
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"CREATE_ENTRY", "toggle":true, "notification":"created new time entry"}' http://localhost:30000/api/toggles
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "toggle":true, "notification":"delete time entry"}' http://localhost:30000/api/toggles
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true, "notification":"statistics have been backed up to database table"}' http://localhost:30000/api/toggles
