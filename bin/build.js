@@ -1,3 +1,4 @@
+#!/usr/bin/node
 /**
  * Read the version and build time from / package.json, increase the build number and set the build time to now
  * Usage: node bin/build.js [<ma|mi|b>]
