@@ -1,6 +1,51 @@
 extends layout
 
 block content
+  script(type='text/javascript').
+    let listOfToggles = [];
+  
+    function loadToggles() {
+        var html = '';
+        listOfToggles.length = 0;
+        let toggles = new Toggles();
+        toggles.fetch({
+            wait: true,
+            success: function(tgs) {
+                html += '<table>';
+                tgs.forEach(function(tg) {
+                    html += '<tr><td>';
+                    const checked = (tg.get("toggle") == true) ? 'checked' : '';
+                    html += '<input type="checkbox" id="' + tg.get("_id") + '" value="' + tg.get("toggle") + '" name="' + tg.get("notification") + '" onclick="toggle(\'' + tg.get("_id") + '\');" ' + checked + '>' + tg.get("notification");
+                    html += '</tr></td>';
+                });
+                html += '</table>'
+                htmlToggles.innerHTML = html;
+            },
+            error: function(model, err) {
+                result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+            }
+        });
+    }
+  
+    function toggle(key) {
+
+        let toggle = new Toggle();
+        toggle.save({ 'id': key, 'toggle': document.getElementById(key).checked, 'notification': document.getElementById(key).name }, {
+            wait: true,
+            success: function(model, timeentry) {
+                //console.log('Successfully saved!');
+                result.innerHTML = 'Toggle saved';
+            },
+            error: function(model, err) {
+                result.innerHTML = "Error (" + err.status + "): " + err.responseText;
+            }
+        });
+    }
+  
+    // ***************************************
+    $(document).ready(function() {
+      loadToggles();
+    })
   p
   table
     tr
