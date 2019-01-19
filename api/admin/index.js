@@ -60,6 +60,21 @@ exports.getToggleByName = (req, res) => {
 };
 
 /**
+ * read the status of toggles; for instance weather or not Slack is used
+ *
+ * curl -X GET http://localhost:30000/api/toggles/all/status
+ */
+exports.getToggleStatus = (req, res) => {
+  console.log(req)
+  console.log('Hi Schernoo')
+
+  util.getToggleStatus()
+    .then(response => res.status(200).send(response))
+    .catch(err => res.status(500).send(`Error while reading toggle status: ${err}`));
+};
+
+
+/**
  * update the value of a toggle
  *
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":true}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
