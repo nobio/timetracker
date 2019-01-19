@@ -13,9 +13,9 @@ function timeentry(direction, datetime) {
     }
 
     var entry = new TimeEntry(); // TimeEntry is a Backbone Model defined in layout.pug
-    entry.save({'direction': direction, 'datetime': dt}, {
-        wait:true,
-        success:function(model, timeentry) {
+    entry.save({ 'direction': direction, 'datetime': dt }, {
+        wait: true,
+        success: function(model, timeentry) {
             console.log('Successfully saved!');
             var sDate = moment(timeentry.entry_date).format('DD.MM.YYYY');
             var sTime = moment(timeentry.entry_date).format('HH:mm');
@@ -52,10 +52,10 @@ function deleteAllTimeEntries() {
 }
 */
 function calculateStats() {
-    var stats = new Statistics({id:''}); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
+    var stats = new Statistics({ id: '' }); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
     stats.save({}, {
-        wait:true,
-        success:function(model, response) {
+        wait: true,
+        success: function(model, response) {
             result.innerHTML = 'updated statistics: ' + JSON.stringify(response);
             alert('updated statistics: ' + JSON.stringify(response))
         },
@@ -67,30 +67,30 @@ function calculateStats() {
 
 function backupData() {
     $.ajax({
-        type : 'POST',
-        url : '/api/entries/backup',
-        dataType : 'json'
-    }).done(function(response) {
-        result.innerHTML = 'data backuped ' + response.backup_count + ' time entries';
-        alert('data backuped ' + response.backup_count + ' time entries');
-    })
-    .error(function(err) {
-        alert("error: " + err.status + " (" + err + ")");
-    });
+            type: 'POST',
+            url: '/api/entries/backup',
+            dataType: 'json'
+        }).done(function(response) {
+            result.innerHTML = 'data backuped ' + response.backup_count + ' time entries';
+            alert('data backuped ' + response.backup_count + ' time entries');
+        })
+        .error(function(err) {
+            alert("error: " + err.status + " (" + err + ")");
+        });
 }
 
 function dumpData() {
     $.ajax({
-        type : 'POST',
-        url : '/api/entries/dump',
-        dataType : 'json'
-    }).done(function(response) {
-        result.innerHTML = 'data dumped ' + response.size + ' time entries to ' + response.filename;
-        alert('data dumped ' + response.size + ' time entries to ' + response.filename);
-    })
-    .error(function(err) {
-        alert("error: " + err.status + " (" + err + ")");
-    });
+            type: 'POST',
+            url: '/api/entries/dump',
+            dataType: 'json'
+        }).done(function(response) {
+            result.innerHTML = 'data dumped ' + response.size + ' time entries to ' + response.filename;
+            alert('data dumped ' + response.size + ' time entries to ' + response.filename);
+        })
+        .error(function(err) {
+            alert("error: " + err.status + " (" + err + ")");
+        });
 }
 
 function getTimeEntriesByDate(dt) {
@@ -101,10 +101,10 @@ function getTimeEntriesByDate(dt) {
         if (err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
-        
+
         var entries = new TimeEntries(); // TimeEntry is a Backbone Model defined in layout.pug
         entries.fetch({
-            data: { dt: ""+dt }, 
+            data: { dt: "" + dt },
             success: function(timeentries) {
                 var html = 'Anwesenheit: ';
                 if (busy && !busy.isEmpty({})) {
@@ -144,10 +144,10 @@ function getTimeEntriesByDate(dt) {
 }
 
 function getBusyTime(dt, callback) {
-    
+
     var duration = new Duration();
     duration.fetch({
-        data: {busy: ""+dt},
+        data: { busy: "" + dt },
         success: function(busy) {
             callback(null, busy);
         },
@@ -155,14 +155,14 @@ function getBusyTime(dt, callback) {
             callback(err);
         }
     });
-    
+
 }
 
 function deleteTimeEntryById(id) {
-    var entry = new TimeEntry({'id': id}); // TimeEntry is a Backbone Model defined in layout.pug
+    var entry = new TimeEntry({ 'id': id }); // TimeEntry is a Backbone Model defined in layout.pug
     entry.destroy({
-        wait:true,
-        success:function(model, response) {
+        wait: true,
+        success: function(model, response) {
             result.innerHTML = 'deleted Time Entry ' + response;
         },
         error: function(model, err) {
@@ -198,10 +198,10 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     }
 
-    var stats = new Statistics({'id': ""+nextDate}); // Statistics is a Backbone Model defined in layout.pug
-    stats.fetch({ 
-        data: {timeUnit: timeUnit},
-        success:function(timerecord) {
+    var stats = new Statistics({ 'id': "" + nextDate }); // Statistics is a Backbone Model defined in layout.pug
+    stats.fetch({
+        data: { timeUnit: timeUnit },
+        success: function(timerecord) {
             busyChartVariable.setData(timerecord.get("chart_data"));
             /*
             plannedTime.innerHTML = Math.round(timerecord.get("planned_working_time") / 1000 / 60 / 60 * 100) / 100;
@@ -222,8 +222,8 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
 function aggregatedStatistics(timeUnit) {
     var aggStats = new StatisticsAggregated();
     aggStats.fetch({
-        data: {timeUnit: timeUnit},
-        success:function(statistic_data) {
+        data: { timeUnit: timeUnit },
+        success: function(statistic_data) {
             aggStatsVariable.setData(statistic_data.get("chart_data"));
         },
         error: function(model, err) {

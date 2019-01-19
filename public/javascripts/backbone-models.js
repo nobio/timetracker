@@ -28,3 +28,10 @@ Duration = Backbone.Model.extend({
     urlRoot: '/api/entries'
 });
 
+Toggle = Backbone.Model.extend({
+    urlRoot: '/api/toggles',
+});
+Toggles = Backbone.Collection.extend({
+    model: Toggle,
+    url: '/api/toggles'
+});
