@@ -22,7 +22,12 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
   const web = new WebClient(SLACK_TOKEN)
   toggleUtil.getToggleByName(notificationKey)
     .then(toggle => {
-      return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`
+      if(toggle.toggle === true) {
+        return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`
+      } else {
+        resolve('toggle ' + notificationKey + ' switched off')
+        return;
+      }
     })
     .then(msg => {
       // if no SLACK_TOKEN was found then lets just return the default slack response (test cases...)
