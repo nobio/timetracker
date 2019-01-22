@@ -15,6 +15,27 @@ const should = chai.should;
 const util = require('../api/admin/util-admin');
 const g_util = require('../api/global_util');
 
+describe('test util.getToggleStatus - Promise', () => {
+
+  it('check Slack status without SLACK_TOKEN', async () => {
+    console.log(process.env.SLACK_TOKEN)
+    await util.getToggleStatus()
+      .then((result) => {
+        expect(result.NOTIFICATION_SLACK).to.equal(false);
+      })
+      .catch((err) => { throw err; });
+  });
+  it('check Slack status with SLACK_TOKEN', async () => {
+    process.env.SLACK_TOKEN = '1234567890'
+    await util.getToggleStatus()
+      .then((result) => {
+        expect(result.NOTIFICATION_SLACK).to.equal(true);
+      })
+      .catch((err) => { throw err; });
+  });
+
+});
+
 describe('test util.createToggle - Promise', () => {
   let db;
   before(() => {

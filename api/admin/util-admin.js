@@ -77,6 +77,12 @@ exports.getToggleByName = name => new Promise((resolve, reject) => {
     .catch(err => reject(err));
 });
 
+exports.getToggleStatus = () => new Promise((resolve, reject) => {
+  resolve ({
+    NOTIFICATION_SLACK: (process.env.SLACK_TOKEN != null && process.env.SLACK_TOKEN != undefined)
+  });
+});
+
 exports.createToggle = (name, toggle, notification) => new Promise((resolve, reject) => {
   new Toggle({
     name,

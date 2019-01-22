@@ -1,4 +1,3 @@
-#!/usr/bin/node
 /**
  * Read the version and build time from / package.json, increase the build number and set the build time to now
  * Usage: node bin/build.js [<ma|mi|b>]
@@ -50,4 +49,5 @@ if (modified) { // only write file if version has changed
     JSON.stringify(package_json, null, 4),
     'UTF8',
   );
+  fs.writeFileSync('./VERSION', `${major_version}.${minor_version}.${build_version}`);
 }

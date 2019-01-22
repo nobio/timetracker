@@ -13,9 +13,12 @@ function timeentry(direction, datetime) {
     }
 
     var entry = new TimeEntry(); // TimeEntry is a Backbone Model defined in layout.pug
-    entry.save({ 'direction': direction, 'datetime': dt }, {
+    entry.save({
+        'direction': direction,
+        'datetime': dt
+    }, {
         wait: true,
-        success: function(model, timeentry) {
+        success: function (model, timeentry) {
             console.log('Successfully saved!');
             var sDate = moment(timeentry.entry_date).format('DD.MM.YYYY');
             var sTime = moment(timeentry.entry_date).format('HH:mm');
@@ -27,7 +30,7 @@ function timeentry(direction, datetime) {
             result.innerHTML += sTime;
             size.innerHTML = timeentry.size;
         },
-        error: function(model, err) {
+        error: function (model, err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
     });
@@ -52,14 +55,16 @@ function deleteAllTimeEntries() {
 }
 */
 function calculateStats() {
-    var stats = new Statistics({ id: '' }); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
+    var stats = new Statistics({
+        id: ''
+    }); // model needs attribute "id" so "isNew === false"; this leads to call PUT rather than POST
     stats.save({}, {
         wait: true,
-        success: function(model, response) {
+        success: function (model, response) {
             result.innerHTML = 'updated statistics: ' + JSON.stringify(response);
             alert('updated statistics: ' + JSON.stringify(response))
         },
-        error: function(model, err) {
+        error: function (model, err) {
             alert("Error (" + err.status + "): " + err.responseText);
         }
     });
@@ -70,11 +75,11 @@ function backupData() {
             type: 'POST',
             url: '/api/entries/backup',
             dataType: 'json'
-        }).done(function(response) {
+        }).done(function (response) {
             result.innerHTML = 'data backuped ' + response.backup_count + ' time entries';
             alert('data backuped ' + response.backup_count + ' time entries');
         })
-        .error(function(err) {
+        .error(function (err) {
             alert("error: " + err.status + " (" + err + ")");
         });
 }
@@ -84,11 +89,11 @@ function dumpData() {
             type: 'POST',
             url: '/api/entries/dump',
             dataType: 'json'
-        }).done(function(response) {
+        }).done(function (response) {
             result.innerHTML = 'data dumped ' + response.size + ' time entries to ' + response.filename;
             alert('data dumped ' + response.size + ' time entries to ' + response.filename);
         })
-        .error(function(err) {
+        .error(function (err) {
             alert("error: " + err.status + " (" + err + ")");
         });
 }
@@ -96,7 +101,7 @@ function dumpData() {
 function getTimeEntriesByDate(dt) {
 
     result.innerHTML = '';
-    getBusyTime(dt, function(err, busy) {
+    getBusyTime(dt, function (err, busy) {
 
         if (err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
@@ -104,8 +109,10 @@ function getTimeEntriesByDate(dt) {
 
         var entries = new TimeEntries(); // TimeEntry is a Backbone Model defined in layout.pug
         entries.fetch({
-            data: { dt: "" + dt },
-            success: function(timeentries) {
+            data: {
+                dt: "" + dt
+            },
+            success: function (timeentries) {
                 var html = 'Anwesenheit: ';
                 if (busy && !busy.isEmpty({})) {
                     let duration = moment(busy.attributes.duration - 60 * 60 * 1000).format('HH:mm');
@@ -120,7 +127,7 @@ function getTimeEntriesByDate(dt) {
                 html += '<th>Kommen/Gehen</th>';
                 html += '<th>Letzte Änderung</th>';
                 html += '<th>Bearbeiten/Löschen</th>';
-                timeentries.forEach(function(entry) {
+                timeentries.forEach(function (entry) {
                     html += '<tr>';
                     html += '<td>' + moment(entry.get("entry_date")).format('DD.MM.YYYY') + '</td>';
                     html += '<td>' + moment(entry.get("entry_date")).format('HH:mm') + '</td>';
@@ -135,7 +142,7 @@ function getTimeEntriesByDate(dt) {
                 html += '</table>';
                 data_by_date.innerHTML = html;
             },
-            error: function(model, err) {
+            error: function (model, err) {
                 result.innerHTML = "Error (" + err.status + "): " + err.responseText;
             }
         });
@@ -147,11 +154,13 @@ function getBusyTime(dt, callback) {
 
     var duration = new Duration();
     duration.fetch({
-        data: { busy: "" + dt },
-        success: function(busy) {
+        data: {
+            busy: "" + dt
+        },
+        success: function (busy) {
             callback(null, busy);
         },
-        error: function(model, err) {
+        error: function (model, err) {
             callback(err);
         }
     });
@@ -159,13 +168,15 @@ function getBusyTime(dt, callback) {
 }
 
 function deleteTimeEntryById(id) {
-    var entry = new TimeEntry({ 'id': id }); // TimeEntry is a Backbone Model defined in layout.pug
+    var entry = new TimeEntry({
+        'id': id
+    }); // TimeEntry is a Backbone Model defined in layout.pug
     entry.destroy({
         wait: true,
-        success: function(model, response) {
+        success: function (model, response) {
             result.innerHTML = 'deleted Time Entry ' + response;
         },
-        error: function(model, err) {
+        error: function (model, err) {
             result.innerHTML = "Error (" + err.status + "): " + err.responseText;
         }
     });
@@ -198,10 +209,14 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
         // setting nextDate as value of text field
     }
 
-    var stats = new Statistics({ 'id': "" + nextDate }); // Statistics is a Backbone Model defined in layout.pug
+    var stats = new Statistics({
+        'id': "" + nextDate
+    }); // Statistics is a Backbone Model defined in layout.pug
     stats.fetch({
-        data: { timeUnit: timeUnit },
-        success: function(timerecord) {
+        data: {
+            timeUnit: timeUnit
+        },
+        success: function (timerecord) {
             busyChartVariable.setData(timerecord.get("chart_data"));
             /*
             plannedTime.innerHTML = Math.round(timerecord.get("planned_working_time") / 1000 / 60 / 60 * 100) / 100;
@@ -210,7 +225,7 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
             diffTime.innerHTML = Math.round((timerecord.get("actual_working_time") - timerecord.get("planned_working_time")) / 1000 / 60 / 60 * 100) / 100;            
             */
         },
-        error: function(model, err) {
+        error: function (model, err) {
             console.log(model);
             console.log(err);
         }
@@ -222,11 +237,13 @@ function nextStatsDay(tableref, time, timeUnit, direction) {
 function aggregatedStatistics(timeUnit) {
     var aggStats = new StatisticsAggregated();
     aggStats.fetch({
-        data: { timeUnit: timeUnit },
-        success: function(statistic_data) {
+        data: {
+            timeUnit: timeUnit
+        },
+        success: function (statistic_data) {
             aggStatsVariable.setData(statistic_data.get("chart_data"));
         },
-        error: function(model, err) {
+        error: function (model, err) {
             console.log(model);
             console.log(err);
         }

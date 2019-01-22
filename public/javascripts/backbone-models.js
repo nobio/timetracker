@@ -35,3 +35,6 @@ Toggles = Backbone.Collection.extend({
     model: Toggle,
     url: '/api/toggles'
 });
+ToggleStatus = Backbone.Model.extend({
+    urlRoot: '/api/toggles/all/status',
+});
