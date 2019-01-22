@@ -13,6 +13,7 @@ curl -X POST  -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "t
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true, "notification":"statistics have been backed up to database table"}' http://localhost:30000/api/toggles
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"DUMP_FS", "toggle":true, "notification":"data has been dumped to file system"}' http://localhost:30000/api/toggles
 curl -X POST  -H "Content-Type: application/json" -d '{"name":"RECALCULATE", "toggle":true, "notification":"statistics have been calculated"}' http://localhost:30000/api/toggles
+curl -X POST  -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "toggle":true, "notification":"server started"}' http://localhost:30000/api/toggles
 */
 
 /**
@@ -22,9 +23,12 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
   const web = new WebClient(SLACK_TOKEN)
   toggleUtil.getToggleByName(notificationKey)
     .then(toggle => {
-      if(toggle.toggle === true) {
+      console.log(notificationKey)
+      console.log(toggle != null)
+      if (toggle != null && toggle.toggle === true) {
         return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`
       } else {
+        console.log('toggle ' + notificationKey + ' switched off')
         resolve('toggle ' + notificationKey + ' switched off')
         return;
       }
@@ -34,11 +38,11 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
       if (SLACK_TOKEN) {
         // See: https://api.slack.com/methods/chat.postMessage
         web.chat.postMessage({
-          channel: CONVERSATION_ID,
-          text: msg,
-          as_user: false,
-          username: 'Nobio Tech'
-        })
+            channel: CONVERSATION_ID,
+            text: msg,
+            as_user: false,
+            username: 'Nobio Tech'
+          })
           .then(result => resolve(result))
           .catch(err => reject(err))
       } else {
