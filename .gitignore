@@ -21,3 +21,4 @@ dump
 ./Dockerfile
 ./docker-compose.yml
 *.xcodeproj
+timetracker.code-workspace
