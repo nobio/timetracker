@@ -8,12 +8,12 @@ const SLACK_TOKEN = process.env.SLACK_TOKEN
 const CONVERSATION_ID = '#timetracker'
 const { WebClient } = require('@slack/client')
 /*
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"CREATE_ENTRY", "toggle":true, "notification":"created new time entry"}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "toggle":true, "notification":"delete time entry"}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true, "notification":"statistics have been backed up to database table"}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"DUMP_FS", "toggle":true, "notification":"data has been dumped to file system"}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"RECALCULATE", "toggle":true, "notification":"statistics have been calculated"}' http://localhost:30000/api/toggles
-curl -X POST  -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "toggle":true, "notification":"server started"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"CREATE_ENTRY", "toggle":true, "notification":"created new time entry"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"DELETE_ENTRY", "toggle":true, "notification":"delete time entry"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"BACKUP_DB", "toggle":true, "notification":"statistics have been backed up to database table"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"DUMP_FS", "toggle":true, "notification":"data has been dumped to file system"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"RECALCULATE", "toggle":true, "notification":"statistics have been calculated"}' http://localhost:30000/api/toggles
+curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "toggle":true, "notification":"timetracker server started up"}' http://localhost:30000/api/toggles
 */
 
 /**
@@ -23,9 +23,9 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
   const web = new WebClient(SLACK_TOKEN)
   toggleUtil.getToggleByName(notificationKey)
     .then(toggle => {
-      console.log(notificationKey)
       console.log(toggle != null)
       if (toggle != null && toggle.toggle === true) {
+        console.log('toggle ' + notificationKey + ' switched on')
         return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`
       } else {
         console.log('toggle ' + notificationKey + ' switched off')
