@@ -23,7 +23,6 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
   const web = new WebClient(SLACK_TOKEN)
   toggleUtil.getToggleByName(notificationKey)
     .then(toggle => {
-      console.log(toggle != null)
       if (toggle != null && toggle.toggle === true) {
         console.log('toggle ' + notificationKey + ' switched on')
         return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`
