@@ -1,6 +1,7 @@
 require('../db');
 const fs = require('fs');
 const mongoose = require('mongoose');
+
 const Toggle = mongoose.model('Toggle');
 
 const chai = require('chai');
@@ -16,9 +17,8 @@ const util = require('../api/admin/util-admin');
 const g_util = require('../api/global_util');
 
 describe('test util.getToggleStatus - Promise', () => {
-
   it('check Slack status without SLACK_TOKEN', async () => {
-    console.log(process.env.SLACK_TOKEN)
+    console.log(process.env.SLACK_TOKEN);
     await util.getToggleStatus()
       .then((result) => {
         expect(result.NOTIFICATION_SLACK).to.equal(false);
@@ -26,14 +26,13 @@ describe('test util.getToggleStatus - Promise', () => {
       .catch((err) => { throw err; });
   });
   it('check Slack status with SLACK_TOKEN', async () => {
-    process.env.SLACK_TOKEN = '1234567890'
+    process.env.SLACK_TOKEN = '1234567890';
     await util.getToggleStatus()
       .then((result) => {
         expect(result.NOTIFICATION_SLACK).to.equal(true);
       })
       .catch((err) => { throw err; });
   });
-
 });
 
 describe('test util.createToggle - Promise', () => {
@@ -108,7 +107,7 @@ describe('test util.getAllToggles - Promise', () => {
     await util.getAllToggles()
       .then((result) => {
         expect(result).to.be.an('array');
-        expect(result[0]).not.to.be.empty
+        expect(result[0]).not.to.be.empty;
         expect(result[0]).to.have.property('toggle');
         expect(result[0]).to.have.property('name');
       })
@@ -128,7 +127,7 @@ describe('test util.getToggle - Promise', () => {
 
   it('load one toggle', async () => {
     await util.getAllToggles()
-      .then((result) => util.getToggle(result[0]._id))
+      .then(result => util.getToggle(result[0]._id))
       .then((result) => {
         expect(result).to.have.property('toggle');
         expect(result).to.have.property('name');
@@ -138,26 +137,26 @@ describe('test util.getToggle - Promise', () => {
 
   it('load one not existing toggle; should fail', async () => expect(util.getToggle('12345')).to.be.rejected);
 
-  it('test to load notification toggle by existing name', async () => {		
-    await util.getToggleByName('CREATE_ENTRY')		
-      .then((result) => {		
-        expect(result.name).to.equal('CREATE_ENTRY');		
-      })		
-      .catch((err) => { throw err; });		
-  });		
-  it('test to load notification toggle by a not existing name', async () => {		
-    await util.getToggleByName('xxx')		
-      .then((result) => {		
-        expect(result).to.be.null;		
-      })		
-      .catch((err) => { throw err; });		
-  });		
-  it('test to load notification toggle without any name (null)', async () => {		
-    await util.getToggleByName()		
-      .then((result) => {		
-        expect(result).to.be.null;		
-      })		
-      .catch((err) => { throw err; });		
+  it('test to load notification toggle by existing name', async () => {
+    await util.getToggleByName('CREATE_ENTRY')
+      .then((result) => {
+        expect(result.name).to.equal('CREATE_ENTRY');
+      })
+      .catch((err) => { throw err; });
+  });
+  it('test to load notification toggle by a not existing name', async () => {
+    await util.getToggleByName('xxx')
+      .then((result) => {
+        expect(result).to.be.null;
+      })
+      .catch((err) => { throw err; });
+  });
+  it('test to load notification toggle without any name (null)', async () => {
+    await util.getToggleByName()
+      .then((result) => {
+        expect(result).to.be.null;
+      })
+      .catch((err) => { throw err; });
   });
 
   after(() => {
@@ -173,44 +172,43 @@ describe('test util.updateToggle - Promise', () => {
 
   it('update existing toggle', async () => {
     const toggleName = getToggleTestName();
-    notification = 'DELETE_ME'
+    notification = 'DELETE_ME';
 
     await util.createToggle(toggleName, false, notification)
-      .then(newToggle => {
-        expect(newToggle.toggle).to.equal(false)
+      .then((newToggle) => {
+        expect(newToggle.toggle).to.equal(false);
         return newToggle._id;
       })
-      .then(id => util.updateToggle(id, true, notification + '_TOO'))
+      .then(id => util.updateToggle(id, true, `${notification}_TOO`))
       .then(toggle => util.getToggle(toggle._id))
-      .then(result => {
+      .then((result) => {
         expect(result).not.to.be.null;
-        expect(result.toggle).to.equal(true)
-        expect(result.notification).to.equal(notification + '_TOO')
+        expect(result.toggle).to.equal(true);
+        expect(result.notification).to.equal(`${notification}_TOO`);
       })
       .catch((err) => { throw err; });
   });
   it('update existing toggle but only notification text', async () => {
     const toggleName = getToggleTestName();
-    notification = 'DELETE_ME'
+    notification = 'DELETE_ME';
 
     await util.createToggle(toggleName, false, notification)
-      .then(newToggle => {
-        expect(newToggle.toggle).to.equal(false)
+      .then((newToggle) => {
+        expect(newToggle.toggle).to.equal(false);
         return newToggle._id;
       })
-      .then(id => util.updateToggle(id, undefined, notification + '_TOO'))
+      .then(id => util.updateToggle(id, undefined, `${notification}_TOO`))
       .then(toggle => util.getToggle(toggle._id))
-      .then(result => {
+      .then((result) => {
         expect(result).not.to.be.null;
-        expect(result.notification).to.equal(notification + '_TOO')
+        expect(result.notification).to.equal(`${notification}_TOO`);
       })
       .catch((err) => { throw err; });
   });
 
   it('update not existing toggle', async () => {
-
     await util.updateToggle('41224d776a326fb40f000001', true)
-      .then(toggle => {
+      .then((toggle) => {
         expect(toggle).to.be.null;
       })
       .catch((err) => { throw err; });
@@ -232,12 +230,10 @@ describe('test util.deleteToggle - Promise', () => {
 
   it('delete an existing toggle', async () => {
     await util.createToggle(toggleName, 'true')
-      .then(newToggle => {
-        return newToggle._id;
-      })
+      .then(newToggle => newToggle._id)
       .then(id => util.deleteToggle(id))
       .then(toggle => util.getToggle(toggle._id))
-      .then(result => {
+      .then((result) => {
         expect(result).to.be.null;
       })
       .catch((err) => { throw err; });
@@ -245,7 +241,7 @@ describe('test util.deleteToggle - Promise', () => {
 
   it('try to delete a not existing toggle', async () => {
     await util.deleteToggle('41224d776a326fb40f000001')
-      .then(result => {
+      .then((result) => {
         expect(result).to.be.null;
       })
       .catch((err) => { throw err; });
@@ -254,14 +250,14 @@ describe('test util.deleteToggle - Promise', () => {
 
   after(() => {
     util.deleteTestToggles()
-      .then(result => {
-        console.log(JSON.stringify(result))
+      .then((result) => {
+        console.log(JSON.stringify(result));
       })
-      //.then(result => db.closeConnection())
-      .catch(err => console.log(err))
+      // .then(result => db.closeConnection())
+      .catch(err => console.log(err));
   });
 });
 
 function getToggleTestName() {
-  return 'TEST-TOGGLE-' + Math.round(Math.random() * 100000000);
+  return `TEST-TOGGLE-${Math.round(Math.random() * 100000000)}`;
 }

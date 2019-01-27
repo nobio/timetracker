@@ -401,7 +401,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   after(() => {
     clearAllEntries(DEFAULT_DATE);
     setTimeout(() => {
-      //db.closeConnection();
+      // db.closeConnection();
     }, 1000);
   });
 });

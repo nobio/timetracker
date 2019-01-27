@@ -41,16 +41,10 @@ describe('isEmpty', () => {
 });
 
 describe('test global_util.sendMessage()', () => {
+  it('should throw exception because SLACK Token is not set', () => expect(g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX')).to.be.rejected);
 
-  it('should work just fine', async () => {
-    await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX')
-      .then()
-      .catch((err) => { throw (err); });
-  });
-
-  it('should work just fine as promise', async () => {
-
-    await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX')
+  it('should work just fine with unknown key as promise', async () => {
+    await g_util.sendMessage('UNKNOWN_KEY', 'XXXXXXX')
       .then((result) => {
         expect(result).to.not.be.undefined;
         expect(result).to.be.string;
@@ -74,7 +68,7 @@ describe('test global_util.sendMessage()', () => {
       })
       .catch((err) => {
         throw err;
-      })
+      });
   });
 });
 
