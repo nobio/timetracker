@@ -7,7 +7,6 @@
  * no argument will increase the build number
  */
 
-
 const fs = require('fs');
 const package_json = require('../package.json');
 
