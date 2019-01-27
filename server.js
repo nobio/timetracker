@@ -116,4 +116,4 @@ https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), ()
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().format('HH:mm:ss DD.MM.YYYY')} on https://${app.get('host')}:${app.get('ssl-port')}`);
+require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`);

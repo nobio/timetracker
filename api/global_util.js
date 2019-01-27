@@ -45,6 +45,7 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
           .then(result => resolve(result))
           .catch(err => reject(err))
       } else {
+        console.log('not able to send message with SLACK; no token provided')
         resolve('ignoring Slack; no token provided');
       }
     })
