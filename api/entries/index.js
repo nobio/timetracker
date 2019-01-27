@@ -1,4 +1,4 @@
-const util = require('./util-entries')
+const util = require('./util-entries');
 
 // const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
 
@@ -10,8 +10,8 @@ const util = require('./util-entries')
 exports.getEntryById = (req, res) => {
   util.findById(req.params.id)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`))
-}
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
+};
 
 /** ******************************************************************************
  * Reads all time entries
@@ -23,29 +23,29 @@ exports.getEntryById = (req, res) => {
  * curl -X GET http://localhost:30000/api/entries?busy=1393455600000
  ****************************************************************************** */
 exports.getEntries = (req, res) => {
-  const filterByDate = req.query.dt
-  const filterByBusy = req.query.busy
+  const filterByDate = req.query.dt;
+  const filterByBusy = req.query.busy;
 
   if (filterByDate && filterByBusy) {
-    console.log('filter by date and busy')
-    res.status(500).send('date and busy filter set; can only handle one of them')
+    console.log('filter by date and busy');
+    res.status(500).send('date and busy filter set; can only handle one of them');
   } else if (filterByDate) {
-    console.log(`filter by date: ${filterByDate}`)
+    console.log(`filter by date: ${filterByDate}`);
     util.getAllByDate(filterByDate)
       .then(timeentries => res.status(200).send(timeentries))
-      .catch(err => res.status(500).send(err))
+      .catch(err => res.status(500).send(err));
   } else if (filterByBusy) {
-    console.log(`filter by busy: ${filterByBusy}`)
+    console.log(`filter by busy: ${filterByBusy}`);
     util.getAllByDate(filterByBusy)
       .then(util.calculateBusyTime)
       .then(busytime => res.status(200).send(busytime))
-      .catch(err => res.status(500).send(err.message))
+      .catch(err => res.status(500).send(err.message));
   } else {
     util.getAll()
       .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`))
+      .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
   }
-}
+};
 
 /** ******************************************************************************
  * Creates a new TimeEntry value. Input data:
@@ -61,18 +61,18 @@ exports.getEntries = (req, res) => {
  * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","entry_date":"2018-02-18T09:46:02.151Z","last_changed":"2018-02-18T09:46:02.151Z","datetime":"2018-02-18T09:46:00.000Z"}'  http://localhost:30000/api/entries
  ****************************************************************************** */
 exports.createEntry = (req, res) => {
-  console.log(JSON.stringify(req.body))
+  console.log(JSON.stringify(req.body));
   const timeEntry = {
     direction: req.body.direction,
     datetime: req.body.datetime,
     longitude: req.body.longitude,
-    latitude: req.body.latitude
-  }
+    latitude: req.body.latitude,
+  };
 
   util.create(timeEntry)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`))
-}
+    .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
+};
 
 /** ******************************************************************************
  * stores one Time Entry
@@ -81,20 +81,20 @@ exports.createEntry = (req, res) => {
  ****************************************************************************** */
 exports.saveEntry = (req, res) => {
   // console.log(JSON.stringify(req.body))
-  const id = req.params.id
+  const id = req.params.id;
   const timeEntry = {
     id: req.params.id,
     direction: req.body.direction,
     entry_date: req.body.entry_date,
     datetime: req.body.datetime,
     longitude: req.body.longitude,
-    latitude: req.body.latitude
-  }
+    latitude: req.body.latitude,
+  };
 
   util.update(timeEntry)
     .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while saving Time Entry: ${id} ${err.message}`))
-}
+    .catch(err => res.status(500).send(`Error while saving Time Entry: ${id} ${err.message}`));
+};
 
 /** ******************************************************************************
  * deletes one time entry by it's id
@@ -102,18 +102,18 @@ exports.saveEntry = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/entries/5a24076af89b40156b1c0efe
  ****************************************************************************** */
 exports.deleteEntry = (req, res) => {
-  const id = req.params.id
+  const id = req.params.id;
 
   util.deleteById(id)
     .then((timeentry) => {
       if (timeentry === undefined || timeentry === null) {
-        res.status(500).send(`Could not delete Time Entry with (id: ${id})`)
+        res.status(500).send(`Could not delete Time Entry with (id: ${id})`);
       } else {
-        res.status(200).send(timeentry)
+        res.status(200).send(timeentry);
       }
     })
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err.message}`))
-}
+    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err.message}`));
+};
 
 /*
   {
@@ -142,22 +142,22 @@ exports.deleteEntry = (req, res) => {
  *
  ****************************************************************************** */
 exports.geofence = (req, res) => {
-  console.log(JSON.stringify(req.body))
+  console.log(JSON.stringify(req.body));
 
-  const direction = (req.body.trigger == 'enter' ? 'enter' : 'go')
+  const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
   if (req.body.id === 'Work') {
     const timeEntry = {
       direction,
       longitude: req.body.longitude,
-      latitude: req.body.latitude
-    }
+      latitude: req.body.latitude,
+    };
 
     util.create(timeEntry)
       .then(timeentry => res.status(200).send(timeentry))
-      .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`))
+      .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
   } else {
     res.status(500).send({
-      message: "no geofence entry made; id must be 'Work')"
-    })
+      message: "no geofence entry made; id must be 'Work')",
+    });
   }
-}
+};

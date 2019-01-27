@@ -117,7 +117,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
       // const sum = time_unit_stats.reduce((total, value) => total + value);
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
-      //console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD') + " / " + lastTimeUnit + " / " + moment(lastTimeUnit).format('YYYY-MM-DD'));
+      // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD') + " / " + lastTimeUnit + " / " + moment(lastTimeUnit).format('YYYY-MM-DD'));
       data[idx] = {
         x: moment(lastTimeUnit).format(timeUnitFormatString),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
@@ -197,8 +197,8 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
   data[2] = renderOneData(time_data.We, 'Mi');
   data[3] = renderOneData(time_data.Th, 'Do');
   data[4] = renderOneData(time_data.Fr, 'Fr');
-  //data[5] = renderOneData(time_data.Sa, 'Sa');
-  //data[6] = renderOneData(time_data.Su, 'Su');
+  // data[5] = renderOneData(time_data.Sa, 'Sa');
+  // data[6] = renderOneData(time_data.Su, 'Su');
 
   return data;
 }

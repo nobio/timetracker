@@ -72,14 +72,14 @@ exports.getToggle = id => new Promise((resolve, reject) => {
 });
 
 exports.getToggleByName = name => new Promise((resolve, reject) => {
-  Toggle.findOne({name: name})
+  Toggle.findOne({ name })
     .then(result => resolve(result))
     .catch(err => reject(err));
 });
 
 exports.getToggleStatus = () => new Promise((resolve, reject) => {
-  resolve ({
-    NOTIFICATION_SLACK: (process.env.SLACK_TOKEN != null && process.env.SLACK_TOKEN != undefined)
+  resolve({
+    NOTIFICATION_SLACK: (process.env.SLACK_TOKEN != null && process.env.SLACK_TOKEN != undefined),
   });
 });
 
@@ -87,7 +87,7 @@ exports.createToggle = (name, toggle, notification) => new Promise((resolve, rej
   new Toggle({
     name,
     toggle,
-    notification
+    notification,
   }).save()
     .then(toggle => resolve(toggle))
     .catch(err => reject(err));
@@ -112,7 +112,7 @@ exports.updateToggle = (id, toggle, notification) => new Promise((resolve, rejec
         resolve(null);
         return;
       }
-      tog.toggle = (toggle === undefined || toggle === null) ? tog.toggle : toggle;  // maybe, only notification is pased
+      tog.toggle = (toggle === undefined || toggle === null) ? tog.toggle : toggle; // maybe, only notification is pased
       tog.notification = (notification === undefined || notification === null) ? '' : notification;
       return tog;
     })

@@ -65,8 +65,8 @@ exports.getToggleByName = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/all/status
  */
 exports.getToggleStatus = (req, res) => {
-  console.log(req)
-  console.log('Hi Schernoo')
+  console.log(req);
+  console.log('Hi Schernoo');
 
   util.getToggleStatus()
     .then(response => res.status(200).send(response))

@@ -117,5 +117,5 @@ require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
 require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
-.then(msg => console.log(msg))
-.catch(err => console.log(err));
+  .then(msg => console.log(msg))
+  .catch(err => console.log(err));
