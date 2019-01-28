@@ -46,5 +46,5 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
         reject(`could not send message '${msg}'; no SLACK token provided`);
       }
     })
-    .catch(err => message = 'no message found');
+    .catch(err => reject(`no message found ${err}`));
 });

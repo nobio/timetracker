@@ -20,8 +20,8 @@ const fs = require('fs');
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const options = {
-  key: fs.readFileSync('keys/key.pem'),
-  cert: fs.readFileSync('keys/cert.pem'),
+   key: fs.readFileSync('keys/key.pem'),
+   cert: fs.readFileSync('keys/cert.pem'),
 };
 
 const app = express();
@@ -98,18 +98,18 @@ app.get('/api/experiment', api_misc.experiment);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
 if (process.env.SLACK_TOKEN) {
-  console.log('using Slack to notify');
+   console.log('using Slack to notify');
 } else {
-  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
+   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
 }
 
 /* start the web service */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
+   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
-  console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
+   console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 /* start scheduler */
@@ -117,5 +117,5 @@ require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
 require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
-  .then(msg => console.log(msg))
-  .catch(err => console.log(err));
+   .then(msg => console.log(JSON.stringify(msg)))
+   .catch(err => console.log(err));
