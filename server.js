@@ -73,6 +73,7 @@ app.post('/api/geofence', api_entries.geofence);
 // admin stuff
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
+app.post('/api/entries/replicate', api_admin.replicateTimeEntries);
 
 app.get('/api/toggles', api_admin.getAllToggles);
 app.get('/api/toggles/:id', api_admin.getToggleById);
