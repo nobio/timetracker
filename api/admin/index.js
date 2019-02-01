@@ -24,17 +24,6 @@ exports.backupTimeEntries = (req, res) => {
 };
 
 /**
- * function to backup data in an extra backup table
- *
- * curl -X POST http://localhost:30000/api/entries/replicate
- */
-exports.replicateTimeEntries = (req, res) => {
-  utilData.replicateTimeEntries()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while replicating data: ${err}`));
-};
-
-/**
  * read the list of all toggles
  *
  * curl -X GET http://localhost:30000/api/toggles
