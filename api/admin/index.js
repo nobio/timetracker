@@ -1,5 +1,4 @@
 const util = require('./util-admin');
-const utilData = require('./util-data');
 
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
