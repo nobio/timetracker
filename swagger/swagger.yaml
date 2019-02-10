@@ -37,6 +37,8 @@ paths:
           schema:
             $ref: '#/definitions/TimeEntry'
     get:
+      consumes: 
+        - 'application/x-www-form-urlencoded'
       tags:
         - TimeEntries
       description: >
@@ -66,10 +68,10 @@ paths:
         - application/json
       responses:
         '200':
-          description: New entry is created
+          description: All (or filtered) time entries
           schema:
             $ref: '#/definitions/TimeEntries'
-
+            
   '/entries/{id}':
     parameters:
       - name: id
@@ -109,7 +111,64 @@ paths:
         '200':
           description: Toggle is updated
           schema:
-            $ref: '#/definitions/Toggle'
+            $ref: '#/definitions/TimeEntry'
+            
+  /entries/dump:
+    post:
+      tags:
+        - TimeEntries
+      description: 
+        dump the mongodb to the local file system in order to be restored if needed
+      responses:
+        200:
+          description: data dumped to file
+          schema:
+            properties:
+              size:
+                type: integer
+                description: number of time entries dumped to file
+                example: 2677
+              filename: 
+                type: string
+                description: name of the file in which the time entries have been dumped
+                example: './dump/timeentry_2019-02-10_200036.json'
+
+  /entries/backup:
+    post:
+      tags:
+        - TimeEntries
+      description: 
+        backup data in an extra backup table
+      responses:
+        200:
+          description: data saved to database
+          schema:
+            properties:
+              backup_count:
+                type: integer
+                description: number of time entries backed up to file
+                example: 2677
+        500:
+          description: something went wrong...
+        
+  /geofence:
+    post:
+      tags:
+        - TimeEntries
+      description: Create new time entry in system using geo fencing; time entrie's date will be "now"
+      parameters:
+        - name: geo_timeentry
+          in: body
+          description: Time entry that we want to create using Geofencing
+          schema:
+            $ref: '#/definitions/Geofence'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: New entry is created
+          schema:
+            $ref: '#/definitions/TimeEntry'
             
   /toggles:
     post:
@@ -194,6 +253,7 @@ paths:
           description: All toggles status
           schema:
             $ref: '#/definitions/Toggle'
+
 definitions:
   TimeEntry:
     required:
@@ -210,6 +270,32 @@ definitions:
         uniqueItems: false
         example: '2000-01-01T10:15:02.151Z'
         description: Date of last change on this time entry
+      direction:
+        type: string
+        uniqueItems: true
+        enum:
+          - enter
+          - go
+        example: enter
+        description: >
+          direction of this time entry; representing, if the time entry means a
+          coming or going event:
+           * `go` - leaving
+           * `enter` - entering
+      longitude:
+        type: number
+        example: 10.875482
+        description: the longitude geo coordinate
+      latitude:
+        type: number
+        example: 49.514135
+        description: the latitude geo coordinate
+  Geofence:
+    required: 
+      - direction
+      - longitude
+      - latitude
+    properties:
       direction:
         type: string
         uniqueItems: true
