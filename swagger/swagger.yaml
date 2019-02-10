@@ -39,19 +39,6 @@ paths:
     get:
       tags:
         - TimeEntries
-      parameters: 
-        - in: query
-          name: dt
-          schema:
-            type: number
-            example: 1393455600000
-            description: List of Time Entry of the given day
-        - in: query
-          name: busy
-          schema:
-            type: number
-            example: 1393455600000
-            description: Busy Time of the given day (in ms)
       description: >
         Reads all time entries; 
 
@@ -59,6 +46,22 @@ paths:
         day; 
 
         Read busy time getBusyTime -> Busy Time of the given day (in ms)
+# ------------------------------------------------------------------------
+# https://swagger.io/docs/specification/describing-parameters/#query-parameters
+#      parameters:
+#        - in: query
+#          name: dt
+#          schema:
+#            type: number
+#            example: 1393455600000
+#            description: List of Time Entry of the given day
+#        - in: query
+#          name: busy
+#          schema:
+#            type: number
+#            example: 1393455600000
+#            description: Busy Time of the given day (in ms)
+# ------------------------------------------------------------------------
       produces:
         - application/json
       responses:
@@ -66,6 +69,48 @@ paths:
           description: New entry is created
           schema:
             $ref: '#/definitions/TimeEntries'
+
+  '/entries/{id}':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: ID of time entry that we want to find
+        type: string
+    get:
+      tags:
+        - TimeEntries
+      summary: Get time entry with given ID
+      responses:
+        '200':
+          description: TimeEntry is found
+          schema:
+            $ref: '#/definitions/TimeEntries'
+    delete:
+      summary: Delete time entry with given ID
+      tags:
+        - TimeEntries
+      responses:
+        '200':
+          description: Time Entry is deleted
+          schema:
+            $ref: '#/definitions/TimeEntries'
+    put:
+      summary: Update toggle with give ID
+      tags:
+        - TimeEntries
+      parameters:
+        - name: TimeEntry
+          in: body
+          description: TimeEntry with new values of properties
+          schema:
+            $ref: '#/definitions/TimeEntry'
+      responses:
+        '200':
+          description: Toggle is updated
+          schema:
+            $ref: '#/definitions/Toggle'
+            
   /toggles:
     post:
       tags:
@@ -98,7 +143,7 @@ paths:
       - name: id
         in: path
         required: true
-        description: ID of user that we want to find
+        description: ID of toggle that we want to find
         type: string
     get:
       tags:
@@ -106,7 +151,7 @@ paths:
       summary: Get toggle with given ID
       responses:
         '200':
-          description: User is found
+          description: Toggle is found
           schema:
             $ref: '#/definitions/Toggle'
     delete:
