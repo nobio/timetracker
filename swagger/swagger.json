@@ -1,0 +1,347 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Timetracker API",
+    "description": "Swagger doc on my fancy timetracker app",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:30000",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "Time Tracker",
+      "description": "description goes here"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/entries": {
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "description": "Create new time entry in system",
+        "parameters": [
+          {
+            "name": "timeentry",
+            "in": "body",
+            "description": "Time entry that we want to create",
+            "schema": {
+              "$ref": "#/definitions/TimeEntry"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New entry is created",
+            "schema": {
+              "$ref": "#/definitions/TimeEntry"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "description": "Reads all time entries; \nread entries by date getAllByDate -> List of Time Entry of the given day; \nRead busy time getBusyTime -> Busy Time of the given day (in ms)\n",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New entry is created",
+            "schema": {
+              "$ref": "#/definitions/TimeEntries"
+            }
+          }
+        }
+      }
+    },
+    "/entries/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of time entry that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Get time entry with given ID",
+        "responses": {
+          "200": {
+            "description": "TimeEntry is found",
+            "schema": {
+              "$ref": "#/definitions/TimeEntries"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete time entry with given ID",
+        "tags": [
+          "TimeEntries"
+        ],
+        "responses": {
+          "200": {
+            "description": "Time Entry is deleted",
+            "schema": {
+              "$ref": "#/definitions/TimeEntries"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update toggle with give ID",
+        "tags": [
+          "TimeEntries"
+        ],
+        "parameters": [
+          {
+            "name": "TimeEntry",
+            "in": "body",
+            "description": "TimeEntry with new values of properties",
+            "schema": {
+              "$ref": "#/definitions/TimeEntry"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toggle is updated",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      }
+    },
+    "/toggles": {
+      "post": {
+        "tags": [
+          "Toggles"
+        ],
+        "description": "Create new toggle in system",
+        "parameters": [
+          {
+            "name": "toggle",
+            "in": "body",
+            "description": "Toggle that we want to create",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New toggle is created",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Get all toggles in system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Toggles"
+            }
+          }
+        }
+      }
+    },
+    "/toggles/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of toggle that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Get toggle with given ID",
+        "responses": {
+          "200": {
+            "description": "Toggle is found",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete toggle with given ID",
+        "tags": [
+          "Toggles"
+        ],
+        "responses": {
+          "200": {
+            "description": "Toggle is deleted",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update toggle with give ID",
+        "tags": [
+          "Toggles"
+        ],
+        "parameters": [
+          {
+            "name": "toggle",
+            "in": "body",
+            "description": "Toggle with new values of properties",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toggle is updated",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      }
+    },
+    "/toggles/name/{name}": {
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "required": true,
+          "description": "Name of a toggle that we want to find",
+          "type": "string"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "read one toggle by its name",
+        "responses": {
+          "200": {
+            "description": "All toggles status",
+            "schema": {
+              "$ref": "#/definitions/Toggle"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "TimeEntry": {
+      "required": [
+        "entry_date",
+        "direction"
+      ],
+      "properties": {
+        "entry_date": {
+          "type": "string",
+          "uniqueItems": true,
+          "example": "2000-01-01T10:15:02.151Z",
+          "description": "The date this time entry represents"
+        },
+        "last_changed": {
+          "type": "string",
+          "uniqueItems": false,
+          "example": "2000-01-01T10:15:02.151Z",
+          "description": "Date of last change on this time entry"
+        },
+        "direction": {
+          "type": "string",
+          "uniqueItems": true,
+          "enum": [
+            "enter",
+            "go"
+          ],
+          "example": "enter",
+          "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n"
+        },
+        "longitude": {
+          "type": "number",
+          "example": 10.875482,
+          "description": "the longitude geo coordinate"
+        },
+        "latitude": {
+          "type": "number",
+          "example": 49.514135,
+          "description": "the latitude geo coordinate"
+        }
+      }
+    },
+    "TimeEntries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/TimeEntry"
+      }
+    },
+    "Toggle": {
+      "required": [
+        "name",
+        "toggle",
+        "notification"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "uniqueItems": true,
+          "example": "__TEST__"
+        },
+        "toggle": {
+          "type": "string",
+          "example": "false"
+        },
+        "notification": {
+          "type": "string",
+          "example": "some text"
+        }
+      }
+    },
+    "Toggles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Toggle"
+      }
+    }
+  }
+}

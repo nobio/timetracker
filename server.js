@@ -17,6 +17,12 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger/swagger.json');
+
+
+
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const options = {
@@ -77,10 +83,10 @@ app.post('/api/entries/backup', api_admin.backupTimeEntries);
 app.get('/api/toggles', api_admin.getAllToggles);
 app.get('/api/toggles/:id', api_admin.getToggleById);
 app.get('/api/toggles/name/:name', api_admin.getToggleByName);
-app.get('/api/toggles/all/status', api_admin.getToggleStatus);
 app.put('/api/toggles/:id', api_admin.saveToggle);
 app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
+//app.get('/api/toggles/all/status', api_admin.getToggleStatus);
 
 // statistics stuff
 app.put('/api/stats', api_stats.calcStats);
@@ -96,6 +102,13 @@ app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
+
+// -------------- SWAGGER ------------------------------------------------
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//app.use('/api/v1', router);
+// -----------------------------------------------------------------------
+
+
 
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');
