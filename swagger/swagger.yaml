@@ -253,6 +253,19 @@ paths:
           description: All toggles status
           schema:
             $ref: '#/definitions/Toggle'
+  /stats:
+    put:
+      tags:
+        - Statistics
+      description: calculates the statistics for today +/- one month and stores them in database
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Statistics have successfully been calculated
+          schema:
+            $ref: '#/definitions/StatsEntryResult'
+                
 
 definitions:
   TimeEntry:
@@ -320,6 +333,7 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/TimeEntry'
+  
   Toggle:
     required:
       - name
@@ -340,3 +354,23 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/Toggle'
+      
+  StatsEntryResult:
+    properties:
+      firstEntry:
+        properties:
+          _id: 
+            type: number
+            example: 0
+          age: 
+            type: string
+            example: '2014-01-13T06:30:00.000Z'
+      lastEntry:
+        properties:
+          _id: 
+            type: number
+            example: 0
+          age: 
+            type: string
+            example: '2019-01-10T21:13:29.233Z'
+  
