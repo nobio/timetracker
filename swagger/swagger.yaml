@@ -6,7 +6,6 @@ info:
   license:
     name: MIT
     url: 'https://opensource.org/licenses/MIT'
-host: 'localhost:30000'
 basePath: /api
 tags:
   - name: Time Tracker
@@ -155,7 +154,7 @@ paths:
     post:
       tags:
         - TimeEntries
-      summary: Create new time entry 
+      summary: Create new time entry
       description: >-
         Create new time entry in system using geo fencing; time entrie's date
         will be "now"
@@ -271,11 +270,10 @@ paths:
           description: Statistics have successfully been calculated
           schema:
             $ref: '#/definitions/StatsEntryResult'
-    
     delete:
       tags:
         - Statistics
-      summary: Deletes all entries from statistics table  
+      summary: Deletes all entries from statistics table
       produces:
         - application/json
       responses:
@@ -287,16 +285,14 @@ paths:
               size:
                 type: number
                 example: 953
-
   '/stats/{date}':
-    parameters: 
+    parameters:
       - name: date
         in: path
         required: true
         description: timestamp representing a date
         type: number
         default: 1391295600000
-
       - name: timeUnit
         in: query
         required: true
@@ -313,16 +309,15 @@ paths:
         - Statistics
       summary: calculate aggregated statistics
       description: returns the aggregated statistics for a given time day
-      produces: 
+      produces:
         - application/json
       responses:
         '200':
           description: statistics for the given date
           schema:
             $ref: '#/definitions/AggregatedStats'
-            
   /statistics/aggregate:
-    parameters: 
+    parameters:
       - name: timeUnit
         in: query
         required: true
@@ -339,38 +334,37 @@ paths:
         - Statistics
       summary: calculate aggregated statistics
       description: calculates statistics aggregated to the geven timeUnit
-      produces: 
+      produces:
         - application/json
       responses:
         '200':
           description: calculated aggregated statistics for this given timeUnit
           schema:
             $ref: '#/definitions/AggregatedStatistics'
-
   '/statistics/histogram/{interval}':
-    parameters: 
+    parameters:
       - name: interval
         in: path
         required: true
         description: time interval this historgram should be created
         default: 60
         type: number
-
       - name: direction
         in: query
         required: false
         description: filter entries by their direction
         type: string
-        enum: 
+        enum:
           - enter
           - go
-
     get:
       tags:
         - Statistics
       summary: calculate historgram from statistic data
-      description: returns a histogram with a given interval (time) and optionally filtered by direction (enter, go or both)
-      produces: 
+      description: >-
+        returns a histogram with a given interval (time) and optionally filtered
+        by direction (enter, go or both)
+      produces:
         - application/json
       responses:
         '200':
@@ -386,25 +380,27 @@ paths:
                   type: number
                   example: 512
   '/statistics/breaktime/{interval}':
-    parameters: 
+    parameters:
       - name: interval
         in: path
         required: true
         description: time interval this historgram should be created
         default: 60
         type: number
-
       - name: real
         in: query
         required: false
         description: filter entries by their direction
         type: boolean
     get:
-      tags: 
+      tags:
         - Statistics
       summary: calculate historgram of break times from statistic data
-      description: returns a histogram of break times optionally filtered by "real" measurement of breaks or, in case of only two entries this day, calculated default breaks (45 min).
-      produces: 
+      description: >-
+        returns a histogram of break times optionally filtered by "real"
+        measurement of breaks or, in case of only two entries this day,
+        calculated default breaks (45 min).
+      produces:
         - application/json
       responses:
         '200':
@@ -419,8 +415,6 @@ paths:
                 breaktime:
                   type: number
                   example: 689
-
-
 definitions:
   TimeEntry:
     required:
@@ -525,18 +519,17 @@ definitions:
           age:
             type: string
             example: '2019-01-10T21:13:29.233Z'
-
   AggregatedStats:
     properties:
       chart_data:
         properties:
-          yScale: 
+          yScale:
             type: string
             enum:
               - linear
           xScale:
             type: string
-            enum: 
+            enum:
               - ordinal
               - time
           type:
@@ -556,18 +549,17 @@ definitions:
                   - line
               data:
                 type: array
-  
   AggregatedStatistics:
     properties:
       chart_data:
         properties:
-          yScale: 
+          yScale:
             type: string
             enum:
               - linear
           xScale:
             type: string
-            enum: 
+            enum:
               - ordinal
               - time
           type:
@@ -582,11 +574,11 @@ definitions:
               data:
                 type: array
                 properties:
-                  y:
+                  'y':
                     type: number
                   x:
                     type: number
-                  n:
+                  'n':
                     type: number
                   dev:
                     type: string
@@ -598,4 +590,3 @@ definitions:
                   - line
               data:
                 type: array
-  
