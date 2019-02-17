@@ -32,6 +32,7 @@
         "tags": [
           "TimeEntries"
         ],
+        "summary": "Create new time entry",
         "description": "Create new time entry in system",
         "parameters": [
           {
@@ -62,6 +63,7 @@
         "tags": [
           "TimeEntries"
         ],
+        "summary": "Read all time entries",
         "description": "Reads all time entries; \nread entries by date getAllByDate -> List of Time Entry of the given day; \nRead busy time getBusyTime -> Busy Time of the given day (in ms)\n",
         "produces": [
           "application/json"
@@ -144,6 +146,7 @@
         "tags": [
           "TimeEntries"
         ],
+        "summary": "Backup data to file system",
         "description": "dump the mongodb to the local file system in order to be restored if needed",
         "responses": {
           "200": {
@@ -171,6 +174,7 @@
         "tags": [
           "TimeEntries"
         ],
+        "summary": "Backup data to database",
         "description": "backup data in an extra backup table",
         "responses": {
           "200": {
@@ -196,6 +200,7 @@
         "tags": [
           "TimeEntries"
         ],
+        "summary": "Create new time entry",
         "description": "Create new time entry in system using geo fencing; time entrie's date will be \"now\"",
         "parameters": [
           {
@@ -225,6 +230,7 @@
         "tags": [
           "Toggles"
         ],
+        "summary": "Create new toggle in system",
         "description": "Create new toggle in system",
         "parameters": [
           {
@@ -356,7 +362,8 @@
         "tags": [
           "Statistics"
         ],
-        "description": "calculates the statistics for today +/- one month and stores them in database",
+        "summary": "calculate and fill database table with statistics",
+        "description": "calculates the statistics for today +/- one month and stores them in database;",
         "produces": [
           "application/json"
         ],
@@ -365,6 +372,211 @@
             "description": "Statistics have successfully been calculated",
             "schema": {
               "$ref": "#/definitions/StatsEntryResult"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Deletes all entries from statistics table",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistics data have successfully been deleted",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "size": {
+                  "type": "number",
+                  "example": 953
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/{date}": {
+      "parameters": [
+        {
+          "name": "date",
+          "in": "path",
+          "required": true,
+          "description": "timestamp representing a date",
+          "type": "number",
+          "default": 1391295600000
+        },
+        {
+          "name": "timeUnit",
+          "in": "query",
+          "required": true,
+          "description": "time unit",
+          "type": "string",
+          "default": "day",
+          "enum": [
+            "year",
+            "month",
+            "week",
+            "day"
+          ]
+        }
+      ],
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate aggregated statistics",
+        "description": "returns the aggregated statistics for a given time day",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "statistics for the given date",
+            "schema": {
+              "$ref": "#/definitions/AggregatedStats"
+            }
+          }
+        }
+      }
+    },
+    "/statistics/aggregate": {
+      "parameters": [
+        {
+          "name": "timeUnit",
+          "in": "query",
+          "required": true,
+          "description": "time unit",
+          "type": "string",
+          "default": "day",
+          "enum": [
+            "year",
+            "month",
+            "week",
+            "day"
+          ]
+        }
+      ],
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate aggregated statistics",
+        "description": "calculates statistics aggregated to the geven timeUnit",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "calculated aggregated statistics for this given timeUnit",
+            "schema": {
+              "$ref": "#/definitions/AggregatedStatistics"
+            }
+          }
+        }
+      }
+    },
+    "/statistics/histogram/{interval}": {
+      "parameters": [
+        {
+          "name": "interval",
+          "in": "path",
+          "required": true,
+          "description": "time interval this historgram should be created",
+          "default": 60,
+          "type": "number"
+        },
+        {
+          "name": "direction",
+          "in": "query",
+          "required": false,
+          "description": "filter entries by their direction",
+          "type": "string",
+          "enum": [
+            "enter",
+            "go"
+          ]
+        }
+      ],
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate historgram from statistic data",
+        "description": "returns a histogram with a given interval (time) and optionally filtered by direction (enter, go or both)",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "histogramm according to the given parameters",
+            "schema": {
+              "type": "array",
+              "items": {
+                "properties": {
+                  "time": {
+                    "type": "string",
+                    "example": "1970-01-01T08:20:00.000Z"
+                  },
+                  "histValue": {
+                    "type": "number",
+                    "example": 512
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statistics/breaktime/{interval}": {
+      "parameters": [
+        {
+          "name": "interval",
+          "in": "path",
+          "required": true,
+          "description": "time interval this historgram should be created",
+          "default": 60,
+          "type": "number"
+        },
+        {
+          "name": "real",
+          "in": "query",
+          "required": false,
+          "description": "filter entries by their direction",
+          "type": "boolean"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate historgram of break times from statistic data",
+        "description": "returns a histogram of break times optionally filtered by \"real\" measurement of breaks or, in case of only two entries this day, calculated default breaks (45 min).",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "histogramm according to the given parameters",
+            "schema": {
+              "type": "array",
+              "items": {
+                "properties": {
+                  "time": {
+                    "type": "number",
+                    "example": 40
+                  },
+                  "breaktime": {
+                    "type": "number",
+                    "example": 689
+                  }
+                }
+              }
             }
           }
         }
@@ -498,6 +710,119 @@
             "age": {
               "type": "string",
               "example": "2019-01-10T21:13:29.233Z"
+            }
+          }
+        }
+      }
+    },
+    "AggregatedStats": {
+      "properties": {
+        "chart_data": {
+          "properties": {
+            "yScale": {
+              "type": "string",
+              "enum": [
+                "linear"
+              ]
+            },
+            "xScale": {
+              "type": "string",
+              "enum": [
+                "ordinal",
+                "time"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "bar",
+                "line-dottet"
+              ]
+            },
+            "main": {
+              "properties": {
+                "data": {
+                  "type": "array"
+                }
+              }
+            },
+            "comp": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "line"
+                  ]
+                },
+                "data": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "AggregatedStatistics": {
+      "properties": {
+        "chart_data": {
+          "properties": {
+            "yScale": {
+              "type": "string",
+              "enum": [
+                "linear"
+              ]
+            },
+            "xScale": {
+              "type": "string",
+              "enum": [
+                "ordinal",
+                "time"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "bar",
+                "line-dottet"
+              ]
+            },
+            "yMin": {
+              "type": "number"
+            },
+            "main": {
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "properties": {
+                    "y": {
+                      "type": "number"
+                    },
+                    "x": {
+                      "type": "number"
+                    },
+                    "n": {
+                      "type": "number"
+                    },
+                    "dev": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "comp": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "line"
+                  ]
+                },
+                "data": {
+                  "type": "array"
+                }
+              }
             }
           }
         }
