@@ -17,18 +17,12 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
 
 
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
-
-const options = {
-   key: fs.readFileSync('keys/key.pem'),
-   cert: fs.readFileSync('keys/cert.pem'),
-};
 
 const app = express();
 
@@ -57,7 +51,9 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
+// ------------------ PUG ------------------------------------------------
 // routes to pug templates
+// -----------------------------------------------------------------------
 app.get('/', web.index);
 app.get('/admin', web.admin);
 app.get('/admin_item', web.admin_item);
@@ -65,18 +61,23 @@ app.get('/stats', web.stats);
 app.get('/statistics', web.statistics);
 app.get('/geo', web.geoloc); // todo
 
+// -------------- SWAGGER ------------------------------------------------
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// -----------------------------------------------------------------------
+
+// ------------------ API ------------------------------------------------
 // restful services for entries using Promises
+// -----------------------------------------------------------------------
 app.post('/api/entries', api_entries.createEntry);
 app.get('/api/entries/:id', api_entries.getEntryById);
 app.put('/api/entries/:id', api_entries.saveEntry);
 app.delete('/api/entries/:id', api_entries.deleteEntry);
 app.get('/api/entries', api_entries.getEntries);
 
-
 // geofencing
 app.post('/api/geofence', api_entries.geofence);
 
-// admin stuff
+// admin 
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
 
@@ -88,7 +89,7 @@ app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
 //app.get('/api/toggles/all/status', api_admin.getToggleStatus);
 
-// statistics stuff
+// statistics
 app.put('/api/stats', api_stats.calcStats);
 app.get('/api/stats/:date', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
@@ -96,18 +97,12 @@ app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
 
-// maintain stuff
+// maintain 
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
-
-// -------------- SWAGGER ------------------------------------------------
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-//app.use('/api/v1', router);
-// -----------------------------------------------------------------------
-
 
 
 if (process.env.SLACK_TOKEN) {
@@ -121,7 +116,11 @@ http.createServer(app).listen(app.get('port'), app.get('host'), () => {
    console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
-https.createServer(options, app).listen(app.get('ssl-port'), app.get('host'), () => {
+const ssl_options = {
+   key: fs.readFileSync('keys/key.pem'),
+   cert: fs.readFileSync('keys/cert.pem'),
+};
+https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
    console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
