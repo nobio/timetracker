@@ -49,22 +49,6 @@ paths:
         day; 
 
         Read busy time getBusyTime -> Busy Time of the given day (in ms)
-# ------------------------------------------------------------------------
-# https://swagger.io/docs/specification/describing-parameters/#query-parameters
-#      parameters:
-#        - in: query
-#          name: dt
-#          schema:
-#            type: number
-#            example: 1393455600000
-#            description: List of Time Entry of the given day
-#        - in: query
-#          name: busy
-#          schema:
-#            type: number
-#            example: 1393455600000
-#            description: Busy Time of the given day (in ms)
-# ------------------------------------------------------------------------
       produces:
         - application/json
       responses:
@@ -285,7 +269,7 @@ paths:
               size:
                 type: number
                 example: 953
-  '/stats/{date}':
+  '/stats/{date}/{timeUnit}':
     parameters:
       - name: date
         in: path
@@ -294,7 +278,7 @@ paths:
         type: number
         default: 1391295600000
       - name: timeUnit
-        in: query
+        in: path
         required: true
         description: time unit
         type: string
@@ -304,10 +288,16 @@ paths:
           - month
           - week
           - day
+      - name: accumulate
+        in: query
+        required: false
+        description: indicates if statistics are to be accumulated or just presented
+        type: boolean
+        default: false
     get:
       tags:
         - Statistics
-      summary: calculate aggregated statistics
+      summary: calculate statistics (evtl. accumulated)
       description: returns the aggregated statistics for a given time day
       produces:
         - application/json

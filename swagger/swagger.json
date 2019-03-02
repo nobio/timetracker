@@ -399,7 +399,7 @@
         }
       }
     },
-    "/stats/{date}": {
+    "/stats/{date}/{timeUnit}": {
       "parameters": [
         {
           "name": "date",
@@ -411,7 +411,7 @@
         },
         {
           "name": "timeUnit",
-          "in": "query",
+          "in": "path",
           "required": true,
           "description": "time unit",
           "type": "string",
@@ -422,13 +422,21 @@
             "week",
             "day"
           ]
+        },
+        {
+          "name": "accumulate",
+          "in": "query",
+          "required": false,
+          "description": "indicates if statistics are to be accumulated or just presented",
+          "type": "boolean",
+          "default": false
         }
       ],
       "get": {
         "tags": [
           "Statistics"
         ],
-        "summary": "calculate aggregated statistics",
+        "summary": "calculate statistics (evtl. accumulated)",
         "description": "returns the aggregated statistics for a given time day",
         "produces": [
           "application/json"

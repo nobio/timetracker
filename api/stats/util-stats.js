@@ -136,8 +136,9 @@ exports.deleteAllStatsDays = () =>
     });
   });
 
-exports.getStats = (timeUnit, dtStart) => {
-  // console.log(dtStart)
+exports.getStats = (timeUnit, dtStart, accumulate) => {
+  console.log(dtStart);
+  console.log(accumulate);
 
   var dtStart = moment.unix(dtStart / 1000);
   let dtEnd;
@@ -155,7 +156,7 @@ exports.getStats = (timeUnit, dtStart) => {
   // console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
 
   return new Promise((resolve, reject) => {
-    this.getStatsByRange(dtStart, dtEnd).then((calculatedBusyTime) => {
+    this.getStatsByRange(dtStart, dtEnd, accumulate).then((calculatedBusyTime) => {
       // console.log(calculatedBusyTime);
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
@@ -184,9 +185,9 @@ exports.getStats = (timeUnit, dtStart) => {
  *
  * @param {*} dtStart
  * @param {*} dtEnd
+ * @param {*} accumulate
  */
-exports.getStatsByRange = (dtStart, dtEnd) =>
-  // console.log(dtStart);
+exports.getStatsByRange = (dtStart, dtEnd, accumulate) =>
   // console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
   // console.log(dtEnd);
   new Promise((resolve, reject) => {
@@ -197,7 +198,7 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
       },
     })
       .sort({
-        date: -1,
+        date: 1,
       })
       .exec((err, stats) => {
         if (err != undefined) {
@@ -219,24 +220,38 @@ exports.getStatsByRange = (dtStart, dtEnd) =>
         stats.forEach((stat) => {
           actual_working_time += stat.actual_working_time;
         });
-        average_working_time =
-          actual_working_time / stats.length / 60 / 60 / 1000;
+        average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
 
         // console.log("average_working_time = " + average_working_time);
         // console.log("length = " + stats.length);
 
+        let sumActual = 0;
+        let sumNominal = 0;
         stats.forEach((stat) => {
           // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
           // actual_working_time += stat.actual_working_time;
           planned_working_time += stat.planned_working_time;
-          innerData[idx] = {
-            x: moment(stat.date).format('YYYY-MM-DD'),
-            y: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-          };
-          innerComp[idx] = {
-            x: moment(stat.date).format('YYYY-MM-DD'),
-            y: Math.round(average_working_time * 100) / 100, // rounding 2 digits after comma
-          };
+          if (accumulate === 'true') {
+            sumActual += Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+            sumNominal += Math.round(average_working_time * 100) / 100, // rounding 2 digits after comma
+            innerData[idx] = {
+              x: moment(stat.date).format('YYYY-MM-DD'),
+              y: sumActual,
+            };
+            innerComp[idx] = {
+              x: moment(stat.date).format('YYYY-MM-DD'),
+              y: sumNominal,
+            };
+          } else {
+            innerData[idx] = {
+              x: moment(stat.date).format('YYYY-MM-DD'),
+              y: Math.round(stat.actual_working_time / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+            };
+            innerComp[idx] = {
+              x: moment(stat.date).format('YYYY-MM-DD'),
+              y: Math.round(average_working_time * 100) / 100, // rounding 2 digits after comma
+            };
+          }
           idx++;
         });
 

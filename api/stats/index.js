@@ -21,10 +21,11 @@ exports.calcStats = (req, res) => {
  *  curl -X GET http://localhost:30000/api/stats/1391295600000?timeUnit=month
  */
 exports.getStats = (req, res) => {
-  const timeUnit = req.query.timeUnit;
   const dtStart = req.params.date;
+  const timeUnit = req.params.timeUnit;
+  const accumulate = req.query.accumulate;
 
-  util.getStats(timeUnit, dtStart)
+  util.getStats(timeUnit, dtStart, accumulate)
     .then(timeentries => res.status(200).send(timeentries))
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
 };
