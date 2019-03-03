@@ -198,7 +198,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate) =>
       },
     })
       .sort({
-        date: -1,
+        date: 1,
       })
       .exec((err, stats) => {
         if (err != undefined) {
