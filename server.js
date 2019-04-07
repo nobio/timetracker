@@ -134,7 +134,7 @@ require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().tz('Europ
    .then(msg => console.log(JSON.stringify(msg)))
    .catch(err => console.log(err));
 
-process.on('exit', () => {
+process.on('__exit', () => {
    console.info('Server is going to shut down (process.on(exit)');
    notifyShutdown();
 });
