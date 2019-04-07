@@ -134,7 +134,7 @@ require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().tz('Europ
    .then(msg => console.log(JSON.stringify(msg)))
    .catch(err => console.log(err));
 
-process.on('__exit', () => {
+process.on('exit', () => {
    console.info('Server is going to shut down (process.on(exit)');
    notifyShutdown();
 });
@@ -150,7 +150,7 @@ process.on('SIGBREAK', () => {
    console.info('Server is going to shut down (process.on(SIGBREAK))');
    notifyShutdown();
 });
-process.on('__SIGKILL', () => {
+process.on('SIGKILL', () => {
    console.info('Server is going to shut down (process.on(SIGKILL))');
    notifyShutdown();
 });
