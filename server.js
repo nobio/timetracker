@@ -133,31 +133,3 @@ require('./api/scheduler').scheduleTasks();
 require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().tz('Europe/Berlin').format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
    .then(msg => console.log(JSON.stringify(msg)))
    .catch(err => console.log(err));
-
-process.on('__exit', () => {
-   console.info('Server is going to shut down (process.on(exit)');
-   notifyShutdown();
-});
-process.on('SIGINT', () => {
-   console.info('Server is going to shut down (process.on(SIGINT))');
-   notifyShutdown();
-});
-process.on('SIGTERM', () => {
-   console.info('Server is going to shut down (process.on(SIGTERM))');
-   notifyShutdown();
-});
-process.on('SIGBREAK', () => {
-   console.info('Server is going to shut down (process.on(SIGBREAK))');
-   notifyShutdown();
-});
-process.on('SIGKILL', () => {
-   console.info('Server is going to shut down (process.on(SIGKILL))');
-   notifyShutdown();
-});
-
-function notifyShutdown() {
-   //require('./db').closeConnection();
-   require('./api/global_util').sendMessage('SERVER_SHUTDOWN', `${moment().tz('Europe/Berlin').format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
-      .then(msg => console.log(JSON.stringify(msg)))
-      .catch(err => console.log(err));
-}
