@@ -43,7 +43,7 @@ function getDataFromSource() {
     TIME_ENTRY_MODEL_SOURCE.find()
       .then((timeEntries) => {
         console.log('closing source database');
-        mongoose.connection.close();
+        //mongoose.connection.close();
         resolve(timeEntries);
       })
       .catch((err) => {
@@ -98,7 +98,7 @@ function storeDataToTarget(timeEntries) {
     });
 
     resolve(`${timeEntries.length} elements saved`);
-    // mongoose.connection.close();
+    mongoose.connection.close();
   });
 }
 
