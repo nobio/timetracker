@@ -356,6 +356,28 @@
         }
       }
     },
+    "/toggles/status": {
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Toggle status (currently onl)",
+        "responses": {
+          "200": {
+            "description": "All toggles status",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "NOTIFICATION_SLACK": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/stats": {
       "put": {
         "tags": [

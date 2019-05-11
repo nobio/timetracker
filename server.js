@@ -84,12 +84,12 @@ app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
 
 app.get('/api/toggles', api_admin.getAllToggles);
+app.get('/api/toggles/status', api_admin.getToggleStatus);
 app.get('/api/toggles/:id', api_admin.getToggleById);
 app.get('/api/toggles/name/:name', api_admin.getToggleByName);
 app.put('/api/toggles/:id', api_admin.saveToggle);
 app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
-//app.get('/api/toggles/all/status', api_admin.getToggleStatus);
 
 // statistics
 app.put('/api/stats', api_stats.calcStats);
