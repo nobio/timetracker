@@ -137,8 +137,8 @@ exports.deleteAllStatsDays = () =>
   });
 
 exports.getStats = (timeUnit, dtStart, accumulate) => {
-  //console.log(dtStart);
-  //console.log(accumulate);
+  // console.log(dtStart);
+  // console.log(accumulate);
 
   var dtStart = moment.unix(dtStart / 1000);
   let dtEnd;
