@@ -26,8 +26,8 @@ require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')
 
 const app = express();
 
-app.set('host', process.env.IP || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
-app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || '30000');
+app.set('host', process.env.IP || '0.0.0.0');
+app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
