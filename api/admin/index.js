@@ -62,7 +62,7 @@ exports.getToggleByName = (req, res) => {
 /**
  * read the status of toggles; for instance weather or not Slack is used
  *
- * curl -X GET http://localhost:30000/api/toggles/all/status
+ * curl -X GET http://localhost:30000/api/toggles/status
  */
 exports.getToggleStatus = (req, res) => {
   util.getToggleStatus()
