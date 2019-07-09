@@ -115,17 +115,6 @@ exports.create = (timeEntry) => {
             reject(new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`));
             return;
           }
-          /*
-          const now = moment();
-          const entryDate = moment(lastTimeEntry.entry_date);
-          const timelapse = now - entryDate;
-
-          //console.log(timelapse + ' ms or ' + timelapse / 1000/60/60 + ' sec')
-          if (timelapse < 1000 * 1) { // not longer than 1 sec
-            reject(new Error(`it seems to be a double entry since the last item and this one are created within ${timelapse} ms`));
-            return;
-          }
-          */
         }
 
         // all checks successfully done, lets create the TimeEntry!
@@ -135,6 +124,12 @@ exports.create = (timeEntry) => {
           longitude: timeEntry.longitude,
           latitude: timeEntry.latitude,
         }).save()
+          .then(tEntry => {
+            // in case the external URL is given, use it to render a deep link
+            const msg = ((process.env.EXTERNAL_DOMAIN) ? "http://" + process.env.EXTERNAL_DOMAIN + "/?dl=entryId:" + tEntry._id : JSON.stringify(timeEntry));
+            g_util.sendMessage('CREATE_ENTRY', msg);
+            return tEntry;
+          })
           .then(tEntry => resolve(tEntry))
           .then(g_util.sendMessage('CREATE_ENTRY', JSON.stringify(timeEntry)))
           .catch(err => reject(err));
