@@ -137,8 +137,7 @@ exports.deleteAllStatsDays = () =>
   });
 
 exports.getStats = (timeUnit, dtStart, accumulate) => {
-  // console.log(dtStart);
-  // console.log(accumulate);
+  // console.log("timeUnit=" + timeUnit + ", dtStart=" + dtStart+ ", accumulate=" + accumulate);
 
   var dtStart = moment.unix(dtStart / 1000);
   let dtEnd;
@@ -157,7 +156,7 @@ exports.getStats = (timeUnit, dtStart, accumulate) => {
 
   return new Promise((resolve, reject) => {
     this.getStatsByRange(dtStart, dtEnd, accumulate).then((calculatedBusyTime) => {
-      // console.log(calculatedBusyTime);
+      // console.log(JSON.stringify(calculatedBusyTime));
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
         yScale: 'linear',
@@ -189,7 +188,7 @@ exports.getStats = (timeUnit, dtStart, accumulate) => {
  */
 exports.getStatsByRange = (dtStart, dtEnd, accumulate) =>
   // console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
-  // console.log(dtEnd);
+  // console.log(">>> searching data for date between " + dtStart + " and " + dtEnd);
   new Promise((resolve, reject) => {
     StatsDay.find({
       date: {

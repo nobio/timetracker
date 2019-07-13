@@ -18,7 +18,7 @@ exports.calcStats = (req, res) => {
  * returns the aggregated statistics for a given time day
  *
  * @param req.params.date timestamp in nano seconds
- *  curl -X GET http://localhost:30000/api/stats/1391295600000?timeUnit=month
+ *  curl -X GET http://localhost:30000/api/stats/1391295600000/month
  */
 exports.getStats = (req, res) => {
   const dtStart = req.params.date;
