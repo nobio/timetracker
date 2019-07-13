@@ -157,7 +157,7 @@ exports.geofence = (req, res) => {
       .catch(err => res.status(500).send(`Error while createing a new Time Entry: ${err.message}`));
   } else {
     res.status(500).send({
-      message: "no geofence entry made; id must be 'Work')",
+      message: "no geofence entry made; id must be 'Work' but is '" + req.body.id + "')",
     });
   }
 };
