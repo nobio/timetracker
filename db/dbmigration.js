@@ -28,12 +28,12 @@ const TimeEntry = new mongoose.Schema({
 });
 /* ==================================================================== */
 
-let connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
-let connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
+const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
+const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
 
 const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
-//const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntryBackup', TimeEntry);
+// const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntryBackup', TimeEntry);
 
 /**
  * Reads data from source data source and returns an json array
@@ -45,7 +45,7 @@ function getDataFromSource() {
     TIME_ENTRY_MODEL_SOURCE.find()
       .then((timeEntries) => {
         console.log('closing source database');
-        //mongoose.connection.close();
+        // mongoose.connection.close();
         resolve(timeEntries);
       })
       .catch((err) => {
@@ -116,6 +116,7 @@ deleteAllTarget()
         process.exit(-1);
     });
 */
+
 getDataFromSource()
   .then(storeDataToTarget)
   .then(msg => console.log(msg))
