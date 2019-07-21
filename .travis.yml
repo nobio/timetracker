@@ -2,7 +2,7 @@ sudo: required #is required to use docker service in travis
 
 language: node_js #can be any language, just php for example
 node_js:
-  - "8.9.3"
+  - "10.16.0"
 
 services:
   - docker 
