@@ -15,10 +15,9 @@ const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
 const MONGO_URL_TARGET = MONGO_URL_MLAB;
 
 /* ==================================================================== */
-
 // Schema
 const directions = 'enter go'.split(' ');
-const TimeEntry = new schema({
+const TimeEntry = new mongoose.Schema({
   entry_date: {
     type: Date, required: true, default: Date.now, index: true,
   },
@@ -27,10 +26,14 @@ const TimeEntry = new schema({
   longitude: { type: Number, required: false },
   latitude: { type: Number, required: false },
 });
+/* ==================================================================== */
 
-const TIME_ENTRY_MODEL_SOURCE = mongoose.model('TimeEntry', TimeEntry);
-const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
-// const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
+const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
+const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
+
+const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
+const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
+// const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntryBackup', TimeEntry);
 
 /**
  * Reads data from source data source and returns an json array
@@ -38,12 +41,11 @@ const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
 function getDataFromSource() {
   return new Promise((resolve, reject) => {
     console.log('connecting to source database');
-    mongoose.connect(MONGO_URL_SOURCE);
 
     TIME_ENTRY_MODEL_SOURCE.find()
       .then((timeEntries) => {
         console.log('closing source database');
-        //mongoose.connection.close();
+        // mongoose.connection.close();
         resolve(timeEntries);
       })
       .catch((err) => {
@@ -55,7 +57,6 @@ function getDataFromSource() {
 
 function deleteAllTarget() {
   console.log('connecting to target database');
-  mongoose.connect(MONGO_URL_TARGET);
 
   return new Promise((resolve, reject) => {
     TIME_ENTRY_MODEL_TARGET.remove()
@@ -118,6 +119,7 @@ deleteAllTarget()
         process.exit(-1);
     });
 */
+
 getDataFromSource()
   .then(storeDataToTarget)
   .then(msg => console.log(msg))

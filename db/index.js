@@ -19,7 +19,7 @@ const db_config = {
  * adding the contains method to the String object
  */
 if (!String.prototype.contains) {
-  String.prototype.contains = function(arg) {
+  String.prototype.contains = function (arg) {
     return !!~this.indexOf(arg);
   };
 }
@@ -31,46 +31,7 @@ console.log('init database');
 
 const mongoose = require('mongoose');
 
-const schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
-
-// --------------------------------------------------
-// ----------------- TimeEntry ----------------------
-// --------------------------------------------------
-const directions = 'enter go'.split(' ');
-const TimeEntry = new schema({
-  entry_date: { type: Date, required: true, default: Date.now, index: true, },
-  direction: { type: String, enum: directions, required: true },
-  last_changed: { type: Date, default: Date.now, required: true },
-  longitude: { type: Number, required: false },
-  latitude: { type: Number, required: false },
-});
-mongoose.model('TimeEntry', TimeEntry);
-mongoose.model('TimeEntryBackup', TimeEntry);
-
-// --------------------------------------------------
-// ------------------ StatisticsDay -----------------
-// --------------------------------------------------
-const StatsDay = new schema({
-  date: { type: Date, required: true, default: Date.now, index: true, unique: true, },
-  actual_working_time: { type: Number, required: true, default: 0 },
-  planned_working_time: { type: Number, required: true, default: 0 },
-  is_working_day: { type: Boolean, required: true, default: false },
-  is_complete: { type: Boolean, required: true },
-  last_changed: { type: Date, required: true, default: Date.now },
-});
-mongoose.model('StatsDay', StatsDay);
-
-// --------------------------------------------------
-// -------------- Notification Toggles --------------
-// --------------------------------------------------
-const Toggle = new schema({
-  name: { type: String, required: true, index: true, unique: true },
-  toggle: { type: Boolean, required: true, default: false, index: false, },
-  notification: { type: String, required: true, default: 'generic message', index: false, unique: false },
-});
-mongoose.model('Toggle', Toggle);
-
 
 const monoddb_options = db_config.options;
 let mongodb_url = process.env.MONGO_URL; // try to use environment variable, perhaps given by container
@@ -93,6 +54,54 @@ mongoose.connect(mongodb_url, monoddb_options).then(
     console.error(`error while connecting mongodb:${err}`);
   },
 );
+
+
+// --------------------------------------------------
+// ----------------- TimeEntry ----------------------
+// --------------------------------------------------
+const directions = 'enter go'.split(' ');
+const TimeEntry = new mongoose.Schema({
+  entry_date: {
+    type: Date, required: true, default: Date.now, index: true,
+  },
+  direction: { type: String, enum: directions, required: true },
+  last_changed: { type: Date, default: Date.now, required: true },
+  longitude: { type: Number, required: false },
+  latitude: { type: Number, required: false },
+});
+mongoose.model('TimeEntry', TimeEntry);
+mongoose.model('TimeEntryBackup', TimeEntry);
+
+// --------------------------------------------------
+// ------------------ StatisticsDay -----------------
+// --------------------------------------------------
+const StatsDay = new mongoose.Schema({
+  date: {
+    type: Date, required: true, default: Date.now, index: true, unique: true,
+  },
+  actual_working_time: { type: Number, required: true, default: 0 },
+  planned_working_time: { type: Number, required: true, default: 0 },
+  is_working_day: { type: Boolean, required: true, default: false },
+  is_complete: { type: Boolean, required: true },
+  last_changed: { type: Date, required: true, default: Date.now },
+});
+mongoose.model('StatsDay', StatsDay);
+
+// --------------------------------------------------
+// -------------- Notification Toggles --------------
+// --------------------------------------------------
+const Toggle = new mongoose.Schema({
+  name: {
+    type: String, required: true, index: true, unique: true,
+  },
+  toggle: {
+    type: Boolean, required: true, default: false, index: false,
+  },
+  notification: {
+    type: String, required: true, default: 'generic message', index: false, unique: false,
+  },
+});
+mongoose.model('Toggle', Toggle);
 
 exports.closeConnection = () => {
   mongoose.connection.close(
