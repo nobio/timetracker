@@ -1,5 +1,5 @@
 #FROM node:carbon
-FROM node:9
+FROM node:10.16.0
 
 # Create app directory
 WORKDIR /usr/src/app

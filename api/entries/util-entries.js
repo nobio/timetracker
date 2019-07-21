@@ -110,11 +110,9 @@ exports.create = (timeEntry) => {
             reject(new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`));
             return;
           }
-        } else {
-          if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
-            reject(new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`));
-            return;
-          }
+        } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
+          reject(new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`));
+          return;
         }
 
         // all checks successfully done, lets create the TimeEntry!
@@ -124,9 +122,9 @@ exports.create = (timeEntry) => {
           longitude: timeEntry.longitude,
           latitude: timeEntry.latitude,
         }).save()
-          .then(tEntry => {
+          .then((tEntry) => {
             // in case the external URL is given, use it to render a deep link
-            const msg = ((process.env.EXTERNAL_DOMAIN) ? "http://" + process.env.EXTERNAL_DOMAIN + "/?dl=entryId:" + tEntry._id : JSON.stringify(timeEntry));
+            const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
             g_util.sendMessage('CREATE_ENTRY', msg);
             return tEntry;
           })

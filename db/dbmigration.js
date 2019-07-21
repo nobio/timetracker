@@ -29,8 +29,8 @@ const TimeEntry = new schema({
 });
 
 const TIME_ENTRY_MODEL_SOURCE = mongoose.model('TimeEntry', TimeEntry);
-// const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
-const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
+const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntry', TimeEntry);
+// const TIME_ENTRY_MODEL_TARGET = mongoose.model('TimeEntryBackup', TimeEntry);
 
 /**
  * Reads data from source data source and returns an json array
@@ -90,15 +90,18 @@ function storeDataToTarget(timeEntries) {
           if (n >= timeEntries.length) { mongoose.connection.close(); }
         })
         .catch((err) => {
-          console.error(err.message);
           n++;
-          if (n >= timeEntries.length) { mongoose.connection.close(); }
-          // reject(err);
+          console.error('> ' + n + ' ' + err.message);
+          if (n >= timeEntries.length) { 
+            console.log('=========================== finite =============================')
+            mongoose.connection.close(); 
+          }
+          reject(err);
         });
     });
 
-    resolve(`${timeEntries.length} elements saved`);
     mongoose.connection.close();
+    resolve(`${timeEntries.length} elements saved`);
   });
 }
 
