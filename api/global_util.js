@@ -25,6 +25,7 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
     .then((toggle) => {
       if (toggle != null && toggle.toggle === true) {
         console.log(`toggle ${notificationKey} switched on`);
+        addedContent = (addedContent) ? addedContent : '';  // if addedContent is undefined set it with blank string
         return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`;
       }
       console.log(`toggle ${notificationKey} switched off`);
