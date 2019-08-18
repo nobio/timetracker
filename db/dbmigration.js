@@ -1,3 +1,5 @@
+#!/usr/local/bin/node
+
 const mongoose = require('mongoose');
 
 mongoose.set('useCreateIndex', true);
