@@ -1,7 +1,7 @@
+const g_util = require('../global_util');
 const moment = require('moment');
 const utilEntry = require('../entries/util-entries');
 
-const DEFAULT_BREAK_TIME = 45 * 60; // 45 min in seconds
 const COUNT_MINUTES = 120; // 120 minutes for histogram (0..120)
 /**
  * get an array of break times; format of one item: {time: t, breakTime: 0.0}
@@ -61,7 +61,7 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
       breakTime = 0;
     }
     if (!realCalc && timeItem.length === 2) {
-      breakTime = DEFAULT_BREAK_TIME;
+      breakTime = g_util.DEFAULT_BREAK_TIME_MINUTES;
     }
 
     if (breakTime === -1) {

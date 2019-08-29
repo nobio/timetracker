@@ -2,6 +2,9 @@ const moment = require('moment');
 require('moment-timezone');
 const toggleUtil = require('./admin/util-admin');
 
+exports.DEFAULT_BREAK_TIME_MINUTES = 60 * 60;
+exports.DEFAULT_BREAK_TIME_MILLISECONDS = this.DEFAULT_BREAK_TIME_MINUTES * 1000;
+
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
 const SLACK_TOKEN = process.env.SLACK_TOKEN;
 // This argument can be a channel ID, a DM ID, a MPDM ID, or a group ID

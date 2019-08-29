@@ -10,8 +10,6 @@ const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
 
-const DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
-
 /**
  * function to check wheather an object is empty or not
  */
@@ -261,8 +259,8 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
 
     // when there have been only 2 entries we reduce the busytime by 45 minutes (default pause)
     if (timeentries.length === 2) {
-      busytime -= DEFAULT_BREAK_TIME;
-      pause = DEFAULT_BREAK_TIME;
+      busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
+      pause = g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
     }
 
     const duration = timeentries[timeentries.length - 1].entry_date - timeentries[0].entry_date;

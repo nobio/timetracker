@@ -7,7 +7,6 @@ const mongoose = require('mongoose');
 const StatsDay = mongoose.model('StatsDay');
 const moment = require('moment');
 
-const DEFAULT_BREAK_TIME = 45 * 60 * 1000; // 45 min in milli seconds
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
 /**
@@ -110,7 +109,7 @@ exports.getBusytimeByDate = dt => new Promise((resolve, reject) => {
       }
       // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
       if (timeentries.length === 2) {
-        busytime -= DEFAULT_BREAK_TIME;
+        busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
       }
       // console.log(`${dt} => ${busytime} ${busytime / 1000 / 60 / 60}`);
 

@@ -1,7 +1,5 @@
 const util = require('./util-entries');
 
-// const DEFAULT_BREAK_TIME = 45 * 60 * 1000 // 45 min in milli seconds
-
 /** ******************************************************************************
  * Get one Time Entry by it's id
  *
