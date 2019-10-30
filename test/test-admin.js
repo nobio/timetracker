@@ -62,7 +62,7 @@ describe('test util.dumpTimeEnties - Promise', () => {
       	expect(data).to.not.be.empty;
       })
       .catch((err) => { throw err; });
-  });
+  }).timeout(10000);
 
   after(() => {
     // db.closeConnection()
@@ -97,7 +97,7 @@ describe('test util.backupTimeEntries - Promise', () => {
       .catch((err) => {
         throw err;
       });
-  });
+  }).timeout(10000);
 
   after(() => {
     // db.closeConnection()
