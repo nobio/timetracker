@@ -12,6 +12,7 @@ const db_config = {
     bufferMaxEntries: -1,
     useCreateIndex: true,
     useNewUrlParser: true,
+    useUnifiedTopology: true,
   },
 };
 

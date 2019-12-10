@@ -75,7 +75,7 @@ function deleteAllTarget() {
 function storeDataToTarget(timeEntries) {
   let n = 0;
   console.log('connecting to target database');
-  mongoose.connect(MONGO_URL_TARGET, { useNewUrlParser: true });
+  mongoose.connect(MONGO_URL_TARGET, { useUnifiedTopology: true, useNewUrlParser: true });
   return new Promise((resolve, reject) => {
     timeEntries.forEach((timeentry) => {
       process.stdout.write('.');
