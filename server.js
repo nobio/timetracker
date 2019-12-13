@@ -93,6 +93,7 @@ app.delete('/api/toggles/:id', api_admin.deleteToggle);
 
 // statistics
 app.put('/api/stats', api_stats.calcStats);
+app.get('/api/stats/validate', api_stats.validateStats);
 app.get('/api/stats/:date/:timeUnit', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);

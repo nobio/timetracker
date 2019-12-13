@@ -34,6 +34,14 @@ exports.calcStats = () => {
   });
 };
 
+exports.validateStats = () => new Promise((resolve, reject) => {
+  // utilEntry.getAllByDate(0) // ---- TODO hier passt etwas nicht
+  utilEntry.getAll()  
+    .then(utilEntry.calculateBusyTime)
+    .then(busytime => resolve(busytime))
+    .catch(err => reject(err));
+});
+
 /**
  * This is the real calculation of statistice. The method searches the first entry point and
  * iterates day by day until the last time entry and calculates for each day the statistics

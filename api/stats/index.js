@@ -14,6 +14,12 @@ exports.calcStats = (req, res) => {
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${err}`));
 };
 
+exports.validateStats = (req, res) => {
+   util.validateStats()
+    .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while validating Time Entries: ${err}`));
+};
+
 /**
  * returns the aggregated statistics for a given time day
  *
