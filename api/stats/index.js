@@ -15,6 +15,24 @@ exports.calcStats = (req, res) => {
 };
 
 /**
+ * curl -X PUT http://localhost:30000/api/stats/evaluate
+ */
+exports.evaluateStats = (req, res) => {
+  util.evaluateStats()
+    .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while validating Time Entries: ${err}`));
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/stats/failuredates
+ */
+exports.getFailureDates = (req, res) => {
+  util.getAllFailureDates()
+    .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while reading failure dates: ${err}`));
+};
+
+/**
  * returns the aggregated statistics for a given time day
  *
  * @param req.params.date timestamp in nano seconds
