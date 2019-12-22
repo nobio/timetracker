@@ -296,7 +296,7 @@ exports.storeValidationErrors = (firstEntry, lastEntry) =>
     // console.log(JSON.stringify(firstEntry), lastEntry);
     const lastEntriesAge = moment(lastEntry.age);
     const date = utilEntry.stripdownToDateUTC(firstEntry.age);
-    console.log(date);
+    
     for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
       // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
       const dt = moment(date);

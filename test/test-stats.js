@@ -281,6 +281,49 @@ describe('test utilTimebox.getStatsByTimeBox - Promise', () => {
   });
 });
 
+describe('test util.storeValidationErrors - Promise', () => {
+  let db;
+  before(() => {
+    db = require('../db');
+  });
+
+  it('evaluateStats', async () => {
+    let firstTime = {'age': moment('2018-01-13T06:30:00.000Z')};
+    let lastTime = {'age': moment('2018-12-15T14:09:49.314Z')};
+
+    await util.evaluateStats(firstTime, lastTime)
+      .then((result) => {
+        expect(result).to.equal('calculation ongoing in background')
+      })
+      .catch((err) => { throw err; });
+  });
+
+  it('storeValidationErrors', async () => {
+    let firstTime = {'age': moment('2018-01-13T06:30:00.000Z')};
+    let lastTime = {'age': moment('2018-12-15T14:09:49.314Z')};
+
+    await util.storeValidationErrors(firstTime, lastTime)
+      .then((result) => {
+        expect(result).to.equal('calculation ongoing in background')
+      })
+      .catch((err) => { throw err; });
+  });
+
+  it('getAllFailureDates', async () => {
+
+    await util.getAllFailureDates()
+      .then((result) => {
+        expect(result).to.be.an('array')
+      })
+      .catch((err) => { throw err; });
+  });
+
+  after(() => {
+    // db.closeConnection()
+  });
+});
+
+
 /*
 describe("test util.deleteAllStatsDays - Promise", () => {
   var db;
