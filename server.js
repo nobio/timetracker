@@ -93,13 +93,13 @@ app.delete('/api/toggles/:id', api_admin.deleteToggle);
 
 // statistics
 app.put('/api/stats', api_stats.calcStats);
-app.get('/api/stats/validate', api_stats.validateStats);
 app.get('/api/stats/:date/:timeUnit', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
-
+app.put('/api/stats/evaluate', api_stats.evaluateStats);
+app.get('/api/stats/failuredates', api_stats.getFailureDates);
 // maintain 
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);

@@ -62,9 +62,7 @@ mongoose.connect(mongodb_url, monoddb_options).then(
 // --------------------------------------------------
 const directions = 'enter go'.split(' ');
 const TimeEntry = new mongoose.Schema({
-  entry_date: {
-    type: Date, required: true, default: Date.now, index: true,
-  },
+  entry_date: {type: Date, required: true, default: Date.now, index: true },
   direction: { type: String, enum: directions, required: true },
   last_changed: { type: Date, default: Date.now, required: true },
   longitude: { type: Number, required: false },
@@ -77,9 +75,7 @@ mongoose.model('TimeEntryBackup', TimeEntry);
 // ------------------ StatisticsDay -----------------
 // --------------------------------------------------
 const StatsDay = new mongoose.Schema({
-  date: {
-    type: Date, required: true, default: Date.now, index: true, unique: true,
-  },
+  date: {type: Date, required: true, default: Date.now, index: true, unique: true },
   actual_working_time: { type: Number, required: true, default: 0 },
   planned_working_time: { type: Number, required: true, default: 0 },
   is_working_day: { type: Boolean, required: true, default: false },
@@ -92,17 +88,21 @@ mongoose.model('StatsDay', StatsDay);
 // -------------- Notification Toggles --------------
 // --------------------------------------------------
 const Toggle = new mongoose.Schema({
-  name: {
-    type: String, required: true, index: true, unique: true,
-  },
-  toggle: {
-    type: Boolean, required: true, default: false, index: false,
-  },
-  notification: {
-    type: String, required: true, default: 'generic message', index: false, unique: false,
-  },
+  name: {type: String, required: true, index: true, unique: true },
+  toggle: {type: Boolean, required: true, default: false, index: false },
+  notification: {type: String, required: true, default: 'generic message', index: false, unique: false },
 });
 mongoose.model('Toggle', Toggle);
+
+// --------------------------------------------------
+// ------------------ Failure Days ------------------
+// --------------------------------------------------
+const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
+const FailureDay = new mongoose.Schema({
+  date: {type: Date, required: true, index: true, unique: true },
+  failure_type: { type: String, enum: failureTypes, required: true },
+});
+mongoose.model('FailureDay', FailureDay);
 
 exports.closeConnection = () => {
   mongoose.connection.close(

@@ -14,10 +14,22 @@ exports.calcStats = (req, res) => {
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${err}`));
 };
 
-exports.validateStats = (req, res) => {
-   util.validateStats()
+/**
+ * curl -X PUT http://localhost:30000/api/stats/evaluate
+ */
+exports.evaluateStats = (req, res) => {
+  util.evaluateStats()
     .then(reply => res.status(200).send(reply))
     .catch(err => res.status(500).send(`Error while validating Time Entries: ${err}`));
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/stats/failuredates
+ */
+exports.getFailureDates = (req, res) => {
+  util.getAllFailureDates()
+  .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while reading failure dates: ${err}`));
 };
 
 /**
