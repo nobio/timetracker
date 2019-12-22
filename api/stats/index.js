@@ -28,7 +28,7 @@ exports.evaluateStats = (req, res) => {
  */
 exports.getFailureDates = (req, res) => {
   util.getAllFailureDates()
-  .then(reply => res.status(200).send(reply))
+    .then(reply => res.status(200).send(reply))
     .catch(err => res.status(500).send(`Error while reading failure dates: ${err}`));
 };
 
