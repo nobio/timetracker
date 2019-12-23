@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.0
+  version: 5.3.0
   title: Timetracker API
   description: Swagger doc on my fancy timetracker app
   license:
@@ -132,6 +132,45 @@ paths:
                 type: integer
                 description: number of time entries backed up to file
                 example: 2677
+        '500':
+          description: something went wrong...
+  /entries/error/evaluate:
+    post:
+      tags:
+        - TimeEntries
+      summary: Evaluate time entries
+      description: Evaluate time entries on their consistency (completeness, order, etc.). As a result, the failure data will be put to an own document in mongodb. This data could be inquired by using the endpoint /api/entries/error/dates
+      responses:
+        '200':
+          description: data saved to database
+          schema:
+            properties:
+              message:
+                type: string
+                example: calculation ongoing in background
+        '500':
+          description: something went wrong...
+  /entries/error/dates:
+    get:
+      tags:
+        - TimeEntries
+      summary: Inquire the error time entries
+      description: Read all dates with error type that was written to database by endpoint /api/entries/error/evaluate
+      responses:
+        '200':
+          description: data saved to database
+          schema:
+            type: array
+            items:
+              properties:
+                  error-date:
+                    type: string
+                    example: '2000-01-01T10:15:02.151Z'
+                    description: There is an error at this date
+                  error-type:
+                    type: string
+                    example: 'INCOMPLETE or WRONG_ORDER'
+                    description: Type of the error - INCOMPLETE means that entries are missing and WRONG_ORDER means that the order of go and enter is not correctly booked
         '500':
           description: something went wrong...
   /geofence:

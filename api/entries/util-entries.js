@@ -9,6 +9,7 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
+const FailureDay = mongoose.model('FailureDay');
 
 /**
  * function to check wheather an object is empty or not
@@ -393,3 +394,91 @@ exports.sleep = (delay) => {
   console.log(`I 'm going to sleep now for ${delay} ms`);
   return new Promise(resolve => setTimeout(resolve, delay));
 };
+
+exports.evaluate = () =>
+  new Promise((resolve, reject) => {
+    let firstEntry;
+    let lastEntry;
+
+    this
+      .getFirstTimeEntry()
+      .then(firstTimeEntry => (firstEntry = firstTimeEntry))
+      .then(firstTimeEntry => this.getLastTimeEntry())
+      .then(lastTimeEntry => (lastEntry = lastTimeEntry))
+      .then(result => FailureDay.deleteMany())
+      .then(result => this.storeValidationErrors(firstEntry, lastEntry))
+      .then(result => resolve(result))
+      .catch(err => reject(err));
+  });
+
+exports.storeValidationErrors = (firstEntry, lastEntry) =>
+  new Promise((resolve, reject) => {
+    // console.log(JSON.stringify(firstEntry), lastEntry);
+    const lastEntriesAge = moment(lastEntry.age);
+    const date = this.stripdownToDateUTC(firstEntry.age);
+    
+    for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
+      // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+      const dt = moment(date);
+
+      this.getAllByDate(dt).then((timeentries) => {
+        // firstly evaluate the not (yet) complete entries and save them....
+        if (timeentries.length % 2 !== 0) {
+          new FailureDay({
+            date: dt,
+            failure_type: 'INCOMPLETE',
+          }).save((err) => {
+            if (err) {
+              reject(err);
+            }
+          });
+        }
+
+        // sencondly evaluate on wrong order of entries and save them too
+        for (let n = timeentries.length - 1; n > 0; n -= 2) {
+          // this must be a go-event
+          if (timeentries[n].direction !== 'go') {
+            new FailureDay({
+              date: dt,
+              failure_type: 'WRONG_ORDER',
+            }).save((err) => {
+              if (err) {
+                reject(err);
+              }
+            });
+          }
+        }
+      });
+    }
+    resolve({'message': 'calculation ongoing in background'});
+  });
+
+/**
+   * read all error dates from database; delivers an array like
+   *
+   * [
+   *     {
+   *       "error-type" : "WRONG_ORDER",
+   *       "error-date" : "2019-11-24T00:00:00.000Z"
+   *    },
+   *    {
+   *       "error-type" : "INCOMPLETE",
+   *       "error-date" : "2019-12-12T00:00:00.000Z"
+   *    }
+   * ]
+   */
+exports.getErrorDates = () => new Promise((resolve, reject) => {
+  FailureDay.find().sort({ failure_type: 1, date: 1 })
+    .then((failureDates) => {
+      const fDates = [];
+      for (let n = 0; n < failureDates.length; n++) {
+        fDates.push({
+          'error-date': failureDates[n].date,
+          'error-type': failureDates[n].failure_type,
+        });
+      }
+      resolve(fDates);
+    })
+    .catch(err => reject(err));
+});
+

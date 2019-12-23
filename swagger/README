@@ -3,7 +3,9 @@ Edit swagger.yaml with http://editor.swagger.io
 File -> import File -> (search swagger.yaml)
 
 Post Edit:
-File -> Save as YAML
-File -> Convert and save as JSON
+File -> "Save as YAML"
+File -> "Convert and save as JSON"
 
 Both files should be copied to the project after download
+
+To use Swagger goto http://localhost:30000/api-docs

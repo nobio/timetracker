@@ -113,6 +113,24 @@ exports.deleteEntry = (req, res) => {
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${err.message}`));
 };
 
+/**
+ * curl -X POST http://localhost:30000/api/entries/error/evaluate
+ */
+exports.evaluate = (req, res) => {
+  util.evaluate()
+    .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while validating Time Entries: ${err}`));
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/entries/error/dates
+ */
+exports.getErrorDates = (req, res) => {
+  util.getErrorDates()
+    .then(reply => res.status(200).send(reply))
+    .catch(err => res.status(500).send(`Error while reading failure dates: ${err}`));
+};
+
 /*
   {
     device: '0C799CAD-D148-4F05-94EA-A74086AA91E3',

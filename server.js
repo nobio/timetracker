@@ -70,11 +70,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ------------------ API ------------------------------------------------
 // restful services for entries using Promises
 // -----------------------------------------------------------------------
-app.post('/api/entries', api_entries.createEntry);
-app.get('/api/entries/:id', api_entries.getEntryById);
-app.put('/api/entries/:id', api_entries.saveEntry);
+app.get(   '/api/entries', api_entries.getEntries);
+app.post(  '/api/entries', api_entries.createEntry);
+app.get(   '/api/entries/:id', api_entries.getEntryById);
+app.put(   '/api/entries/:id', api_entries.saveEntry);
 app.delete('/api/entries/:id', api_entries.deleteEntry);
-app.get('/api/entries', api_entries.getEntries);
+app.post(  '/api/entries/error/evaluate', api_entries.evaluate);
+app.get(   '/api/entries/error/dates', api_entries.getErrorDates);
 
 // geofencing
 app.post('/api/geofence', api_entries.geofence);
@@ -98,8 +100,6 @@ app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
-app.put('/api/stats/evaluate', api_stats.evaluateStats);
-app.get('/api/stats/failuredates', api_stats.getFailureDates);
 // maintain 
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
