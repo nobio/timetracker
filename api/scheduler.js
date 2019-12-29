@@ -1,6 +1,7 @@
 const scheduler = require('node-schedule');
 const admin = require('./admin/util-admin');
 const stats = require('./stats/util-stats');
+const entries = require('./entries/util-entries')
 
 /**
  * start scheduler to run tasks
@@ -23,6 +24,12 @@ exports.scheduleTasks = function () {
   scheduler.scheduleJob({ minute: 10 }, () => {
     console.log('scheduled task "backupTimeEntry" started');
     admin.backupTimeEntries();
+  });
+
+  console.log('job scheduler: data evaluate (every hour at ??:00)');
+  scheduler.scheduleJob({ minute: 13 }, () => { // every hour at ??:13
+      console.log('scheduled task "evaluate" started');
+    entries.evaluate();
   });
 
   /*

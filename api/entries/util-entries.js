@@ -408,6 +408,7 @@ exports.evaluate = () =>
       .then(result => FailureDay.deleteMany())
       .then(result => this.storeValidationErrors(firstEntry, lastEntry))
       .then(result => resolve(result))
+      .then(g_util.sendMessage('EVALUATE_DATA'))
       .catch(err => reject(err));
   });
 
