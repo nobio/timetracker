@@ -469,7 +469,7 @@ exports.storeValidationErrors = (firstEntry, lastEntry) =>
    * ]
    */
 exports.getErrorDates = () => new Promise((resolve, reject) => {
-  FailureDay.find().sort({ failure_type: 1, date: 1 })
+  FailureDay.find().sort({ failure_type: 1, date: -1 })
     .then((failureDates) => {
       const fDates = [];
       for (let n = 0; n < failureDates.length; n++) {
