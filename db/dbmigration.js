@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 
+mongoose.set('useUnifiedTopology', true);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 
@@ -74,8 +75,6 @@ function deleteAllTarget() {
  */
 function storeDataToTarget(timeEntries) {
   let n = 0;
-  console.log('connecting to target database');
-  mongoose.connect(MONGO_URL_TARGET, { useUnifiedTopology: true, useNewUrlParser: true });
   return new Promise((resolve, reject) => {
     timeEntries.forEach((timeentry) => {
       process.stdout.write('.');
@@ -90,7 +89,11 @@ function storeDataToTarget(timeEntries) {
         .then((doc) => {
           console.log(`saved: ObjectId('${timeentry._id}')`);
           n++;
-          if (n >= timeEntries.length) { mongoose.connection.close(); }
+          if (n >= timeEntries.length) { 
+            mongoose.connection.close(); 
+            resolve();
+            process.exit(0);
+          }
         })
         .catch((err) => {
           n++;
@@ -122,9 +125,10 @@ deleteAllTarget()
     });
 */
 
-getDataFromSource()
+deleteAllTarget()
+  .then(getDataFromSource)
   .then(storeDataToTarget)
-  .then(msg => console.log(msg))
+  //.then(msg => console.log(msg))
   .catch((err) => {
     console.log(err);
     console.log('***********************************************************************');
