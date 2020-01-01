@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "5.5.2",
-    "last_build": "2019-12-29T19:59:10.804Z",
+    "version": "6.0.0",
+    "last_build": "2020-01-01T10:06:02.898Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -24,7 +24,7 @@
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.19.1",
         "mocha": "^4.0.1",
-        "nodemon": "1.17.5"
+        "nodemon": "1.19.2"
     },
     "dependencies": {
         "@slack/client": "^4.12.0",
