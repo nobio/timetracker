@@ -9,6 +9,7 @@ WORKDIR=./
 TARGETDIR=/share/CACHEDEV1_DATA/homes/admin/Projects/timetracker-composition
 
 ##rsync -avp --delete $WORKDIR $QNAP_HOST:$TARGETDIR --exclude node_modules --exclude dump --exclude data --exclude .git
-rsync -avp --delete "Dockerfile" "docker-compose.yml" $QNAP_HOST:$TARGETDIR 
+##rsync -avp --delete "Dockerfile" "docker-compose.yml" $QNAP_HOST:$TARGETDIR 
+rsync -avp --delete "Dockerfile" $QNAP_HOST:$TARGETDIR 
 #ssh -t $QNAP_HOST $TARGETDIR/bin/docker-build.sh
 echo ...done
