@@ -8,6 +8,7 @@ const api_entries = require('./api/entries');
 const api_admin = require('./api/admin');
 const api_stats = require('./api/stats');
 const api_misc = require('./api/misc');
+const api_users = require('./api/users');
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -78,13 +79,20 @@ app.delete('/api/entries/:id', api_entries.deleteEntry);
 app.post(  '/api/entries/error/evaluate', api_entries.evaluate);
 app.get(   '/api/entries/error/dates', api_entries.getErrorDates);
 
+// .......................................................................
 // geofencing
+// .......................................................................
 app.post('/api/geofence', api_entries.geofence);
 
+// .......................................................................
 // admin 
+// .......................................................................
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
 
+// .......................................................................
+// toggles
+// .......................................................................
 app.get('/api/toggles', api_admin.getAllToggles);
 app.get('/api/toggles/status', api_admin.getToggleStatus);
 app.get('/api/toggles/:id', api_admin.getToggleById);
@@ -93,20 +101,31 @@ app.put('/api/toggles/:id', api_admin.saveToggle);
 app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
 
+// .......................................................................
 // statistics
+// .......................................................................
 app.put('/api/stats', api_stats.calcStats);
 app.get('/api/stats/:date/:timeUnit', api_stats.getStats);
 app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
+
+// .......................................................................
 // maintain 
+// .......................................................................
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
+// .......................................................................
+// users and authentication
+// .......................................................................
+app.get('/api/users', api_users.getAllUsers);
+app.post('/api/users', api_users.createUser);
+app.post('/api/users/login', api_users.login);
 
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');

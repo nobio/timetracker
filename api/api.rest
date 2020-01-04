@@ -1,0 +1,3 @@
+GET http://localhost:30000/api/entries
+###
+GET http://localhost:30000/api/entries/52d38dcdbe2c010000000001
