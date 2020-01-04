@@ -116,6 +116,19 @@ const FailureDay = new mongoose.Schema({
 });
 mongoose.model('FailureDay', FailureDay);
 
+// --------------------------------------------------
+// -------------- Users -------------- --------------
+// --------------------------------------------------
+const User = new mongoose.Schema({
+  name: {
+    type: String, required: true, index: true, unique: true,
+  },
+  password: {
+    type: String, required: true, default: false, index: false,
+  },
+});
+mongoose.model('User', User);
+
 exports.closeConnection = () => {
   mongoose.connection.close(
     () => {

@@ -8,7 +8,7 @@ const api_entries = require('./api/entries');
 const api_admin = require('./api/admin');
 const api_stats = require('./api/stats');
 const api_misc = require('./api/misc');
-const api_users = require('./api/users');
+const api_auth = require('./api/auth');
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -123,9 +123,9 @@ app.get('/api/experiment', api_misc.experiment);
 // .......................................................................
 // users and authentication
 // .......................................................................
-app.get('/api/users', api_users.getAllUsers);
-app.post('/api/users', api_users.createUser);
-app.post('/api/users/login', api_users.login);
+app.get('/api/users', api_auth.getAllUsers);
+app.post('/api/users', api_auth.createUser);
+app.post('/api/users/login', api_auth.login);
 
 if (process.env.SLACK_TOKEN) {
    console.log('using Slack to notify');
