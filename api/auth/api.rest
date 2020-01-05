@@ -6,8 +6,8 @@ POST http://localhost:30000/api/users
 Content-Type: application/json
 
 {
-    "name": "gernot.reichel@me.com",
-    "password": "Schernoobioc3p="
+    "name": "Tester",
+    "password": "test12345"
 }
 
 ###
@@ -16,6 +16,6 @@ POST http://localhost:30000/api/users/login
 Content-Type: application/json
 
 {
-    "name": "gernot.reichel@me.com",
-    "password": "Schernoobioc3p="
+    "name": "Tester",
+    "password": "test12345"
 }

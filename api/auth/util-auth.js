@@ -1,51 +1,40 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const User = mongoose.model('User');
-
-const bcrypt = require('bcrypt');
 
 users = []; // TODO: replace by database
 
 exports.getAllUsers = async () => User.find();
 
+/**
+ * creates a new user in database
+ */
 exports.createUser = async (name, password) => {
-
+  if (!name) throw Error('User must be provided');
+  if (!password) throw Error('No password provided');
   const user = await User.findOne({ name });
+  if (user) throw Error('User already exists');
 
-  return new Promise((resolve, reject) => {
-    if (user) {
-      reject({ message: 'User already exists' });
-      return;
-    }
-    bcrypt
-      .hash(password, 10)
-      .then((hashedPassword) => {
-        new User({
-          name,
-          password: hashedPassword,
-        }).save();
+  const hashedPassword = await bcrypt.hash(password, 10);
+  new User({
+    name,
+    password: hashedPassword,
+  }).save();
 
-        resolve({
-          message: 'User created',
-        });
-      })
-      .catch(err => reject(err));
-  });
+  return 'User created';
 };
 
 /** login with user and password (needs to be passed) */
 exports.login = async (name, password) => {
-  try {
-    const user = await User.findOne({ name });
+  if (!name) throw Error('User must be provided');
+  if (!password) throw Error('No password provided');
 
-    if (user == null) {
-      throw Error('Cannot find user');
-    } else if (await bcrypt.compare(password, user.password)) {
-      return ('User authenticated');
-    } else {
-      throw Error('User not authenticated');
-    }
-  } catch (err) {
-    throw Error(err);
+  const user = await User.findOne({ name });
+
+  if (user == null) throw Error('User not authenticated');
+  if (await bcrypt.compare(password, user.password)) {
+    return 'User authenticated';
   }
+  throw Error('User not authenticated');
 };
