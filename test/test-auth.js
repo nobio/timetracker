@@ -30,10 +30,6 @@ describe('test utilAuth.getAllUsers', () => {
     expect(result[0]).to.have.property('name');
     expect(result[0]).to.have.property('password');
   });
-
-  after(() => {
-    // db.closeConnection();
-  });
 });
 
 describe('test utilAuth.createUser', () => {
@@ -124,59 +120,60 @@ describe('test utilAuth.createUser', () => {
       expect(err.message).to.equal('User must be provided');
     }
   });
-
-  describe('test utilAuth.login', () => {
-    let db;
-    before(() => {
-      db = require('../db');
-    });
-
-    it('login with valid principal and credenital', async () => {
-      try {
-        await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
-        await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-
-        const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
-
-        expect(result).to.be.a('string');
-        expect(result).to.equal('User authenticated');
-      } catch (err) {
-        throw Error(err);
-      } finally {
-        await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-        await User.deleteOne({ name: TESTUSER_NAME });
-      }
-    });
-
-    it('login with valid principal and invalid credenital', async () => {
-      try {
-        await util.createUser(TESTUSER_NAME, 'XXXXX');
-        await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-
-        const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
-
-        assert.fail(); // should not reach this...
-      } catch (err) {
-        expect(err).to.be.an('error');
-        expect(err.message).to.equal('User not authenticated');
-      } finally {
-        await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-        await User.deleteOne({ name: TESTUSER_NAME });
-      }
-    });
-    it('login with invalid principal and invalid credenital', async () => {
-      try {
-        const result = await util.login('YYYYYYYYYYYYYYYYYYYY', 'XXXXX');
-        assert.fail(); // should not reach this...
-      } catch (err) {
-        expect(err).to.be.an('error');
-        expect(err.message).to.equal('User not authenticated');
-      }
-    });
+});
+describe('test utilAuth.login', () => {
+  let db;
+  before(() => {
+    db = require('../db');
   });
+
+  it('login with valid principal and credenital', async () => {
+    try {
+      await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
+      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+
+      const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+
+      expect(result).to.be.a('string');
+      expect(result).to.equal('User authenticated');
+    } catch (err) {
+      throw Error(err);
+    } finally {
+      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+      await User.deleteOne({ name: TESTUSER_NAME });
+    }
+  });
+
+  it('login with valid principal and invalid credenital', async () => {
+    try {
+      await util.createUser(TESTUSER_NAME, 'XXXXX');
+      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+
+      const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.message).to.equal('User not authenticated');
+    } finally {
+      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+      await User.deleteOne({ name: TESTUSER_NAME });
+    }
+  });
+  it('login with invalid principal and invalid credenital', async () => {
+    try {
+      const result = await util.login('YYYYYYYYYYYYYYYYYYYY', 'XXXXX');
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.message).to.equal('User not authenticated');
+    }
+  });
+
 
   after(async () => {
     await User.deleteOne({ name: TESTUSER_NAME });
-    db.closeConnection();
+    //db.closeConnection();
   });
 });
+
