@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 
 const User = mongoose.model('User');
 
-users = []; // TODO: replace by database
-
 exports.getAllUsers = async () => User.find();
 
 /**
