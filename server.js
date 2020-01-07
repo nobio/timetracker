@@ -1,6 +1,7 @@
 /**
  * Module dependencies.
  */
+require(dotenv).configure();
 require('./db');
 const express = require('express');
 const web = require('./web');
