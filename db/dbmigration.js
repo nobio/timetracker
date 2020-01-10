@@ -9,8 +9,7 @@ mongoose.set('useNewUrlParser', true);
 const schema = mongoose.Schema;
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-// const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 // const MONGO_URL_TARGET = MONGO_URL_DOCKER;
@@ -38,6 +37,10 @@ const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
 // const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntryBackup', TimeEntry);
 
+console.log('--------------------------------------------------------------- \n')
+console.log('Usage: node db/dbmigration.js [-d]     (emtpy target collection)')
+console.log('\n--------------------------------------------------------------- ')
+
 /**
  * Reads data from source data source and returns an json array
  */
@@ -59,10 +62,15 @@ function getDataFromSource() {
 }
 
 function deleteAllTarget() {
-  console.log('connecting to target database');
-
   return new Promise((resolve, reject) => {
-    TIME_ENTRY_MODEL_TARGET.remove()
+    if(!process.argv.includes('-d')) {
+      resolve('no delete');
+      return;
+    }
+
+    console.log('connecting to target database');
+
+    TIME_ENTRY_MODEL_TARGET.deleteMany({})
       .then(() => resolve('deletion ok'))
       .catch(err => reject(err));
   });
@@ -99,8 +107,8 @@ function storeDataToTarget(timeEntries) {
           n++;
           console.error(`> ${n} ${err.message}`);
           if (n >= timeEntries.length) {
-            console.log('=========================== finite =============================');
             mongoose.connection.close();
+            process.exit(-1);
           }
           reject(err);
         });
