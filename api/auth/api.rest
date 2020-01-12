@@ -19,3 +19,12 @@ Content-Type: application/json
     "name": "Tester",
     "password": "test12345"
 }
+
+###
+
+GET http://localhost:30000/api/ping
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M
+###
+
+GET http://localhost:30000/api/ping
+Authorization: Bearer xxx.yyy.zzz

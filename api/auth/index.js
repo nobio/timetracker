@@ -1,4 +1,5 @@
 const util = require('./util-auth');
+const jwt = require('jsonwebtoken');
 
 /**
  * reads all users from database
@@ -41,13 +42,48 @@ exports.createUser = async (req, res) => {
  * curl -X POST -H "Content-Type: application/json" -d '{"name": "Tester", "password": "test12345"}' http://localhost:30000/api/users/login
  *
  * @param {*} req Request object
- * @param {*} res Response object
+ * @param {*} res Response object; resp.json: {accessToken: '...'}
  */
 exports.login = async (req, res) => {
+  // console.log(req)
   try {
-    const result = await util.login(req.body.name, req.body.password);
-    res.status(200).json({ response: result });
+    const token = await util.login(req.body.name, req.body.password);
+    res.status(200).json(token);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+/**
+ * Middleware to authorize the access token created by /api/user/login
+ * This method is intentionally not implemented in util-auth because it
+ * does not care about the content only about request header
+ *
+ * @param req Request object (includes the header and possibly token); user object will be added
+ * @param res Respons object; only used in case of error
+ * @param next callback to next middleware
+ */
+exports.authorizeToken = async (req, res, next) => {
+  // check the switch if we are supposed to authorize
+  // or request is a login POST (must be possible without token)
+  if (process.env.AUTHORIZATION !== 'on' || (req.url === '/api/users/login' && req.method === 'POST')) {
+    // just continue...
+    res.status(200);
+    return next();
+  }
+
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.status(401).send();
+
+  await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    // console.log(err)
+    if (err) return res.status(403).send();
+
+    req.user = user; // store user in request object
+    res.status(200);
+    next();
+  });
+};
+

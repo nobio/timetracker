@@ -1,17 +1,23 @@
+require('dotenv').config();
 require('../db');
 const mongoose = require('mongoose');
 
 const User = mongoose.model('User');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const { mockRequest, mockResponse, } = require('mock-req-res')
+const sinon = require('sinon');
+var sinonChai = require('sinon-chai');
 
 chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
 const expect = chai.expect;
 const assert = chai.assert;
 const should = chai.should;
 
 const util = require('../api/auth/util-auth');
+const auth = require('../api/auth');
 
 const TESTUSER_NAME = 'TEST_USER_DELETE_ME';
 const TESTUSER_PASSWORD = 'Test12345';
@@ -121,6 +127,7 @@ describe('test utilAuth.createUser', () => {
     }
   });
 });
+
 describe('test utilAuth.login', () => {
   let db;
   before(() => {
@@ -134,8 +141,8 @@ describe('test utilAuth.login', () => {
 
       const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
 
-      expect(result).to.be.a('string');
-      expect(result).to.equal('User authenticated');
+      expect(result).to.be.a('object');
+      expect(result).to.have.property('accessToken');
     } catch (err) {
       throw Error(err);
     } finally {
@@ -170,10 +177,71 @@ describe('test utilAuth.login', () => {
     }
   });
 
-
   after(async () => {
     await User.deleteOne({ name: TESTUSER_NAME });
-    //db.closeConnection();
+    // db.closeConnection();
   });
 });
 
+describe('test index.authorizeToken', () => {
+  it('test for OK (200): call authorizeToken service with empty header and auth switch off', async () => {
+    process.env.AUTHORIZATION = 'off';
+    const req = mockRequest({ headers: [] });
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorizeToken(req, res, next)
+      expect(res.status).to.have.been.calledWith(200)
+      expect(next).to.have.been.called
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for Unauthorized (401): call authorizeToken service with empty header and auth switch on', async () => {
+    //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: [] });
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorizeToken(req, res, next)
+      expect(res.status).to.have.been.calledWith(401)
+      expect(next).to.not.have.been.called
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for Forbidden (403): call authorizeToken service with header but invalid token and auth switch on', async () => {
+    //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Bearer xxx.yyy.zzz' } });
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorizeToken(req, res, next)
+
+      expect(res.status).to.have.been.calledWith(403)
+      expect(next).to.not.have.been.called
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M' } });
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorizeToken(req, res, next)
+
+      expect(res.status).to.have.been.calledWith(200)
+      expect(req.user).to.have.property('name');   // name: <Username> was added to request
+      expect(next).to.have.been.called
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+});

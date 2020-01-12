@@ -1,7 +1,7 @@
 /**
  * Module dependencies.
  */
-require(dotenv).configure();
+require('dotenv').config();
 require('./db');
 const express = require('express');
 const web = require('./web');
@@ -22,8 +22,6 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
 
-
-
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const app = express();
@@ -37,11 +35,13 @@ app.set('view engine', 'pug');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-   extended: false
+  extended: false,
 }));
 app.use(cookieParser());
+app.use(api_auth.authorizeToken);
 /*
 app.use((req, res, next) => {
    console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
@@ -72,13 +72,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ------------------ API ------------------------------------------------
 // restful services for entries using Promises
 // -----------------------------------------------------------------------
-app.get(   '/api/entries', api_entries.getEntries);
-app.post(  '/api/entries', api_entries.createEntry);
-app.get(   '/api/entries/:id', api_entries.getEntryById);
-app.put(   '/api/entries/:id', api_entries.saveEntry);
+app.get('/api/entries', api_entries.getEntries);
+app.post('/api/entries', api_entries.createEntry);
+app.get('/api/entries/:id', api_entries.getEntryById);
+app.put('/api/entries/:id', api_entries.saveEntry);
 app.delete('/api/entries/:id', api_entries.deleteEntry);
-app.post(  '/api/entries/error/evaluate', api_entries.evaluate);
-app.get(   '/api/entries/error/dates', api_entries.getErrorDates);
+app.post('/api/entries/error/evaluate', api_entries.evaluate);
+app.get('/api/entries/error/dates', api_entries.getErrorDates);
 
 // .......................................................................
 // geofencing
@@ -86,7 +86,7 @@ app.get(   '/api/entries/error/dates', api_entries.getErrorDates);
 app.post('/api/geofence', api_entries.geofence);
 
 // .......................................................................
-// admin 
+// admin
 // .......................................................................
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
@@ -113,7 +113,7 @@ app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
 
 // .......................................................................
-// maintain 
+// maintain
 // .......................................................................
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
@@ -129,28 +129,29 @@ app.post('/api/users', api_auth.createUser);
 app.post('/api/users/login', api_auth.login);
 
 if (process.env.SLACK_TOKEN) {
-   console.log('using Slack to notify');
+  console.log('using Slack to notify');
 } else {
-   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
+  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
 }
 
 /* start the web service */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
+  console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 const ssl_options = {
-   key: fs.readFileSync('keys/key.pem'),
-   cert: fs.readFileSync('keys/cert.pem'),
+  key: fs.readFileSync('keys/key.pem'),
+  cert: fs.readFileSync('keys/cert.pem'),
 };
 https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
-   console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
+  console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 /* start scheduler */
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', `${moment().tz('Europe/Berlin').format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
-   .then(msg => console.log(JSON.stringify(msg)))
-   .catch(err => console.log(err));
+require('./api/global_util')
+  .sendMessage('SERVER_STARTED', `${moment().tz('Europe/Berlin').format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
+  .then(msg => console.log(JSON.stringify(msg)))
+  .catch(err => console.log(err));

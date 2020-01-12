@@ -10,8 +10,9 @@
         "start-dbdocker1": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
         "start-dbdocker2": "MONGO_URL=mongodb://192.168.178.46:27017/timetracker npm start",
         "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000",
-        "test-mon": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
+        "test-dev": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000",
         "serve": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
+        "dev": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
         "build": "node ./bin/build.js",
@@ -24,7 +25,10 @@
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.19.1",
         "mocha": "^4.0.1",
-        "nodemon": "1.19.2"
+        "mock-req-res": "^1.1.4",
+        "nodemon": "1.19.2",
+        "sinon": "^8.0.4",
+        "sinon-chai": "^3.4.0"
     },
     "dependencies": {
         "@slack/client": "^4.12.0",
