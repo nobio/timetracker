@@ -23,7 +23,7 @@ Content-Type: application/json
 ###
 
 GET http://localhost:30000/api/ping
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4OTAyNDIwLCJleHAiOjE1Nzg5MDMzMjB9.qG5WZWZk6xXn7awXI3YUL-RUIJJKVI0HmOQf9XNxc4I
 ###
 
 GET http://localhost:30000/api/ping
