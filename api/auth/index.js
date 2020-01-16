@@ -47,12 +47,24 @@ exports.createUser = async (req, res) => {
 exports.login = async (req, res) => {
   // console.log(req)
   try {
-    const token = await util.login(req.body.name, req.body.password);
-    res.status(200).json(token);
+    const tokens = await util.login(req.body.name, req.body.password);
+    res.status(200).json(tokens);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+/**
+ * Use the refresh token to generate a new token
+ */
+exports.refreshToken = async (req, res) => {
+  try {
+    const token = await util.refreshToken(req.body.refreshToken);
+    res.status(200).send(token)
+  } catch (err) {
+    es.status(500).json({ message: err.message });
+  }
+}
 
 /**
  * Middleware to authorize the access token created by /api/user/login

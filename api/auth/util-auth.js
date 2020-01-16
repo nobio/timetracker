@@ -60,3 +60,14 @@ exports.login = async (name, password) => {
   return { accessToken, refreshToken };
 };
 
+/**
+ * validates input and creates a new token with expire time using (validating) the refresh token
+ */
+exports.refreshToken = async (refreshToken, userName) => {
+  const token = 'abc123'
+
+  // ...
+
+  return {token};
+}
+
