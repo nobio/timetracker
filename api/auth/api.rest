@@ -22,8 +22,18 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:30000/api/auth/token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5MjkxNzY4LCJleHAiOjE1ODE4ODM3Njh9.w_y-UUdQR9W3NmAogkm1QQk-_Rn0p2uPcSSt_saRBJY"
+}
+
+###
+
 GET http://localhost:30000/api/ping
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4OTAyNDIwLCJleHAiOjE1Nzg5MDMzMjB9.qG5WZWZk6xXn7awXI3YUL-RUIJJKVI0HmOQf9XNxc4I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5MjkyNDM1LCJleHAiOjE1NzkyOTI0NTB9.Snh7tZRhi-x3P9WZZ2JbsMLexi1CbxKPyFRs5t9yH1A
+
 ###
 
 GET http://localhost:30000/api/ping

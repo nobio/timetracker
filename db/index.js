@@ -129,6 +129,16 @@ const User = new mongoose.Schema({
 });
 mongoose.model('User', User);
 
+// --------------------------------------------------
+// -------------- Token -------------- --------------
+// --------------------------------------------------
+const Token = new mongoose.Schema({
+  token: {
+    type: String, required: true, index: true, unique: true,
+  }
+});
+mongoose.model('Token', Token);
+
 exports.closeConnection = () => {
   mongoose.connection.close(
     () => {

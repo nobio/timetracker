@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = mongoose.model('User');
-const jwt = require('jsonwebtoken');
+const Token = mongoose.model('Token');
 
 /**
  * Reads all registeredusers
@@ -55,19 +56,40 @@ exports.login = async (name, password) => {
   const user = { name: mdbUser.name };
 
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
-  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
+  const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRE } );
+
+  new Token({ token: refreshToken }).save();
 
   return { accessToken, refreshToken };
 };
 
+
 /**
  * validates input and creates a new token with expire time using (validating) the refresh token
  */
-exports.refreshToken = async (refreshToken, userName) => {
-  const token = 'abc123'
+exports.refreshToken = async (refreshToken) => {
+  
+  const storedRefreshToken = await Token.findOne({ token: refreshToken })
+  if(storedRefreshToken == null) {
+    throw Error('invalid refresh token');
+  }
 
-  // ...
+  let accessToken;
+  /*
+  await jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if(err) {
+      throw err;
+    }
 
-  return {token};
+    // console.log(user)
+    accessToken = jwt.sign({ name: user.name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
+
+  });
+  */
+  const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+  accessToken = jwt.sign({ name: user.name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
+
+  return { accessToken, user };
+
 }
 
