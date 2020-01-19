@@ -73,6 +73,7 @@ exports.login = async (name, password) => {
  * @param req: contains refresh token (named token)
  */
 exports.logout = async (token) => {
+  if (!token) throw createError(400, 'Token must be provided');
   try {
     await Token.deleteOne({ token });
   } catch (err) {

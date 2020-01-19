@@ -440,7 +440,7 @@ describe('test index.logout', () => {
 
     try {
       await auth.logout(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
+      expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       throw Error(err);
     }
