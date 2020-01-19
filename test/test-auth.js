@@ -392,3 +392,77 @@ describe('test index.refreshToken', () => {
   });
 });
 
+/**
+ * =============================================================
+ * logout
+ * =============================================================
+ */
+describe('test index.logout', () => {
+
+  before(async () => {
+    // *** create a user with password
+    await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
+    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+
+  });
+
+  it('test for OK (200): call logout', async () => {
+    // *** login to get the access- and refresh token
+    const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+    const token = result.refreshToken;
+
+    let req = mockRequest({ headers: [], body: { token: token } });
+    let res = mockResponse();
+    const next = sinon.spy();
+
+    try {
+      await auth.logout(req, res, next);
+      expect(res.status).to.have.been.calledWith(200);
+
+      // *** authorization should fail now
+      process.env.AUTHORIZATION = 'on';
+      req = mockRequest({ headers: { authorization: 'Bearer ' + token } });
+      res = mockResponse();
+  
+      await auth.authorizeToken(req, res, next);
+      expect(res.status).to.have.been.calledWith(403); //Forbidden
+      expect(next).to.not.have.been.called;
+
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for OK (200): call logout but without token', async () => {
+    const req = mockRequest({ headers: [], body: { token: null } });
+    const res = mockResponse();
+    const next = sinon.spy();
+
+    try {
+      await auth.logout(req, res, next);
+      expect(res.status).to.have.been.calledWith(200);
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for NOK (200): call logout with invalid token', async () => {
+    const req = mockRequest({ headers: [], body: { token: 'xxx.yyy.zzz' } });
+    const res = mockResponse();
+    const next = sinon.spy();
+
+    try {
+      await auth.logout(req, res, next);
+      // console.log(res.json.getCalls()[0].lastArg)
+      expect(res.status).to.have.been.calledWith(200);
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  after(async () => {
+    await User.deleteOne({ name: TESTUSER_NAME });
+    await Token.deleteMany({ user: TESTUSER_NAME });
+  });
+});
+
