@@ -97,3 +97,6 @@ exports.refreshToken = async (refreshToken) => {
   return { accessToken, user };
 };
 
+exports.removeTesterToken = async () => {
+    await Token.deleteMany({ user: 'Tester' });
+};

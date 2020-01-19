@@ -26,7 +26,7 @@ POST http://localhost:30000/api/auth/token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDMxODE0LCJleHAiOjE1ODIwMjM4MTR9.RHi1lzI3xj_mucEq5gqg13pRKlPQDFHeFvEzu1X0zL4"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDQ3NTc4LCJleHAiOjE1ODIwMzk1Nzh9.xJw5aYP-popOaFpP-vXLA0wgcIqROY8-W-uSKYKQ4Sk"
 }
 
 ###
