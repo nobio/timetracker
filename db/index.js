@@ -135,6 +135,9 @@ mongoose.model('User', User);
 const Token = new mongoose.Schema({
   token: {
     type: String, required: true, index: true, unique: true,
+  },
+  user: {
+    type: String, required: false, index: false, unique: false, default: 'ANONYMOUS',
   }
 });
 mongoose.model('Token', Token);

@@ -418,34 +418,33 @@ describe('test util.storeValidationErrors - Promise', () => {
   });
 
   it('evaluate', async () => {
-    let firstTime = {'age': moment('2018-01-13T06:30:00.000Z')};
-    let lastTime = {'age': moment('2018-12-15T14:09:49.314Z')};
+    const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
+    const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
     await util.evaluate(firstTime, lastTime)
       .then((result) => {
         expect(result).to.have.property('message');
-        expect(result.message).to.equal('calculation ongoing in background')
+        expect(result.message).to.equal('calculation ongoing in background');
       })
       .catch((err) => { throw err; });
   });
 
   it('storeValidationErrors', async () => {
-    let firstTime = {'age': moment('2018-01-13T06:30:00.000Z')};
-    let lastTime = {'age': moment('2018-12-15T14:09:49.314Z')};
+    const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
+    const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
     await util.storeValidationErrors(firstTime, lastTime)
       .then((result) => {
         expect(result).to.have.property('message');
-        expect(result.message).to.equal('calculation ongoing in background')
+        expect(result.message).to.equal('calculation ongoing in background');
       })
       .catch((err) => { throw err; });
   });
 
   it('getErrorDates', async () => {
-
     await util.getErrorDates()
       .then((result) => {
-        expect(result).to.be.an('array')
+        expect(result).to.be.an('array');
       })
       .catch((err) => { throw err; });
   });

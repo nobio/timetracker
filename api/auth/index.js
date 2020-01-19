@@ -56,7 +56,16 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.name, password);
     res.status(200).json(tokens);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(err.status).json({ message: err.message });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    await util.logout(req.body.token);
+    res.status(200).send();
+  } catch (err) {
+    res.status(err.status).json({ message: err.message });
   }
 };
 
@@ -72,17 +81,17 @@ exports.refreshToken = async (req, res) => {
 
   try {
     const token = await util.refreshToken(refreshToken);
-    res.status(200).send(token)
+    res.status(200).send(token);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(err.status).json({ message: err.message });
   }
-}
+};
 
 /**
  * Middleware to authorize the access token created by /api/auth/login
  * This method is intentionally not implemented in util-auth because it
  * does not care about the content only about request header
- * 
+ *
  * Clients need to create a new token using the refresh token when they got a 403 in the first place
  *
  * @param req Request object (includes the header and possibly token); user object will be added
@@ -93,7 +102,8 @@ exports.authorizeToken = async (req, res, next) => {
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   if (process.env.AUTHORIZATION !== 'on' || (
-    (req.method === 'POST' && req.url === '/api/auth/login') || 
+    (req.method === 'POST' && req.url === '/api/auth/login') ||
+    (req.method === 'POST' && req.url === '/api/auth/logout') ||
     (req.method === 'POST' && req.url === '/api/auth/token')
   )) {
     // just continue...
@@ -107,7 +117,6 @@ exports.authorizeToken = async (req, res, next) => {
   if (token == null) return res.status(401).send();
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    // console.log(err)
     if (err) return res.status(403).send();
 
     req.user = user; // store user in request object

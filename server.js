@@ -127,6 +127,7 @@ app.get('/api/experiment', api_misc.experiment);
 app.get('/api/users', api_auth.getAllUsers);
 app.post('/api/users', api_auth.createUser);
 app.post('/api/auth/login', api_auth.login);
+app.post('/api/auth/logout', api_auth.logout);
 app.post('/api/auth/token', api_auth.refreshToken);
 
 if (process.env.SLACK_TOKEN) {

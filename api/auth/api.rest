@@ -26,15 +26,24 @@ POST http://localhost:30000/api/auth/token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5MjkxNzY4LCJleHAiOjE1ODE4ODM3Njh9.w_y-UUdQR9W3NmAogkm1QQk-_Rn0p2uPcSSt_saRBJY"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDMxODE0LCJleHAiOjE1ODIwMjM4MTR9.RHi1lzI3xj_mucEq5gqg13pRKlPQDFHeFvEzu1X0zL4"
 }
 
 ###
 
 GET http://localhost:30000/api/ping
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5MjkyNDM1LCJleHAiOjE1NzkyOTI0NTB9.Snh7tZRhi-x3P9WZZ2JbsMLexi1CbxKPyFRs5t9yH1A
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDMxODE0LCJleHAiOjE1Nzk0MzI3MTR9.wKBD4wP5q8SkeRYYkVWLa5iP_jGrJaE1PUfmGpmoLK4
 
 ###
 
 GET http://localhost:30000/api/ping
 Authorization: Bearer xxx.yyy.zzz
+
+###
+
+POST http://localhost:30000/api/auth/logout
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5MzY4NzQzLCJleHAiOjE1ODE5NjA3NDN9.JVPvv8faZDWzmkPzOQE7WdI-gZktl-ec7KIsfT3F1pY"
+}
