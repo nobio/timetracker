@@ -346,7 +346,7 @@ describe('test index.refreshToken', () => {
   });
 
   it('test for OK (200): call refreshToken', async () => {
-    const req = mockRequest({ headers: [], body: { token: refreshToken } });
+    const req = mockRequest({ headers: [], params: { token: refreshToken } });
     const res = mockResponse();
     const next = sinon.spy();
 
@@ -411,7 +411,7 @@ describe('test index.logout', () => {
     const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
     const token = result.refreshToken;
 
-    let req = mockRequest({ headers: [], body: { token: token } });
+    let req = mockRequest({ headers: [], params: { token } });
     let res = mockResponse();
     const next = sinon.spy();
 
@@ -434,7 +434,7 @@ describe('test index.logout', () => {
   });
 
   it('test for OK (200): call logout but without token', async () => {
-    const req = mockRequest({ headers: [], body: { token: null } });
+    const req = mockRequest({ headers: [], params: { token: null } });
     const res = mockResponse();
     const next = sinon.spy();
 
@@ -447,7 +447,7 @@ describe('test index.logout', () => {
   });
 
   it('test for NOK (200): call logout with invalid token', async () => {
-    const req = mockRequest({ headers: [], body: { token: 'xxx.yyy.zzz' } });
+    const req = mockRequest({ headers: [], params: { token: 'xxx.yyy.zzz' } });
     const res = mockResponse();
     const next = sinon.spy();
 

@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    await util.logout(req.body.token);
+    await util.logout(req.params.token);
     res.status(200).send();
   } catch (err) {
     res.status(err.status).json({ message: err.message });
@@ -73,7 +73,7 @@ exports.logout = async (req, res) => {
  * Use the refresh token to generate a new token
  */
 exports.refreshToken = async (req, res) => {
-  const refreshToken = req.body.token;
+  const refreshToken = req.params.token;
   if (refreshToken == null) {
     res.status(401).send();
     return;
@@ -103,8 +103,8 @@ exports.authorizeToken = async (req, res, next) => {
   // or request is a login POST (must be possible without token)
   if (process.env.AUTHORIZATION !== 'on' || (
     (req.method === 'POST' && req.url === '/api/auth/login') ||
-    (req.method === 'POST' && req.url === '/api/auth/logout') ||
-    (req.method === 'POST' && req.url === '/api/auth/token')
+    (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
+    (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
   )) {
     // just continue...
     res.status(200);
