@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
   // console.log(req)
   const password = req.body.password;
   if (password == null) {
-    res.status(401).send();
+    res.status(400).send();
     return;
   }
 
@@ -104,7 +104,8 @@ exports.authorizeToken = async (req, res, next) => {
   if (process.env.AUTHORIZATION !== 'on' || (
     (req.method === 'POST' && req.url === '/api/auth/login') ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
+    (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
+    (req.method === 'GET'  && req.url.startsWith('/api-docs'))
   )) {
     // just continue...
     res.status(200);
