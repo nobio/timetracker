@@ -80,6 +80,7 @@ app.get(   '/api/entries/error/dates', api_entries.getErrorDates);
 
 // geofencing
 app.post('/api/geofence', api_entries.geofence);
+app.post('/api/geotrack', api_misc.geoTracking);
 
 // admin 
 app.post('/api/entries/dump', api_admin.dumpTimeEntries);

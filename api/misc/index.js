@@ -37,6 +37,16 @@ exports.version = (req, res) => {
   }
 };
 
+/**
+ * Stores Geo Locations (i.e. latitude and longitude) coming from a mobile device 
+ * to geo track
+ *
+ * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038"}' http://localhost:30000/api/geotrack
+ */  
+exports.geoTracking = (req, res) => {
+   res.status(200).send();
+};
+
 /*
  * test and experiment endpoint
  *
