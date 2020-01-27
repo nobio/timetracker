@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 
 const TimeEntry = mongoose.model('TimeEntry');
+const GeoTracking = mongoose.model('GeoTracking');
 const packageJson = require('../../package.json');
 
 /**
@@ -44,7 +45,13 @@ exports.version = (req, res) => {
  * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038"}' http://localhost:30000/api/geotrack
  */  
 exports.geoTracking = (req, res) => {
-   res.status(200).send();
+   new GeoTracking({
+      longitude: req.body.longitude,
+      latitude: req.body.latitude
+   })
+      .save()
+      .then(geoTrack => res.status(200).json(geoTrack))
+      .catch(err => res.status(500).json(err.message))
 };
 
 /*
