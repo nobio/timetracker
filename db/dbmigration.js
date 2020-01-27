@@ -89,18 +89,18 @@ function storeDataToTarget(timeEntries) {
         .then((doc) => {
           console.log(`saved: ObjectId('${timeentry._id}')`);
           n++;
-          if (n >= timeEntries.length) { 
-            mongoose.connection.close(); 
+          if (n >= timeEntries.length) {
+            mongoose.connection.close();
             resolve();
             process.exit(0);
           }
         })
         .catch((err) => {
           n++;
-          console.error('> ' + n + ' ' + err.message);
-          if (n >= timeEntries.length) { 
-            console.log('=========================== finite =============================')
-            mongoose.connection.close(); 
+          console.error(`> ${n} ${err.message}`);
+          if (n >= timeEntries.length) {
+            console.log('=========================== finite =============================');
+            mongoose.connection.close();
           }
           reject(err);
         });
@@ -128,7 +128,7 @@ deleteAllTarget()
 deleteAllTarget()
   .then(getDataFromSource)
   .then(storeDataToTarget)
-  //.then(msg => console.log(msg))
+  // .then(msg => console.log(msg))
   .catch((err) => {
     console.log(err);
     console.log('***********************************************************************');
