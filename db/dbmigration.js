@@ -9,8 +9,8 @@ mongoose.set('useNewUrlParser', true);
 const schema = mongoose.Schema;
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-// const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 // const MONGO_URL_TARGET = MONGO_URL_DOCKER;
