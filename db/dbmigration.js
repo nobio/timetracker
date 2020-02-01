@@ -9,8 +9,8 @@ mongoose.set('useNewUrlParser', true);
 const schema = mongoose.Schema;
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-// const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://192.168.178.46:27017/timetracker';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 // const MONGO_URL_TARGET = MONGO_URL_DOCKER;
@@ -89,18 +89,18 @@ function storeDataToTarget(timeEntries) {
         .then((doc) => {
           console.log(`saved: ObjectId('${timeentry._id}')`);
           n++;
-          if (n >= timeEntries.length) { 
-            mongoose.connection.close(); 
+          if (n >= timeEntries.length) {
+            mongoose.connection.close();
             resolve();
             process.exit(0);
           }
         })
         .catch((err) => {
           n++;
-          console.error('> ' + n + ' ' + err.message);
-          if (n >= timeEntries.length) { 
-            console.log('=========================== finite =============================')
-            mongoose.connection.close(); 
+          console.error(`> ${n} ${err.message}`);
+          if (n >= timeEntries.length) {
+            console.log('=========================== finite =============================');
+            mongoose.connection.close();
           }
           reject(err);
         });
@@ -128,7 +128,7 @@ deleteAllTarget()
 deleteAllTarget()
   .then(getDataFromSource)
   .then(storeDataToTarget)
-  //.then(msg => console.log(msg))
+  // .then(msg => console.log(msg))
   .catch((err) => {
     console.log(err);
     console.log('***********************************************************************');
