@@ -42,12 +42,13 @@ exports.version = (req, res) => {
  * Stores Geo Locations (i.e. latitude and longitude) coming from a mobile device
  * to geo track
  *
- * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "source": "cli"}' http://localhost:30000/api/geotrack
+ * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "accuracy": 10, "source": "cli"}' http://localhost:30000/api/geotrack
  */
 exports.geoTracking = (req, res) => {
   new GeoTracking({
     longitude: req.body.longitude,
     latitude: req.body.latitude,
+    accuracy: req.body.accuracy,
     source: req.body.source
   })
     .save()
