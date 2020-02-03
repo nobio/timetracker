@@ -45,6 +45,7 @@ exports.version = (req, res) => {
  * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "accuracy": 10, "source": "cli"}' http://localhost:30000/api/geotrack
  */
 exports.geoTracking = (req, res) => {
+  console.log(JSON.stringify(req.body));
   new GeoTracking({
     longitude: req.body.longitude,
     latitude: req.body.latitude,
