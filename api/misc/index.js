@@ -46,6 +46,10 @@ exports.version = (req, res) => {
  */
 exports.geoTracking = (req, res) => {
   console.log(JSON.stringify(req.body));
+  if(req.body.longitude == null || req.body.latitude == null || req.body.accuracy == null || req.body.source == null) {
+     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
+     return;
+  }
   new GeoTracking({
     longitude: req.body.longitude,
     latitude: req.body.latitude,
