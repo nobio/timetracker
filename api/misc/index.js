@@ -61,13 +61,20 @@ exports.geoTracking = (req, res) => {
     .catch(err => res.status(500).json(err.message));
 };
 
+/**
+ * reads geo tracks
+ * 
+ * curl -X GET http://localhost:30000/api/geotrack
+ */
 exports.getGeoTracking = async (req, res) => {
   try {
-    //await tracks = GeoTracking.find();
+    const tracks = await GeoTracking.find().sort({ date: 1 })
+    res.status(200).send(tracks);
   } catch (err) {
-    
+    res.status(err.status).json({ message: err.message });
   }
 };
+
 /*
  * test and experiment endpoint
  *
