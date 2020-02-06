@@ -61,6 +61,13 @@ exports.geoTracking = (req, res) => {
     .catch(err => res.status(500).json(err.message));
 };
 
+exports.getGeoTracking = async (req, res) => {
+  try {
+    //await tracks = GeoTracking.find();
+  } catch (err) {
+    
+  }
+};
 /*
  * test and experiment endpoint
  *
