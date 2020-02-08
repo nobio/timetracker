@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "5.3.0",
+    "version": "6.0.0",
     "title": "Timetracker API",
     "description": "Swagger doc on my fancy timetracker app",
     "license": {
@@ -26,6 +26,94 @@
     "application/json"
   ],
   "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "Login of a user",
+        "description": "A user (name, password) will be authenticated; a jwt access token (5min expiry) and a refresh token will be returned.",
+        "parameters": [
+          {
+            "name": "User",
+            "in": "body",
+            "description": "The User object to be authenticated",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "access and refresh tokens are created",
+            "schema": {
+              "properties": {
+                "accessToken": {
+                  "type": "string",
+                  "description": "access token to be used within header of all other services; will expire after a short while ()minutes)",
+                  "example": "<jwt token>"
+                },
+                "refreshToken": {
+                  "type": "string",
+                  "description": "refresh token to be used to create a new access token when it has expired; will expire after a long while (days)",
+                  "example": "<jwt token>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized; usually when no password was provided or when user is not registered or when password was incorrect"
+          }
+        }
+      }
+    },
+    "/auth/logout/{token}": {
+      "parameters": [
+        {
+          "name": "token",
+          "in": "path",
+          "required": true,
+          "description": "long living refresh token will be invalidated (short livinf access token might still live until expiry)",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "Get time entry with given ID",
+        "responses": {
+          "200": {
+            "description": "Invalidates the refresh token of a user"
+          }
+        }
+      }
+    },
+    "/auth/token/{token}": {
+      "parameters": [
+        {
+          "name": "token",
+          "in": "path",
+          "required": true,
+          "description": "creates a new access token from the given (refresh) token",
+          "type": "string"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "Get time entry with given ID",
+        "responses": {
+          "200": {
+            "description": "Invalidates the refresh token of a user"
+          }
+        }
+      }
+    },
     "/entries": {
       "post": {
         "tags": [
@@ -432,6 +520,57 @@
                   "example": true
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create a new user",
+        "description": "Create a new user with password. PWD will be stored encrypted",
+        "parameters": [
+          {
+            "name": "User",
+            "in": "body",
+            "description": "The User object to be created",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New user is created",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      },
+      "get": {
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "tags": [
+          "Users"
+        ],
+        "summary": "Read all users",
+        "description": "Reads all time users from database;",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "All (or filtered) time entries",
+            "schema": {
+              "$ref": "#/definitions/Users"
             }
           }
         }
@@ -914,6 +1053,29 @@
             }
           }
         }
+      }
+    },
+    "User": {
+      "required": [
+        "name",
+        "password"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "uniqueItems": true,
+          "example": "Tester"
+        },
+        "password": {
+          "type": "string",
+          "example": "test12345"
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/User"
       }
     }
   }

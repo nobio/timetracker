@@ -133,6 +133,30 @@ mongoose.model('GeoTracking', GeoTracking);
 // --------------------------------------------------
 // --------------------------------------------------
 // --------------------------------------------------
+// -------------- Users -------------- --------------
+// --------------------------------------------------
+const User = new mongoose.Schema({
+  name: {
+    type: String, required: true, index: true, unique: true,
+  },
+  password: {
+    type: String, required: true, default: false, index: false,
+  },
+});
+mongoose.model('User', User);
+
+// --------------------------------------------------
+// -------------- Token -------------- --------------
+// --------------------------------------------------
+const Token = new mongoose.Schema({
+  token: {
+    type: String, required: true, index: true, unique: true,
+  },
+  user: {
+    type: String, required: false, index: false, unique: false, default: 'ANONYMOUS',
+  }
+});
+mongoose.model('Token', Token);
 
 exports.closeConnection = () => {
   mongoose.connection.close(

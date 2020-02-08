@@ -1,0 +1,41 @@
+GET http://localhost:30000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDU4MjIwLCJleHAiOjE1Nzk0NTg1MjB9.LbEY5pihgOgvXff5355HqKN1NhdRfUc9yyRWtCyfTIk
+
+###
+
+POST http://localhost:30000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDU4MjIwLCJleHAiOjE1Nzk0NTg1MjB9.LbEY5pihgOgvXff5355HqKN1NhdRfUc9yyRWtCyfTIk
+Content-Type: application/json
+
+{
+    "name": "Tester",
+    "password": "test12345"
+}
+
+###
+
+POST http://localhost:30000/api/auth/login
+Content-Type: application/json
+
+{
+    "name": "Tester",
+    "password": "test12345"
+}
+
+###
+
+POST http://localhost:30000/api/auth/token/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDU4MTMyLCJleHAiOjE1ODIwNTAxMzJ9.aLOO0IPmOoiwyhyDXBn9RiNjl9u4_IoPTWjqdmhHrI8
+
+###
+
+GET http://localhost:30000/api/ping
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDU4MjIwLCJleHAiOjE1Nzk0NTg1MjB9.LbEY5pihgOgvXff5355HqKN1NhdRfUc9yyRWtCyfTIk
+
+###
+
+GET http://localhost:30000/api/ping
+Authorization: Bearer xxx.yyy.zzz
+
+###
+
+POST http://localhost:30000/api/auth/logout/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc5NDU3NjE5LCJleHAiOjE1ODIwNDk2MTl9.4wToQbZEcbEzsTXBS5PYV9XSAq5BQK3kBhb6_g8kyaw
