@@ -69,7 +69,7 @@ exports.geoTracking = (req, res) => {
 exports.getGeoTracking = async (req, res) => {
   try {
     const tracks = await GeoTracking.find().sort({ date: 1 })
-    res.status(200).send(tracks);
+    res.status(200).json(tracks);
   } catch (err) {
     res.status(err.status).json({ message: err.message });
   }
