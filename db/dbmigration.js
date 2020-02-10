@@ -29,14 +29,25 @@ const TimeEntry = new mongoose.Schema({
   longitude: { type: Number, required: false },
   latitude: { type: Number, required: false },
 });
-/* ==================================================================== */
+const GeoTracking = new mongoose.Schema({
+  longitude: { type: Number, required: true, index: true },
+  latitude: { type: Number, required: true, index: true },
+  accuracy: { type: Number, required: true },
+  source: { type: String, required: true },
+  date: {
+    type: Date, required: true, index: true, unique: true, default: Date.now,
+  },
+});
+/* ====================-================================================ */
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
 const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
 
 const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
-// const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntryBackup', TimeEntry);
+const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', GeoTracking);
+const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTracking);
+mongoose.model('GeoTracking', GeoTracking);
 
 console.log('--------------------------------------------------------------- \n')
 console.log('Usage: node db/dbmigration.js [-d]     (emtpy target collection)')

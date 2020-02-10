@@ -10,6 +10,8 @@ const api_admin = require('./api/admin');
 const api_stats = require('./api/stats');
 const api_misc = require('./api/misc');
 const api_auth = require('./api/auth');
+const api_geotrack = require('./api/geotrack');
+
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -84,8 +86,8 @@ app.get('/api/entries/error/dates', api_entries.getErrorDates);
 // geofencing
 // .......................................................................
 app.post('/api/geofence', api_entries.geofence);
-app.post('/api/geotrack', api_misc.geoTracking);
-app.get('/api/geotrack', api_misc.getGeoTracking);
+app.post('/api/geotrack', api_geotrack.geoTracking);
+app.get('/api/geotrack', api_geotrack.getGeoTracking);
 
 // .......................................................................
 // admin
