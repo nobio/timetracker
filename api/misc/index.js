@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
+const util = require('../entries/util-entries');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const GeoTracking = mongoose.model('GeoTracking');
@@ -12,9 +13,9 @@ const packageJson = require('../../package.json');
  */
 exports.ping = (req, res) => {
   const ip = (req.headers['x-forwarded-for'] ||
-  req.connection.remoteAddress ||
-  req.socket.remoteAddress ||
-  req.connection.socket.remoteAddress).split(',')[0];
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress).split(',')[0];
 
   res.status(200).send({
     response: 'pong',
@@ -46,15 +47,15 @@ exports.version = (req, res) => {
  */
 exports.geoTracking = (req, res) => {
   console.log(JSON.stringify(req.body));
-  if(req.body.longitude == null || req.body.latitude == null || req.body.accuracy == null || req.body.source == null) {
-     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
-     return;
+  if (req.body.longitude == null || req.body.latitude == null || req.body.accuracy == null || req.body.source == null) {
+    res.status(400).send('missing data (longitude, latitude, accuracy, source)');
+    return;
   }
   new GeoTracking({
     longitude: req.body.longitude,
     latitude: req.body.latitude,
     accuracy: req.body.accuracy,
-    source: req.body.source
+    source: req.body.source,
   })
     .save()
     .then(geoTrack => res.status(200).json(geoTrack))
@@ -63,13 +64,34 @@ exports.geoTracking = (req, res) => {
 
 /**
  * reads geo tracks
- * 
+ *
  * curl -X GET http://localhost:30000/api/geotrack
  */
 exports.getGeoTracking = async (req, res) => {
   try {
-    const tracks = await GeoTracking.find().sort({ date: 1 })
+    const tracks = await GeoTracking.find().sort({ date: 1 });
     res.status(200).send(tracks);
+  } catch (err) {
+    res.status(err.status).json({ message: err.message });
+  }
+};
+
+exports.getGeoTrackingForDate = async (req, res) => {
+  const date = req.query.date;
+  // ====== TODO: refactor util-entries.stripdownToDateBerlin to a common module and use it here
+  const dtStart = util.stripdownToDateBerlin(moment.unix(date / 1000));
+  const dtEnd = moment(dtStart).add(1, 'days');
+
+  try {
+    const tracks = await GeoTracking.find({
+      date: {
+        $gte: dtStart,
+        $lt: dtEnd,
+      },
+    }).skip(0).sort({ entry_date: 1 });
+
+    res.status(200).send(tracks);
+    
   } catch (err) {
     res.status(err.status).json({ message: err.message });
   }
