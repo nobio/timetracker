@@ -86,8 +86,9 @@ app.get('/api/entries/error/dates', api_entries.getErrorDates);
 // geofencing
 // .......................................................................
 app.post('/api/geofence', api_entries.geofence);
-app.post('/api/geotrack', api_geotrack.geoTracking);
-app.get('/api/geotrack', api_geotrack.getGeoTracking);
+app.post('/api/geotrack', api_misc.geoTracking);
+app.get('/api/geotrack', api_misc.getGeoTracking);
+app.get('/api/geotrack/:date', api_misc.getGeoTrackingForDate);
 
 // .......................................................................
 // admin
