@@ -56,15 +56,15 @@ console.log('\n--------------------------------------------------------------- '
 /**
  * Reads data from source data source and returns an json array
  */
-function getDataFromSource() {
+function getDataFromSource(source) {
   return new Promise((resolve, reject) => {
     console.log('connecting to source database');
 
-    TIME_ENTRY_MODEL_SOURCE.find()
-      .then((timeEntries) => {
+    source.find()
+      .then((entries) => {
         console.log('closing source database');
         // mongoose.connection.close();
-        resolve(timeEntries);
+        resolve(entries);
       })
       .catch((err) => {
         mongoose.connection.close();
@@ -73,7 +73,7 @@ function getDataFromSource() {
   });
 }
 
-function deleteAllTarget() {
+function deleteAllTarget(target) {
   return new Promise((resolve, reject) => {
     if(!process.argv.includes('-d')) {
       resolve('no delete');
@@ -81,8 +81,8 @@ function deleteAllTarget() {
     }
 
     console.log('connecting to target database');
-
-    TIME_ENTRY_MODEL_TARGET.deleteMany({})
+    console.log('deleting target data');
+    target.deleteMany({})
       .then(() => resolve('deletion ok'))
       .catch(err => reject(err));
   });
@@ -91,25 +91,23 @@ function deleteAllTarget() {
 /**
  * Stores the data to target data srouce read from source data source
  *
- * @param {timeEntries} timeEntries
+ * @param {entries} entries
  */
-function storeDataToTarget(timeEntries) {
+function storeDataToTarget(entries, target) {
   let n = 0;
   return new Promise((resolve, reject) => {
-    timeEntries.forEach((timeentry) => {
+    entries.forEach((entry) => {
       process.stdout.write('.');
-      new TIME_ENTRY_MODEL_TARGET({
-        _id: timeentry._id,
-        entry_date: timeentry.entry_date,
-        direction: timeentry.direction,
-        last_changed: timeentry.last_changed,
-        longitude: timeentry.longitude,
-        latitude: timeentry.latitude,
-      }).save()
+      //console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
+      const t = new target();
+      Object.keys(target.schema.tree).forEach(element => {
+        t[element] = entry[element];        
+      });
+      t.save()
         .then((doc) => {
-          console.log(`saved: ObjectId('${timeentry._id}')`);
+          console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
           n++;
-          if (n >= timeEntries.length) {
+          if (n >= entries.length) {
             mongoose.connection.close();
             resolve();
             process.exit(0);
@@ -118,7 +116,7 @@ function storeDataToTarget(timeEntries) {
         .catch((err) => {
           n++;
           console.error(`> ${n} ${err.message}`);
-          if (n >= timeEntries.length) {
+          if (n >= entries.length) {
             mongoose.connection.close();
             process.exit(-1);
           }
@@ -127,28 +125,19 @@ function storeDataToTarget(timeEntries) {
     });
 
     mongoose.connection.close();
-    resolve(`${timeEntries.length} elements saved`);
+    resolve(`${entries.length} elements saved`);
   });
 }
 
 // start the migration...
-/*
-deleteAllTarget()
-    .then(result => {
-        console.log(result)
-        process.exit(0)
-    })
-    .catch((err) => {
-        console.log(err);
-        console.log('***********************************************************************')
-        process.exit(-1);
-    });
-*/
+deleteAllTarget(TIME_ENTRY_MODEL_TARGET)
+  .then(reply => getDataFromSource(TIME_ENTRY_MODEL_SOURCE))
+  .then(entries => storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET))
 
-deleteAllTarget()
-  .then(getDataFromSource)
-  .then(storeDataToTarget)
-  // .then(msg => console.log(msg))
+  .then(deleteAllTarget(GEO_TRACKING_MODEL_TARGET))
+  .then(reply => getDataFromSource(GEO_TRACKING_MODEL_SOURCE))
+  .then(entries => storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET))
+  
   .catch((err) => {
     console.log(err);
     console.log('***********************************************************************');
