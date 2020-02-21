@@ -37,8 +37,7 @@ exports.getGeoTracking = async (req, res) => {
     const tracks = await GeoTracking.find().sort({ date: 1 });
     res.status(200).send(tracks);
   } catch (err) {
-
-    if(!err.status) {
+    if (!err.status) {
       err.status = 500;
     }
     res.status(err.status).json({ message: err.message });
@@ -48,17 +47,30 @@ exports.getGeoTracking = async (req, res) => {
 
 /**
  * reads geo tracking data for a given date
- * curl -X GET http://localhost:30000/api/geotrack/1580886983000
+ * curl -X GET http://localhost:30000/api/geotrack/1580886983
+ * curl -X GET http://localhost:30000/api/geotrack/2020-02-21
+ * 
+ * generate timestamp on unix cli: date +%s
  */
 exports.getGeoTrackingForDate = async (req, res) => {
-
+  const regexDate = new RegExp('^[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$');
+  const regexTimestemp = new RegExp('^1[0-9]{9}$');
   const dt = req.params.date;
-  // ====== TODO: refactor util-entries.stripdownToDateBerlin to a common module and use it here
-  const dtStart = util.stripdownToDateBerlin(moment.unix(dt / 1000));
+  let dtStart;
+
+  // check the parameter: if it matches yyyy-mm-dd then get moment from this format
+  if (regexDate.test(dt)) {
+    dtStart = moment(dt);
+  } else if (regexTimestemp.test(dt)) {
+    dtStart = util.stripdownToDateBerlin(moment.unix(dt));
+  } else {
+    res.status(400).send('format of date invalid; provide timestamp or date (yyyy-mm-dd)');
+    return;
+  }
   const dtEnd = moment(dtStart).add(1, 'days');
-  
-  //console.log(dtStart);
-  //console.log(dtEnd);
+
+  console.log(dtStart);
+  console.log(dtEnd);
 
   try {
     const tracks = await GeoTracking.find({
@@ -69,9 +81,8 @@ exports.getGeoTrackingForDate = async (req, res) => {
     }).skip(0).sort({ entry_date: 1 });
 
     res.status(200).send(tracks);
-    
   } catch (err) {
-   if(!err.status) {
+    if (!err.status) {
       err.status = 500;
     }
     res.status(err.status).json({ message: err.message });
