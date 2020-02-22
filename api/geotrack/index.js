@@ -10,7 +10,7 @@ const util = require('../entries/util-entries');
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "accuracy": 10, "source": "cli"}' http://localhost:30000/api/geotrack
  */
-exports.geoTracking = (req, res) => {
+exports.createGeoTrack = (req, res) => {
   console.log(JSON.stringify(req.body));
   if (req.body.longitude == null || req.body.latitude == null || req.body.accuracy == null || req.body.source == null) {
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
@@ -69,8 +69,8 @@ exports.getGeoTrackingForDate = async (req, res) => {
   }
   const dtEnd = moment(dtStart).add(1, 'days');
 
-  console.log(dtStart);
-  console.log(dtEnd);
+  // console.log(dtStart);
+  // console.log(dtEnd);
 
   try {
     const tracks = await GeoTracking.find({
