@@ -339,7 +339,7 @@ function createTimeEntry(timeEntry) {
  */
 function clearAllEntries(dt) {
   utilTimeEntry.getAllByDate(dt).then((timeentries) => {
-    console.log(`removing ${timeentries.length} entries`);
+    // console.log(`removing ${timeentries.length} entries`);
     timeentries.forEach((timeentry) => {
       utilTimeEntry.deleteById(timeentry._id);
     });

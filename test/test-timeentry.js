@@ -484,7 +484,7 @@ function create(timeEntry) {
 function clearAllEntries(dt) {
   util.getAllByDate(dt)
     .then((timeentries) => {
-      console.log(`removing ${timeentries.length} entries`);
+      //console.log(`removing ${timeentries.length} entries`);
       timeentries.forEach((timeentry) => {
         util.deleteById(timeentry._id);
       });

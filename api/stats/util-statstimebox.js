@@ -118,6 +118,12 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
       const avg = sum / time_unit_stats.length;
       // var variance = time_unit_stats.reduce(varianz, 0);
       // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD') + " / " + lastTimeUnit + " / " + moment(lastTimeUnit).format('YYYY-MM-DD'));
+      // special treatment for time unit 'year':
+      //   The constructor does not take '2014' it needs to get '2014-01-01';
+      if (timeUnitFormatString === 'gggg') {
+        lastTimeUnit += '-01-01';
+      }
+
       data[idx] = {
         x: moment(lastTimeUnit).format(timeUnitFormatString),
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma

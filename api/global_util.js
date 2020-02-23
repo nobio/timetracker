@@ -31,11 +31,11 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
   toggleUtil.getToggleByName(notificationKey)
     .then((toggle) => {
       if (toggle != null && toggle.toggle === true) {
-        console.log(`toggle '${notificationKey}' switched on`);
+        // console.log(`toggle '${notificationKey}' switched on`);
         addedContent = (addedContent) || ''; // if addedContent is undefined set it with blank string
         return `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) ${toggle.notification} ${addedContent}`;
       }
-      console.log(`toggle ${notificationKey} switched off`);
+      // console.log(`toggle ${notificationKey} switched off`);
       resolve(`toggle ${notificationKey} switched off`);
     })
     .then((msg) => {
@@ -51,7 +51,8 @@ exports.sendMessage = (notificationKey, addedContent) => new Promise((resolve, r
           .then(result => resolve(result))
           .catch(err => reject(err));
       } else {
-        reject(`could not send message '${msg}' to SLACK (no token provided); logging instead to stderr`);
+        //        reject(`could not send message '${msg}' to SLACK (no token provided); logging instead to stderr`);
+        resolve(`could not send message '${msg}' to SLACK (no token provided); logging instead to stderr`);
       }
     })
     .catch(err => reject(`no message found ${err}`));

@@ -36,7 +36,7 @@ exports.dumpTimeEntries = () => new Promise((resolve, reject) => {
 
 exports.backupTimeEntries = () => new Promise((resolve, reject) => {
   let len = 0;
-  TimeEntryBackup.remove()
+  TimeEntryBackup.deleteMany({})
     .then(() => TimeEntry.find())
     .then((timeEntries) => {
       console.log(`${timeEntries.length} time entries found to be backed up`);
