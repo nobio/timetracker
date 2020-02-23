@@ -69,6 +69,7 @@ describe('test utilAuth.createUser', () => {
 
   it('try to create user twice', async () => {
     try {
+      await new Promise(resolve => setTimeout(resolve, 500)); // sleep a little while...
       const result = await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
       assert.fail(); // should not reach this...
     } catch (err) {
