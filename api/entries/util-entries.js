@@ -103,7 +103,7 @@ exports.create = (timeEntry) => {
   return new Promise((resolve, reject) => {
     this.getLastTimeEntryByDate(timeEntry.datetime)
       .then((lastTimeEntry) => {
-        // console.log(JSON.stringify(timeEntry));
+        //console.log(JSON.stringify(timeEntry));
         if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
           if (timeEntry.direction != 'enter') {
             reject(new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`));
