@@ -13,6 +13,7 @@ const db_config = {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   },
 };
 
