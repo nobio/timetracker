@@ -78,7 +78,7 @@ exports.getGeoTrackingForDate = async (req, res) => {
         $gte: dtStart,
         $lt: dtEnd,
       },
-    }).skip(0).sort({ entry_date: 1 });
+    }).skip(0).sort({ date: 1 });
 
     res.status(200).send(tracks);
   } catch (err) {
