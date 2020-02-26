@@ -65,7 +65,7 @@ app.get('/admin', web.admin);
 app.get('/admin_item', web.admin_item);
 app.get('/stats', web.stats);
 app.get('/statistics', web.statistics);
-app.get('/geo', web.geoloc); // todo
+app.get('/geo', web.geoloc);
 
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
