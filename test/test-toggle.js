@@ -18,7 +18,7 @@ const g_util = require('../api/global_util');
 
 describe('test util.getToggleStatus - Promise', () => {
   it('check Slack status without SLACK_TOKEN', async () => {
-    console.log(process.env.SLACK_TOKEN);
+    // console.log(process.env.SLACK_TOKEN);
     await util.getToggleStatus()
       .then((result) => {
         expect(result.NOTIFICATION_SLACK).to.equal(false);
