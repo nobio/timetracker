@@ -51,7 +51,7 @@ const ONE_ENTRY =
 // ##  TEST Cases
 // ##
 // ####################################################################################
-describe('isEmpty - Promise', () => {
+describe('isEmpty ', () => {
   let testv;
   it('should return false when the value is a string', () => {
     testv = util.isEmpty('Test');
@@ -82,56 +82,56 @@ describe('isEmpty - Promise', () => {
 });
 
 describe('test stripdownToDateBerlin method', () => {
-  it('should remove time component', () => util.stripdownToDateBerlin(1393455600031).format('HH:mm:ss').should.equal('00:00:00'));
-  it('should have date component', () => util.stripdownToDateBerlin(1000000000000).format('YYYY-MM-DD').should.equal('2001-09-09'));
-  it('should have date Europe/Berlin timezone', () => util.stripdownToDateBerlin(1000000000000)._z.name.should.equal('Europe/Berlin'));
-  it('should parse timestamp 0', () => util.stripdownToDateBerlin(0).format('YYYY-MM-DD HH:mm:ss').should.equal('1970-01-01 00:00:00'));
-  it('should parse negative timestamp to timestamp 0', () => util.stripdownToDateBerlin(-999).format('YYYY-MM-DD HH:mm:ss').should.equal('1970-01-01 00:00:00'));
+  it('should remove time component', () => expect(util.stripdownToDateBerlin(1393455600031).format('HH:mm:ss')).to.equal('00:00:00'));
+  it('should have date component', () => expect(util.stripdownToDateBerlin(1000000000000).format('YYYY-MM-DD')).to.equal('2001-09-09'));
+  it('should have date Europe/Berlin timezone', () => expect(util.stripdownToDateBerlin(1000000000000)._z.name).to.equal('Europe/Berlin'));
+  it('should parse timestamp 0', () => expect(util.stripdownToDateBerlin(0).format('YYYY-MM-DD HH:mm:ss')).to.equal('1970-01-01 00:00:00'));
+  it('should parse negative timestamp to timestamp 0', () => expect(util.stripdownToDateBerlin(-999).format('YYYY-MM-DD HH:mm:ss')).to.equal('1970-01-01 00:00:00'));
 });
 
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
-describe('test util.getAllByDate - Promise', () => {
+describe('test util.getAllByDate ', () => {
   let db;
   before(() => {
     db = require('../db');
   });
 
-  it('response array should have length of 0', () => util.getAllByDate(-1).should.eventually.have.length(0));
-  it('response array should have length of 2', () => util.getAllByDate(1393455600000).should.eventually.have.length(2));
-  it('response array should have length of 0', () => util.getAllByDate(1000000000000).should.eventually.have.length(0));
-  it('response array should have length of 0', () => util.getAllByDate(0).should.eventually.have.length(0));
+  it('response array should have length of 0', () => expect(util.getAllByDate(-1)).to.eventually.have.length(0));
+  it('response array should have length of 2', () => expect(util.getAllByDate(1393455600000)).to.eventually.have.length(2));
+  it('response array should have length of 0', () => expect(util.getAllByDate(1000000000000)).to.eventually.have.length(0));
+  it('response array should have length of 0', () => expect(util.getAllByDate(0)).to.eventually.have.length(0));
 
   after(() => {
     // db.closeConnection()
   });
 });
 
-describe('test util.getBusyTime - Promise', () => {
+describe('test util.getBusyTime', () => {
   let db;
   before(() => {
     db = require('../db');
   });
 
-  it('should not have any entries', async () => {
-    await util.calculateBusyTime({}).should.be.rejected;
+  it('should not have any entries', () => {
+    expect(util.calculateBusyTime({})).to.eventually.be.rejected;
   });
 
-  it('should be rejected if only one entry', async () => {
-    await util.calculateBusyTime(ONE_ENTRY).should.be.rejected;
+  it('should be rejected if only one entry', () => {
+   expect(util.calculateBusyTime(ONE_ENTRY)).to.eventually.be.rejected;
   });
 
-  it('should be rejected if the second entry is not a go', async () => {
+  it('should be rejected if the second entry is not a go', () => {
     const ENTRIES =
     [
       { direction: 'enter' },
       { direction: 'enter' },
     ];
 
-    await util.calculateBusyTime(ENTRIES).should.be.rejected;
+    expect(util.calculateBusyTime(ENTRIES)).to.eventually.be.rejected;
   });
-  it('should not be rejected if the second entry is a go', async () => {
-    await util.calculateBusyTime(TWO_ENTRIES).should.not.be.rejected;
+  it('should not be rejected if the second entry is a go', () => {
+    expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.be.rejected;
   });
 
   after(() => {
@@ -139,7 +139,7 @@ describe('test util.getBusyTime - Promise', () => {
   });
 });
 
-describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () => {
+describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -162,14 +162,14 @@ describe('test find one TimeEntry by its id:  -> util.findById() - Promise', () 
       })
       .catch((err) => { throw err; });
   });
-  it('should not find a Time Entry by an invalid id', () => util.findById('********_invalid-id_********').should.be.rejectedWith(Error));
+  it('should not find a Time Entry by an invalid id', () => expect(util.findById('********_invalid-id_********')).to.eventually.be.rejectedWith(Error));
 
   after(() => {
     // db.closeConnection()
   });
 });
 
-describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeEntryByDate(dt) - Promise', () => {
+describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeEntryByDate(dt) ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -211,7 +211,7 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
   });
 });
 
-describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
+describe('test to create one TimeEntry:  -> util.create() ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -307,7 +307,7 @@ describe('test to create one TimeEntry:  -> util.create() - Promise', () => {
 });
 
 
-describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise', () => {
+describe('test delete one TimeEntry by its id:  -> util.deleteById() ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -329,7 +329,7 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() - Promise',
   });
 });
 
-describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
+describe('test to modify one TimeEntry:  -> util.update() ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -398,9 +398,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
       });
   }),
   it('should throw exception when passing an undefined object', () => {
-    (function () {
-      util.update();
-    }).should.throw(Error);
+    expect(() => util.update()).to.throw('to update a record, the passed object must not be undefined');
   });
 
   after(() => {
@@ -411,7 +409,7 @@ describe('test to modify one TimeEntry:  -> util.update() - Promise', () => {
   });
 });
 
-describe('test util.storeValidationErrors - Promise', () => {
+describe('test util.storeValidationErrors ', () => {
   let db;
   before(() => {
     db = require('../db');
@@ -442,11 +440,7 @@ describe('test util.storeValidationErrors - Promise', () => {
   });
 
   it('getErrorDates', async () => {
-    await util.getErrorDates()
-      .then((result) => {
-        expect(result).to.be.an('array');
-      })
-      .catch((err) => { throw err; });
+    expect(util.getErrorDates()).to.eventually.be.an('array');
   });
 
   after(() => {
