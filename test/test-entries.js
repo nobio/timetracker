@@ -7,7 +7,6 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
-const assert = chai.assert;
 chai.should();
 
 describe('isEmpty', () => {
@@ -59,17 +58,8 @@ describe('test global_util.sendMessage()', () => {
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
 describe('test utilEntries.getBusytimeByDate()', () => {
-  //let db;
-  before(() => {
-    // console.log('BEFORE')
-    //db = require('../db');
-  });
   it('response array should have length of 0', () => utilEntries.getAllByDate(-1).should.eventually.have.length(0));
   it('response array should have length of 2', () => utilEntries.getAllByDate(1393455600000).should.eventually.have.length(2));
   it('response array should have length of 0', () => utilEntries.getAllByDate(0).should.eventually.have.length(0));
-
-  after(() => {
-    //db.closeConnection();
-  });
 });
 

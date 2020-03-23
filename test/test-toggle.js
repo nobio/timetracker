@@ -1,8 +1,4 @@
-require('../db');
 const fs = require('fs');
-const mongoose = require('mongoose');
-
-const Toggle = mongoose.model('Toggle');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -10,32 +6,29 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
 
 const util = require('../api/admin/util-admin');
-const g_util = require('../api/global_util');
 
-describe('test util.getToggleStatus - Promise', () => {
+describe('test util.getToggleStatus', () => {
   it('check Slack status without SLACK_TOKEN', () => {
     // console.log(process.env.SLACK_TOKEN);
     util.getToggleStatus()
-    .then((result) => {
-      expect(result).to.have.property('NOTIFICATION_SLACK');
-      expect(result.NOTIFICATION_SLACK).to.equal(false);
-    });
+      .then((result) => {
+        expect(result).to.have.property('NOTIFICATION_SLACK');
+        expect(result.NOTIFICATION_SLACK).to.equal(false);
+      });
   });
   it('check Slack status with SLACK_TOKEN', () => {
     process.env.SLACK_TOKEN = '1234567890';
     util.getToggleStatus()
-    .then((result) => {
-      expect(result).to.have.property('NOTIFICATION_SLACK');
-      expect(result.NOTIFICATION_SLACK).to.equal(true);
-    });
+      .then((result) => {
+        expect(result).to.have.property('NOTIFICATION_SLACK');
+        expect(result.NOTIFICATION_SLACK).to.equal(true);
+      });
   });
 });
 
-describe('test util.createToggle - Promise', () => {
+describe('test util.createToggle', () => {
   it('creating a new toggle with name, that does not exist without toggle value', () => {
     const toggleName = getToggleTestName();
 
@@ -87,7 +80,7 @@ describe('test util.createToggle - Promise', () => {
   it('creating a new toggle without name but toggle; should fail', async () => expect(util.createToggle('', true)).to.eventually.be.rejected);
 });
 
-describe('test util.getAllToggles - Promise', () => {
+describe('test util.getAllToggles', () => {
   it('load all toggles', () => {
     util.getAllToggles()
       .then((result) => {
@@ -100,7 +93,7 @@ describe('test util.getAllToggles - Promise', () => {
   });
 });
 
-describe('test util.getToggle - Promise', () => {
+describe('test util.getToggle', () => {
   it('load one toggle', async () => {
     util.getAllToggles()
       .then(result => util.getToggle(result[0]._id))
@@ -134,13 +127,9 @@ describe('test util.getToggle - Promise', () => {
       })
       .catch((err) => { throw err; });
   });
-
-  after(() => {
-    // db.closeConnection()
-  });
 });
 
-describe('test util.updateToggle - Promise', () => {
+describe('test util.updateToggle', () => {
   it('update existing toggle', async () => {
     const toggleName = getToggleTestName();
     notification = 'DELETE_ME';
@@ -187,7 +176,7 @@ describe('test util.updateToggle - Promise', () => {
 });
 
 
-describe('test util.deleteToggle - Promise', () => {
+describe('test util.deleteToggle', () => {
   const toggleName = getToggleTestName();
   it('delete an existing toggle', () => {
     util.createToggle(toggleName, 'true')
@@ -214,7 +203,6 @@ describe('test util.deleteToggle - Promise', () => {
       .then((result) => {
         console.log(JSON.stringify(result));
       })
-      // .then(result => db.closeConnection())
       .catch(err => console.log(err));
   });
 });

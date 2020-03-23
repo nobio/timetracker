@@ -399,12 +399,10 @@ describe('test index.refreshToken', () => {
  * =============================================================
  */
 describe('test index.logout', () => {
-
   before(async () => {
     // *** create a user with password
     await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-
   });
 
   it('test for OK (200): call logout', async () => {
@@ -422,13 +420,12 @@ describe('test index.logout', () => {
 
       // *** authorization should fail now
       process.env.AUTHORIZATION = 'on';
-      req = mockRequest({ headers: { authorization: 'Bearer ' + token } });
+      req = mockRequest({ headers: { authorization: `Bearer ${token}` } });
       res = mockResponse();
-  
-      await auth.authorizeToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(403); //Forbidden
-      expect(next).to.not.have.been.called;
 
+      await auth.authorizeToken(req, res, next);
+      expect(res.status).to.have.been.calledWith(403); // Forbidden
+      expect(next).to.not.have.been.called;
     } catch (err) {
       throw Error(err);
     }

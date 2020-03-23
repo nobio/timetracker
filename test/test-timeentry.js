@@ -10,8 +10,6 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
 
 const moment = require('moment');
 require('moment-timezone');
@@ -92,27 +90,13 @@ describe('test stripdownToDateBerlin method', () => {
 // assert('foo' !== 'bar', 'foo is not bar')
 // assert(Array.isArray([]), 'empty arrays are arrays')
 describe('test util.getAllByDate ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
   it('response array should have length of 0', () => expect(util.getAllByDate(-1)).to.eventually.have.length(0));
   it('response array should have length of 2', () => expect(util.getAllByDate(1393455600000)).to.eventually.have.length(2));
   it('response array should have length of 0', () => expect(util.getAllByDate(1000000000000)).to.eventually.have.length(0));
   it('response array should have length of 0', () => expect(util.getAllByDate(0)).to.eventually.have.length(0));
-
-  after(() => {
-    // db.closeConnection()
-  });
 });
 
 describe('test util.getBusyTime', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
   it('should not have any entries', () => {
     expect(util.calculateBusyTime({})).to.eventually.be.rejected;
   });
@@ -133,21 +117,12 @@ describe('test util.getBusyTime', () => {
   it('should not be rejected if the second entry is a go', () => {
     expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.not.be.rejected;
   });
-
-  after(() => {
-    // db.closeConnection()
-  });
 });
 
 describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('should find one Time Entry by its id', async () => {
+  it('should find one Time Entry by its id', () => {
     // util.findById('5a2100cf87f1f368d087696a').then(timeentry => console.log(timeentry))
-    await util.findById('5a2100cf87f1f368d087696a')
+    util.findById('5a2100cf87f1f368d087696a')
       .then((timeentry) => {
         // console.log(timeentry)
         expect(timeentry).to.have.property('_id');
@@ -163,22 +138,13 @@ describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
       .catch((err) => { throw err; });
   });
   it('should not find a Time Entry by an invalid id', () => expect(util.findById('********_invalid-id_********')).to.eventually.be.rejectedWith(Error));
-
-  after(() => {
-    // db.closeConnection()
-  });
 });
 
 describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeEntryByDate(dt) ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('check the last entry of a given date', async () => {
+  it('check the last entry of a given date', () => {
     const MY_DATE = moment('2018-01-12');
 
-    await util.getLastTimeEntryByDate(MY_DATE)
+    util.getLastTimeEntryByDate(MY_DATE)
       .then((timeEntry) => {
         // console.log(timeEntry)
         expect(timeEntry).to.not.be.null;
@@ -196,10 +162,10 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
       });
   });
 
-  it('last entry of an empty date (in the future) must be undefined', async () => {
+  it('last entry of an empty date (in the future) must be undefined', () => {
     const MY_DATE = moment('2050-01-01');
 
-    await util.getLastTimeEntryByDate(MY_DATE)
+    util.getLastTimeEntryByDate(MY_DATE)
       .then((timeEntry) => {
         // console.log(timeEntry)
         expect(timeEntry).to.be.undefined;
@@ -212,13 +178,8 @@ describe('test to load the last TimeEntry of a given date:  -> util.getLastTimeE
 });
 
 describe('test to create one TimeEntry:  -> util.create() ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('create successfully a new TimeEntry', async () => {
-    await util.create({ direction: 'enter', datetime: DEFAULT_DATE })
+  it('create successfully a new TimeEntry', () => {
+    util.create({ direction: 'enter', datetime: DEFAULT_DATE })
       .then((timeEntry) => {
         // console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined;
@@ -255,10 +216,10 @@ describe('test to create one TimeEntry:  -> util.create() ', () => {
       });
   });
 
-  it('create not successfully a new TimeEntry: first entry must not have direction "go"', async () => expect(util.create('go', DEFAULT_DATE)).to.be.rejected);
+  it('create not successfully a new TimeEntry: first entry must not have direction "go"', () => expect(util.create('go', DEFAULT_DATE)).to.be.rejected);
 
-  it('create not successfully: enter one entry with "enter" and then another one also with "enter"', async () => {
-    await util.create({ direction: 'enter', datetime: DEFAULT_DATE })
+  it('create not successfully: enter one entry with "enter" and then another one also with "enter"', () => {
+    util.create({ direction: 'enter', datetime: DEFAULT_DATE })
       .then(timeEntry => timeEntry._id)
       .then(expect(util.create('go', DEFAULT_DATE)).to.be.rejected)
       .then(clearAllEntries(DEFAULT_DATE))
@@ -268,8 +229,8 @@ describe('test to create one TimeEntry:  -> util.create() ', () => {
       });
   });
 
-  it('create successfully a new TimeEntry without datetime', async () => {
-    await util.create({ direction: 'enter' })
+  it('create successfully a new TimeEntry without datetime', () => {
+    util.create({ direction: 'enter' })
       .then((timeEntry) => {
         // console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined;
@@ -308,14 +269,9 @@ describe('test to create one TimeEntry:  -> util.create() ', () => {
 
 
 describe('test delete one TimeEntry by its id:  -> util.deleteById() ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('should delete one Time Entry by its id', async () => {
+  it('should delete one Time Entry by its id', () => {
     // create new entry (which will be deleted later)
-    await create({ direction: 'enter', datetime: DEFAULT_DATE })
+    create({ direction: 'enter', datetime: DEFAULT_DATE })
       .then(timeEntry => timeEntry._id)
       .then(util.deleteById)
       .then(util.findById)
@@ -330,13 +286,8 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() ', () => {
 });
 
 describe('test to modify one TimeEntry:  -> util.update() ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('modify successfully a new TimeEntry', async () => {
-    await create({ direction: 'enter', datetime: DEFAULT_DATE })
+  it('modify successfully a new TimeEntry', () => {
+    create({ direction: 'enter', datetime: DEFAULT_DATE })
       .then((timeEntry) => {
         //        console.log(timeEntry)
         expect(timeEntry).to.not.be.undefined;
@@ -403,23 +354,15 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
 
   after(() => {
     clearAllEntries(DEFAULT_DATE);
-    setTimeout(() => {
-      // db.closeConnection();
-    }, 1000);
   });
 });
 
 describe('test util.storeValidationErrors ', () => {
-  let db;
-  before(() => {
-    db = require('../db');
-  });
-
-  it('evaluate', async () => {
+  it('evaluate', () => {
     const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
-    await util.evaluate(firstTime, lastTime)
+    util.evaluate(firstTime, lastTime)
       .then((result) => {
         expect(result).to.have.property('message');
         expect(result.message).to.equal('calculation ongoing in background');
@@ -427,11 +370,11 @@ describe('test util.storeValidationErrors ', () => {
       .catch((err) => { throw err; });
   });
 
-  it('storeValidationErrors', async () => {
+  it('storeValidationErrors', () => {
     const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
-    await util.storeValidationErrors(firstTime, lastTime)
+    util.storeValidationErrors(firstTime, lastTime)
       .then((result) => {
         expect(result).to.have.property('message');
         expect(result.message).to.equal('calculation ongoing in background');
@@ -439,12 +382,8 @@ describe('test util.storeValidationErrors ', () => {
       .catch((err) => { throw err; });
   });
 
-  it('getErrorDates', async () => {
+  it('getErrorDates', () => {
     expect(util.getErrorDates()).to.eventually.be.an('array');
-  });
-
-  after(() => {
-    // db.closeConnection()
   });
 });
 

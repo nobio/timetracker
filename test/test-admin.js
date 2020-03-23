@@ -1,5 +1,4 @@
 const fs = require('fs');
-const mongoose = require('mongoose');
 
 const util = require('../api/admin/util-admin');
 
@@ -13,13 +12,15 @@ const expect = chai.expect;
 require('moment-timezone');
 
 /** ************************************************************ */
-rmDir = function (dirPath, removeSelf) {
+const rmDir = function (dirPath, removeSelf) {
+  let files;
+  let bRemoveSelf = removeSelf;
   if (removeSelf === undefined) {
-    removeSelf = true;
+    bRemoveSelf = true;
   }
 
   try {
-    var files = fs.readdirSync(dirPath);
+    files = fs.readdirSync(dirPath);
   } catch (e) {
     return;
   }
@@ -31,7 +32,7 @@ rmDir = function (dirPath, removeSelf) {
       else rmDir(filePath);
     }
   }
-  if (removeSelf) fs.rmdirSync(dirPath);
+  if (bRemoveSelf) fs.rmdirSync(dirPath);
 };
 /** ************************************************************ */
 
@@ -42,7 +43,7 @@ describe('test util.dumpTimeEnties', () => {
   });
 
   it('dumping the database should lead to a new file in /dump', async () => {
-  	await util.dumpTimeEntries()
+    await util.dumpTimeEntries()
       .then((result) => {
         console.log();
         expect(result).to.have.property('size');
@@ -50,8 +51,8 @@ describe('test util.dumpTimeEnties', () => {
         return result.filename;
       })
       .then((filename) => {
-      	const data = fs.readFileSync(filename);
-      	expect(data).to.not.be.empty;
+        const data = fs.readFileSync(filename);
+        expect(data).to.not.be.empty;
       })
       .catch((err) => { throw err; });
   }).timeout(10000);

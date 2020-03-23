@@ -5,8 +5,6 @@ const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
 
 const TIME_ENTRIES_01 = [
   {
@@ -54,13 +52,11 @@ const TIME_ENTRIES_02 = [
   },
 ];
 
-
-/** ************************************************************ */
 /** ************************************************************ */
 
 describe('test util-breaktime - Promise', () => {
-  it('getAllTimeEntriesGroupedByDate one day', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+  it('getAllTimeEntriesGroupedByDate one day', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then((result) => {
         expect(result).to.be.a('map');
         const ar = result.get('20.02.2014');
@@ -76,8 +72,8 @@ describe('test util-breaktime - Promise', () => {
       });
   });
 
-  it('getAllTimeEntriesGroupedByDateTowDays', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('getAllTimeEntriesGroupedByDateTowDays', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then((result) => {
         expect(result).to.be.a('map');
         let ar = result.get('20.02.2014');
@@ -100,8 +96,8 @@ describe('test util-breaktime - Promise', () => {
   });
 
 
-  it('prepareBreakTimes one day - all data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+  it('prepareBreakTimes one day - all data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
       .then((result) => {
         expect(result).to.be.an('array');
@@ -112,8 +108,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('prepareBreakTimes one day - only real data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+  it('prepareBreakTimes one day - only real data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, true))
       .then((result) => {
         expect(result).to.be.an('array');
@@ -126,8 +122,8 @@ describe('test util-breaktime - Promise', () => {
   });
 
 
-  it('prepareBreakTimes two days - all data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('prepareBreakTimes two days - all data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
       .then((result) => {
         expect(result).to.be.an('array');
@@ -140,8 +136,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('prepareBreakTimes two days - only real data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('prepareBreakTimes two days - only real data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, true))
       .then((result) => {
         expect(result).to.be.an('array');
@@ -154,8 +150,8 @@ describe('test util-breaktime - Promise', () => {
       });
   });
 
-  it('calculateHistogram one day, interval 1, all real', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+  it('calculateHistogram one day, interval 1, all real', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false))
       .then((result) => {
@@ -170,8 +166,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('calculateHistogram one day, interval 1, rale data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
+  it('calculateHistogram one day, interval 1, rale data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, true))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 1, true))
       .then((result) => {
@@ -182,8 +178,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('calculateHistogram two days, interval 1, all data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('calculateHistogram two days, interval 1, all data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false))
       .then((result) => {
@@ -195,8 +191,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('calculateHistogram two days, interval 1, real data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('calculateHistogram two days, interval 1, real data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, true))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 1, true))
       .then((result) => {
@@ -208,8 +204,8 @@ describe('test util-breaktime - Promise', () => {
       });
   });
 
-  it('calculateHistogram two days, interval 20, real data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('calculateHistogram two days, interval 20, real data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, true))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 20, true))
       .then((result) => {
@@ -219,8 +215,8 @@ describe('test util-breaktime - Promise', () => {
         throw err;
       });
   });
-  it('calculateHistogram two days, interval 20, all data', async () => {
-    await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
+  it('calculateHistogram two days, interval 20, all data', () => {
+    utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02)
       .then(timeEntries => utilBreaktime.prepareBreakTimes(timeEntries, false))
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 20, false))
       .then((result) => {

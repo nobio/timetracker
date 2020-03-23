@@ -24,9 +24,7 @@ const should = chai.should;
  * =============================================================
  */
 describe('test index', () => {
-  let db;
   before(() => {
-    db = require('../db');
     process.env.AUTHORIZATION = 'off';
   });
 
