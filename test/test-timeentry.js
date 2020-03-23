@@ -118,7 +118,7 @@ describe('test util.getBusyTime', () => {
   });
 
   it('should be rejected if only one entry', () => {
-   expect(util.calculateBusyTime(ONE_ENTRY)).to.eventually.be.rejected;
+    expect(util.calculateBusyTime(ONE_ENTRY)).to.eventually.be.rejected;
   });
 
   it('should be rejected if the second entry is not a go', () => {
@@ -131,7 +131,7 @@ describe('test util.getBusyTime', () => {
     expect(util.calculateBusyTime(ENTRIES)).to.eventually.be.rejected;
   });
   it('should not be rejected if the second entry is a go', () => {
-    expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.be.rejected;
+    expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.not.be.rejected;
   });
 
   after(() => {
@@ -478,7 +478,7 @@ function create(timeEntry) {
 function clearAllEntries(dt) {
   util.getAllByDate(dt)
     .then((timeentries) => {
-      //console.log(`removing ${timeentries.length} entries`);
+      // console.log(`removing ${timeentries.length} entries`);
       timeentries.forEach((timeentry) => {
         util.deleteById(timeentry._id);
       });

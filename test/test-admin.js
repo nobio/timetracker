@@ -1,9 +1,6 @@
-require('../db');
 const fs = require('fs');
 const mongoose = require('mongoose');
 
-const TimeEntry = mongoose.model('TimeEntry');
-const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 const util = require('../api/admin/util-admin');
 
 const chai = require('chai');
@@ -12,10 +9,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
 
-const moment = require('moment');
 require('moment-timezone');
 
 /** ************************************************************ */
@@ -42,10 +36,8 @@ rmDir = function (dirPath, removeSelf) {
 /** ************************************************************ */
 
 
-describe('test util.dumpTimeEnties - Promise', () => {
-  let db;
+describe('test util.dumpTimeEnties', () => {
   before(() => {
-    db = require('../db');
     rmDir('./dump');
   });
 
@@ -63,43 +55,4 @@ describe('test util.dumpTimeEnties - Promise', () => {
       })
       .catch((err) => { throw err; });
   }).timeout(10000);
-
-  after(() => {
-    // db.closeConnection()
-  });
-});
-
-describe('test util.backupTimeEntries - Promise', () => {
-  let db;
-
-  before(() => {
-    db = require('../db');
-  });
-
-  it('backing up the productive database into a history-staging table', async () => {
-    let countBackups;
-
-    await TimeEntryBackup.find()
-      .then((timeEntryBackups) => {
-        countBackups = timeEntryBackups.length;
-      })
-      .catch((err) => {
-        throw err;
-      });
-
-    await util
-      .backupTimeEntries()
-      .then((result) => {
-        expect(result).to.not.be.undefined;
-        expect(result).to.have.property('backup_count');
-        expect(result.backup_count).to.equal(countBackups);
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }).timeout(10000);
-
-  after(() => {
-    // db.closeConnection()
-  });
 });
