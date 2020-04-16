@@ -141,11 +141,12 @@ if (process.env.SLACK_TOKEN) {
   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
 }
 
-/* start the web service */
+/* start the web service on http */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
+/* start the web service on https */
 const ssl_options = {
   key: fs.readFileSync('keys/key.pem'),
   cert: fs.readFileSync('keys/cert.pem'),
