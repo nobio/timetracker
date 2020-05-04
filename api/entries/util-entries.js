@@ -128,8 +128,10 @@ exports.create = (timeEntry) => {
             return tEntry;
           })
           .then(tEntry => resolve(tEntry))
-          .then(g_util.sendMessage('CREATE_ENTRY', JSON.stringify(timeEntry)))
-          .catch(err => reject(err));
+          .catch(err => {
+            g_util.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`)
+            reject(err);
+          });
       })
       .catch(err => reject(err));
   });
