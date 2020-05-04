@@ -2,11 +2,11 @@ const moment = require('moment');
 require('moment-timezone');
 const toggleUtil = require('./admin/util-admin');
 
-exports.DEFAULT_BREAK_TIME_SECONDS = 60 * 60;
+exports.DEFAULT_BREAK_TIME_SECONDS = 45 * 60;
 exports.DEFAULT_BREAK_TIME_MILLISECONDS = this.DEFAULT_BREAK_TIME_SECONDS * 1000;
 
 
-exports.DEFAULT_BREAK_TIME_SECONDS_XXX = () => 60 * 60;
+exports.DEFAULT_BREAK_TIME_SECONDS_XXX = () => this.DEFAULT_BREAK_TIME_SECONDS;
 exports.DEFAULT_BREAK_TIME_MILLISECONDS_XXX = () => this.DEFAULT_BREAK_TIME_SECONDS * 1000;
 
 // An access token (from your Slack app or custom integration - xoxa, xoxp, or xoxb)
