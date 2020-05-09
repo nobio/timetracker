@@ -126,7 +126,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
       if (timeUnitFormatString === 'gggg') {
         lastTimeUnit += '-01-01';
       }
-      console.log(lastTimeUnit + " - " + timeUnitFormatString + " " + moment(lastTimeUnit).format(timeUnitFormatString))
+
       data[idx] = {
         x: lastTimeUnit,
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
