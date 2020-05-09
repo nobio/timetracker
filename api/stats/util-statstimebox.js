@@ -97,10 +97,13 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
  * @param {*} timeUnitFormatString 'gggg-MM', 'ggg-ww', 'gggg'
  */
 function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
+
   const data = [{
     0: 0,
   }];
   let time_unit_stats = [];
+  if (stats === undefined || stats.length == 0) return data;
+
   // console.log(time_unit_stats.reduce(add, 0));
 
   let lastTimeUnit = moment(stats[0].date).format(timeUnitFormatString);
@@ -123,9 +126,9 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
       if (timeUnitFormatString === 'gggg') {
         lastTimeUnit += '-01-01';
       }
-
+      console.log(lastTimeUnit + " - " + timeUnitFormatString + " " + moment(lastTimeUnit).format(timeUnitFormatString))
       data[idx] = {
-        x: moment(lastTimeUnit).format(timeUnitFormatString),
+        x: lastTimeUnit,
         y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
 
@@ -164,6 +167,7 @@ function getStatsByTimeBoxDay(stats) {
  * @param {*} stats
  */
 function getStatsByTimeBoxTimeWeekDay(stats) {
+
   const data = [{
     0: 0,
   }];
@@ -190,6 +194,7 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
       rawData: [],
     },
   };
+  if (stats === undefined || stats.length == 0) return data;
 
   // prepare data array: sort all working times to the corresponding week day
   stats.forEach((stat) => {
