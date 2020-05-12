@@ -25,15 +25,15 @@ exports.getEntries = (req, res) => {
   const filterByBusy = req.query.busy;
 
   if (filterByDate && filterByBusy) {
-    console.log('filter by date and busy');
+    // console.log('filter by date and busy');
     res.status(500).send('date and busy filter set; can only handle one of them');
   } else if (filterByDate) {
-    console.log(`filter by date: ${filterByDate}`);
+    // console.log(`filter by date: ${filterByDate}`);
     util.getAllByDate(filterByDate)
       .then(timeentries => res.status(200).send(timeentries))
       .catch(err => res.status(500).send(err));
   } else if (filterByBusy) {
-    console.log(`filter by busy: ${filterByBusy}`);
+    // console.log(`filter by busy: ${filterByBusy}`);
     util.getAllByDate(filterByBusy)
       .then(util.calculateBusyTime)
       .then(busytime => res.status(200).send(busytime))
