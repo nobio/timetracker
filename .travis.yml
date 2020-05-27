@@ -31,8 +31,8 @@ after_success:
   - docker --version  # document the version travis is using
   - docker build -t $IMAGE_NAME:$TAG .
 
-  #- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
-  - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
+  #- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
   #- docker images
   
   - if [ $TRAVIS_BRANCH == "master" ]; then

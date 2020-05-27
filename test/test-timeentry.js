@@ -16,33 +16,33 @@ require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
 const TWO_ENTRIES =
-[
-  {
-    last_changed: '2014-02-27T07:37:02.543Z',
-    entry_date: '2014-02-27T07:37:00.000Z',
-    __v: 0,
-    _id: '530eeb1ea8ee5e0000000917',
-    direction: 'enter',
-  },
-  {
-    __v: 0,
-    last_changed: '2014-02-27T15:55:56.607Z',
-    entry_date: '2014-02-27T15:55:00.000Z',
-    _id: '530f600ca8ee5e00000009f0',
-    direction: 'go',
-  },
-];
+  [
+    {
+      last_changed: '2014-02-27T07:37:02.543Z',
+      entry_date: '2014-02-27T07:37:00.000Z',
+      __v: 0,
+      _id: '530eeb1ea8ee5e0000000917',
+      direction: 'enter',
+    },
+    {
+      __v: 0,
+      last_changed: '2014-02-27T15:55:56.607Z',
+      entry_date: '2014-02-27T15:55:00.000Z',
+      _id: '530f600ca8ee5e00000009f0',
+      direction: 'go',
+    },
+  ];
 
 const ONE_ENTRY =
-[
-  {
-    last_changed: '2014-02-27T07:37:02.543Z',
-    entry_date: '2014-02-27T07:37:00.000Z',
-    __v: 0,
-    _id: '530eeb1ea8ee5e0000000917',
-    direction: 'enter',
-  },
-];
+  [
+    {
+      last_changed: '2014-02-27T07:37:02.543Z',
+      entry_date: '2014-02-27T07:37:00.000Z',
+      __v: 0,
+      _id: '530eeb1ea8ee5e0000000917',
+      direction: 'enter',
+    },
+  ];
 
 // ####################################################################################
 // ##
@@ -96,7 +96,7 @@ describe('test util.getAllByDate ', () => {
   it('response array should have length of 0', () => expect(util.getAllByDate(0)).to.eventually.have.length(0));
 });
 
-describe('test util.getBusyTime', () => {
+describe('test util.calculateBusyTime', () => {
   it('should not have any entries', () => {
     expect(util.calculateBusyTime({})).to.eventually.be.rejected;
   });
@@ -107,17 +107,28 @@ describe('test util.getBusyTime', () => {
 
   it('should be rejected if the second entry is not a go', () => {
     const ENTRIES =
-    [
-      { direction: 'enter' },
-      { direction: 'enter' },
-    ];
+      [
+        { direction: 'enter' },
+        { direction: 'enter' },
+      ];
 
     expect(util.calculateBusyTime(ENTRIES)).to.eventually.be.rejected;
+  });
+  it('pause should be the same as global_util.DEFAULT_BREAK_TIME_SECONDS', async () => {
+    //    expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.have.length(33223);
+    //    expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.have.length(1)
+    util.calculateBusyTime(TWO_ENTRIES)
+      .then((result) => {
+        expect(result).to.have.property('duration');
+        expect(result).to.have.property('busytime');
+        expect(result).to.have.property('pause');
+        expect(result).to.have.property('count');
+      });
   });
   it('should not be rejected if the second entry is a go', () => {
     expect(util.calculateBusyTime(TWO_ENTRIES)).to.eventually.not.be.rejected;
   });
-});
+})
 
 describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
   it('should find one Time Entry by its id', () => {
@@ -348,9 +359,9 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
         throw err;
       });
   }),
-  it('should throw exception when passing an undefined object', () => {
-    expect(() => util.update()).to.throw('to update a record, the passed object must not be undefined');
-  });
+    it('should throw exception when passing an undefined object', () => {
+      expect(() => util.update()).to.throw('to update a record, the passed object must not be undefined');
+    });
 
   after(() => {
     clearAllEntries(DEFAULT_DATE);
