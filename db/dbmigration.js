@@ -6,16 +6,17 @@ mongoose.set('useUnifiedTopology', true);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 
-const schema = mongoose.Schema;
-
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
 const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-//const MONGO_URL_DOCKER = 'mongodb://192.168.178.42::27017/timetracker';
+// const MONGO_URL_DOCKER = 'mongodb://192.168.178.42::27017/timetracker';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
 // const MONGO_URL_TARGET = MONGO_URL_DOCKER;
 const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
 const MONGO_URL_TARGET = MONGO_URL_MLAB;
+
+const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
+const SILENT = process.argv.includes('-s');
 
 /* ==================================================================== */
 // Schema
@@ -49,9 +50,11 @@ const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', GeoTrack
 const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTracking);
 mongoose.model('GeoTracking', GeoTracking);
 
-console.log('--------------------------------------------------------------- \n')
-console.log('Usage: node db/dbmigration.js [-d]     (emtpy target collection)')
-console.log('\n--------------------------------------------------------------- ')
+console.log('--------------------------------------------------------------- \n');
+console.log('Usage: node db/dbmigration.js [-d] [-s]');
+console.log('   -d: emtpy target collection');
+console.log('   -s: silent');
+console.log('\n--------------------------------------------------------------- ');
 
 /**
  * Reads data from source data source and returns an json array
@@ -75,11 +78,10 @@ function getDataFromSource(source) {
 
 function deleteAllTarget(target) {
   return new Promise((resolve, reject) => {
-    if(!process.argv.includes('-d')) {
+    if (SHOULD_EMPTY_TARGET) {
       resolve('no delete');
       return;
     }
-
     console.log('connecting to target database');
     console.log('deleting target data');
     target.deleteMany({})
@@ -98,15 +100,16 @@ function storeDataToTarget(entries, target) {
   return new Promise((resolve, reject) => {
     entries.forEach((entry) => {
       process.stdout.write('.');
-      //console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
+      // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
       const t = new target();
-      Object.keys(target.schema.tree).forEach(element => {
-        t[element] = entry[element];        
+      Object.keys(target.schema.tree).forEach((element) => {
+        t[element] = entry[element];
       });
       t.save()
-        .then((doc) => {
+        .then(() => {
+          // eslint-disable-next-line no-underscore-dangle
           console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
-          n++;
+          n += 1;
           if (n >= entries.length) {
             mongoose.connection.close();
             resolve();
@@ -114,8 +117,8 @@ function storeDataToTarget(entries, target) {
           }
         })
         .catch((err) => {
-          n++;
-          console.error(`> ${n} ${err.message}`);
+          n += 1;
+          if (!SILENT) console.error(`> ${n} ${err.message}`); else (process.stdout.write('#'));
           if (n >= entries.length) {
             mongoose.connection.close();
             process.exit(-1);
@@ -131,15 +134,14 @@ function storeDataToTarget(entries, target) {
 
 // start the migration...
 deleteAllTarget(TIME_ENTRY_MODEL_TARGET)
-  .then(reply => getDataFromSource(TIME_ENTRY_MODEL_SOURCE))
+  .then(() => getDataFromSource(TIME_ENTRY_MODEL_SOURCE))
   .then(entries => storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET))
 
   .then(deleteAllTarget(GEO_TRACKING_MODEL_TARGET))
-  .then(reply => getDataFromSource(GEO_TRACKING_MODEL_SOURCE))
+  .then(() => getDataFromSource(GEO_TRACKING_MODEL_SOURCE))
   .then(entries => storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET))
-  
   .catch((err) => {
-    console.log(err);
-    console.log('***********************************************************************');
+    console.err(err);
+    console.err('***********************************************************************');
     process.exit(-1);
   });
