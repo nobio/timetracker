@@ -56,6 +56,8 @@ const allowedOrigins = [
   'http://localhost:8100',
   'https://nobio.myhome-server.de:30043',
   'http://nobio.myhome-server.de:30030',
+  'https://timetracker-ui.firebaseapp.com',
+  'https://timetracker-ui.web.app'
 ];
 const corsOptions = {
   origin: (origin, callback) => {
