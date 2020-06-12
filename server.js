@@ -23,6 +23,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger/swagger.json');
+const cors = require('cors');
+
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -44,6 +46,29 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 app.use(api_auth.authorizeToken);
+
+// Reflect the origin if it's in the allowed list or not defined (cURL, Postman, etc.)
+const allowedOrigins = [
+  'capacitor://localhost',
+  'ionic://localhost',
+  'http://localhost',
+  'http://localhost:8080',
+  'http://localhost:8100',
+  'https://nobio.myhome-server.de:30043',
+  'http://nobio.myhome-server.de:30030',
+];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Origin not allowed by CORS'));
+    }
+  }
+};
+
+// Enable preflight requests for all routes
+app.options('*', cors(corsOptions));
 /*
 app.use((req, res, next) => {
    console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
@@ -74,13 +99,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // ------------------ API ------------------------------------------------
 // restful services for entries using Promises
 // -----------------------------------------------------------------------
-app.get('/api/entries', api_entries.getEntries);
-app.post('/api/entries', api_entries.createEntry);
-app.get('/api/entries/:id', api_entries.getEntryById);
-app.put('/api/entries/:id', api_entries.saveEntry);
-app.delete('/api/entries/:id', api_entries.deleteEntry);
-app.post('/api/entries/error/evaluate', api_entries.evaluate);
-app.get('/api/entries/error/dates', api_entries.getErrorDates);
+app.get('/api/entries', cors(corsOptions), api_entries.getEntries);
+app.post('/api/entries', cors(corsOptions), api_entries.createEntry);
+app.get('/api/entries/:id', cors(corsOptions), api_entries.getEntryById);
+app.put('/api/entries/:id', cors(corsOptions), api_entries.saveEntry);
+app.delete('/api/entries/:id', cors(corsOptions), api_entries.deleteEntry);
+app.post('/api/entries/error/evaluate', cors(corsOptions), api_entries.evaluate);
+app.get('/api/entries/error/dates', cors(corsOptions), api_entries.getErrorDates);
 
 // .......................................................................
 // geofencing
@@ -93,47 +118,47 @@ app.get('/api/geotrack/:date', api_geotrack.getGeoTrackingForDate);
 // .......................................................................
 // admin
 // .......................................................................
-app.post('/api/entries/dump', api_admin.dumpTimeEntries);
-app.post('/api/entries/backup', api_admin.backupTimeEntries);
+app.post('/api/entries/dump', cors(corsOptions), api_admin.dumpTimeEntries);
+app.post('/api/entries/backup', cors(corsOptions), api_admin.backupTimeEntries);
 
 // .......................................................................
 // toggles
 // .......................................................................
-app.get('/api/toggles', api_admin.getAllToggles);
-app.get('/api/toggles/status', api_admin.getToggleStatus);
-app.get('/api/toggles/:id', api_admin.getToggleById);
-app.get('/api/toggles/name/:name', api_admin.getToggleByName);
-app.put('/api/toggles/:id', api_admin.saveToggle);
-app.post('/api/toggles', api_admin.createToggle);
-app.delete('/api/toggles/:id', api_admin.deleteToggle);
+app.get('/api/toggles', cors(corsOptions), api_admin.getAllToggles);
+app.get('/api/toggles/status', cors(corsOptions), api_admin.getToggleStatus);
+app.get('/api/toggles/:id', cors(corsOptions), api_admin.getToggleById);
+app.get('/api/toggles/name/:name', cors(corsOptions), api_admin.getToggleByName);
+app.put('/api/toggles/:id', cors(corsOptions), api_admin.saveToggle);
+app.post('/api/toggles', cors(corsOptions), api_admin.createToggle);
+app.delete('/api/toggles/:id', cors(corsOptions), api_admin.deleteToggle);
 
 // .......................................................................
 // statistics
 // .......................................................................
-app.put('/api/stats', api_stats.calcStats);
-app.get('/api/stats/:date/:timeUnit', api_stats.getStats);
-app.delete('/api/stats', api_stats.deleteAllStatsDays);
-app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
-app.get('/api/statistics/histogram/:interval', api_stats.histogram);
-app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
+app.put('/api/stats', cors(corsOptions), api_stats.calcStats);
+app.get('/api/stats/:date/:timeUnit', cors(corsOptions), api_stats.getStats);
+app.delete('/api/stats', cors(corsOptions), api_stats.deleteAllStatsDays);
+app.get('/api/statistics/aggregate', cors(corsOptions), api_stats.getStatsByTimeBox);
+app.get('/api/statistics/histogram/:interval', cors(corsOptions), api_stats.histogram);
+app.get('/api/statistics/breaktime/:interval', cors(corsOptions), api_stats.breaktime);
 
 // .......................................................................
 // maintain
 // .......................................................................
-app.get('/api/ping', api_misc.ping);
-app.get('/api/version', api_misc.version);
-app.get('/api/experiment', api_misc.experiment);
+app.get('/api/ping', cors(corsOptions), api_misc.ping);
+app.get('/api/version', cors(corsOptions), api_misc.version);
+app.get('/api/experiment', cors(corsOptions), api_misc.experiment);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
 // .......................................................................
 // users and authentication
 // .......................................................................
-app.get('/api/users', api_auth.getAllUsers);
-app.post('/api/users', api_auth.createUser);
-app.post('/api/auth/login', api_auth.login);
-app.post('/api/auth/logout/:token', api_auth.logout);
-app.post('/api/auth/token/:token', api_auth.refreshToken);
+app.get('/api/users', cors(corsOptions), api_auth.getAllUsers);
+app.post('/api/users', cors(corsOptions), api_auth.createUser);
+app.post('/api/auth/login', cors(corsOptions), api_auth.login);
+app.post('/api/auth/logout/:token', cors(corsOptions), api_auth.logout);
+app.post('/api/auth/token/:token', cors(corsOptions), api_auth.refreshToken);
 
 if (process.env.SLACK_TOKEN) {
   console.log('using Slack to notify');
