@@ -216,6 +216,8 @@ describe('test utilAuth.login', () => {
 
       // *** check authorization
       req = mockRequest({ headers: { authorization: `Bearer ${accessToken}` } });
+      req.url = '/api/auth/login';
+
       res = mockResponse();
 
       await auth.authorizeToken(req, res, next);
@@ -227,6 +229,7 @@ describe('test utilAuth.login', () => {
 
       // *** authorization should fail now
       req = mockRequest({ headers: { authorization: `Bearer ${accessToken}` } });
+      req.url = '/api/auth/login';
       res = mockResponse();
 
       await auth.authorizeToken(req, res, next);
@@ -237,6 +240,7 @@ describe('test utilAuth.login', () => {
 
       // *** authorization should be great again
       req = mockRequest({ headers: { authorization: `Bearer ${accessToken}` } });
+      req.url = '/api/auth/login';
       res = mockResponse();
 
       await auth.authorizeToken(req, res, next);
@@ -278,7 +282,7 @@ describe('test index.authorizeToken', () => {
   it('test for Unauthorized (401): call authorizeToken service with empty header and auth switch on', async () => {
     //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
     process.env.AUTHORIZATION = 'on';
-    const req = mockRequest({ headers: [] });
+    const req = mockRequest({ headers: [] }); req.url = '/api/xyz';
     const res = mockResponse();
     const next = sinon.spy();
     try {
@@ -293,7 +297,7 @@ describe('test index.authorizeToken', () => {
   it('test for Forbidden (403): call authorizeToken service with header but invalid token and auth switch on', async () => {
     //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
     process.env.AUTHORIZATION = 'on';
-    const req = mockRequest({ headers: { authorization: 'Bearer xxx.yyy.zzz' } });
+    const req = mockRequest({ headers: { authorization: 'Bearer xxx.yyy.zzz' } }); req.url = '/api/xyz';
     const res = mockResponse();
     const next = sinon.spy();
     try {
@@ -309,6 +313,7 @@ describe('test index.authorizeToken', () => {
   it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
     const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M' } });
+    req.url = '/api/xyz';
     const res = mockResponse();
     const next = sinon.spy();
     try {
@@ -410,7 +415,7 @@ describe('test index.logout', () => {
     const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
     const token = result.refreshToken;
 
-    let req = mockRequest({ headers: [], params: { token } });
+    let req = mockRequest({ headers: [], params: { token } }); 
     let res = mockResponse();
     const next = sinon.spy();
 
@@ -420,7 +425,7 @@ describe('test index.logout', () => {
 
       // *** authorization should fail now
       process.env.AUTHORIZATION = 'on';
-      req = mockRequest({ headers: { authorization: `Bearer ${token}` } });
+      req = mockRequest({ headers: { authorization: `Bearer ${token}` } }); req.url = '/api/xyz';
       res = mockResponse();
 
       await auth.authorizeToken(req, res, next);
