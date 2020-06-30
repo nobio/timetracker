@@ -46,7 +46,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 app.use(api_auth.authorizeToken);
-
+/* =============================================================================
 // Reflect the origin if it's in the allowed list or not defined (cURL, Postman, etc.)
 const allowedOrigins = [
   'capacitor://localhost',
@@ -73,6 +73,9 @@ const corsOptions = {
 
 // Enable preflight requests for all routes
 app.options('*', cors(corsOptions));
+============================================================================= */
+app.use(cors());
+
 /*
 app.use((req, res, next) => {
    console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
