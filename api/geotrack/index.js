@@ -15,9 +15,10 @@ function parseGeoTrackingObject(req) {
       longitude: req.body.lon,
       latitude: req.body.lat,
       accuracy: req.body.acc,
-      source: req.body.tid,
       altitude: req.body.alt,
       date: moment.unix(req.body.tst),
+      source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
+
     });
   } else if (req.body.longitude && req.body.latitude) {
     // HASSIO
