@@ -84,7 +84,7 @@
         "tags": [
           "Authentication & Authorization"
         ],
-        "summary": "Get time entry with given ID",
+        "summary": "Log out a user session",
         "responses": {
           "200": {
             "description": "Invalidates the refresh token of a user"
@@ -106,7 +106,7 @@
         "tags": [
           "Authentication & Authorization"
         ],
-        "summary": "Get time entry with given ID",
+        "summary": "New token from refresh token",
         "responses": {
           "200": {
             "description": "Invalidates the refresh token of a user"
