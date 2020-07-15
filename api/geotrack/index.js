@@ -37,11 +37,13 @@ function parseGeoTrackingObject(req) {
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "accuracy": 10, "source": "cli"}' http://localhost:30000/api/geotrack
  * curl -X POST -H "Content-Type: application/json" -d '{"lat": "49.51429653451733", "lon": "10.87531216443598", "acc": 10, "alt": 320, "tid": "A8", "tst": 1594722307}' http://localhost:30000/api/geotrack
+ * curl -X POST -H "Content-Type: application/json" -d '{"batt":47,"lon":11.130830364065023,"acc":65,"p":97.75843048095703,"bs":1,"vac":5,"lat":49.42936418399344,"topic":"owntracks/user/026D4FAA-69D0-4673-B216-1C464919F9A8","t":"t","conn":"w","tst":1594723732,"alt":340,"_type":"location","tid":"A8"}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = (req, res) => {
   console.log(JSON.stringify(req.body));
 
   const geoTrack = parseGeoTrackingObject(req);
+  console.log(geoTrack);
   if (!geoTrack) {
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
@@ -50,7 +52,7 @@ exports.createGeoTrack = (req, res) => {
   geoTrack
     .save()
     .then(gt => res.status(200).json(gt))
-    .catch(err => res.status(500).json(err.message));
+    .catch(err => { console.log(err); res.status(500).json(err.message) });
 };
 
 /**
