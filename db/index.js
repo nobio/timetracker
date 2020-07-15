@@ -123,9 +123,9 @@ mongoose.model('FailureDay', FailureDay);
 const GeoTracking = new mongoose.Schema({
   longitude: { type: Number, required: true, index: true },
   latitude: { type: Number, required: true, index: true },
-  accuracy: { type: Number, required: true },
+  accuracy: { type: Number, required: false }, // OPTIONAL
   source: { type: String, required: true },
-  altitude: { type: String, required: true, default: 0 },
+  altitude: { type: String, required: false }, // OPTIONAL
   date: {
     type: Date, required: true, index: true, unique: true, default: Date.now,
   },
