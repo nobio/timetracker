@@ -52,7 +52,14 @@ exports.createGeoTrack = (req, res) => {
   geoTrack
     .save()
     .then(gt => res.status(200).json(gt))
-    .catch(err => { console.log(err); res.status(500).json(err.message) });
+    .catch(err => {
+      if (err.code === 11000) {
+        res.status(202).json(err.message);
+      } else {
+        console.log(err.code); 
+        res.status(500).json(err.message);
+      }
+    });
 };
 
 /**
