@@ -125,6 +125,7 @@ const GeoTracking = new mongoose.Schema({
   latitude: { type: Number, required: true, index: true },
   accuracy: { type: Number, required: true },
   source: { type: String, required: true },
+  altitude: { type: String, required: true, default: 0 },
   date: {
     type: Date, required: true, index: true, unique: true, default: Date.now,
   },

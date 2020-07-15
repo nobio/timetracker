@@ -1,29 +1,55 @@
+/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const moment = require('moment');
 
 const GeoTracking = mongoose.model('GeoTracking');
 const util = require('../entries/util-entries');
 
+function parseGeoTrackingObject(req) {
+  let geoTrack;
+
+  // find out if this is hassio or OwnTracks data
+  if (req.body.lon && req.body.lat) {
+    // OWN_TRACKS
+    geoTrack = new GeoTracking({
+      longitude: req.body.lon,
+      latitude: req.body.lat,
+      accuracy: req.body.acc,
+      source: req.body.tid,
+      altitude: req.body.alt,
+      date: moment.unix(req.body.tst),
+    });
+  } else if (req.body.longitude && req.body.latitude) {
+    // HASSIO
+    geoTrack = new GeoTracking({
+      longitude: req.body.longitude,
+      latitude: req.body.latitude,
+      accuracy: req.body.accuracy,
+      source: req.body.source,
+    });
+  }
+  return geoTrack;
+}
+
 /**
  * Stores Geo Locations (i.e. latitude and longitude) coming from a mobile device
  * to geo track
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"latitude": "49.51429653451733", "longitude": "10.87531216443598", "accuracy": 10, "source": "cli"}' http://localhost:30000/api/geotrack
+ * curl -X POST -H "Content-Type: application/json" -d '{"lat": "49.51429653451733", "lon": "10.87531216443598", "acc": 10, "alt": 320, "tid": "A8", "tst": 1594722307}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = (req, res) => {
   console.log(JSON.stringify(req.body));
-  if (req.body.longitude == null || req.body.latitude == null || req.body.accuracy == null || req.body.source == null) {
+
+  const geoTrack = parseGeoTrackingObject(req);
+  if (!geoTrack) {
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }
-  new GeoTracking({
-    longitude: req.body.longitude,
-    latitude: req.body.latitude,
-    accuracy: req.body.accuracy,
-    source: req.body.source,
-  })
+
+  geoTrack
     .save()
-    .then(geoTrack => res.status(200).json(geoTrack))
+    .then(gt => res.status(200).json(gt))
     .catch(err => res.status(500).json(err.message));
 };
 
@@ -49,7 +75,7 @@ exports.getGeoTracking = async (req, res) => {
  * reads geo tracking data for a given date
  * curl -X GET http://localhost:30000/api/geotrack/1580886983
  * curl -X GET http://localhost:30000/api/geotrack/2020-02-21
- * 
+ *
  * generate timestamp on unix cli: date +%s
  */
 exports.getGeoTrackingForDate = async (req, res) => {
@@ -88,3 +114,4 @@ exports.getGeoTrackingForDate = async (req, res) => {
     res.status(err.status).json({ message: err.message });
   }
 };
+
