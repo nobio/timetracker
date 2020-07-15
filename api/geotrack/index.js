@@ -28,6 +28,9 @@ function parseGeoTrackingObject(req) {
       accuracy: req.body.accuracy,
       source: req.body.source,
     });
+  } else if (req.body._type === 'encrypted') {
+    // HASSIO
+    geoTrack = null;
   }
   return geoTrack;
 }
@@ -40,13 +43,17 @@ function parseGeoTrackingObject(req) {
  * curl -X POST -H "Content-Type: application/json" -d '{"lat": "49.51429653451733", "lon": "10.87531216443598", "acc": 10, "alt": 320, "tid": "A8", "tst": 1594722307}' http://localhost:30000/api/geotrack
  * curl -X POST -H "Content-Type: application/json" -d '{"batt":47,"lon":11.130830364065023,"acc":65,"p":97.75843048095703,"bs":1,"vac":5,"lat":49.42936418399344,"topic":"owntracks/user/026D4FAA-69D0-4673-B216-1C464919F9A8","t":"t","conn":"w","tst":1594723732,"alt":340,"_type":"location","tid":"A8"}' http://localhost:30000/api/geotrack
  * curl -X POST -H "Content-Type: application/json" -d '{"rad":60,"tst":1594722217,"_type":"waypoint","lon":11.13133862839,"topic":"owntracks/user/026D4FAA-69D0-4673-B216-1C464919F9A8/waypoint","lat":49.428161621094,"desc":"zu Hause"}' http://localhost:30000/api/geotrack
+ * curl -X POST -H "Content-Type: application/json" -d '{"_type":"encrypted","data":"O5O4V7PF0o90tfmGg04TnGDJ73sA9iIxHpEvQ3J3qwHs3Vqh77lH1/Kh5PxMnZLDZzLn7AWtz+87GZ5+q04PzmqVJcoCud1qg5tEVAQOrlxRS8XZKhc3tLUJm6B2t5Cjb3Ro51+y1MX2lLe+1KMhhpWjZkSvQNf4trFfoOpN5w38rlrBB4VCFJeLFKJzICEFkE0kTwYyJpeHUKJ/wmed20fPT3RXWd6ozYhxa7NrUl+aa15gB7f0BemdhoVJ6EZJHeo9zsRevqEfF0wOiQnul4PujceCL41JFE2iuAtDRyN0yns="}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = (req, res) => {
   console.log(JSON.stringify(req.body));
 
   const geoTrack = parseGeoTrackingObject(req);
   console.log(geoTrack);
-  if (!geoTrack) {
+  if (geoTrack === null) {
+    res.status(202).send('data encrypted');
+    return;
+  } else if (!geoTrack) {
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }
@@ -58,7 +65,7 @@ exports.createGeoTrack = (req, res) => {
       if (err.code === 11000) {
         res.status(202).json(err.message);
       } else {
-        console.log(err.code); 
+        console.log(err.code);
         res.status(500).json(err.message);
       }
     });
