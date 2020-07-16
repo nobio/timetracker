@@ -18,7 +18,6 @@ function parseGeoTrackingObject(req) {
       altitude: req.body.alt,
       date: moment.unix(req.body.tst),
       source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
-
     });
   } else if (req.body.longitude && req.body.latitude) {
     // HASSIO
@@ -29,7 +28,7 @@ function parseGeoTrackingObject(req) {
       source: req.body.source,
     });
   } else if (req.body._type === 'encrypted') {
-    // HASSIO
+    // encrypted...
     geoTrack = null;
   }
   return geoTrack;
@@ -51,9 +50,11 @@ exports.createGeoTrack = (req, res) => {
   const geoTrack = parseGeoTrackingObject(req);
   console.log(geoTrack);
   if (geoTrack === null) {
+    console.error('data encrypted')
     res.status(202).send('data encrypted');
     return;
   } else if (!geoTrack) {
+    console.error('missing data (longitude, latitude, accuracy, source)')
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }
@@ -63,6 +64,7 @@ exports.createGeoTrack = (req, res) => {
     .then(gt => res.status(200).json(gt))
     .catch(err => {
       if (err.code === 11000) {
+        console.error('ignoring duplication error')
         res.status(202).json(err.message);
       } else {
         console.log(err.code);
