@@ -84,7 +84,7 @@
         "tags": [
           "Authentication & Authorization"
         ],
-        "summary": "Log out a user session",
+        "summary": "Get time entry with given ID",
         "responses": {
           "200": {
             "description": "Invalidates the refresh token of a user"
@@ -106,7 +106,7 @@
         "tags": [
           "Authentication & Authorization"
         ],
-        "summary": "New token from refresh token",
+        "summary": "Get time entry with given ID",
         "responses": {
           "200": {
             "description": "Invalidates the refresh token of a user"
@@ -344,9 +344,9 @@
     "/geofence": {
       "post": {
         "tags": [
-          "TimeEntries"
+          "Geo Tracking"
         ],
-        "summary": "Create new time entry",
+        "summary": "Create new time entry from Geo Fence event",
         "description": "Create new time entry in system using geo fencing; time entrie's date will be \"now\"",
         "parameters": [
           {
@@ -366,6 +366,80 @@
             "description": "New entry is created",
             "schema": {
               "$ref": "#/definitions/TimeEntry"
+            }
+          }
+        }
+      }
+    },
+    "/geotrack": {
+      "post": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "Create new time entry from a geo tracking device like Hassio Mobil App or OwnTrack",
+        "description": "Create new time entry from a geo tracking device like Hassio Mobil App or OwnTrack; the request body takes differen formats; internally they  will be transformed to a internal general format before storing to database ",
+        "parameters": [
+          {
+            "name": "geo_timeentry",
+            "in": "body",
+            "description": "Time entry that we want to create using Geofencing",
+            "schema": {
+              "$ref": "#/definitions/Geotrack"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "New entry is created",
+            "schema": {
+              "$ref": "#/definitions/GeotrackResp"
+            }
+          },
+          "202": {
+            "description": "duplicate entry or encrypted data; does not change database and will be ignored"
+          },
+          "400": {
+            "description": "some data is missing"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "Reads all geo tracking data for a given date",
+        "description": "Reads all geo tracking data for a given date",
+        "parameters": null,
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/GeotrackResponses"
+            }
+          }
+        }
+      }
+    },
+    "/geotrack/{date}": {
+      "get": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "Reads all geo tracking data (maybe too much - dont call it often...)",
+        "description": "Reads all geo tracking data (maybe too much - dont call it often...)",
+        "parameters": null,
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/GeotrackResponses"
             }
           }
         }
@@ -878,6 +952,103 @@
           "example": 49.514135,
           "description": "the latitude geo coordinate"
         }
+      }
+    },
+    "Geotrack": {
+      "properties": {
+        "longitude": {
+          "type": "number",
+          "example": 10.875482,
+          "description": "the longitude geo coordinate"
+        },
+        "latitude": {
+          "type": "number",
+          "example": 49.514135,
+          "description": "the latitude geo coordinate"
+        },
+        "accuracy": {
+          "type": "number",
+          "description": "the accuracy of the position measurement in meter (radius)",
+          "example": 60
+        },
+        "source": {
+          "type": "string",
+          "description": "identifier of the sender of this request",
+          "example": "HASSIO"
+        },
+        "lon": {
+          "type": "number",
+          "example": 10.875482,
+          "description": "the longitude geo coordinate"
+        },
+        "lat": {
+          "type": "number",
+          "example": 49.514135,
+          "description": "the latitude geo coordinate"
+        },
+        "acc": {
+          "type": "number",
+          "description": "the accuracy of the position measurement in meter (radius)",
+          "example": 60
+        },
+        "alt": {
+          "type": "number",
+          "description": "altitude of the position",
+          "example": 320
+        },
+        "tst": {
+          "type": "number",
+          "description": "unix timestamp of this event",
+          "example": 1594913160
+        },
+        "desc": {
+          "type": "string",
+          "description": "description (?)"
+        },
+        "tid": {
+          "type": "string",
+          "description": "some source identifier; sometimes its desc, sometimes its tid"
+        }
+      }
+    },
+    "GeotrackResp": {
+      "properties": {
+        "longitude": {
+          "type": "number",
+          "example": 10.875482,
+          "description": "the longitude geo coordinate"
+        },
+        "latitude": {
+          "type": "number",
+          "example": 49.514135,
+          "description": "the latitude geo coordinate"
+        },
+        "accuracy": {
+          "type": "number",
+          "description": "the accuracy of the position measurement in meter (radius)",
+          "example": 60
+        },
+        "source": {
+          "type": "string",
+          "description": "identifier of the sender of this request",
+          "example": "HASSIO"
+        },
+        "alt": {
+          "type": "numebr",
+          "description": "altitude of the position",
+          "example": 320
+        },
+        "date": {
+          "type": "string",
+          "description": "date of this entry in ISO format",
+          "example": "2020-07-15T10:45:23.000Z"
+        }
+      }
+    },
+    "GeotrackResponses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GeotrackResp"
       }
     },
     "TimeEntries": {
