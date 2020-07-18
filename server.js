@@ -22,7 +22,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger/swagger.json');
+const jsyaml = require('js-yaml');
 const cors = require('cors');
 
 
@@ -70,13 +70,15 @@ const corsOptions = {
     } else {
       callback(new Error('Origin not allowed by CORS'));
     }
-  }
+  },
 };
 
 // Enable preflight requests for all routes
 app.options('*', cors(corsOptions));
-/* ============================================================================= */
 // app.use(cors());
+/* ============================================================================= */
+const spec = fs.readFileSync(path.join(__dirname, 'spec/swagger.yaml'), 'utf8');
+const swaggerDoc = jsyaml.safeLoad(spec);
 
 /*
 app.use((req, res, next) => {
@@ -102,7 +104,7 @@ app.get('/statistics', web.statistics);
 app.get('/geo', web.geoloc);
 
 // -------------- SWAGGER ------------------------------------------------
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------
 
 // ------------------ API ------------------------------------------------

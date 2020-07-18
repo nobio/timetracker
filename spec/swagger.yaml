@@ -1,0 +1,943 @@
+openapi: 3.0.1
+info:
+  title: Timetracker API
+  description: OpenaAPI SPEC oF my fancy timetracker app
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 6.0.0
+servers:
+- url: http://localhost:30000/api
+- url: https://nobio.myhome-server.de:30043/api
+tags: 
+- name: Time Tracker
+  description: description goes here
+paths:
+  /auth/login:
+    post:
+      tags:
+      - Authentication & Authorization
+      summary: Login of a user
+      description: A user (name, password) will be authenticated; a jwt access token
+        (5min expiry) and a refresh token will be returned.
+      requestBody:
+        description: The User object to be authenticated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: false
+      responses:
+        200:
+          description: access and refresh tokens are created
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: Unauthorized; usually when no password was provided or when
+            user is not registered or when password was incorrect
+          content: {}
+      x-codegen-request-body-name: User
+  /auth/logout/{token}:
+    post:
+      tags:
+      - Authentication & Authorization
+      summary: Get time entry with given ID
+      parameters:
+      - name: token
+        in: path
+        description: long living refresh token will be invalidated (short livinf access
+          token might still live until expiry)
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Invalidates the refresh token of a user
+          content: {}
+  /auth/token/{token}:
+    post:
+      tags:
+      - Authentication & Authorization
+      summary: Get time entry with given ID
+      parameters:
+      - name: token
+        in: path
+        description: creates a new access token from the given (refresh) token
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Invalidates the refresh token of a user
+          content: {}
+  /entries:
+    get:
+      tags:
+      - TimeEntries
+      summary: Read all time entries
+      description: "Reads all time entries; \nread entries by date getAllByDate ->\
+        \ List of Time Entry of the given day; \nRead busy time getBusyTime -> Busy\
+        \ Time of the given day (in ms)\n"
+      responses:
+        200:
+          description: All (or filtered) time entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntries'
+    post:
+      tags:
+      - TimeEntries
+      summary: Create new time entry
+      description: Create new time entry in system
+      requestBody:
+        description: Time entry that we want to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeEntry'
+        required: false
+      responses:
+        200:
+          description: New entry is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+      x-codegen-request-body-name: timeentry
+  /entries/{id}:
+    get:
+      tags:
+      - TimeEntries
+      summary: Get time entry with given ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of time entry that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: TimeEntry is found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntries'
+    put:
+      tags:
+      - TimeEntries
+      summary: Update toggle with give ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of time entry that we want to find
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: TimeEntry with new values of properties
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeEntry'
+        required: false
+      responses:
+        200:
+          description: Toggle is updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+      x-codegen-request-body-name: TimeEntry
+    delete:
+      tags:
+      - TimeEntries
+      summary: Delete time entry with given ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of time entry that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Time Entry is deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntries'
+  /entries/dump:
+    post:
+      tags:
+      - TimeEntries
+      summary: Backup data to file system
+      description: dump the mongodb to the local file system in order to be restored
+        if needed
+      responses:
+        200:
+          description: data dumped to file
+          content:
+            application/json:
+              schema:
+                type: object
+  /entries/backup:
+    post:
+      tags:
+      - TimeEntries
+      summary: Backup data to database
+      description: backup data in an extra backup table
+      responses:
+        200:
+          description: data saved to database
+          content:
+            application/json:
+              schema:
+                type: object
+        500:
+          description: something went wrong...
+          content: {}
+  /entries/error/evaluate:
+    post:
+      tags:
+      - TimeEntries
+      summary: Evaluate time entries
+      description: Evaluate time entries on their consistency (completeness, order,
+        etc.). As a result, the failure data will be put to an own document in mongodb.
+        This data could be inquired by using the endpoint /api/entries/error/dates
+      responses:
+        200:
+          description: data saved to database
+          content:
+            application/json:
+              schema:
+                type: object
+        500:
+          description: something went wrong...
+          content: {}
+  /entries/error/dates:
+    get:
+      tags:
+      - TimeEntries
+      summary: Inquire the error time entries
+      description: Read all dates with error type that was written to database by
+        endpoint /api/entries/error/evaluate
+      responses:
+        200:
+          description: data saved to database
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    error-date:
+                      type: string
+                      description: There is an error at this date
+                      example: 2000-01-01T10:15:02.151Z
+                    error-type:
+                      type: string
+                      description: Type of the error - INCOMPLETE means that entries
+                        are missing and WRONG_ORDER means that the order of go and
+                        enter is not correctly booked
+                      example: INCOMPLETE or WRONG_ORDER
+        500:
+          description: something went wrong...
+          content: {}
+  /geofence:
+    post:
+      tags:
+      - Geo Tracking
+      summary: Create new time entry from Geo Fence event
+      description: Create new time entry in system using geo fencing; time entrie's
+        date will be "now"
+      requestBody:
+        description: Time entry that we want to create using Geofencing
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Geofence'
+        required: false
+      responses:
+        200:
+          description: New entry is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+      x-codegen-request-body-name: geo_timeentry
+  /geotrack:
+    get:
+      tags:
+      - Geo Tracking
+      summary: Reads all geo tracking data for a given date
+      description: Reads all geo tracking data for a given date
+      responses:
+        200:
+          description: delivered a valid result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeotrackResponses'
+    post:
+      tags:
+      - Geo Tracking
+      summary: Create new time entry from a geo tracking device like Hassio Mobil
+        App or OwnTrack
+      description: 'Create new time entry from a geo tracking device like Hassio Mobil
+        App or OwnTrack; the request body takes differen formats; internally they  will
+        be transformed to a internal general format before storing to database '
+      requestBody:
+        description: Time entry that we want to create using Geofencing
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Geotrack'
+        required: false
+      responses:
+        200:
+          description: New entry is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeotrackResp'
+        202:
+          description: duplicate entry or encrypted data; does not change database
+            and will be ignored
+          content: {}
+        400:
+          description: some data is missing
+          content: {}
+      x-codegen-request-body-name: geo_timeentry
+  /geotrack/{date}:
+    get:
+      tags:
+      - Geo Tracking
+      summary: Reads all geo tracking data (maybe too much - dont call it often...)
+      description: Reads all geo tracking data (maybe too much - dont call it often...)
+      parameters:
+      - name: date
+        in: path
+        description: ID of toggle that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: delivered a valid result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeotrackResponses'
+  /toggles:
+    get:
+      tags:
+      - Toggles
+      summary: Get all toggles in system
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggles'
+    post:
+      tags:
+      - Toggles
+      summary: Create new toggle in system
+      description: Create new toggle in system
+      requestBody:
+        description: Toggle that we want to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Toggle'
+        required: false
+      responses:
+        200:
+          description: New toggle is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggle'
+      x-codegen-request-body-name: toggle
+  /toggles/{id}:
+    get:
+      tags:
+      - Toggles
+      summary: Get toggle with given ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of toggle that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Toggle is found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggle'
+    put:
+      tags:
+      - Toggles
+      summary: Update toggle with give ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of toggle that we want to find
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Toggle with new values of properties
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Toggle'
+        required: false
+      responses:
+        200:
+          description: Toggle is updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggle'
+      x-codegen-request-body-name: toggle
+    delete:
+      tags:
+      - Toggles
+      summary: Delete toggle with given ID
+      parameters:
+      - name: id
+        in: path
+        description: ID of toggle that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Toggle is deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggle'
+  /toggles/name/{name}:
+    get:
+      tags:
+      - Toggles
+      summary: read one toggle by its name
+      parameters:
+      - name: name
+        in: path
+        description: Name of a toggle that we want to find
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: All toggles status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Toggle'
+  /toggles/status:
+    get:
+      tags:
+      - Toggles
+      summary: Toggle status (currently onl)
+      responses:
+        200:
+          description: All toggles status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  NOTIFICATION_SLACK:
+                    type: boolean
+                    example: true
+  /users:
+    get:
+      tags:
+      - Users
+      summary: Read all users
+      description: Reads all time users from database;
+      responses:
+        200:
+          description: All (or filtered) time entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+    post:
+      tags:
+      - Users
+      summary: Create a new user
+      description: Create a new user with password. PWD will be stored encrypted
+      requestBody:
+        description: The User object to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: false
+      responses:
+        200:
+          description: New user is created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      x-codegen-request-body-name: User
+  /stats:
+    put:
+      tags:
+      - Statistics
+      summary: calculate and fill database table with statistics
+      description: calculates the statistics for today +/- one month and stores them
+        in database;
+      responses:
+        200:
+          description: Statistics have successfully been calculated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsEntryResult'
+    delete:
+      tags:
+      - Statistics
+      summary: Deletes all entries from statistics table
+      responses:
+        200:
+          description: Statistics data have successfully been deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  size:
+                    type: number
+                    example: 953.0
+  /stats/{date}/{timeUnit}:
+    get:
+      tags:
+      - Statistics
+      summary: calculate statistics (evtl. accumulated)
+      description: returns the aggregated statistics for a given time day
+      parameters:
+      - name: date
+        in: path
+        description: timestamp representing a date
+        required: true
+        schema:
+          type: number
+          default: 1.3912956E+12
+      - name: timeUnit
+        in: path
+        description: time unit
+        required: true
+        schema:
+          type: string
+          default: day
+          enum:
+          - year
+          - month
+          - week
+          - day
+      - name: accumulate
+        in: query
+        description: indicates if statistics are to be accumulated or just presented
+        schema:
+          type: boolean
+          default: false
+      responses:
+        200:
+          description: statistics for the given date
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregatedStats'
+  /statistics/aggregate:
+    get:
+      tags:
+      - Statistics
+      summary: calculate aggregated statistics
+      description: calculates statistics aggregated to the geven timeUnit
+      parameters:
+      - name: timeUnit
+        in: query
+        description: time unit
+        required: true
+        schema:
+          type: string
+          default: day
+          enum:
+          - year
+          - month
+          - week
+          - day
+      responses:
+        200:
+          description: calculated aggregated statistics for this given timeUnit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AggregatedStatistics'
+  /statistics/histogram/{interval}:
+    get:
+      tags:
+      - Statistics
+      summary: calculate historgram from statistic data
+      description: returns a histogram with a given interval (time) and optionally
+        filtered by direction (enter, go or both)
+      parameters:
+      - name: interval
+        in: path
+        description: time interval this historgram should be created
+        required: true
+        schema:
+          type: number
+          default: 60.0
+      - name: direction
+        in: query
+        description: filter entries by their direction
+        schema:
+          type: string
+          enum:
+          - enter
+          - go
+      responses:
+        200:
+          description: histogramm according to the given parameters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time:
+                      type: string
+                      example: 1970-01-01T08:20:00.000Z
+                    histValue:
+                      type: number
+                      example: 512.0
+  /statistics/breaktime/{interval}:
+    get:
+      tags:
+      - Statistics
+      summary: calculate historgram of break times from statistic data
+      description: returns a histogram of break times optionally filtered by "real"
+        measurement of breaks or, in case of only two entries this day, calculated
+        default breaks (45 min).
+      parameters:
+      - name: interval
+        in: path
+        description: time interval this historgram should be created
+        required: true
+        schema:
+          type: number
+          default: 60.0
+      - name: real
+        in: query
+        description: filter entries by their direction
+        schema:
+          type: boolean
+      responses:
+        200:
+          description: histogramm according to the given parameters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time:
+                      type: number
+                      example: 40.0
+                    breaktime:
+                      type: number
+                      example: 689.0
+components:
+  schemas:
+    TimeEntry:
+      required:
+      - direction
+      - entry_date
+      type: object
+      properties:
+        entry_date:
+          type: string
+          description: The date this time entry represents
+          example: 2000-01-01T10:15:02.151Z
+        last_changed:
+          type: string
+          description: Date of last change on this time entry
+          example: 2000-01-01T10:15:02.151Z
+        direction:
+          type: string
+          description: |
+            direction of this time entry; representing, if the time entry means a coming or going event:
+             * `go` - leaving
+             * `enter` - entering
+          example: enter
+          enum:
+          - enter
+          - go
+        longitude:
+          type: number
+          description: the longitude geo coordinate
+          example: 10.875482
+        latitude:
+          type: number
+          description: the latitude geo coordinate
+          example: 49.514135
+    Geofence:
+      required:
+      - direction
+      - latitude
+      - longitude
+      type: object
+      properties:
+        direction:
+          type: string
+          description: |
+            direction of this time entry; representing, if the time entry means a coming or going event:
+             * `go` - leaving
+             * `enter` - entering
+          example: enter
+          enum:
+          - enter
+          - go
+        longitude:
+          type: number
+          description: the longitude geo coordinate
+          example: 10.875482
+        latitude:
+          type: number
+          description: the latitude geo coordinate
+          example: 49.514135
+    Geotrack:
+      type: object
+      properties:
+        longitude:
+          type: number
+          description: the longitude geo coordinate
+          example: 10.875482
+        latitude:
+          type: number
+          description: the latitude geo coordinate
+          example: 49.514135
+        accuracy:
+          type: number
+          description: the accuracy of the position measurement in meter (radius)
+          example: 60.0
+        source:
+          type: string
+          description: identifier of the sender of this request
+          example: HASSIO
+        lon:
+          type: number
+          description: the longitude geo coordinate
+          example: 10.875482
+        lat:
+          type: number
+          description: the latitude geo coordinate
+          example: 49.514135
+        acc:
+          type: number
+          description: the accuracy of the position measurement in meter (radius)
+          example: 60.0
+        alt:
+          type: number
+          description: altitude of the position
+          example: 320.0
+        tst:
+          type: number
+          description: unix timestamp of this event
+          example: 1.59491316E+9
+        desc:
+          type: string
+          description: description (?)
+        tid:
+          type: string
+          description: some source identifier; sometimes its desc, sometimes its tid
+    GeotrackResp:
+      type: object
+      properties:
+        longitude:
+          type: number
+          description: the longitude geo coordinate
+          example: 10.875482
+        latitude:
+          type: number
+          description: the latitude geo coordinate
+          example: 49.514135
+        accuracy:
+          type: number
+          description: the accuracy of the position measurement in meter (radius)
+          example: 60.0
+        source:
+          type: string
+          description: identifier of the sender of this request
+          example: HASSIO
+        alt:
+          type: number
+          description: altitude of the position
+          example: 320.0
+        date:
+          type: string
+          description: date of this entry in ISO format
+          example: 2020-07-15T10:45:23.000Z
+    GeotrackResponses:
+      type: array
+      items:
+        $ref: '#/components/schemas/GeotrackResp'
+    TimeEntries:
+      type: array
+      items:
+        $ref: '#/components/schemas/TimeEntry'
+    Toggle:
+      required:
+      - name
+      - notification
+      - toggle
+      type: object
+      properties:
+        name:
+          type: string
+          example: __TEST__
+        toggle:
+          type: string
+          example: "false"
+        notification:
+          type: string
+          example: some text
+    Toggles:
+      type: array
+      items:
+        $ref: '#/components/schemas/Toggle'
+    StatsEntryResult:
+      type: object
+      properties:
+        firstEntry:
+          type: object
+          properties:
+            _id:
+              type: number
+              example: 0.0
+            age:
+              type: string
+              example: 2014-01-13T06:30:00.000Z
+        lastEntry:
+          type: object
+          properties:
+            _id:
+              type: number
+              example: 0.0
+            age:
+              type: string
+              example: 2019-01-10T21:13:29.233Z
+    AggregatedStats:
+      type: object
+      properties:
+        chart_data:
+          type: object
+          properties:
+            yScale:
+              type: string
+              enum:
+              - linear
+            xScale:
+              type: string
+              enum:
+              - ordinal
+              - time
+            type:
+              type: string
+              enum:
+              - bar
+              - line-dottet
+            main:
+              type: object
+              properties:
+                data:
+                  type: array
+            comp:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - line
+                data:
+                  type: array
+    AggregatedStatistics:
+      type: object
+      properties:
+        chart_data:
+          type: object
+          properties:
+            yScale:
+              type: string
+              enum:
+              - linear
+            xScale:
+              type: string
+              enum:
+              - ordinal
+              - time
+            type:
+              type: string
+              enum:
+              - bar
+              - line-dottet
+            yMin:
+              type: number
+            main:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    y:
+                      type: number
+                    x:
+                      type: number
+                    n:
+                      type: number
+                    dev:
+                      type: string
+            comp:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - line
+                data:
+                  type: array
+    User:
+      required:
+      - name
+      - password
+      type: object
+      properties:
+        name:
+          type: string
+          example: Tester
+        password:
+          type: string
+          example: test12345
+    Users:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
