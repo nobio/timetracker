@@ -276,6 +276,19 @@ paths:
       - Geo Tracking
       summary: Reads all geo tracking data for a given date
       description: Reads all geo tracking data for a given date
+      parameters:
+      - name: dateStart
+        in: query
+        description: start date of the time range; format YYYY-MM-DD like 2020-03-09
+        required: false
+        schema:
+          type: string
+      - name: dateEnd
+        in: query
+        description: end date of the time range; format YYYY-MM-DD like 2020-03-10
+        required: false
+        schema:
+          type: string
       responses:
         200:
           description: delivered a valid result
