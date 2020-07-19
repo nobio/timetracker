@@ -34,6 +34,24 @@ function parseGeoTrackingObject(req) {
   return geoTrack;
 }
 
+function getGeoTrackingDataByTime(dtStart, dtEnd) {
+  const options = {
+    $gte: dtStart,
+    $lte: dtEnd,
+  };
+
+  console.log(options);
+
+  return new Promise((resolve, reject) => {
+    GeoTracking.find({
+      date: options,
+    }).skip(0).sort({ date: 1 })
+      .then(tracks => resolve(tracks))
+      .catch(err => reject(err));
+  });
+}
+
+
 /**
  * Stores Geo Locations (i.e. latitude and longitude) coming from a mobile device
  * to geo track
@@ -77,17 +95,19 @@ exports.createGeoTrack = (req, res) => {
  * reads geo tracks
  *
  * curl -X GET http://localhost:30000/api/geotrack
+ * curl -X GET "http://localhost:30000/api/geotrack?dateStart=2020-03-09&dateEnd=2020-03-10" -H "accept: application/json"
  */
-exports.getGeoTracking = async (req, res) => {
-  try {
-    const tracks = await GeoTracking.find().sort({ date: 1 });
-    res.status(200).send(tracks);
-  } catch (err) {
-    if (!err.status) {
-      err.status = 500;
-    }
-    res.status(err.status).json({ message: err.message });
-  }
+exports.getGeoTracking = (req, res) => {
+  let dtStart = moment(req.query.dateStart);
+  let dtEnd = moment(req.query.dateEnd);
+
+  if (!req.query.dateStart) dtStart = moment('1970-01-01');
+  if (!req.query.dateEnd) dtEnd = moment();
+
+
+  getGeoTrackingDataByTime(dtStart, dtEnd)
+    .then(tracks => res.status(200).send(tracks))
+    .catch(err => res.status(err.status).json({ message: err.message }));
 };
 
 
@@ -115,23 +135,12 @@ exports.getGeoTrackingForDate = async (req, res) => {
   }
   const dtEnd = moment(dtStart).add(1, 'days');
 
-  // console.log(dtStart);
-  // console.log(dtEnd);
-
-  try {
-    const tracks = await GeoTracking.find({
-      date: {
-        $gte: dtStart,
-        $lt: dtEnd,
-      },
-    }).skip(0).sort({ date: 1 });
-
-    res.status(200).send(tracks);
-  } catch (err) {
-    if (!err.status) {
-      err.status = 500;
-    }
-    res.status(err.status).json({ message: err.message });
-  }
+  getGeoTrackingDataByTime(dtStart, dtEnd)
+    .then(tracks => res.status(200).send(tracks))
+    .catch(err => {
+      if (!err.status) {
+        err.status = 500;
+      }
+      res.status(err.status).json({ message: err.message });
+    });
 };
-
