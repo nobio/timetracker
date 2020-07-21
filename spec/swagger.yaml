@@ -326,26 +326,6 @@ paths:
           description: some data is missing
           content: {}
       x-codegen-request-body-name: geo_timeentry
-  /geotrack/{date}:
-    get:
-      tags:
-      - Geo Tracking
-      summary: Reads all geo tracking data (maybe too much - dont call it often...)
-      description: Reads all geo tracking data (maybe too much - dont call it often...)
-      parameters:
-      - name: date
-        in: path
-        description: ID of toggle that we want to find
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: delivered a valid result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GeotrackResponses'
   /toggles:
     get:
       tags:
