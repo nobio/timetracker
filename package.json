@@ -15,7 +15,6 @@
         "dev": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
-        "build": "node ./bin/build.js",
         "backup": "node db/dbmigration"
     },
     "devDependencies": {
