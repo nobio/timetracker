@@ -326,6 +326,32 @@ paths:
           description: some data is missing
           content: {}
       x-codegen-request-body-name: geo_timeentry
+  /geotrack/metadata:
+    get:
+      tags:
+      - Geo Tracking
+      summary: meta data about the track for the given time span
+      description: Returns som meta data about the track for the given time span
+      parameters:
+      - name: dateStart
+        in: query
+        description: start date of the time range; format YYYY-MM-DD like 2020-03-09
+        required: false
+        schema:
+          type: string
+      - name: dateEnd
+        in: query
+        description: end date of the time range; format YYYY-MM-DD like 2020-03-10
+        required: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: delivered a valid result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeotrackMetaDataResponse'
   /toggles:
     get:
       tags:
@@ -794,6 +820,28 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/GeotrackResp'
+    GeotrackMetaDataResponse:
+      type: object
+      properties:
+        size:
+          type: number
+          description: number of geo track entries for the given time span
+          example: 210
+        totalDistance:
+          type: number
+          description: distance in meter of the given time span
+          example: 21232
+        accuracy:
+          type: object
+          properties:
+            mean:
+              type: number
+              description: mean of accuracies in meters of all geo locations
+              example: 114.232
+            variance:
+              type: number
+              description: variance of accuracies in meters of all geo locations
+              example: 11.031
     TimeEntries:
       type: array
       items:

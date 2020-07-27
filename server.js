@@ -124,7 +124,7 @@ app.get('/api/entries/error/dates', cors(corsOptions), api_entries.getErrorDates
 app.post('/api/geofence', api_entries.geofence);
 app.post('/api/geotrack', api_geotrack.createGeoTrack);
 app.get('/api/geotrack', cors(corsOptions), api_geotrack.getGeoTracking);
-
+app.get('/api/geotrack/metadata', cors(corsOptions), api_geotrack.getGeoTrackingMetadata);
 // .......................................................................
 // admin
 // .......................................................................
