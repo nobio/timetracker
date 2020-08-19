@@ -1,4 +1,5 @@
 #!/usr/local/bin/node
+/* eslint-disable no-console */
 
 const mongoose = require('mongoose');
 
@@ -15,8 +16,10 @@ const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
 const MONGO_URL_TARGET = MONGO_URL_MLAB;
 
+const HELP = process.argv.includes('-h');
 const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
 const SILENT = process.argv.includes('-s');
+const SUCCESS_ONLY = process.argv.includes('-c');
 
 /* ==================================================================== */
 // Schema
@@ -52,8 +55,10 @@ mongoose.model('GeoTracking', GeoTracking);
 
 console.log('--------------------------------------------------------------- \n');
 console.log('Usage: node db/dbmigration.js [-d] [-s]');
+console.log('   -h: display this');
 console.log('   -d: emtpy target collection');
 console.log('   -s: silent');
+console.log('   -c: only success, no errors');
 console.log('\n--------------------------------------------------------------- ');
 
 /**
@@ -96,8 +101,8 @@ function deleteAllTarget(target) {
  * @param {entries} entries
  */
 function storeDataToTarget(entries, target) {
-  let n = 0;
   return new Promise((resolve, reject) => {
+    let n = 0;
     entries.forEach((entry) => {
       process.stdout.write('.');
       // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
@@ -111,17 +116,17 @@ function storeDataToTarget(entries, target) {
           console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
           n += 1;
           if (n >= entries.length) {
-            mongoose.connection.close();
+            //mongoose.connection.close();
             resolve();
-            process.exit(0);
+            //process.exit(0);
           }
         })
         .catch((err) => {
           n += 1;
-          if (!SILENT) console.error(`> ${n} ${err.message}`); else (process.stdout.write('#'));
+          if (!SILENT && !SUCCESS_ONLY) console.error(`> ${n} ${err.message}`);
           if (n >= entries.length) {
-            mongoose.connection.close();
-            process.exit(-1);
+            //mongoose.connection.close();
+            //process.exit(-1);
           }
           reject(err);
         });
@@ -132,7 +137,10 @@ function storeDataToTarget(entries, target) {
   });
 }
 
+if (HELP) process.exit(0);
+
 // start the migration...
+/*
 deleteAllTarget(TIME_ENTRY_MODEL_TARGET)
   .then(() => getDataFromSource(TIME_ENTRY_MODEL_SOURCE))
   .then(entries => storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET))
@@ -145,3 +153,25 @@ deleteAllTarget(TIME_ENTRY_MODEL_TARGET)
     console.err('***********************************************************************');
     process.exit(-1);
   });
+*/
+const app = async () => {
+
+  try {
+    let entries;
+    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
+    entries = await getDataFromSource(GEO_TRACKING_MODEL_SOURCE);
+    await storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET);
+
+    await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
+    entries = await getDataFromSource(TIME_ENTRY_MODEL_SOURCE);
+    await storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET);
+    //process.exit(0);
+
+  } catch (err) {
+    console.err(err);
+    console.err('***********************************************************************');
+    process.exit(-1);
+  }
+};
+
+app();
