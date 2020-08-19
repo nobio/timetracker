@@ -89,7 +89,7 @@ describe('test util.getStats and getStatsByRange', () => {
 
     util.getStatsByRange(dtStart, dtEnd)
       .then((result) => {
-        // console.log(result)
+        console.log(result)
         expect(result).to.have.property('planned_working_time');
         expect(result).to.have.property('average_working_time');
         expect(result).to.have.property('actual_working_time');

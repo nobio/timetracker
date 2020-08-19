@@ -129,8 +129,8 @@ describe('test util-breaktime - Promise', () => {
         expect(result).to.be.an('array');
         expect(result).to.have.lengthOf(2);
         expect(result[0]).to.equal(50);
-        // expect(result[1]).to.equal(45);  // old break time
-        expect(result[1]).to.equal(60); // new break time
+        expect(result[1]).to.equal(45);  // old break time
+        // expect(result[1]).to.equal(60); // new break time
       })
       .catch((err) => {
         throw err;
@@ -184,7 +184,7 @@ describe('test util-breaktime - Promise', () => {
       .then(preparedBreakTimes => utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false))
       .then((result) => {
         //        expect(result[44].breakTime).to.equal(1); // minute 45
-        expect(result[59].breakTime).to.equal(1); // minute 45
+        expect(result[59].breakTime).to.equal(0); // minute 45
         expect(result[49].breakTime).to.equal(1); // minute 50
       })
       .catch((err) => {
