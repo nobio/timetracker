@@ -166,6 +166,7 @@ app.get('/api/experiment', cors(corsOptions), api_misc.experiment);
 // .......................................................................
 app.get('/api/users', cors(corsOptions), api_auth.getAllUsers);
 app.post('/api/users', cors(corsOptions), api_auth.createUser);
+app.delete('/api/users/:id', cors(corsOptions), api_auth.deleteUser);
 app.post('/api/auth/login', cors(corsOptions), api_auth.login);
 app.post('/api/auth/logout/:token', cors(corsOptions), api_auth.logout);
 app.post('/api/auth/token/:token', cors(corsOptions), api_auth.refreshToken);

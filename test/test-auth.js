@@ -13,6 +13,7 @@ const sinonChai = require('sinon-chai');
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
+chai.use( require('chai-integer'));
 
 const expect = chai.expect;
 const assert = chai.assert;
@@ -60,8 +61,7 @@ describe('test utilAuth.createUser', () => {
   it('create new user', async () => {
     try {
       const result = await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
-      expect(result).to.be.a('string');
-      expect(result).to.equal('User created');
+      expect(result).to.be.an.integer;
     } catch (err) {
       throw Error(err);
     }
@@ -143,6 +143,41 @@ describe('test utilAuth.createUser', () => {
 
 /**
  * =============================================================
+ * deleteUser
+ * =============================================================
+ */
+describe('test utilAuth.deleteUser', () => {
+  let db;
+  before(async () => {
+    await User.deleteOne({ name: TESTUSER_NAME });
+    db = require('../db');
+  });
+
+  it('delete an existing user', async () => {
+    try {
+      const resultCreate = await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
+      expect(resultCreate).to.be.an.integer;
+
+      const resultDelete = await util.deleteUser(resultCreate);
+      expect(resultCreate).to.be.an.integer;
+
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+  it('delete a non-existing user', async () => {
+    try {
+      await util.deleteUser("1234567");
+    } catch (err) {
+      expect(err).to.be.a("string");
+      expect(err).to.equal("cannot delete user 1234567");
+    }
+  });
+
+});
+
+/**
+ * =============================================================
  * login
  * =============================================================
  */
@@ -150,6 +185,7 @@ describe('test utilAuth.login', () => {
   let db;
   before(async () => {
     db = require('../db');
+    await User.deleteOne({ name: TESTUSER_NAME });
     // *** create a user with password
     await util.createUser(TESTUSER_NAME, TESTUSER_PASSWORD);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...

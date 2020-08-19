@@ -29,13 +29,30 @@ exports.createUser = async (name, password) => {
   if (user) throw Error('User already exists');
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  new User({
-    name,
-    password: hashedPassword,
-  }).save();
-
-  return 'User created';
+  return new Promise((resolve, reject) => {
+    new User({
+      name,
+      password: hashedPassword,
+    }).save()
+      .then(ret => resolve(ret._id))
+      .catch(err => reject(err));
+  });
 };
+
+/**
+ * Delete a user by it's id
+ * @param {*} id 
+ */
+exports.deleteUser = async (id) => {
+  if (!id) throw Error('id must be provided');
+  return new Promise((resolve, reject) => {
+    User.findByIdAndRemove(id)
+      .then(res => res._id)
+      .then(ret => resolve(ret))
+      .catch(err => reject("cannot delete user " + id));
+  });
+
+}
 
 /**
  * login with user and password (needs to be passed)
@@ -98,5 +115,5 @@ exports.refreshToken = async (refreshToken) => {
 };
 
 exports.removeTesterToken = async () => {
-    await Token.deleteMany({ user: 'Tester' });
+  await Token.deleteMany({ user: 'Tester' });
 };

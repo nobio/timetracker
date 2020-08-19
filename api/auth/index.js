@@ -18,6 +18,23 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a user from database
+ *
+ * curl -X DELETE http://localhost:30000/api/users/<id>
+ *
+ * @param {*} req Request object
+ * @param {*} res Response object
+ */
+exports.deleteUser = async (req, res) => {
+  try {
+    const result = await util.deleteUser(req.params.id);
+    res.status(202).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 /**
  * create a new user

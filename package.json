@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "6.9.0",
-    "last_build": "2020-07-27T06:13:50.806Z",
+    "version": "6.9.1",
+    "last_build": "2020-08-19T09:34:21.579Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -20,6 +20,7 @@
     "devDependencies": {
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
+        "chai-integer": "*",
         "eslint": "^4.19.1",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.21.2",
