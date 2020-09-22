@@ -9,12 +9,27 @@ mongoose.set('useNewUrlParser', true);
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
 const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-// const MONGO_URL_DOCKER = 'mongodb://192.168.178.42::27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://192.168.178.42::27017/timetracker';
+const MONGO_URL_MONGO = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
-// const MONGO_URL_TARGET = MONGO_URL_DOCKER;
+let targetMongodbUrl = process.env.MONGO_URL; // try to use environment variable, perhaps given by container
+if (!targetMongodbUrl) {
+  targetMongodbUrl = MONGO_URL_MONGO;
+} else if (targetMongodbUrl === 'DOCKER') {
+  targetMongodbUrl = MONGO_URL_DOCKER;
+} else if (targetMongodbUrl === 'MLAB') {
+  targetMongodbUrl = MONGO_URL_MLAB;
+} else if (targetMongodbUrl === 'MONGO') {
+  targetMongodbUrl = MONGO_URL_MONGO;
+}
+console.error(`target Mongo database: ${targetMongodbUrl}`);
+
 const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
-const MONGO_URL_TARGET = MONGO_URL_MLAB;
+//const MONGO_URL_TARGET = MONGO_URL_DOCKER;
+//const MONGO_URL_TARGET = MONGO_URL_MLAB;
+//const MONGO_URL_TARGET = MONGO_URL_MONGO;
+const MONGO_URL_TARGET = targetMongodbUrl;
 
 const HELP = process.argv.includes('-h');
 const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
@@ -54,7 +69,7 @@ const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTrack
 mongoose.model('GeoTracking', GeoTracking);
 
 console.log('--------------------------------------------------------------- \n');
-console.log('Usage: node db/dbmigration.js [-d] [-s]');
+console.log('Usage: [MONGO_URL=MONGO | MLAB ] node db/dbmigration.js [-d] [-s]');
 console.log('   -h: display this');
 console.log('   -d: emtpy target collection');
 console.log('   -s: silent');

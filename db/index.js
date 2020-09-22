@@ -1,8 +1,14 @@
+/* eslint-disable no-console */
 const db_config = {
   mlab: {
     user: 'nobio',
     password: '1gR7hW2cPhtkRlv2',
     uri: 'ds061928.mlab.com:61928/timetrack',
+  },
+  atlas: {
+    user: 'timetracker-user',
+    password: 'cyfgeq-mypnu9-vozFyv',
+    uri: 'nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority',
   },
   options: {
     // reconnectTries: 1000,
@@ -35,20 +41,18 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const monoddb_options = db_config.options;
-let mongodb_url = process.env.MONGO_URL; // try to use environment variable, perhaps given by container
-if (!mongodb_url) {
+const monoddbOptions = db_config.options;
+let mongodbUrl = process.env.MONGO_URL; // try to use environment variable, perhaps given by container
+if (!mongodbUrl) {
   console.error('overwriting mongodb_url');
-  mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
+  // mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
+  mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}`;
 }
 // mongodb_url = `mongodb://${db_config.mlab.user}:${db_config.mlab.password}@${db_config.mlab.uri}`;
 
-console.log(`connecting to mongodb on ${
-  mongodb_url
-} with options ${
-  JSON.stringify(monoddb_options)}`);
+console.log(`connecting to mongodb on ${mongodbUrl} with options ${JSON.stringify(monoddbOptions)}`);
 
-mongoose.connect(mongodb_url, monoddb_options).then(
+mongoose.connect(mongodbUrl, monoddbOptions).then(
   () => {
     console.log('mongodb is ready to use.');
   },
@@ -156,7 +160,7 @@ const Token = new mongoose.Schema({
   },
   user: {
     type: String, required: false, index: false, unique: false, default: 'ANONYMOUS',
-  }
+  },
 });
 mongoose.model('Token', Token);
 
