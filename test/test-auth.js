@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 require('dotenv').config();
 require('../db');
 const mongoose = require('mongoose');
@@ -387,19 +388,6 @@ describe('test index.refreshToken', () => {
     refreshToken = result.refreshToken;
   });
 
-  it('test for OK (200): call refreshToken', async () => {
-    const req = mockRequest({ headers: [], params: { token: refreshToken } });
-    const res = mockResponse();
-    const next = sinon.spy();
-
-    try {
-      await auth.refreshToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
-    } catch (err) {
-      throw Error(err);
-    }
-  });
-
   it('test for NOK (401): call refreshToken but without token', async () => {
     const req = mockRequest({ headers: [], body: { token: null } });
     const res = mockResponse();
@@ -422,6 +410,19 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(401);
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+
+  it('test for OK (200): call refreshToken', async () => {
+    const req = mockRequest({ headers: [], params: { token: refreshToken } });
+    const res = mockResponse();
+    const next = sinon.spy();
+
+    try {
+      await auth.refreshToken(req, res, next);
+      expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
       throw Error(err);
     }
