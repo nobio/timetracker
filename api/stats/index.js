@@ -24,8 +24,9 @@ exports.getStats = (req, res) => {
   const dtStart = req.params.date;
   const timeUnit = req.params.timeUnit;
   const accumulate = req.query.accumulate;
+  const fill = req.query.fill;
 
-  util.getStats(timeUnit, dtStart, accumulate)
+  util.getStats(timeUnit, dtStart, accumulate, fill)
     .then(timeentries => res.status(200).send(timeentries))
     .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
 };

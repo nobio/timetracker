@@ -8,8 +8,8 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 
 const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-//const MONGO_URL_DOCKER = 'mongodb://192.168.178.42::27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://192.168.178.42:27017/timetracker';
 const MONGO_URL_MONGO = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;

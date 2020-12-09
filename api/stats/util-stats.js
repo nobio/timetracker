@@ -133,7 +133,7 @@ exports.deleteAllStatsDays = () =>
     });
   });
 
-exports.getStats = (timeUnit, dtStart, accumulate) => {
+exports.getStats = (timeUnit, dtStart, accumulate, fill) => {
   // console.log("timeUnit=" + timeUnit + ", dtStart=" + dtStart+ ", accumulate=" + accumulate);
 
   var dtStart = moment.unix(dtStart / 1000);
@@ -152,7 +152,7 @@ exports.getStats = (timeUnit, dtStart, accumulate) => {
   // console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
 
   return new Promise((resolve, reject) => {
-    this.getStatsByRange(dtStart, dtEnd, accumulate).then((calculatedBusyTime) => {
+    this.getStatsByRange(dtStart, dtEnd, accumulate, fill).then((calculatedBusyTime) => {
       // console.log(JSON.stringify(calculatedBusyTime));
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
@@ -187,64 +187,69 @@ exports.getStats = (timeUnit, dtStart, accumulate) => {
  * @param {*} dtEnd
  * @param {*} accumulate
  */
-exports.getStatsByRange = (dtStart, dtEnd, accumulate) =>
-  // console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
-  // console.log(">>> searching data for date between " + dtStart + " and " + dtEnd);
+exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
   new Promise((resolve, reject) => {
-    StatsDay.find({
-      date: {
-        $gte: dtStart,
-        $lt: dtEnd,
-      },
-    })
-      .sort({
-        date: 1,
-      })
+    // console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
+    // console.log(">>> searching data for date between " + dtStart + " and " + dtEnd);
+    StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd, }, })
+      .sort({ date: 1, })
       .exec((err, stats) => {
         if (err != undefined) {
           reject(err);
           return;
         }
         const innerData = [
-          {
-            0: 0,
-          },
+          { 0: 0, },
         ];
         const innerComp = [
-          {
-            0: 0,
-          },
+          { 0: 0, },
         ];
-        let idx = 0;
         let actual_working_time = -1;
         let planned_working_time = -1;
         let average_working_time = -1;
+
+        // init arrays innerComp, innerData
+        if (fill === 'true') {
+          let i = 0;
+          for (var m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
+            //console.log(m.format('YYYY-MM-DD'));
+            innerData[i] = {
+              x: moment(m.format('YYYY-MM-DD')),
+              y: 0.0
+            };
+            innerComp[i] = {
+              x: moment(m.format('YYYY-MM-DD')),
+              y: 0.0
+            };
+            i++;
+          }
+        }
+
 
         // calculating actual working time
         stats.forEach((stat) => {
           actual_working_time += stat.actual_working_time;
         });
-        average_working_time =
-          actual_working_time / stats.length / 60 / 60 / 1000;
+        average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
 
         // console.log("average_working_time = " + average_working_time);
         // console.log("length = " + stats.length);
 
         let sumActual = 0;
         let sumNominal = 0;
+        let idx = 0;
         stats.forEach((stat) => {
           // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
           // actual_working_time += stat.actual_working_time;
           planned_working_time += stat.planned_working_time;
           if (accumulate === 'true') {
-            (sumActual +=
-              Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) /
-              100), // rounding 2 digits after comma
-            (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
-            (innerData[idx] = {
-              x: moment(stat.date).format('YYYY-MM-DD'),
-              y: sumActual,
-            });
+            (sumActual += Math.round(
+              (stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
+              (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
+              (innerData[idx] = {
+                x: moment(stat.date).format('YYYY-MM-DD'),
+                y: sumActual,
+              });
             innerComp[idx] = {
               x: moment(stat.date).format('YYYY-MM-DD'),
               y: sumNominal,

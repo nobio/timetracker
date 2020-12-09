@@ -576,6 +576,12 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: fill
+        in: query
+        description: indicates if the data should be filled with all days of this time range; if no measured value is available, the value is 0
+        schema:
+          type: boolean
+          default: false
       responses:
         200:
           description: statistics for the given date
