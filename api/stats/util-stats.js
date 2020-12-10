@@ -214,11 +214,11 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
           for (var m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
             //console.log(m.format('YYYY-MM-DD'));
             innerData[i] = {
-              x: moment(m.format('YYYY-MM-DD')),
+              x: moment(m).format('YYYY-MM-DD'),
               y: 0.0
             };
             innerComp[i] = {
-              x: moment(m.format('YYYY-MM-DD')),
+              x: moment(m).format('YYYY-MM-DD'),
               y: 0.0
             };
             i++;
