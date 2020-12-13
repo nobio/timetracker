@@ -198,12 +198,8 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
           reject(err);
           return;
         }
-        const innerData = [
-          { 0: 0, },
-        ];
-        const innerComp = [
-          { 0: 0, },
-        ];
+        const innerData = [];
+        const innerComp = [];
         let actual_working_time = -1;
         let planned_working_time = -1;
         let average_working_time = -1;
@@ -225,7 +221,6 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
           }
         }
 
-
         // calculating actual working time
         stats.forEach((stat) => {
           actual_working_time += stat.actual_working_time;
@@ -239,35 +234,30 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
         let sumNominal = 0;
         let idx = 0;
         stats.forEach((stat) => {
-          // console.log(" >>>>   " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
+          const statDateYMD = moment(stat.date).format('YYYY-MM-DD');
+          // console.log(" >>>>   " + moment(stat.date).format('YYYY-MM-DD') + " " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
           // actual_working_time += stat.actual_working_time;
+          let obj;
           planned_working_time += stat.planned_working_time;
           if (accumulate === 'true') {
             (sumActual += Math.round(
               (stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
               (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
-              (innerData[idx] = {
-                x: moment(stat.date).format('YYYY-MM-DD'),
-                y: sumActual,
-              });
-            innerComp[idx] = {
-              x: moment(stat.date).format('YYYY-MM-DD'),
-              y: sumNominal,
-            };
+              obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
+              obj.y = sumActual;
+              obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
+              obj.y = sumNominal
           } else {
-            innerData[idx] = {
-              x: moment(stat.date).format('YYYY-MM-DD'),
-              y:
-                Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) /
-                100, // rounding 2 digits after comma
-            };
-            innerComp[idx] = {
-              x: moment(stat.date).format('YYYY-MM-DD'),
-              y: Math.round(average_working_time * 100) / 100, // rounding 2 digits after comma
-            };
+            obj = getXYObjectByXValue(innerData, statDateYMD);
+            obj.y = Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100; // rounding 2 digits after comma
+            obj = getXYObjectByXValue(innerComp, statDateYMD);
+            obj.y = Math.round(average_working_time * 100) / 100; // rounding 2 digits after comma;
           }
           idx++;
         });
+
+        // console.log(JSON.stringify(innerData))
+        // console.log(JSON.stringify(innerComp))
 
         resolve({
           actual_working_time,
@@ -279,3 +269,14 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
       });
   });
 
+function getXYObjectByXValue(arr, xVal) {
+  for (let n = 0; n < arr.length - 1; n++) {
+    if (arr[n].x === xVal) {
+      return arr[n];
+      break;
+    }
+  }
+  // in case there has not been any array value (return see above did not work); add a new object and return it's reference
+  arr.push({ x: xVal, y: 0 });
+  return (arr[arr.length - 1]);
+}
