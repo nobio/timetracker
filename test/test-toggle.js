@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 
 const expect = chai.expect;
 
-const util = require('../api/admin/util-admin');
+const util = require('../api/admin/util-toggles');
 
 describe('test util.getToggleStatus', () => {
   it('check Slack status without SLACK_TOKEN', () => {

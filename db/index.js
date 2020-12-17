@@ -110,6 +110,19 @@ const Toggle = new mongoose.Schema({
 mongoose.model('Toggle', Toggle);
 
 // --------------------------------------------------
+// ----------------- Properties ---------------------
+// --------------------------------------------------
+const Properties = new mongoose.Schema({
+  key: {
+    type: String, required: true, index: true, unique: true,
+  },
+  value: {
+    type: String, required: true, index: false, unique: false,
+  },
+});
+mongoose.model('Properties', Properties);
+
+// --------------------------------------------------
 // ------------------ Failure Days ------------------
 // --------------------------------------------------
 const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');

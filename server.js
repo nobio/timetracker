@@ -115,6 +115,14 @@ app.post('/api/toggles', api_admin.createToggle);
 app.delete('/api/toggles/:id', api_admin.deleteToggle);
 
 // .......................................................................
+// properties
+// .......................................................................
+app.get('/api/properties', api_admin.getProperties);
+app.get('/api/properties/:key', api_admin.getProperty);
+app.put('/api/properties/:key', api_admin.setProperty);
+app.delete('/api/properties/:key', api_admin.deleteProperty);
+
+// .......................................................................
 // statistics
 // .......................................................................
 app.put('/api/stats', api_stats.calcStats);

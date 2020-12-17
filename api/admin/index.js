@@ -1,4 +1,5 @@
 const util = require('./util-admin');
+const utilProps = require('./util-properties');
 
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
@@ -121,4 +122,73 @@ exports.deleteToggle = (req, res) => {
       }
     })
     .catch(err => res.status(500).send(`Error while deleting existing toggle: ${err}`));
+};
+
+/**
+app.get('/api/properties', api_admin.getAllProperties);
+app.get('/api/properties/:key', api_admin.getProperty);
+app.put('/api/properties/:key', api_admin.setProperty);
+app.delete('/api/properties/:key', api_admin.deleteProperty);
+ */
+
+/**
+ * read all properties
+ *
+ * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ */
+exports.getProperties = (req, res) => {
+  utilProps.getProperties()
+    .then(response => res.status(200).send(response))
+    .catch(err => res.status(500).send(`Error while reading all properties: ${err}`));
+};
+
+/**
+ * read a property
+ *
+ * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ */
+exports.getProperty = (req, res) => {
+  const key = req.params.key;
+
+  utilProps.getProperty(key)
+    .then(response => {
+      if (response) {
+        res.status(200).send(response)
+      } else {
+        res.status(404).send();
+      }
+    })
+    .catch(err => res.status(500).send(`Error while reading one property: ${err}`));
+};
+
+/**
+ * read a property
+ *
+ * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ */
+exports.setProperty = (req, res) => {
+  const key = req.params.key;
+  const value = req.query.value;
+
+  utilProps.setProperty(key, value)
+    .then(response => res.status(200).send())
+    .catch(err => res.status(500).send(`Error while reading a property: ${err}`));
+};
+
+/**
+ * read a property
+ *
+ * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ */
+exports.deleteProperty = (req, res) => {
+  const key = req.params.key;
+
+  utilProps.deleteProperty(key)
+    .then(response => {
+      if (response) {
+        res.status(200).send()
+      } else {
+        res.status(404).send();
+      }
+    }).catch(err => res.status(500).send(`Error while deleting a property: ${err}`));
 };

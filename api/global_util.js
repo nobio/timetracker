@@ -1,6 +1,6 @@
 const moment = require('moment');
 require('moment-timezone');
-const toggleUtil = require('./admin/util-admin');
+const toggleUtil = require('./admin/util-toggles');
 
 exports.DEFAULT_BREAK_TIME_SECONDS = 45 * 60;
 exports.DEFAULT_BREAK_TIME_MILLISECONDS = this.DEFAULT_BREAK_TIME_SECONDS * 1000;

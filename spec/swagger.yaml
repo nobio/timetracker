@@ -482,6 +482,83 @@ paths:
                   NOTIFICATION_SLACK:
                     type: boolean
                     example: true
+  /properties:
+    get:
+      tags:
+      - Properties
+      summary: Read a all persisted properties
+      responses:
+        200:
+          description: Read a property by it's key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Properties'
+        500:
+          description: unable to read key-value pairs from database
+  /properties/{key}:
+    get:
+      tags:
+      - Properties
+      summary: Read one persisted propertie's value
+      parameters:
+      - name: key
+        in: path
+        description: Key of key-value pair
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Read a property by it's key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Properties'
+        404:
+          description: Property for given key was not found
+        500:
+          description: unable to read key-value pair from database
+    put:
+      tags:
+      - Properties
+      summary: Create or update a property (key-value pair)
+      parameters:
+      - name: key
+        in: path
+        description: Key of key-value pair
+        required: true
+        schema:
+          type: string
+      - name: value
+        in: query
+        description: Value of key-value pair
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: no body, please check http status code
+        500:
+          description: unable to store key-value pair
+    delete:
+      tags:
+      - Properties
+      summary: Delete a persisted property 
+      parameters:
+      - name: key
+        in: path
+        description: Key of key-value pair
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successfully deleted key-value pair
+        404:
+          description: Property for given key was not found
+        500:
+          description: unable to delete key-value pair
   /users:
     get:
       tags:
@@ -872,6 +949,22 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Toggle'
+    Property:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          example: de.nobio.timetracker.KEY_01
+        value:
+          type: string
+          example: "this is a value"
+    Properties:
+      type: array
+      items:
+        $ref: '#/components/schemas/Property'
     StatsEntryResult:
       type: object
       properties:
