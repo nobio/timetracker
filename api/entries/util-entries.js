@@ -439,10 +439,11 @@ exports.storeValidationErrors = (firstEntry, lastEntry) =>
 
         // sencondly evaluate on wrong order of entries and save them too
         for (let n = timeentries.length - 1; n > 0; n -= 2) {
-          // this must be a go-event
+          // this must be a go-event to be good. Otherwise report a failure
           if (timeentries[n].direction !== 'go') {
+            console.log('gotcha' + moment(dt).format('DD.MM.YYYY hh:mm:ss'))
             new FailureDay({
-              date: dt,
+              date: dt.toDate(),
               failure_type: 'WRONG_ORDER',
             }).save((err) => {
               if (err) {

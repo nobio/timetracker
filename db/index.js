@@ -115,9 +115,11 @@ mongoose.model('Toggle', Toggle);
 const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
 const FailureDay = new mongoose.Schema({
   date: {
-    type: Date, required: true, index: true, unique: true,
+    type: Date, required: true, index: false, unique: false,
   },
-  failure_type: { type: String, enum: failureTypes, required: true },
+  failure_type: { 
+    type: String, enum: failureTypes, required: true, index: false, unique: false,
+  },
 });
 mongoose.model('FailureDay', FailureDay);
 

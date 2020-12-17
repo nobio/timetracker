@@ -211,7 +211,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
             //console.log(m.format('YYYY-MM-DD'));
             innerData[i] = {
               x: moment(m).format('YYYY-MM-DD'),
-              y: 0.0
+              y: null,
             };
             innerComp[i] = {
               x: moment(m).format('YYYY-MM-DD'),
@@ -244,9 +244,9 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
               (stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
               (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
               obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
-              obj.y = sumActual;
-              obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
-              obj.y = sumNominal
+            obj.y = sumActual;
+            obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
+            obj.y = sumNominal
           } else {
             obj = getXYObjectByXValue(innerData, statDateYMD);
             obj.y = Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100; // rounding 2 digits after comma
@@ -256,7 +256,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) =>
           idx++;
         });
 
-        // console.log(JSON.stringify(innerData))
+        console.log(JSON.stringify(innerData))
         // console.log(JSON.stringify(innerComp))
 
         resolve({
@@ -277,6 +277,6 @@ function getXYObjectByXValue(arr, xVal) {
     }
   }
   // in case there has not been any array value (return see above did not work); add a new object and return it's reference
-  arr.push({ x: xVal, y: 0 });
+  arr.push({ x: xVal, y: null });
   return (arr[arr.length - 1]);
 }

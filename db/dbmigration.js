@@ -57,6 +57,15 @@ const GeoTracking = new mongoose.Schema({
     type: Date, required: true, index: true, unique: true, default: Date.now,
   },
 });
+const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
+const FailureDay = new mongoose.Schema({
+  date: {
+    type: Date, required: true, index: false, unique: false,
+  },
+  failure_type: { 
+    type: String, enum: failureTypes, required: true, index: false, unique: false,
+  },
+});
 /* ====================-================================================ */
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
@@ -66,6 +75,9 @@ const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
 const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', GeoTracking);
 const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTracking);
+const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', FailureDay);
+const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', FailureDay);
+
 mongoose.model('GeoTracking', GeoTracking);
 
 console.log('--------------------------------------------------------------- \n');
@@ -173,6 +185,10 @@ const app = async () => {
 
   try {
     let entries;
+    await deleteAllTarget(FAILURE_MODEL_TARGET);
+    entries = await getDataFromSource(FAILURE_MODEL_SOURCE);
+    await storeDataToTarget(entries, FAILURE_MODEL_TARGET);
+
     await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
     entries = await getDataFromSource(GEO_TRACKING_MODEL_SOURCE);
     await storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET);
@@ -180,6 +196,7 @@ const app = async () => {
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     entries = await getDataFromSource(TIME_ENTRY_MODEL_SOURCE);
     await storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET);
+
     //process.exit(0);
 
   } catch (err) {
