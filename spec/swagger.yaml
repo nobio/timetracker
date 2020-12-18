@@ -537,7 +537,7 @@ paths:
         schema:
           type: string
       responses:
-        200:
+        201:
           description: no body, please check http status code
         500:
           description: unable to store key-value pair
@@ -553,7 +553,7 @@ paths:
         schema:
           type: string
       responses:
-        200:
+        204:
           description: successfully deleted key-value pair
         404:
           description: Property for given key was not found

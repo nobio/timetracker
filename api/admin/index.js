@@ -135,7 +135,7 @@ app.delete('/api/properties/:key', api_admin.deleteProperty);
 /**
  * read all properties
  *
- * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ * curl -X GET http://localhost:30000/api/properties
  */
 exports.getProperties = (req, res) => {
   utilProps.getProperties()
@@ -146,7 +146,7 @@ exports.getProperties = (req, res) => {
 /**
  * read a property
  *
- * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ * curl -X GET http://localhost:30000/api/properties/TEST_KEY01
  */
 exports.getProperty = (req, res) => {
   const key = req.params.key;
@@ -163,23 +163,23 @@ exports.getProperty = (req, res) => {
 };
 
 /**
- * read a property
+ * set (creat or update) a property
  *
- * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ * curl -X PUT http://localhost:30000/api/properties/TEST_KEY01?value=TEST_VALUE
  */
 exports.setProperty = (req, res) => {
   const key = req.params.key;
   const value = req.query.value;
 
   utilProps.setProperty(key, value)
-    .then(response => res.status(200).send())
+    .then(response => res.status(201).send())
     .catch(err => res.status(500).send(`Error while reading a property: ${err}`));
 };
 
 /**
- * read a property
+ * delete a property
  *
- * curl -X GET http://localhost:30000/api/properties/5c347688567bd711d5d2c056
+ * curl -X DELETE http://localhost:30000/api/properties/TEST_KEY01
  */
 exports.deleteProperty = (req, res) => {
   const key = req.params.key;
@@ -187,7 +187,7 @@ exports.deleteProperty = (req, res) => {
   utilProps.deleteProperty(key)
     .then(response => {
       if (response) {
-        res.status(200).send()
+        res.status(204).send()
       } else {
         res.status(404).send();
       }
