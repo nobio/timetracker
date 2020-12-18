@@ -37,9 +37,8 @@ exports.setProperty = (key, value) => new Promise((resolve, reject) => {
   Properties.findOne({ key })
     .then((property) => {
       if (property === null) {
-        console.log(property)
         // create a new property 
-        console.log(`creating a new property`);
+        //console.log(`creating a new property`);
         property = new Properties({ key, value });
       }
       property.value = value;
