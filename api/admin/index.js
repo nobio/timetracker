@@ -1,4 +1,5 @@
 const util = require('./util-admin');
+const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
 
 /**
@@ -29,7 +30,7 @@ exports.backupTimeEntries = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles
  */
 exports.getAllToggles = (req, res) => {
-  util.getAllToggles()
+  utilToggles.getAllToggles()
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading all toggles: ${err}`));
 };
@@ -42,7 +43,7 @@ exports.getAllToggles = (req, res) => {
 exports.getToggleById = (req, res) => {
   const id = req.params.id;
 
-  util.getToggle(id)
+  utilToggles.getToggle(id)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
 };
@@ -55,7 +56,7 @@ exports.getToggleById = (req, res) => {
 exports.getToggleByName = (req, res) => {
   const name = req.params.name;
 
-  util.getToggleByName(name)
+  utilToggles.getToggleByName(name)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
 };
@@ -66,7 +67,7 @@ exports.getToggleByName = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/status
  */
 exports.getToggleStatus = (req, res) => {
-  util.getToggleStatus()
+  utilToggles.getToggleStatus()
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while reading toggle status: ${err}`));
 };
@@ -84,7 +85,7 @@ exports.saveToggle = (req, res) => {
   const toggle = req.body.toggle;
   const notification = req.body.notification;
 
-  util.updateToggle(id, toggle, notification)
+  utilToggles.updateToggle(id, toggle, notification)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while saving toggle: ${err}`));
 };
@@ -99,7 +100,7 @@ exports.createToggle = (req, res) => {
   const toggle = req.body.toggle;
   const notification = req.body.notification;
 
-  util.createToggle(name, toggle, notification)
+  utilToggles.createToggle(name, toggle, notification)
     .then(response => res.status(200).send(response))
     .catch(err => res.status(500).send(`Error while creating new toggle: ${err}`));
 };
@@ -113,7 +114,7 @@ exports.createToggle = (req, res) => {
 exports.deleteToggle = (req, res) => {
   const id = req.params.id;
 
-  util.deleteToggle(id)
+  utilToggles.deleteToggle(id)
     .then((toggle) => {
       if (toggle === undefined || toggle === null) {
         res.status(500).send(`Could not delete Toggle with (id: ${id})`);
