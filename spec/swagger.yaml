@@ -80,6 +80,19 @@ paths:
       description: "Reads all time entries; \nread entries by date getAllByDate ->\
         \ List of Time Entry of the given day; \nRead busy time getBusyTime -> Busy\
         \ Time of the given day (in ms)\n"
+      parameters:
+      - name: busy
+        in: query
+        description: Zeitstempel
+        required: false
+        schema:
+          type: string
+      - name: dt
+        in: query
+        description: Zeitstempel
+        required: false
+        schema:
+          type: string
       responses:
         200:
           description: All (or filtered) time entries

@@ -233,16 +233,33 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
-  // console.log(timeentries);
+  //console.log(timeentries);
 
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
-  } else if (timeentries.length % 2 !== 0) {
+//  } else if (timeentries.length % 2 !== 0) {
+  } else if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') !== moment(timeentries[timeentries.length - 1].last_changed).format('DD.MM.YYYY'))) {
+    latestTimeEntry = timeentries[timeentries.length - 1];
+    console.log(moment().format('DD.MM.YYYY'));
+    console.log(moment(latestTimeEntry.last_changed).format('DD.MM.YYYY'));
+    if(moment().format('DD.MM.YYYY') === moment(latestTimeEntry.last_changed).format('DD.MM.YYYY')) {
+      console.log(latestTimeEntry);
+    }
+
     reject(new Error('Bitte die Einträge für vervollständigen'), 0);
   } else {
     let busytime = 0;
     let pause = 0;
+    const lastTimeEntry = timeentries[timeentries.length - 1];
+    
+    if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') === moment(lastTimeEntry.last_changed).format('DD.MM.YYYY'))) {
+      timeentries.push(new TimeEntry({
+        entry_date: moment().toISOString(),
+        last_changed: moment().toISOString(),
+        direction: 'go',
+      }))
+    }
 
     for (let n = timeentries.length - 1; n > 0; n -= 2) {
       // this must be a go-event
