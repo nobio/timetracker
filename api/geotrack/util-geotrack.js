@@ -141,6 +141,8 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
     GeoTracking.find({
       date: options,
     }).skip(0).sort({ date: 1 })
+      .then(transform)
+      .then(appendSpeed)
       .then(tracks => resolve(tracks))
       .catch(err => reject(err));
   });
@@ -159,3 +161,37 @@ exports.getGeoTrackingMetadata = tracks => new Promise((resolve) => {
   });
 });
 
+function transform(tracks) {
+  const tr = [];
+  tracks.forEach(t => {
+    tr.push({
+      date: t.date,
+      longitude: t.longitude,
+      latitude: t.latitude,
+      speed: 0,
+      dist: 0,
+      timediff: 0,
+      accuracy: t.accuracy,
+      sourc: t.source
+    });
+  });
+  return tr;
+}
+
+function appendSpeed(tracks) {
+  let oldPoint;
+  tracks.forEach(point => {
+    if (oldPoint) {
+      const dist = calcDist(oldPoint.longitude, oldPoint.latitude, point.longitude, point.latitude);  // distance in meter
+      const timeDiff = moment(point.date).diff(moment(oldPoint.date)) / 1000;  // time difference in seconds
+      const speed = dist / timeDiff;  // speed in m/s
+      point.dist = dist;
+      point.timediff = timeDiff;
+      point.speed = speed;
+    }
+    oldPoint = point;
+  });
+  //console.log(JSON.stringify(tracks, null, 2))
+
+  return tracks;
+}
