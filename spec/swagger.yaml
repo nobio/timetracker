@@ -900,6 +900,18 @@ components:
           type: number
           description: the accuracy of the position measurement in meter (radius)
           example: 60.0
+        speed:
+          type: number
+          description: the speed in [m/s] between two points (this related to the last one in time)
+          example: 22.3
+        timediff:
+          type: number
+          description: The time in [s] passed between two points (this related to the last one in time)
+          example: 11620
+        dist:
+          type: number
+          description: The distance in [m] passed between two points (this related to the last one in time)
+          example: 320
         source:
           type: string
           description: identifier of the sender of this request
