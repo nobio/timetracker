@@ -34,10 +34,29 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: the accees JWT to be used to access
+                    example: eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",
+                  refreshToken:
+                    type: string
+                    description: refresh JWT
+                    example: eyIjshJ9.eyJOOksW1lIjdasdihg0Mn0.kgR2dNsda2d8",
         401:
           description: Unauthorized; usually when no password was provided or when
             user is not registered or when password was incorrect
-          content: {}
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    description: error message
+                    example: Unauthorized
+
+
       x-codegen-request-body-name: User
   /auth/logout/{token}:
     post:
@@ -60,18 +79,33 @@ paths:
     post:
       tags:
       - Authentication & Authorization
-      summary: Get time entry with given ID
+      summary: Renews the access token using the refresh token
       parameters:
       - name: token
         in: path
-        description: creates a new access token from the given (refresh) token
+        description: Renews the access token using the refresh token
         required: true
         schema:
           type: string
       responses:
         200:
-          description: Invalidates the refresh token of a user
-          content: {}
+          description: new access token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: new accees JWT to be used to access
+                    example: eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",
+                  user: 
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: user name linked to this token
+                        example: user@university.edu
   /entries:
     get:
       tags:
