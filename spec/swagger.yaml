@@ -55,8 +55,6 @@ paths:
                     type: string
                     description: error message
                     example: Unauthorized
-
-
       x-codegen-request-body-name: User
   /auth/logout/{token}:
     post:
@@ -106,6 +104,25 @@ paths:
                         type: string
                         description: user name linked to this token
                         example: user@university.edu
+                      iat:
+                        type: number
+                        description: generation timetamp 
+                        example: 1618390174
+                      exp:
+                        type: number
+                        description: expire timetamp 
+                        example: 1618390174
+        401:
+          description: refresh token is invalid
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    description: error message
+                    example: Unauthorized (invalid refresh token)
   /entries:
     get:
       tags:
