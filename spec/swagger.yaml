@@ -605,6 +605,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
       x-codegen-request-body-name: User
+  /users/{id}:
+    delete:
+      tags:
+      - Users
+      summary: Delets an existing user incl. credentials
+      description: Deletes a new user with credentials
+      parameters:
+      - name: id
+        in: path
+        description: unique reference to user
+        required: true
+        schema:
+          type: string
+      responses:
+        202: 
+          description: User was deleted; also returned if user did not exist
   /stats:
     put:
       tags:
