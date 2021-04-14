@@ -47,7 +47,7 @@ exports.deleteUser = async (id) => {
   if (!id) throw Error('id must be provided');
   return new Promise((resolve, reject) => {
     User.findByIdAndRemove(id)
-      .then(res => res._id)
+      .then(res => res)
       .then(ret => resolve(ret))
       .catch(err => reject("cannot delete user " + id));
   });
