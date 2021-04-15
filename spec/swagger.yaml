@@ -73,7 +73,7 @@ paths:
         200:
           description: Invalidates the refresh token of a user
           content: {}
-  /auth/token/{token}:
+  /auth/token/{refresh-token}:
     post:
       tags:
       - Authentication & Authorization
