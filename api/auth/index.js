@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 exports.getAllUsers = async (req, res) => {
   try {
     const result = await util.getAllUsers(req.body.name, req.body.password);
-    res.status(201).json(result);
+    res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -118,7 +118,7 @@ exports.refreshToken = async (req, res) => {
 exports.authorizeToken = async (req, res, next) => {
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
-  if (process.env.AUTHORIZATION !== 'on' || (
+  if (/*HACK for developing phase: ignore auth for https*/req.protocol === 'https' || process.env.AUTHORIZATION !== 'on' || (
     (req.method === 'POST' && req.url === '/api/auth/login') ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
