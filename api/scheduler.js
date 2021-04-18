@@ -33,10 +33,16 @@ exports.scheduleTasks = function () {
     entries.evaluate();
   });
 
-  console.log('job scheduler: remote tokens of user \'Tester\' (every day at 21:59)');
+  console.log('job scheduler: remove tokens of user \'Tester\' (every day at 21:59)');
   scheduler.scheduleJob({ hour: 21, minute: 50 }, () => { // every hour at ??:13
     console.log('scheduled task "removeTesterToken" started');
     auth.removeTesterToken();
+  });
+
+  console.log('job scheduler: remove expired Tokens (every day at 21:59)');
+  scheduler.scheduleJob({ hour: 23 }, () => { // every hour at ??:13
+    console.log('scheduled task "removeExpiredTokens" started');
+    auth.removeExpiredToken();
   });
 
   /*

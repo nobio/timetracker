@@ -114,6 +114,27 @@ exports.refreshToken = async (refreshToken) => {
   return { accessToken, user };
 };
 
+/**
+ * removes expired refresh tokens from database
+ */
+exports.removeExpiredToken = async () => {
+  const now = parseInt(Date.now() / 1000);   // timestamp in s
+  try {
+    const tokens = await Token.find();
+    tokens.forEach(jwt => {
+      const payload = jwt.token.split('.')[1];
+      const token = JSON.parse(Buffer.from(payload, 'base64').toString('ascii'));
+      if(parseInt(token.exp), now - token.exp > 0) {
+        console.log(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
+        jwt.remove();
+      }
+    });
+  } catch (err) {
+    console.log(err)
+    return createError(500, err.message);
+  }
+};
+
 exports.removeTesterToken = async () => {
   await Token.deleteMany({ user: 'Tester' });
 };
