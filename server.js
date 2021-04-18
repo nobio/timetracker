@@ -19,7 +19,6 @@ const moment = require('moment');
 const favicon = require('serve-favicon');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
@@ -40,13 +39,9 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false,
-}));
 app.use(cookieParser());
-app.use(api_auth.authorizeToken);
 app.use(cors());
+app.use(api_auth.authorizeToken);
 
 /* ============================================================================= */
 const spec = fs.readFileSync(path.join(__dirname, 'spec/swagger.yaml'), 'utf8');
@@ -97,6 +92,7 @@ app.post('/api/geofence', api_entries.geofence);
 app.post('/api/geotrack', api_geotrack.createGeoTrack);
 app.get('/api/geotrack', api_geotrack.getGeoTracking);
 app.get('/api/geotrack/metadata', api_geotrack.getGeoTrackingMetadata);
+
 // .......................................................................
 // admin
 // .......................................................................
