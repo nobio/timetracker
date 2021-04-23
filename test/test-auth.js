@@ -235,6 +235,7 @@ describe('test utilAuth.login', () => {
   it('test expire time: set expiretime to 2s, login, use accessToken, wait, fail using access token, get new token, use new access token', async () => {
     process.env.AUTHORIZATION = 'on';
     process.env.ACCESS_TOKEN_EXPIRE = '1s'; // 1000ms
+    process.env.IGNORE_AUTH_PROTOCOL = 'http'
 
     let refreshToken;
     let accessToken;

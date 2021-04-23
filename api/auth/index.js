@@ -116,15 +116,20 @@ exports.refreshToken = async (req, res) => {
  * @param next callback to next middleware
  */
 exports.authorizeToken = async (req, res, next) => {
+
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
-  if (/*HACK for developing phase: ignore auth for https*/req.protocol === 'https' || process.env.AUTHORIZATION !== 'on' || (
-    (req.method === 'POST' && req.url === '/api/auth/login') ||
-    (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
-    (req.method === 'GET'  && req.url.startsWith('/api-docs'))
-  )) {
+  if (/*HACK for developing phase: ignore auth for https*/
+    (req.protocol === 'https' && process.env.IGNORE_AUTH_PROTOCOL === 'https') ||
+    process.env.AUTHORIZATION !== 'on' || 
+    (
+      (req.method === 'POST' && req.url === '/api/auth/login') ||
+      (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
+      (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
+      (req.method === 'GET' && req.url.startsWith('/api-docs'))
+    )) {
     // just continue...
+    console.log('authorization disabled for ' + req.url)
     res.status(200);
     return next();
   }
