@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "7.4.1",
-    "last_build": "2021-04-23T14:50:29.551Z",
+    "version": "7.4.3",
+    "last_build": "2021-04-23T17:25:12.102Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
