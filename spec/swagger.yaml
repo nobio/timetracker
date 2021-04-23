@@ -699,7 +699,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Users"
+                $ref: "#/components/schemas/UniqueUsers"
         403:
           $ref: '#/components/responses/UnauthorizedError'
     post:
@@ -715,7 +715,7 @@ paths:
               $ref: "#/components/schemas/User"
         required: false
       responses:
-        200:
+        201:
           description: New user is created
           content:
             application/json:
@@ -725,6 +725,27 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: User
   /users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Loads an existing user by it's it
+      description: Loads an existing user by it's it
+      parameters:
+        - name: id
+          in: path
+          description: unique reference to user
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A user from database
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UniqueUser"
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
     delete:
       tags:
         - Users
@@ -1242,6 +1263,25 @@ components:
                     - line
                 data:
                   type: array
+    UniqueUsers:
+      type: array
+      items:
+        $ref: "#/components/schemas/UniqueUser"
+    UniqueUser:
+      required:
+        - name
+        - password
+      type: object
+      properties:
+        id:
+          type: string
+          example: unique identifier
+        name:
+          type: string
+          example: Tester
+        password:
+          type: string
+          example: test12345
     User:
       required:
         - name
@@ -1254,11 +1294,6 @@ components:
         password:
           type: string
           example: test12345
-    Users:
-      type: array
-      items:
-        $ref: "#/components/schemas/User"
-
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
       type: http

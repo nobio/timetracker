@@ -9,12 +9,29 @@ const jwt = require('jsonwebtoken');
  * @param {*} req Request object
  * @param {*} res Response object
  */
-exports.getAllUsers = async (req, res) => {
+ exports.getAllUsers = async (req, res) => {
   try {
     const result = await util.getAllUsers(req.body.name, req.body.password);
     res.status(200).json(result);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err });
+  }
+};
+
+/**
+ * reads one user from database
+ *
+ * curl -X GET http://localhost:30000/api/users/12345678
+ *
+ * @param {*} req Request object
+ * @param {*} res Response object
+ */
+ exports.getUser = async (req, res) => {
+  try {
+    const result = await util.getUser(req.params.id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err });
   }
 };
 
@@ -31,7 +48,7 @@ exports.deleteUser = async (req, res) => {
     const result = await util.deleteUser(req.params.id);
     res.status(202).json(result);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err });
   }
 };
 
@@ -49,7 +66,7 @@ exports.createUser = async (req, res) => {
     const result = await util.createUser(req.body.name, req.body.password);
     res.status(201).json(result);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err });
   }
 };
 
@@ -73,7 +90,7 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.name, password);
     res.status(200).json(tokens);
   } catch (err) {
-    res.status(err.status).json({ message: err.message });
+    res.status(err.status).json({ message: err });
   }
 };
 
@@ -82,7 +99,7 @@ exports.logout = async (req, res) => {
     await util.logout(req.params.token);
     res.status(200).send();
   } catch (err) {
-    res.status(err.status).json({ message: err.message });
+    res.status(err.status).json({ message: err });
   }
 };
 
@@ -100,7 +117,7 @@ exports.refreshToken = async (req, res) => {
     const token = await util.refreshToken(refreshToken);
     res.status(200).send(token);
   } catch (err) {
-    res.status(err.status).json({ message: err.message });
+    res.status(err.status).json({ message: err });
   }
 };
 

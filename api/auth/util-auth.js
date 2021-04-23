@@ -13,7 +13,44 @@ const Token = mongoose.model('Token');
  * @param {*} name User name of user
  * @param {*} password Password of user
  */
-exports.getAllUsers = async () => User.find();
+exports.getAllUsers = async () => {
+  const users = [];
+
+  return new Promise((resolve, reject) => {
+    User.find()
+      .then(res => {
+        res.forEach(user => {
+          users.push(
+            {
+              id: user._id,
+              name: user.name,
+              password: user.password
+            }
+          )
+        });
+        resolve(users);
+      })
+      .catch(err => reject("cannot load users "));
+  });
+}
+
+exports.getUser = async (id) => {
+  if (!id) throw Error('id must be provided');
+
+  return new Promise((resolve, reject) => {
+    User.findById(id)
+      .then(res => {
+        resolve({
+          id: res._id,
+          name: res.name,
+          password: res.password
+        })
+      })
+      .then(ret => resolve(ret))
+      .catch(err => reject("cannot load user " + id));
+  });
+
+}
 
 /**
  * creates a new user in database
@@ -124,7 +161,7 @@ exports.removeExpiredToken = async () => {
     tokens.forEach(jwt => {
       const payload = jwt.token.split('.')[1];
       const token = JSON.parse(Buffer.from(payload, 'base64').toString('ascii'));
-      if(parseInt(token.exp), now - token.exp > 0) {
+      if (parseInt(token.exp), now - token.exp > 0) {
         console.log(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
         jwt.remove();
       }

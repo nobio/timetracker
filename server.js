@@ -141,8 +141,10 @@ app.get('/api/experiment', api_misc.experiment);
 // users and authentication
 // .......................................................................
 app.get('/api/users', api_auth.getAllUsers);
+app.get('/api/users/:id', api_auth.getUser);
 app.post('/api/users', api_auth.createUser);
 app.delete('/api/users/:id', api_auth.deleteUser);
+
 app.post('/api/auth/login', api_auth.login);
 app.post('/api/auth/logout/:token', api_auth.logout);
 app.post('/api/auth/token/:token', api_auth.refreshToken);
