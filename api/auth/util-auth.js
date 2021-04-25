@@ -58,7 +58,7 @@ exports.getUser = async (id) => {
  * @param {*} name User name of user
  * @param {*} password Password of user
  */
-exports.createUser = async (name, password) => {
+ exports.createUser = async (name, password) => {
   if (!name) throw Error('User must be provided');
   if (!password) throw Error('No password provided');
 
@@ -71,6 +71,32 @@ exports.createUser = async (name, password) => {
       name,
       password: hashedPassword,
     }).save()
+      .then(ret => resolve(ret._id))
+      .catch(err => reject(err));
+  });
+};
+
+/**
+ * updates an existing user in database
+ *
+ * @param {*} ud Unique ID of user
+ * @param {*} name User name of user
+ * @param {*} password Password of user
+ */
+ exports.updateUser = async (id, name, password) => {
+  if (!id) throw Error('User must be provided');
+  if (!name) throw Error('User must be provided');
+  if (!password) throw Error('No password provided');
+
+  const user = await User.findById(id);
+  if (!user) throw Error('User does not exists');
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.name = name;
+  user.password = hashedPassword;
+
+  return new Promise((resolve, reject) => {
+    user.save()
       .then(ret => resolve(ret._id))
       .catch(err => reject(err));
   });

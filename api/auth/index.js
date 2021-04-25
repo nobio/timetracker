@@ -61,12 +61,33 @@ exports.deleteUser = async (req, res) => {
  * @param {*} req Request object
  * @param {*} res Response object
  */
-exports.createUser = async (req, res) => {
+ exports.createUser = async (req, res) => {
   try {
     const result = await util.createUser(req.body.name, req.body.password);
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({ message: err });
+  }
+};
+
+/**
+ * updates an existing user
+ *
+ * curl -X PUT -H "Content-Type: application/json" -d '{"name": "Tester", "password": "test12345"}' http://localhost:30000/api/users/123456789
+ *
+ * @param {*} req Request object
+ * @param {*} res Response object
+ */
+ exports.updateUser = async (req, res) => {
+  try {
+    const result = await util.updateUser(req.params.id, req.body.name, req.body.password);
+    res.status(201).json(result);
+  } catch (err) {
+    console.log(err)
+    if(err.message === 'User does not exists')
+      res.status(404).json({ message: err.message });
+    else
+      res.status(500).json({ message: err.message });
   }
 };
 

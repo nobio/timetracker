@@ -746,6 +746,37 @@ paths:
                 $ref: "#/components/schemas/UniqueUser"
         403:
           $ref: '#/components/responses/UnauthorizedError'
+    put:
+      tags:
+        - Users
+      summary: Updates an existing user
+      description: Updates an existing user
+      parameters:
+        - name: id
+          in: path
+          description: unique reference to user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The User object to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: false
+      responses:
+        201:
+          description: User sucessfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          description: User (id) does not exist 
+      x-codegen-request-body-name: User
     delete:
       tags:
         - Users
