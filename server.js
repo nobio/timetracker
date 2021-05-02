@@ -144,6 +144,7 @@ app.get('/api/users', api_auth.getAllUsers);
 app.get('/api/users/:id', api_auth.getUser);
 app.post('/api/users', api_auth.createUser);
 app.put('/api/users/:id', api_auth.updateUser);
+app.put('/api/users/:id/password', api_auth.updateUsersPassword);
 app.delete('/api/users/:id', api_auth.deleteUser);
 
 app.post('/api/auth/login', api_auth.login);

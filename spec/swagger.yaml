@@ -30,7 +30,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Tester
+                password:
+                  type: string
+                  format: password
+                  example: psiodjkÜsö93JKK=w8dj
         required: false
       responses:
         200:
@@ -160,7 +168,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntries"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       tags:
         - TimeEntries
@@ -181,7 +189,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntry"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: timeentry
   /entries/{id}:
     get:
@@ -203,7 +211,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntries"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     put:
       tags:
         - TimeEntries
@@ -230,7 +238,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntry"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: TimeEntry
     delete:
       tags:
@@ -251,7 +259,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntries"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /entries/dump:
     post:
       tags:
@@ -268,7 +276,7 @@ paths:
               schema:
                 type: object
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /entries/backup:
     post:
       tags:
@@ -283,7 +291,7 @@ paths:
               schema:
                 type: object
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: something went wrong...
           content: {}
@@ -304,7 +312,7 @@ paths:
               schema:
                 type: object
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: something went wrong...
           content: {}
@@ -338,7 +346,7 @@ paths:
                         enter is not correctly booked
                       example: INCOMPLETE or WRONG_ORDER
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: something went wrong...
           content: {}
@@ -365,7 +373,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/TimeEntry"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: geo_timeentry
   /geotrack:
     get:
@@ -394,7 +402,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GeotrackResponses"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       tags:
         - Geo Tracking
@@ -428,7 +436,7 @@ paths:
           description: some data is missing
           content: {}
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: geo_timeentry
   /geotrack/metadata:
     get:
@@ -457,7 +465,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GeotrackMetaDataResponse"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /toggles:
     get:
       tags:
@@ -471,7 +479,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggles"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       tags:
         - Toggles
@@ -492,7 +500,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggle"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: toggle
   /toggles/{id}:
     get:
@@ -514,7 +522,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggle"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     put:
       tags:
         - Toggles
@@ -541,7 +549,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggle"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: toggle
     delete:
       tags:
@@ -562,7 +570,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggle"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /toggles/name/{name}:
     get:
       tags:
@@ -583,7 +591,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Toggle"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /toggles/status:
     get:
       tags:
@@ -601,7 +609,7 @@ paths:
                     type: boolean
                     example: true
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /properties:
     get:
       tags:
@@ -615,7 +623,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Properties"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: unable to read key-value pairs from database
   /properties/{key}:
@@ -640,7 +648,7 @@ paths:
         404:
           description: Property for given key was not found
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: unable to read key-value pair from database
     put:
@@ -664,7 +672,7 @@ paths:
         201:
           description: no body, please check http status code
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         500:
           description: unable to store key-value pair
     delete:
@@ -682,7 +690,7 @@ paths:
         204:
           description: successfully deleted key-value pair
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         404:
           description: Property for given key was not found
         500:
@@ -701,7 +709,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UniqueUsers"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       tags:
         - Users
@@ -712,7 +720,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/FullUser"
         required: false
       responses:
         201:
@@ -722,12 +730,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
       x-codegen-request-body-name: User
   /users/{id}:
     get:
       tags:
-      - Users
+        - Users
       summary: Loads an existing user by it's it
       description: Loads an existing user by it's it
       parameters:
@@ -745,7 +753,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UniqueUser"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     put:
       tags:
         - Users
@@ -773,9 +781,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
         404:
-          description: User (id) does not exist 
+          description: User (id) does not exist
       x-codegen-request-body-name: User
     delete:
       tags:
@@ -793,7 +801,46 @@ paths:
         202:
           description: User was deleted; also returned if user did not exist
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
+  /users/{id}/password:
+    put:
+      tags:
+        - Users
+      summary: Updates the password of an existing user
+      description: Updates the password of an existing user
+      parameters:
+        - name: id
+          in: path
+          description: unique reference to user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The password to be updated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  format: password
+                  minimum: 5
+                  example: k9wPüä=kdHs2
+        required: true
+      responses:
+        201:
+          description: User sucessfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        403:
+          $ref: "#/components/responses/UnauthorizedError"
+        404:
+          description: User (id) does not exist
+      x-codegen-request-body-name: User
+
   /stats:
     put:
       tags:
@@ -810,7 +857,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/StatsEntryResult"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
     delete:
       tags:
         - Statistics
@@ -827,7 +874,7 @@ paths:
                     type: number
                     example: 953.0
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /stats/{date}/{timeUnit}:
     get:
       tags:
@@ -874,7 +921,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AggregatedStats"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /statistics/aggregate:
     get:
       tags:
@@ -902,7 +949,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AggregatedStatistics"
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /statistics/histogram/{interval}:
     get:
       tags:
@@ -944,7 +991,7 @@ paths:
                       type: number
                       example: 512.0
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
   /statistics/breaktime/{interval}:
     get:
       tags:
@@ -984,7 +1031,7 @@ paths:
                       type: number
                       example: 689.0
         403:
-          $ref: '#/components/responses/UnauthorizedError'
+          $ref: "#/components/responses/UnauthorizedError"
 components:
   schemas:
     TimeEntry:
@@ -1299,20 +1346,17 @@ components:
       items:
         $ref: "#/components/schemas/UniqueUser"
     UniqueUser:
-      required:
-        - name
-        - password
       type: object
       properties:
         id:
           type: string
           example: unique identifier
+        mailAddress:
+          type: string
+          example: albert@einstein.edu
         name:
           type: string
           example: Tester
-        password:
-          type: string
-          example: test12345
     User:
       required:
         - name
@@ -1322,9 +1366,26 @@ components:
         name:
           type: string
           example: Tester
+        mailAddress:
+          type: string
+          example: albert@einstein.edu
+    FullUser:
+      required:
+        - name
+        - password
+      type: object
+      properties:
+        name:
+          type: string
+          example: Tester
+        mailAddress:
+          type: string
+          example: albert@einstein.edu
         password:
           type: string
-          example: test12345
+          format: password
+          minLength: 5
+          example: jshHfu3ek=fDÖ
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
       type: http

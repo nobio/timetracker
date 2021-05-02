@@ -163,6 +163,9 @@ const User = new mongoose.Schema({
   password: {
     type: String, required: true, default: false, index: false,
   },
+  mailaddress: {
+    type: String, required: true, default: false, index: false,
+  },
 });
 mongoose.model('User', User);
 

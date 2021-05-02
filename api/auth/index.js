@@ -11,9 +11,10 @@ const jwt = require('jsonwebtoken');
  */
  exports.getAllUsers = async (req, res) => {
   try {
-    const result = await util.getAllUsers(req.body.name, req.body.password);
+    const result = await util.getAllUsers();
     res.status(200).json(result);
   } catch (err) {
+    console.error(err)
     res.status(500).json({ message: err });
   }
 };
@@ -31,6 +32,7 @@ const jwt = require('jsonwebtoken');
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
   } catch (err) {
+    console.error(err)
     res.status(500).json({ message: err });
   }
 };
@@ -48,6 +50,7 @@ exports.deleteUser = async (req, res) => {
     const result = await util.deleteUser(req.params.id);
     res.status(202).json(result);
   } catch (err) {
+    console.error(err)
     res.status(500).json({ message: err });
   }
 };
@@ -56,16 +59,17 @@ exports.deleteUser = async (req, res) => {
 /**
  * create a new user
  *
- * curl -X POST -H "Content-Type: application/json" -d '{"name": "Tester", "password": "test12345"}' http://localhost:30000/api/users
+ * curl -X POST -H "Content-Type: application/json" -d '{"name": "Tester", "mailAddress": "albert@einstein.edu", "password": "test12345"}' http://localhost:30000/api/users
  *
  * @param {*} req Request object
  * @param {*} res Response object
  */
  exports.createUser = async (req, res) => {
   try {
-    const result = await util.createUser(req.body.name, req.body.password);
+    const result = await util.createUser(req.body.name, req.body.mailAddress, req.body.password);
     res.status(201).json(result);
   } catch (err) {
+    console.error(err)
     res.status(500).json({ message: err });
   }
 };
@@ -73,17 +77,35 @@ exports.deleteUser = async (req, res) => {
 /**
  * updates an existing user
  *
- * curl -X PUT -H "Content-Type: application/json" -d '{"name": "Tester", "password": "test12345"}' http://localhost:30000/api/users/123456789
+ * curl -X PUT -H "Content-Type: application/json" -d '{"name": "Tester", "mailAddress": "albert@einstein.edu"}' http://localhost:30000/api/users/123456789
  *
  * @param {*} req Request object
  * @param {*} res Response object
  */
  exports.updateUser = async (req, res) => {
   try {
-    const result = await util.updateUser(req.params.id, req.body.name, req.body.password);
+    const result = await util.updateUser(req.params.id, req.body.name, req.body.mailAddress);
     res.status(201).json(result);
   } catch (err) {
-    console.log(err)
+    console.error(err)
+    if(err.message === 'User does not exists')
+      res.status(404).json({ message: err.message });
+    else
+      res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * updates only the password of a user
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.updateUsersPassword = async (req, res) => {
+  try {
+    const result = await util.updateUsersPassword(req.params.id, req.body.password);
+    res.status(201).json(result);
+  } catch (err) {
+    console.error(err)
     if(err.message === 'User does not exists')
       res.status(404).json({ message: err.message });
     else

@@ -12,6 +12,7 @@ const Token = mongoose.model('Token');
  * @returns Array of all registered users
  * @param {*} name User name of user
  * @param {*} password Password of user
+ * @param {*} mailAddress mail address of user
  */
 exports.getAllUsers = async () => {
   const users = [];
@@ -24,7 +25,7 @@ exports.getAllUsers = async () => {
             {
               id: user._id,
               name: user.name,
-              password: user.password
+              mailAddress: user.mailaddress
             }
           )
         });
@@ -38,12 +39,12 @@ exports.getUser = async (id) => {
   if (!id) throw Error('id must be provided');
 
   return new Promise((resolve, reject) => {
-    User.findById(id)
+    User.findById({ _id: id })
       .then(res => {
         resolve({
           id: res._id,
           name: res.name,
-          password: res.password
+          mailAddress: res.mailaddress
         })
       })
       .then(ret => resolve(ret))
@@ -56,10 +57,12 @@ exports.getUser = async (id) => {
  * creates a new user in database
  *
  * @param {*} name User name of user
+ * @param {*} mailAddress  Mail address of uzser
  * @param {*} password Password of user
  */
- exports.createUser = async (name, password) => {
+exports.createUser = async (name, mailAddress, password) => {
   if (!name) throw Error('User must be provided');
+  if (!mailAddress) throw Error('Mail address must be provided');
   if (!password) throw Error('No password provided');
 
   const user = await User.findOne({ name });
@@ -70,6 +73,7 @@ exports.getUser = async (id) => {
     new User({
       name,
       password: hashedPassword,
+      mailaddress: mailAddress
     }).save()
       .then(ret => resolve(ret._id))
       .catch(err => reject(err));
@@ -80,19 +84,33 @@ exports.getUser = async (id) => {
  * updates an existing user in database
  *
  * @param {*} ud Unique ID of user
- * @param {*} name User name of user
- * @param {*} password Password of user
+ * @param {*} name User name of user (optional)
+ * @param {*} mailAddress mail address of user (optional)
  */
- exports.updateUser = async (id, name, password) => {
+exports.updateUser = async (id, name, mailAddress) => {
   if (!id) throw Error('User must be provided');
-  if (!name) throw Error('User must be provided');
-  if (!password) throw Error('No password provided');
 
   const user = await User.findById(id);
   if (!user) throw Error('User does not exists');
 
+  if (name) user.name = name;
+  if (mailAddress) user.mailaddress = mailAddress;
+
+  return new Promise((resolve, reject) => {
+    user.save()
+      .then(ret => resolve(ret._id))
+      .catch(err => reject(err));
+  });
+};
+
+exports.updateUsersPassword = async (id, password) => {
+  if (!id) throw Error('User must be provided');
+  if (!password) throw Error('Password must be provided');
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  user.name = name;
+
+  const user = await User.findById(id);
+  if (!user) throw Error('User does not exists');
   user.password = hashedPassword;
 
   return new Promise((resolve, reject) => {
@@ -101,6 +119,7 @@ exports.getUser = async (id) => {
       .catch(err => reject(err));
   });
 };
+
 
 /**
  * Delete a user by it's id
