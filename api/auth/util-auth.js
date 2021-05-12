@@ -153,7 +153,10 @@ exports.login = async (name, password) => {
   if (!(await bcrypt.compare(password, mdbUser.password))) {
     throw createError(401);
   }
-  const user = { name: mdbUser.name };
+  const user = {
+    name: mdbUser.name,
+    mailAddress: mdbUser.mailaddress
+  };
 
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
   const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRE });

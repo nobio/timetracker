@@ -214,7 +214,9 @@ describe('test utilAuth.login', () => {
       expect(result).to.be.a('object');
       expect(result).to.have.property('accessToken');
       expect(result).to.have.property('refreshToken');
+
       refreshToken = result.refreshToken;
+      expect(refreshToken).to.be.a('string');
     } catch (err) {
       throw Error(err);
     } finally {
