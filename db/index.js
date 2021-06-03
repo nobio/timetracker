@@ -180,7 +180,7 @@ const Token = new mongoose.Schema({
     type: String, required: true, index: true, unique: true,
   },
   user: {
-    type: String, required: false, index: false, unique: false, default: 'ANONYMOUS',
+    type: String, required: false, index: true, unique: false, default: 'ANONYMOUS',
   },
 });
 mongoose.model('Token', Token);

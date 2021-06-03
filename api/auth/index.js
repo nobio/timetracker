@@ -142,7 +142,7 @@ exports.logout = async (req, res) => {
     await util.logout(req.params.token);
     res.status(200).send();
   } catch (err) {
-    res.status(err.status).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 

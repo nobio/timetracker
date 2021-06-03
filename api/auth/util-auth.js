@@ -206,8 +206,11 @@ exports.refreshToken = async (refreshToken) => {
 exports.logout = async (token) => {
   if (!token) throw createError(400, 'Token must be provided');
   try {
-    await Token.deleteOne({ token });
+    //await Token.deleteOne({ token });  // delete this refresh token
+    const user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    await Token.deleteMany({ user: user.username });  // delete all refresh tokens with the same username
   } catch (err) {
+    console.error(err)
     return createError(400, err.message);
   }
 };
