@@ -66,7 +66,7 @@ exports.deleteUser = async (req, res) => {
  */
  exports.createUser = async (req, res) => {
   try {
-    const result = await util.createUser(req.body.name, req.body.mailAddress, req.body.password);
+    const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
@@ -84,7 +84,7 @@ exports.deleteUser = async (req, res) => {
  */
  exports.updateUser = async (req, res) => {
   try {
-    const result = await util.updateUser(req.params.id, req.body.name, req.body.mailAddress);
+    const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
@@ -130,7 +130,7 @@ exports.login = async (req, res) => {
   }
 
   try {
-    const tokens = await util.login(req.body.name, password);
+    const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
     res.status(err.status).json({ message: err });
@@ -152,7 +152,7 @@ exports.logout = async (req, res) => {
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.params.token;
   if (refreshToken == null) {
-    res.status(401).send();
+    res.status(401).send('Unauthorized refresh token');
     return;
   }
 
@@ -179,9 +179,7 @@ exports.authorizeToken = async (req, res, next) => {
 
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
-  if (/*HACK for developing phase: ignore auth for https*/
-    (req.protocol === 'https' && process.env.IGNORE_AUTH_PROTOCOL === 'https') ||
-    process.env.AUTHORIZATION !== 'on' || 
+  if (process.env.AUTHORIZATION !== 'on' || 
     (
       (req.method === 'POST' && req.url === '/api/auth/login') ||
       (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
@@ -197,7 +195,7 @@ exports.authorizeToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.status(401).send();
+  if (token == null) return res.status(401).send('Unauthorized');
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.status(403).send();

@@ -23,9 +23,10 @@ const should = chai.should;
 const util = require('../api/auth/util-auth');
 const auth = require('../api/auth');
 
+const TESTUSER_USERNAME = 'TEST_USER_USERNAME_DELETE_ME';
+const TESTUSER_PASSWORD = 'Test12345';
 const TESTUSER_NAME = 'TEST_USER_DELETE_ME';
 const TESTUSER_MAIL = 'TEST_USER_DELETE_ME@fake.com';
-const TESTUSER_PASSWORD = 'Test12345';
 
 /**
  * =============================================================
@@ -34,8 +35,10 @@ const TESTUSER_PASSWORD = 'Test12345';
  */
 describe('test utilAuth.getAllUsers', () => {
   let db;
-  before(() => {
+  before(async () => {
     db = require('../db');
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
   });
 
   it('getAllUsers', async () => {
@@ -43,6 +46,7 @@ describe('test utilAuth.getAllUsers', () => {
     // console.log(result);
     expect(result).to.be.an('array');
     expect(result).to.have.length > 0;
+    expect(result[0]).to.have.property('username');
     expect(result[0]).to.have.property('name');
     expect(result[0]).to.have.property('mailAddress');
   });
@@ -56,15 +60,16 @@ describe('test utilAuth.getAllUsers', () => {
 describe('test utilAuth.createUser', () => {
   let db;
   before(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ username: TESTUSER_USERNAME });
     db = require('../db');
   });
 
   it('create new user', async () => {
     try {
-      const result = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+      const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       expect(result).to.be.an.integer;
       const user = await util.getUser(result);
+      expect(user.username).to.eq(TESTUSER_USERNAME);
       expect(user.name).to.eq(TESTUSER_NAME);
       expect(user.mailAddress).to.eq(TESTUSER_MAIL);
     } catch (err) {
@@ -75,7 +80,7 @@ describe('test utilAuth.createUser', () => {
   it('try to create user twice', async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500)); // sleep a little while...
-      const result = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+      const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
@@ -85,8 +90,18 @@ describe('test utilAuth.createUser', () => {
 
   it('try to create user without password (empty)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
-      const result = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, '');
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME, '');
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.message).to.equal('No password provided');
+    }
+  });
+  it('try to create user without password (null)', async () => {
+    try {
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME, null);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
@@ -95,8 +110,8 @@ describe('test utilAuth.createUser', () => {
   });
   it('try to create user without password (undefined)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
-      const result = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL);
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
@@ -105,53 +120,62 @@ describe('test utilAuth.createUser', () => {
   });
   it('try to create user without mail address (undefined)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
-      const result = await util.createUser(TESTUSER_NAME);
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('Mail address must be provided');
     }
   });
-  it('try to create user without password (null)', async () => {
+  it('try to create user without display name (undefined)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
-      const result = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, null);
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, undefined, TESTUSER_MAIL);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
-      expect(err.message).to.equal('No password provided');
+      expect(err.message).to.equal('Display name  must be provided');
     }
   });
-
+  it('try to create user without display name (null)', async () => {
+    try {
+      await User.deleteOne({ name: TESTUSER_USERNAME });
+      const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, null, TESTUSER_MAIL);
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.message).to.equal('Display name  must be provided');
+    }
+  });
   it('try to create user without name (empty)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
+      await User.deleteOne({ password: TESTUSER_PASSWORD });
       const result = await util.createUser('', '');
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
-      expect(err.message).to.equal('User must be provided');
+      expect(err.message).to.equal('Users unique user name must be provided');
     }
   });
   it('try to create user without name (undefined)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
+      await User.deleteOne({ username: undefined, password: TESTUSER_PASSWORD });
       const result = await util.createUser();
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
-      expect(err.message).to.equal('User must be provided');
+      expect(err.message).to.equal('Users unique user name must be provided');
     }
   });
   it('try to create user without name (null)', async () => {
     try {
-      await User.deleteOne({ name: TESTUSER_NAME });
+      await User.deleteOne({ username: TESTUSER_USERNAME });
       const result = await util.createUser(null, null);
       assert.fail(); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
-      expect(err.message).to.equal('User must be provided');
+      expect(err.message).to.equal('Users unique user name must be provided');
     }
   });
 });
@@ -164,13 +188,13 @@ describe('test utilAuth.createUser', () => {
 describe('test utilAuth.deleteUser', () => {
   let db;
   before(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ username: TESTUSER_USERNAME });
     db = require('../db');
   });
 
   it('delete an existing user', async () => {
     try {
-      const resultCreate = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+      const resultCreate = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       expect(resultCreate).to.be.an.integer;
 
       const resultDelete = await util.deleteUser(resultCreate);
@@ -200,16 +224,16 @@ describe('test utilAuth.login', () => {
   let db;
   before(async () => {
     db = require('../db');
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
-    await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('login with valid principal and credenital', async () => {
     let refreshToken = '';
     try {
-      const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+      const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
 
       expect(result).to.be.a('object');
       expect(result).to.have.property('accessToken');
@@ -226,7 +250,7 @@ describe('test utilAuth.login', () => {
 
   it('login with valid principal and invalid credenital', async () => {
     try {
-      const result = await util.login(TESTUSER_NAME, 'XXXXXX');
+      const result = await util.login(TESTUSER_USERNAME, 'XXXXXX');
 
       assert.fail(); // should not reach this...
     } catch (err) {
@@ -261,7 +285,7 @@ describe('test utilAuth.login', () => {
 
     try {
       // *** login to get the access- and refresh token
-      const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+      const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
       expect(result).to.be.a('object');
       expect(result).to.have.property('accessToken');
       expect(result).to.have.property('refreshToken');
@@ -303,13 +327,13 @@ describe('test utilAuth.login', () => {
       throw Error(err);
     } finally {
       await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
-      await User.deleteOne({ name: TESTUSER_NAME });
+      await User.deleteOne({ name: TESTUSER_USERNAME });
       await Token.deleteOne({ token: refreshToken });
     }
   });
 
   after(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ name: TESTUSER_USERNAME });
   });
 });
 
@@ -320,20 +344,20 @@ describe('test utilAuth.login', () => {
  */
 describe('test utilAuth.updateUsersPassword', () => {
   let refreshToken;
-  let userId; 
+  let userId;
   let db;
   before(async () => {
     db = require('../db');
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
-    userId = await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+    userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('set new password for existing user', async () => {
     const NEW_PASSWORD = "___SECRETPSSWORD___";
     try {
-      let result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+      let result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
       expect(result).to.be.a('object');
       expect(result).to.have.property('accessToken');
       expect(result).to.have.property('refreshToken');
@@ -343,21 +367,20 @@ describe('test utilAuth.updateUsersPassword', () => {
       await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
 
       // try to login with new password
-      result = await util.login(TESTUSER_NAME, NEW_PASSWORD);
+      result = await util.login(TESTUSER_USERNAME, NEW_PASSWORD);
       expect(result).to.be.a('object');
       expect(result).to.have.property('accessToken');
       expect(result).to.have.property('refreshToken');
 
       // try to login with old password
       try {
-        result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+        result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
         assert.fail(); // should not reach this...
       } catch (err) {
         expect(err).to.be.an('error');
         expect(err.status).to.equal(401);
         expect(err.message).to.equal('Unauthorized');
       }
-
 
     } catch (err) {
       throw Error(err);
@@ -366,8 +389,22 @@ describe('test utilAuth.updateUsersPassword', () => {
     }
   });
 
+  it('set new password for not existing user', async () => {
+    const NEW_PASSWORD = "___SECRETPSSWORD___";
+    try {
+      // update password
+      await util.updateUsersPassword('asdkahsd87ggakjhfbjkshdbuszvf', NEW_PASSWORD);
+      assert.fail(); // should not reach 
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.message).to.equal('User does not exists');
+    } finally {
+      await Token.deleteOne({ token: refreshToken });
+    }
+  });
+
   after(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ name: TESTUSER_USERNAME });
   });
 });
 
@@ -393,7 +430,7 @@ describe('test index.authorizeToken', () => {
   });
 
   it('test for Unauthorized (401): call authorizeToken service with empty header and auth switch on', async () => {
-    //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
+    //    const req = mockRequest({ headers: [{name: TESTUSER_USERNAME, password: TESTUSER_PASSWORD}] });
     process.env.AUTHORIZATION = 'on';
     const req = mockRequest({ headers: [] }); req.url = '/api/xyz';
     const res = mockResponse();
@@ -408,7 +445,7 @@ describe('test index.authorizeToken', () => {
   });
 
   it('test for Forbidden (403): call authorizeToken service with header but invalid token and auth switch on', async () => {
-    //    const req = mockRequest({ headers: [{name: TESTUSER_NAME, password: TESTUSER_PASSWORD}] });
+    //    const req = mockRequest({ headers: [{name: TESTUSER_USERNAME, password: TESTUSER_PASSWORD}] });
     process.env.AUTHORIZATION = 'on';
     const req = mockRequest({ headers: { authorization: 'Bearer xxx.yyy.zzz' } }); req.url = '/api/xyz';
     const res = mockResponse();
@@ -452,11 +489,12 @@ describe('test index.refreshToken', () => {
 
   before(async () => {
     // *** create a user with password
-    await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
 
     // *** then login to get the access- and refresh token
-    const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+    const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
     expect(result).to.be.a('object');
     expect(result).to.have.property('accessToken');
     expect(result).to.have.property('refreshToken');
@@ -505,9 +543,9 @@ describe('test index.refreshToken', () => {
   });
 
   after(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
+    await User.deleteOne({ name: TESTUSER_USERNAME });
     await Token.deleteOne({ token: refreshToken });
-    await Token.deleteMany({ user: TESTUSER_NAME });
+    await Token.deleteMany({ user: TESTUSER_USERNAME });
   });
 });
 
@@ -519,13 +557,14 @@ describe('test index.refreshToken', () => {
 describe('test index.logout', () => {
   before(async () => {
     // *** create a user with password
-    await util.createUser(TESTUSER_NAME, TESTUSER_MAIL, TESTUSER_PASSWORD);
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
     await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('test for OK (200): call logout', async () => {
     // *** login to get the access- and refresh token
-    const result = await util.login(TESTUSER_NAME, TESTUSER_PASSWORD);
+    const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
     const token = result.refreshToken;
 
     let req = mockRequest({ headers: [], params: { token } });
@@ -577,8 +616,8 @@ describe('test index.logout', () => {
   });
 
   after(async () => {
-    await User.deleteOne({ name: TESTUSER_NAME });
-    await Token.deleteMany({ user: TESTUSER_NAME });
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    await Token.deleteMany({ user: TESTUSER_USERNAME });
   });
 });
 

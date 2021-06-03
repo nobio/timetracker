@@ -157,11 +157,14 @@ mongoose.model('GeoTracking', GeoTracking);
 // -------------- Users -------------- --------------
 // --------------------------------------------------
 const User = new mongoose.Schema({
-  name: {
+  username: {
     type: String, required: true, index: true, unique: true,
   },
   password: {
     type: String, required: true, default: false, index: false,
+  },
+  name: {
+    type: String, required: true, index: false, unique: false,
   },
   mailaddress: {
     type: String, required: true, default: false, index: false,

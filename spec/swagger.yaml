@@ -23,7 +23,7 @@ paths:
         - Authentication & Authorization
       summary: Login of a user
       description:
-        A user (name, password) will be authenticated; a jwt access token
+        A user (username, password) will be authenticated; a jwt access token
         (5min expiry) and a refresh token will be returned.
       requestBody:
         description: The User object to be authenticated
@@ -1350,19 +1350,25 @@ components:
       properties:
         id:
           type: string
-          example: unique identifier
-        mailAddress:
+          example: asdjas0sd-sdasdi-asdasd
+        username:
           type: string
-          example: albert@einstein.edu
+          example: tester
         name:
           type: string
           example: Tester
+        mailAddress:
+          type: string
+          example: albert@einstein.edu
     User:
       required:
-        - name
+        - username
         - password
       type: object
       properties:
+        username:
+          type: string
+          example: tester
         name:
           type: string
           example: Tester
@@ -1371,21 +1377,24 @@ components:
           example: albert@einstein.edu
     FullUser:
       required:
-        - name
+        - username
         - password
       type: object
       properties:
+        username:
+          type: string
+          example: Tester
+        password:
+          type: string
+          format: password
+          minLength: 5
+          example: jshHfu3ek=fDÖ
         name:
           type: string
           example: Tester
         mailAddress:
           type: string
           example: albert@einstein.edu
-        password:
-          type: string
-          format: password
-          minLength: 5
-          example: jshHfu3ek=fDÖ
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
       type: http

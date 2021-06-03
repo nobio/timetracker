@@ -10,8 +10,9 @@ const Token = mongoose.model('Token');
  * Reads all registeredusers
  *
  * @returns Array of all registered users
- * @param {*} name User name of user
+ * @param {*} username User id in terms of credentials of user
  * @param {*} password Password of user
+ * @param {*} name User name of user
  * @param {*} mailAddress mail address of user
  */
 exports.getAllUsers = async () => {
@@ -24,8 +25,9 @@ exports.getAllUsers = async () => {
           users.push(
             {
               id: user._id,
+              username: user.username,
               name: user.name,
-              mailAddress: user.mailaddress
+              mailAddress: user.mailaddress,
             }
           )
         });
@@ -43,8 +45,9 @@ exports.getUser = async (id) => {
       .then(res => {
         resolve({
           id: res._id,
+          username: res.username,
           name: res.name,
-          mailAddress: res.mailaddress
+          mailAddress: res.mailaddress,
         })
       })
       .then(ret => resolve(ret))
@@ -56,23 +59,26 @@ exports.getUser = async (id) => {
 /**
  * creates a new user in database
  *
+ * @param {*} username User name of user
+ * @param {*} password Password of user
  * @param {*} name User name of user
  * @param {*} mailAddress  Mail address of uzser
- * @param {*} password Password of user
  */
-exports.createUser = async (name, mailAddress, password) => {
-  if (!name) throw Error('User must be provided');
-  if (!mailAddress) throw Error('Mail address must be provided');
+exports.createUser = async (username, password, name, mailAddress) => {
+  if (!username) throw Error('Users unique user name must be provided');
   if (!password) throw Error('No password provided');
+  if (!name) throw Error('Display name  must be provided');
+  if (!mailAddress) throw Error('Mail address must be provided');
 
-  const user = await User.findOne({ name });
+  const user = await User.findOne({ username });
   if (user) throw Error('User already exists');
 
   const hashedPassword = await bcrypt.hash(password, 10);
   return new Promise((resolve, reject) => {
     new User({
-      name,
+      username,
       password: hashedPassword,
+      name,
       mailaddress: mailAddress
     }).save()
       .then(ret => resolve(ret._id))
@@ -83,16 +89,18 @@ exports.createUser = async (name, mailAddress, password) => {
 /**
  * updates an existing user in database
  *
- * @param {*} ud Unique ID of user
+ * @param {*} id Unique ID of user
+ * @param {*} username User name of user (optional)
  * @param {*} name User name of user (optional)
  * @param {*} mailAddress mail address of user (optional)
  */
-exports.updateUser = async (id, name, mailAddress) => {
+exports.updateUser = async (id, username, name, mailAddress) => {
   if (!id) throw Error('User must be provided');
 
   const user = await User.findById(id);
   if (!user) throw Error('User does not exists');
 
+  if (username) user.username = username;
   if (name) user.name = name;
   if (mailAddress) user.mailaddress = mailAddress;
 
@@ -107,17 +115,21 @@ exports.updateUsersPassword = async (id, password) => {
   if (!id) throw Error('User must be provided');
   if (!password) throw Error('Password must be provided');
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.findById(id);
-  if (!user) throw Error('User does not exists');
-  user.password = hashedPassword;
-
-  return new Promise((resolve, reject) => {
-    user.save()
-      .then(ret => resolve(ret._id))
-      .catch(err => reject(err));
-  });
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.findById(id);
+    if (!user) throw Error('User does not exists');
+    user.password = hashedPassword;
+  
+    return new Promise((resolve, reject) => {
+      user.save()
+        .then(ret => resolve(ret._id))
+        .catch(err => reject(err));
+    });
+      
+  } catch (error) {
+    throw Error('User does not exists');
+  }
 };
 
 
@@ -139,22 +151,22 @@ exports.deleteUser = async (id) => {
 /**
  * login with user and password (needs to be passed)
  *
- * @param {*} name User name of user
+ * @param {*} username User name of user
  * @param {*} password Password of user
  * @returns accessToken
  */
-exports.login = async (name, password) => {
-  if (!name) throw createError(400, 'User must be provided');
+exports.login = async (username, password) => {
+  if (!username) throw createError(400, 'User must be provided');
   if (!password) throw createError(400, 'No password provided');
 
-  const mdbUser = await User.findOne({ name });
+  const mdbUser = await User.findOne({ username });
   if (mdbUser == null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) {
     throw createError(401);
   }
   const user = {
-    name: mdbUser.name,
+    username: mdbUser.username,
     mailAddress: mdbUser.mailaddress
   };
 
@@ -163,7 +175,7 @@ exports.login = async (name, password) => {
 
   new Token({
     token: refreshToken,
-    user: mdbUser.name,
+    user: mdbUser.username,
   }).save();
 
   return { accessToken, refreshToken };
@@ -194,7 +206,7 @@ exports.refreshToken = async (refreshToken) => {
 
   let accessToken;
   const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  accessToken = jwt.sign({ name: user.name }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
+  accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
 
   return { accessToken, user };
 };
