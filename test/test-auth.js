@@ -311,7 +311,7 @@ describe('test utilAuth.login', () => {
       res = mockResponse();
 
       await auth.authorizeToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(403);
+      expect(res.status).to.have.been.calledWith(401);
 
       // *** get a new token using the refresh token
       accessToken = await (await util.refreshToken(refreshToken)).accessToken;

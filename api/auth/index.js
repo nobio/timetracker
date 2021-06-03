@@ -199,7 +199,10 @@ exports.authorizeToken = async (req, res, next) => {
   if (token == null) return res.status(401).send('Unauthorized');
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.status(403).send();
+    if (err) {
+      if(err.name == 'TokenExpiredError') return res.status(401).send(err.message);
+      else return res.status(403).send(err.message);
+    }
 
     req.user = user; // store user in request object
     res.status(200);
