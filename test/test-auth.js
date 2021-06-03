@@ -502,20 +502,20 @@ describe('test index.refreshToken', () => {
     refreshToken = result.refreshToken;
   });
 
-  it('test for NOK (401): call refreshToken but without token', async () => {
+  it('test for NOK (400): call refreshToken but without token', async () => {
     const req = mockRequest({ headers: [], body: { token: null } });
     const res = mockResponse();
     const next = sinon.spy();
 
     try {
       await auth.refreshToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(401);
+      expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       throw Error(err);
     }
   });
 
-  it('test for NOK (401): call refreshToken with invalid token', async () => {
+  it('test for NOK (400): call refreshToken with invalid token', async () => {
     const req = mockRequest({ headers: [], body: { token: 'xxx.yyy.zzz' } });
     const res = mockResponse();
     const next = sinon.spy();
@@ -523,7 +523,7 @@ describe('test index.refreshToken', () => {
     try {
       await auth.refreshToken(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
-      expect(res.status).to.have.been.calledWith(401);
+      expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       throw Error(err);
     }

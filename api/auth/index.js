@@ -133,7 +133,7 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
-    res.status(err.status).json({ message: err });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -142,7 +142,7 @@ exports.logout = async (req, res) => {
     await util.logout(req.params.token);
     res.status(200).send();
   } catch (err) {
-    res.status(err.status).json({ message: err });
+    res.status(err.status).json({ message: err.message });
   }
 };
 
@@ -152,7 +152,7 @@ exports.logout = async (req, res) => {
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.params.token;
   if (refreshToken == null) {
-    res.status(401).send('Unauthorized refresh token');
+    res.status(400).send('Unauthorized refresh token');
     return;
   }
 
@@ -160,7 +160,8 @@ exports.refreshToken = async (req, res) => {
     const token = await util.refreshToken(refreshToken);
     res.status(200).send(token);
   } catch (err) {
-    res.status(err.status).json({ message: err });
+    console.error(err)
+    res.status(400).send({ message: err.message });
   }
 };
 

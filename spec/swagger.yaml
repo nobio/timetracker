@@ -32,9 +32,9 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                username:
                   type: string
-                  example: Tester
+                  example: tester
                 password:
                   type: string
                   format: password
@@ -88,15 +88,15 @@ paths:
         200:
           description: Invalidates the refresh token of a user
           content: {}
-  /auth/token/{refresh-token}:
+  /auth/token/{token}:
     post:
       tags:
         - Authentication & Authorization
-      summary: Renews the access token using the refresh token
+      summary: Refresh the access token using the refresh token
       parameters:
         - name: token
           in: path
-          description: Renews the access token using the refresh token
+          description: Refresh the access token using the refresh token
           required: true
           schema:
             type: string

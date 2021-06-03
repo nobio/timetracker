@@ -42,6 +42,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(api_auth.authorizeToken);
+console.log(process.envs)
 
 /* ============================================================================= */
 const spec = fs.readFileSync(path.join(__dirname, 'spec/swagger.yaml'), 'utf8');

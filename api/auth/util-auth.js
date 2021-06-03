@@ -120,13 +120,13 @@ exports.updateUsersPassword = async (id, password) => {
     const user = await User.findById(id);
     if (!user) throw Error('User does not exists');
     user.password = hashedPassword;
-  
+
     return new Promise((resolve, reject) => {
       user.save()
         .then(ret => resolve(ret._id))
         .catch(err => reject(err));
     });
-      
+
   } catch (error) {
     throw Error('User does not exists');
   }
@@ -167,18 +167,35 @@ exports.login = async (username, password) => {
   }
   const user = {
     username: mdbUser.username,
+    name: mdbUser.name,
     mailAddress: mdbUser.mailaddress
   };
 
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
   const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: process.env.REFRESH_TOKEN_EXPIRE });
 
+  // save the refresh token to database only. The access token will not be persisted
   new Token({
     token: refreshToken,
     user: mdbUser.username,
   }).save();
 
   return { accessToken, refreshToken };
+};
+
+/**
+ * validates input and creates a new token with expire time using (validating) the refresh token
+ */
+exports.refreshToken = async (refreshToken) => {
+  const storedRefreshToken = await Token.findOne({ token: refreshToken });
+  if (storedRefreshToken == null) {
+    throw createError(401, 'Unauthorized (invalid refresh token)');
+  }
+  const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+  delete user.iat; delete user.exp;
+  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
+
+  return { accessToken };
 };
 
 /**
@@ -193,22 +210,6 @@ exports.logout = async (token) => {
   } catch (err) {
     return createError(400, err.message);
   }
-};
-
-/**
- * validates input and creates a new token with expire time using (validating) the refresh token
- */
-exports.refreshToken = async (refreshToken) => {
-  const storedRefreshToken = await Token.findOne({ token: refreshToken });
-  if (storedRefreshToken == null) {
-    throw createError(401, 'Unauthorized (invalid refresh token)');
-  }
-
-  let accessToken;
-  const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
-
-  return { accessToken, user };
 };
 
 /**
