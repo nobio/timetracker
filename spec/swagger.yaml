@@ -70,36 +70,34 @@ paths:
                     description: error message
                     example: Unauthorized
       x-codegen-request-body-name: User
-  /auth/logout/{token}:
+  /auth/logout:
     post:
       tags:
         - Authentication & Authorization
-      summary: Get time entry with given ID
-      parameters:
-        - name: token
-          in: path
-          description:
-            long living refresh token will be invalidated (short livinf access
-            token might still live until expiry)
-          required: true
-          schema:
-            type: string
+      summary: logout and destroy tokens; does not need bearer token
+      requestBody:
+        description: long living refresh token will be invalidated (short living access token might still live until expiry)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Token"
+        required: true
       responses:
         200:
           description: Invalidates the refresh token of a user
           content: {}
-  /auth/token/{token}:
+  /auth/token:
     post:
       tags:
         - Authentication & Authorization
       summary: Refresh the access token using the refresh token
-      parameters:
-        - name: token
-          in: path
-          description: Refresh the access token using the refresh token
-          required: true
-          schema:
-            type: string
+      requestBody:
+        description: long living refresh token will be invalidated (short living access token might still live until expiry)
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Token"
+        required: true
       responses:
         200:
           description: new access token
@@ -1395,6 +1393,15 @@ components:
         mailAddress:
           type: string
           example: albert@einstein.edu
+    Token:
+      required:
+        - token
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
       type: http

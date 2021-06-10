@@ -125,7 +125,7 @@ exports.login = async (req, res) => {
   // console.log(req)
   const password = req.body.password;
   if (password == null) {
-    res.status(400).send();
+    res.status(401).send();
     return;
   }
 
@@ -133,13 +133,24 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    if(err.status) {
+      res.status(err.status).json({ message: err.message });
+    } else {
+      res.status(401).json({ message: err.message });
+    }
   }
 };
 
+/**
+ * logout of a session
+ * curl -X POST -H "Content-Type: application/json" -d '{"token": "eyJh...sw5c"}' http://localhost:30000/api/auth/logout
+ * 
+ * @param {token} req JWT Token
+ * @param {*} res 
+ */
 exports.logout = async (req, res) => {
   try {
-    await util.logout(req.params.token);
+    await util.logout(req.body.token);
     res.status(200).send();
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -148,9 +159,13 @@ exports.logout = async (req, res) => {
 
 /**
  * Use the refresh token to generate a new token
+ * curl -X POST -H "Content-Type: application/json" -d '{"token": "eyJh...sw5c"}' http://localhost:30000/api/auth/token
+ * 
+ * @param {token} req JWT Token
+ * @param {*} res 
  */
 exports.refreshToken = async (req, res) => {
-  const refreshToken = req.params.token;
+  const refreshToken = req.body.token;
   if (refreshToken == null) {
     res.status(400).send('Unauthorized refresh token');
     return;

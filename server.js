@@ -42,7 +42,9 @@ morgan.token('auth-headers', function (req, res) {
   else
     return '';
 })
-app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status :auth-headers'));
+app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
+// app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status :auth-headers'));
+// app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status :auth-headers'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
 app.use(cookieParser());
@@ -155,8 +157,8 @@ app.put('/api/users/:id/password', api_auth.updateUsersPassword);
 app.delete('/api/users/:id', api_auth.deleteUser);
 
 app.post('/api/auth/login', api_auth.login);
-app.post('/api/auth/logout/:token', api_auth.logout);
-app.post('/api/auth/token/:token', api_auth.refreshToken);
+app.post('/api/auth/logout', api_auth.logout);
+app.post('/api/auth/token', api_auth.refreshToken);
 
 if (process.env.SLACK_TOKEN) {
   console.log('using Slack to notify');

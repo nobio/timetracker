@@ -128,7 +128,7 @@ exports.updateUsersPassword = async (id, password) => {
     });
 
   } catch (error) {
-    throw Error('User does not exists');
+    throw createError('User does not exists');
   }
 };
 
@@ -163,7 +163,7 @@ exports.login = async (username, password) => {
   if (mdbUser == null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) {
-    throw createError(401);
+    throw createError(401, 'User not authenticated');
   }
   const user = {
     username: mdbUser.username,
@@ -210,8 +210,7 @@ exports.logout = async (token) => {
     const user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     await Token.deleteMany({ user: user.username });  // delete all refresh tokens with the same username
   } catch (err) {
-    console.error(err)
-    return createError(400, err.message);
+    throw createError(400, err.message);
   }
 };
 
@@ -232,7 +231,7 @@ exports.removeExpiredToken = async () => {
     });
   } catch (err) {
     console.log(err)
-    return createError(500, err.message);
+    throw createError(500, err.message);
   }
 };
 

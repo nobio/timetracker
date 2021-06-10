@@ -248,7 +248,7 @@ describe('test utilAuth.login', () => {
     }
   });
 
-  it('login with valid principal and invalid credenital', async () => {
+  it('login with valid principal and invalid credential', async () => {
     try {
       const result = await util.login(TESTUSER_USERNAME, 'XXXXXX');
 
@@ -256,7 +256,7 @@ describe('test utilAuth.login', () => {
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.status).to.equal(401);
-      expect(err.message).to.equal('Unauthorized');
+      expect(err.message).to.equal('User not authenticated');
     }
   });
 
@@ -379,7 +379,7 @@ describe('test utilAuth.updateUsersPassword', () => {
       } catch (err) {
         expect(err).to.be.an('error');
         expect(err.status).to.equal(401);
-        expect(err.message).to.equal('Unauthorized');
+        expect(err.message).to.equal('User not authenticated');
       }
 
     } catch (err) {
@@ -529,14 +529,14 @@ describe('test index.refreshToken', () => {
     }
   });
 
-  it('test for OK (200): call refreshToken', async () => {
+  it('test for NOK (400): call refreshToken', async () => {
     const req = mockRequest({ headers: [], params: { token: refreshToken } });
     const res = mockResponse();
     const next = sinon.spy();
 
     try {
       await auth.refreshToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
+      expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       throw Error(err);
     }
@@ -567,7 +567,7 @@ describe('test index.logout', () => {
     const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
     const token = result.refreshToken;
 
-    let req = mockRequest({ headers: [], params: { token } });
+    let req = mockRequest({ headers: [], body: { token } });
     let res = mockResponse();
     const next = sinon.spy();
 
@@ -588,8 +588,8 @@ describe('test index.logout', () => {
     }
   });
 
-  it('test for OK (200): call logout but without token', async () => {
-    const req = mockRequest({ headers: [], params: { token: null } });
+  it('test for NOK (400): call logout but without token', async () => {
+    const req = mockRequest({ headers: [], body: { token: null } });
     const res = mockResponse();
     const next = sinon.spy();
 
@@ -601,7 +601,7 @@ describe('test index.logout', () => {
     }
   });
 
-  it('test for NOK (200): call logout with invalid token', async () => {
+  it('test for NOK (400): call logout with invalid token', async () => {
     const req = mockRequest({ headers: [], params: { token: 'xxx.yyy.zzz' } });
     const res = mockResponse();
     const next = sinon.spy();
@@ -609,7 +609,7 @@ describe('test index.logout', () => {
     try {
       await auth.logout(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
-      expect(res.status).to.have.been.calledWith(200);
+      expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       throw Error(err);
     }
