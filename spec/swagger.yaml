@@ -352,7 +352,9 @@ paths:
     post:
       tags:
         - Geo Tracking
-      summary: Create new time entry from Geo Fence event
+      summary: |
+        Create new time entry from Geo Fence event coming from Locative for example. 
+        Please mind this service requires basic authentication in header: "Basic <base64 encoded 'user:password'>"
       description:
         Create new time entry in system using geo fencing; time entrie's
         date will be "now"
@@ -1066,11 +1068,16 @@ components:
           example: 49.514135
     Geofence:
       required:
+        - id
         - direction
         - latitude
         - longitude
       type: object
       properties:
+        id:
+          type: string
+          description: Identifier of sender
+          example: Work, Home
         direction:
           type: string
           description: |
