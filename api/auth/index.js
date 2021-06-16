@@ -184,7 +184,7 @@ exports.authorize = async (req, res, next) => {
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
-  if (process.env.AUTHORIZATION === 'on' && (
+  if (process.env.AUTHORIZATION !== 'on' || (
     (req.method === 'POST' && req.url.startsWith('/api/auth/login')) ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
@@ -194,15 +194,13 @@ exports.authorize = async (req, res, next) => {
     console.log('authorization disabled for ' + req.url)
     res.status(200);
     return next();
-  } else if (process.env.AUTHORIZATION === 'on' && req.method === 'POST' && req.url === '/api/geofence') {
+  } else if (process.env.AUTHORIZATION === 'on' && req.method === 'POST' && req.url.startsWith('/api/geofence')) {
     // basic authorisation
     return this.authorizeBasicAuth(req, res, next);
   } else {
     // token authorization for the rest of us
     return this.authorizeToken(req, res, next);
   }
-
-
 };
 
 /**
@@ -252,7 +250,7 @@ exports.authorizeBasicAuth = async (req, res, next) => {
     res.status(200);
     next();
   } catch (err) {
-    //console.log(err);
+    console.log(err);
     res.status(400).json({ message: err.message });
   }
 };

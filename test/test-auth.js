@@ -298,7 +298,7 @@ describe('test utilAuth.login', () => {
 
       res = mockResponse();
 
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       // console.log(res.status.getCalls()[0].lastArg);
       expect(res.status).to.have.been.calledWith(200);
 
@@ -310,7 +310,7 @@ describe('test utilAuth.login', () => {
       req.url = '/api/auth/login';
       res = mockResponse();
 
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(401);
 
       // *** get a new token using the refresh token
@@ -321,7 +321,7 @@ describe('test utilAuth.login', () => {
       req.url = '/api/auth/login';
       res = mockResponse();
 
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
       throw Error(err);
@@ -411,17 +411,17 @@ describe('test utilAuth.updateUsersPassword', () => {
 
 /**
  * =============================================================
- * authorizeToken
+ * authorize
  * =============================================================
  */
-describe('test index.authorizeToken', () => {
+describe('test index.authorize', () => {
   it('test for OK (200): call authorizeToken service with empty header and auth switch off', async () => {
     process.env.AUTHORIZATION = 'off';
     const req = mockRequest({ headers: [] });
     const res = mockResponse();
     const next = sinon.spy();
     try {
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
     } catch (err) {
@@ -436,7 +436,7 @@ describe('test index.authorizeToken', () => {
     const res = mockResponse();
     const next = sinon.spy();
     try {
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(401);
       expect(next).to.not.have.been.called;
     } catch (err) {
@@ -451,7 +451,7 @@ describe('test index.authorizeToken', () => {
     const res = mockResponse();
     const next = sinon.spy();
     try {
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
 
       expect(res.status).to.have.been.calledWith(403);
       expect(next).to.not.have.been.called;
@@ -467,7 +467,7 @@ describe('test index.authorizeToken', () => {
     const res = mockResponse();
     const next = sinon.spy();
     try {
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
 
       expect(res.status).to.have.been.calledWith(200);
       expect(req.user).to.have.property('name'); // name: <Username> was added to request
@@ -476,6 +476,24 @@ describe('test index.authorizeToken', () => {
       throw Error(err);
     }
   });
+
+  it('test for OK (400): call authorizeBasic service with header incl. valid basic authentication  and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
+    req.url = '/api/geofence/';
+    req.method = 'POST';
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorize(req, res, next);
+
+      expect(res.status).to.have.been.calledWith(400);
+      expect(next).not.to.have.been.called;
+    } catch (err) {
+      throw Error(err);
+    }
+  });
+  
 });
 
 /**
@@ -580,7 +598,7 @@ describe('test index.logout', () => {
       req = mockRequest({ headers: { authorization: `Bearer ${token}` } }); req.url = '/api/xyz';
       res = mockResponse();
 
-      await auth.authorizeToken(req, res, next);
+      await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(403); // Forbidden
       expect(next).to.not.have.been.called;
     } catch (err) {
