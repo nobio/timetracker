@@ -5,6 +5,7 @@
  */
 require('../../db');
 const g_util = require('../global_util');
+const auth_util = require('../auth/util-auth');
 const moment = require('moment');
 const mongoose = require('mongoose');
 
@@ -91,14 +92,9 @@ exports.findById = id =>
  * @param latitude (optional) the latitude of this TimeEntry
  * @returns new TimeEntry object
  */
-exports.create = (timeEntry) => {
-  if (!timeEntry) {
-    throw new Error('to update a record, the passed object must not be undefined');
-  }
-
-  if (!timeEntry.datetime) {
-    timeEntry.datetime = moment();
-  }
+exports.create = async (timeEntry) => {
+  if (!timeEntry) throw new Error('to update a record, the passed object must not be undefined');
+  if (!timeEntry.datetime) timeEntry.datetime = moment();
 
   return new Promise((resolve, reject) => {
     this.getLastTimeEntryByDate(timeEntry.datetime)
@@ -238,12 +234,12 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
     resolve([]);
-//  } else if (timeentries.length % 2 !== 0) {
+    //  } else if (timeentries.length % 2 !== 0) {
   } else if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') !== moment(timeentries[timeentries.length - 1].last_changed).format('DD.MM.YYYY'))) {
     latestTimeEntry = timeentries[timeentries.length - 1];
     console.log(moment().format('DD.MM.YYYY'));
     console.log(moment(latestTimeEntry.last_changed).format('DD.MM.YYYY'));
-    if(moment().format('DD.MM.YYYY') === moment(latestTimeEntry.last_changed).format('DD.MM.YYYY')) {
+    if (moment().format('DD.MM.YYYY') === moment(latestTimeEntry.last_changed).format('DD.MM.YYYY')) {
       console.log(latestTimeEntry);
     }
 
@@ -252,7 +248,7 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
     let busytime = 0;
     let pause = 0;
     const lastTimeEntry = timeentries[timeentries.length - 1];
-    
+
     if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') === moment(lastTimeEntry.last_changed).format('DD.MM.YYYY'))) {
       timeentries.push(new TimeEntry({
         entry_date: moment().toISOString(),

@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
  * @param {*} req Request object
  * @param {*} res Response object
  */
- exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
   try {
     const result = await util.getAllUsers();
     res.status(200).json(result);
@@ -27,7 +27,7 @@ const jwt = require('jsonwebtoken');
  * @param {*} req Request object
  * @param {*} res Response object
  */
- exports.getUser = async (req, res) => {
+exports.getUser = async (req, res) => {
   try {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
@@ -64,7 +64,7 @@ exports.deleteUser = async (req, res) => {
  * @param {*} req Request object
  * @param {*} res Response object
  */
- exports.createUser = async (req, res) => {
+exports.createUser = async (req, res) => {
   try {
     const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
     res.status(201).json(result);
@@ -82,13 +82,13 @@ exports.deleteUser = async (req, res) => {
  * @param {*} req Request object
  * @param {*} res Response object
  */
- exports.updateUser = async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
     const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
-    if(err.message === 'User does not exists')
+    if (err.message === 'User does not exists')
       res.status(404).json({ message: err.message });
     else
       res.status(500).json({ message: err.message });
@@ -106,7 +106,7 @@ exports.updateUsersPassword = async (req, res) => {
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
-    if(err.message === 'User does not exists')
+    if (err.message === 'User does not exists')
       res.status(404).json({ message: err.message });
     else
       res.status(500).json({ message: err.message });
@@ -133,7 +133,7 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
-    if(err.status) {
+    if (err.status) {
       res.status(err.status).json({ message: err.message });
     } else {
       res.status(401).json({ message: err.message });
@@ -180,6 +180,31 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
+exports.authorize = async (req, res, next) => {
+  // check the switch if we are supposed to authorize
+  // or request is a login POST (must be possible without token)
+  // console.log(req.method, req.url);
+  if (process.env.AUTHORIZATION === 'on' && (
+    (req.method === 'POST' && req.url.startsWith('/api/auth/login')) ||
+    (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
+    (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
+    (req.method === 'GET' && req.url.startsWith('/api-docs'))
+  )) {
+    // just continue...
+    console.log('authorization disabled for ' + req.url)
+    res.status(200);
+    return next();
+  } else if (process.env.AUTHORIZATION === 'on' && req.method === 'POST' && req.url === '/api/geofence') {
+    // basic authorisation
+    return this.authorizeBasicAuth(req, res, next);
+  } else {
+    // token authorization for the rest of us
+    return this.authorizeToken(req, res, next);
+  }
+
+
+};
+
 /**
  * Middleware to authorize the access token created by /api/auth/login
  * This method is intentionally not implemented in util-auth because it
@@ -192,22 +217,6 @@ exports.refreshToken = async (req, res) => {
  * @param next callback to next middleware
  */
 exports.authorizeToken = async (req, res, next) => {
-
-  // check the switch if we are supposed to authorize
-  // or request is a login POST (must be possible without token)
-  if (process.env.AUTHORIZATION !== 'on' || 
-    (
-      (req.method === 'POST' && req.url === '/api/auth/login') ||
-      (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
-      (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
-      (req.method === 'GET' && req.url.startsWith('/api-docs'))
-    )) {
-    // just continue...
-    console.log('authorization disabled for ' + req.url)
-    res.status(200);
-    return next();
-  }
-
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -215,7 +224,7 @@ exports.authorizeToken = async (req, res, next) => {
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      if(err.name == 'TokenExpiredError') return res.status(401).send(err.message);
+      if (err.name == 'TokenExpiredError') return res.status(401).send(err.message);
       else return res.status(403).send(err.message);
     }
 
@@ -223,5 +232,28 @@ exports.authorizeToken = async (req, res, next) => {
     res.status(200);
     next();
   });
+};
+
+/**
+ * Middleware to authorize the access token created by /api/auth/login
+ * This method is intentionally not implemented in util-auth because it
+ * does not care about the content only about request header
+ *
+ * Clients need to create a new token using the refresh token when they got a 403 in the first place
+ *
+ * @param req Request object (includes the header and possibly token); user object will be added
+ * @param res Respons object; only used in case of error
+ * @param next callback to next middleware
+ */
+exports.authorizeBasicAuth = async (req, res, next) => {
+  const credentials = req.headers.authorization;
+  try {
+    await util.validateBasicAuth(credentials)
+    res.status(200);
+    next();
+  } catch (err) {
+    //console.log(err);
+    res.status(400).json({ message: err.message });
+  }
 };
 

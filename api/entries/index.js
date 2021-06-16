@@ -152,10 +152,23 @@ exports.getErrorDates = (req, res) => {
  */
 /** ******************************************************************************
  * takes an event triggered by Geofancy and creates und certain circumstances a new Time Entry
+ * mind that this endpoint is not secured by OAuth2. It requires Basic Auth
  *
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Work", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/api/geofence
  * curl -X POST -H "Content-Type: application/json" -d '{"device": "0C799CAD-D148-4F05-94EA-A74086AA91E3", "id": "Home", "latitude": "49.51429653451733", "longitude": "10.87531216443598", "timestamp": "1401728167.886038", "trigger": "enter"}' http://localhost:30000/api/geofence
  *
+ * 
+ curl -X 'POST' \
+  'https://localhost:30443/api/geofence' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Basic bm9iaW86c2NoZXJub28=' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "id": "Work, Home",
+  "direction": "enter",
+  "longitude": 10.875482,
+  "latitude": 49.514135
+}'
  ****************************************************************************** */
 exports.geofence = (req, res) => {
   console.log(JSON.stringify(req.body));

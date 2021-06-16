@@ -238,3 +238,21 @@ exports.removeExpiredToken = async () => {
 exports.removeTesterToken = async () => {
   await Token.deleteMany({ user: 'Tester' });
 };
+
+exports.validateBasicAuth = async (authorization) => {
+  if (!authorization) throw createError(401, 'Unauthorized; provide basic authentication');
+  const method = authorization.split(' ')[0];
+  if (method !== 'Basic') throw createError(401, 'Unauthorized; provide "Basic" authentication');
+  const credentialsBase64 = authorization.split(' ')[1];
+  const credentials = Buffer.from(credentialsBase64, 'base64').toString();
+  const username = credentials.split(':')[0];
+  const password = credentials.split(':')[1];
+  // console.log(user, password);
+
+  const mdbUser = await User.findOne({ username });
+  if (mdbUser == null) throw createError(401, 'User not authenticated');
+
+  if (!(await bcrypt.compare(password, mdbUser.password))) throw createError(401, 'User not authenticated');
+
+  return;
+};

@@ -49,7 +49,7 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - st
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use(api_auth.authorizeToken);
+app.use(api_auth.authorize);
 console.log(process.envs)
 
 /* ============================================================================= */
