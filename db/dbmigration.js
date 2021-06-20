@@ -7,7 +7,7 @@ mongoose.set('useUnifiedTopology', true);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 
-const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
+//const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
 //const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_DOCKER = 'mongodb://192.168.178.42:27017/timetracker';
 const MONGO_URL_MONGO = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
@@ -62,7 +62,7 @@ const FailureDay = new mongoose.Schema({
   date: {
     type: Date, required: true, index: false, unique: false,
   },
-  failure_type: { 
+  failure_type: {
     type: String, enum: failureTypes, required: true, index: false, unique: false,
   },
 });
@@ -91,35 +91,28 @@ console.log('\n--------------------------------------------------------------- '
 /**
  * Reads data from source data source and returns an json array
  */
-function getDataFromSource(source) {
-  return new Promise((resolve, reject) => {
-    console.log('connecting to source database');
-
-    source.find()
-      .then((entries) => {
-        console.log('closing source database');
-        // mongoose.connection.close();
-        resolve(entries);
-      })
-      .catch((err) => {
-        mongoose.connection.close();
-        reject(err);
-      });
-  });
+async function getDataFromSource(source) {
+  try {
+    const entries = await source.find();
+    console.log(`found ${entries.length} entries`);
+    return entries;
+  } catch (error) {
+    throw new Error(error);
+  }
 }
 
-function deleteAllTarget(target) {
-  return new Promise((resolve, reject) => {
-    if (SHOULD_EMPTY_TARGET) {
-      resolve('no delete');
-      return;
-    }
+async function deleteAllTarget(target) {
+  if (SHOULD_EMPTY_TARGET) {
+    return 'no delete';
+  }
+  try {
     console.log('connecting to target database');
     console.log('deleting target data');
-    target.deleteMany({})
-      .then(() => resolve('deletion ok'))
-      .catch(err => reject(err));
-  });
+    await target.deleteMany({});
+  } catch (error) {
+    throw new Error(error);
+  }
+
 }
 
 /**
@@ -166,21 +159,6 @@ function storeDataToTarget(entries, target) {
 
 if (HELP) process.exit(0);
 
-// start the migration...
-/*
-deleteAllTarget(TIME_ENTRY_MODEL_TARGET)
-  .then(() => getDataFromSource(TIME_ENTRY_MODEL_SOURCE))
-  .then(entries => storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET))
-
-  .then(deleteAllTarget(GEO_TRACKING_MODEL_TARGET))
-  .then(() => getDataFromSource(GEO_TRACKING_MODEL_SOURCE))
-  .then(entries => storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET))
-  .catch((err) => {
-    console.err(err);
-    console.err('***********************************************************************');
-    process.exit(-1);
-  });
-*/
 const app = async () => {
 
   try {
@@ -200,8 +178,8 @@ const app = async () => {
     //process.exit(0);
 
   } catch (err) {
-    console.err(err);
-    console.err('***********************************************************************');
+    console.error(err);
+    console.error('***********************************************************************');
     process.exit(-1);
   }
 };
