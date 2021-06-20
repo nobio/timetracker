@@ -32,10 +32,7 @@ const app = express();
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
-app.set('views', `${__dirname}/views`);
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'pug');
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 morgan.token('auth-headers', function (req, res) {
   if (req.headers['authorization'])
     return '\n' + JSON.stringify(req.headers['authorization']);
