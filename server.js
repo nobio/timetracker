@@ -57,11 +57,6 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
-app.get('/timetracker', (req, res) => {
-  console.log('redirecting to /')
-  res.redirect('/');
-});
-
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------
