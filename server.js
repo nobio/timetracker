@@ -4,7 +4,6 @@
 require('dotenv').config();
 require('./db');
 const express = require('express');
-const web = require('./web');
 const api_entries = require('./api/entries');
 const api_admin = require('./api/admin');
 const api_stats = require('./api/stats');
@@ -16,14 +15,13 @@ const http = require('http');
 const https = require('https');
 const path = require('path');
 const moment = require('moment');
-const favicon = require('serve-favicon');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
-
+const serveStatic = require('serve-static');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -32,25 +30,15 @@ const app = express();
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
-app.set('views', `${__dirname}/views`);
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'pug');
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-morgan.token('auth-headers', function (req, res) {
-  if (req.headers['authorization'])
-    return '\n' + JSON.stringify(req.headers['authorization']);
-  else
-    return '';
-})
+//app.use(express.static(path.join(__dirname, 'public')));
+//app.use(express.static(path.join(__dirname, 'www')));
+app.use(serveStatic('www', { 'index': ['index.html'] }));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
-// app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status :auth-headers'));
-// app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status :auth-headers'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(api_auth.authorize);
-console.log(process.envs)
 
 /* ============================================================================= */
 const spec = fs.readFileSync(path.join(__dirname, 'spec/swagger.yaml'), 'utf8');
@@ -69,16 +57,6 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
-// ------------------ PUG ------------------------------------------------
-// routes to pug templates
-// -----------------------------------------------------------------------
-app.get('/', web.index);
-app.get('/admin', web.admin);
-app.get('/admin_item', web.admin_item);
-app.get('/stats', web.stats);
-app.get('/statistics', web.statistics);
-app.get('/geo', web.geoloc);
-
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------

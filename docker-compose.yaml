@@ -1,0 +1,38 @@
+version: "3"
+services:
+  timetracker:
+    container_name: timetracker
+    restart: unless-stopped
+    image: nobio/timetracker:latest
+    #image: nobio/timetracker:_ionic5-frontend-DEV
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/timetracker
+      - SLACK_TOKEN=xoxp-403948417110-402765462469-516600941136-ab7691a26fc04d92d8254229aa18abad
+    volumes:
+      # in-host:in-container
+      - ./dump:/usr/src/app/dump
+      - ./www:/usr/src/app/www
+    ports:
+      - "30030:30000"
+      - "30043:30443"
+    links:
+      - mongo
+    depends_on:
+      - mongo
+  mongo:
+    container_name: mongo
+    restart: unless-stopped
+    image: mongo:4.0
+    volumes:
+      # in-host:in-container
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
+  mongo-admin:
+    container_name: mongo-admin
+    image: nobio/mongo-admin:latest
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - "30031:3001"
