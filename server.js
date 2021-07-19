@@ -32,7 +32,7 @@ app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 //app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(path.join(__dirname, 'www')));
-app.use(serveStatic('www', { 'index': ['index.html'] }));
+//app.use(serveStatic('www', { 'index': ['index.html'] }));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
