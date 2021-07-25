@@ -40,9 +40,7 @@ const SUCCESS_ONLY = process.argv.includes('-c');
 // Schema
 const directions = 'enter go'.split(' ');
 const TimeEntry = new mongoose.Schema({
-  entry_date: {
-    type: Date, required: true, default: Date.now, index: true,
-  },
+  entry_date: { type: Date, required: true, default: Date.now, index: true, },
   direction: { type: String, enum: directions, required: true },
   last_changed: { type: Date, default: Date.now, required: true },
   longitude: { type: Number, required: false },
@@ -53,19 +51,20 @@ const GeoTracking = new mongoose.Schema({
   latitude: { type: Number, required: true, index: true },
   accuracy: { type: Number, required: false },
   source: { type: String, required: true },
-  date: {
-    type: Date, required: true, index: true, unique: true, default: Date.now,
-  },
+  date: { type: Date, required: true, index: true, unique: true, default: Date.now, },
 });
 const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
 const FailureDay = new mongoose.Schema({
-  date: {
-    type: Date, required: true, index: false, unique: false,
-  },
-  failure_type: {
-    type: String, enum: failureTypes, required: true, index: false, unique: false,
-  },
+  date: { type: Date, required: true, index: false, unique: false, },
+  failure_type: { type: String, enum: failureTypes, required: true, index: false, unique: false, },
 });
+const User = new mongoose.Schema({
+  username: { type: String, required: true, index: true, unique: true, },
+  password: { type: String, required: true, default: false, index: false, },
+  name: { type: String, required: true, index: false, unique: false, },
+  mailaddress: { type: String, required: true, default: false, index: false, },
+});
+
 /* ====================-================================================ */
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
@@ -77,6 +76,8 @@ const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', GeoTrack
 const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTracking);
 const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', FailureDay);
 const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', FailureDay);
+const USER_SOURCE = connectionSource.model('User', User);
+const USER_TARGET = connectionTarget.model('User', User);
 
 mongoose.model('GeoTracking', GeoTracking);
 
@@ -163,6 +164,11 @@ const app = async () => {
 
   try {
     let entries;
+
+    await deleteAllTarget(USER_TARGET);
+    entries = await getDataFromSource(USER_SOURCE);
+    await storeDataToTarget(entries, USER_TARGET);
+
     await deleteAllTarget(FAILURE_MODEL_TARGET);
     entries = await getDataFromSource(FAILURE_MODEL_SOURCE);
     await storeDataToTarget(entries, FAILURE_MODEL_TARGET);
@@ -170,6 +176,7 @@ const app = async () => {
     await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
     entries = await getDataFromSource(GEO_TRACKING_MODEL_SOURCE);
     await storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET);
+
 
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     entries = await getDataFromSource(TIME_ENTRY_MODEL_SOURCE);
