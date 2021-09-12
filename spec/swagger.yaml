@@ -882,7 +882,7 @@ paths:
       tags:
         - Statistics
       summary: calculate statistics (evtl. accumulated)
-      description: returns the aggregated statistics for a given time day
+      description: Returns the aggregated statistics for a given time day
       parameters:
         - name: date
           in: path
@@ -1294,6 +1294,8 @@ components:
               properties:
                 data:
                   type: array
+                  items:
+                    type: number
             comp:
               type: object
               properties:
@@ -1303,6 +1305,8 @@ components:
                     - line
                 data:
                   type: array
+                  items:
+                    type: number
     AggregatedStatistics:
       type: object
       properties:
@@ -1348,6 +1352,8 @@ components:
                     - line
                 data:
                   type: array
+                  items:
+                    type: number
     UniqueUsers:
       type: array
       items:
