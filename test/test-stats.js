@@ -1,9 +1,7 @@
 require('../db');
-const fs = require('fs');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
-const StatsDay = mongoose.model('StatsDay');
 const util = require('../api/stats/util-stats');
 const utilTimeEntry = require('../api/entries/util-entries');
 const utilTimebox = require('../api/stats/util-statstimebox');
@@ -89,7 +87,7 @@ describe('test util.getStats and getStatsByRange', () => {
 
     util.getStatsByRange(dtStart, dtEnd)
       .then((result) => {
-        console.log(result)
+        //console.log(result)
         expect(result).to.have.property('planned_working_time');
         expect(result).to.have.property('average_working_time');
         expect(result).to.have.property('actual_working_time');
