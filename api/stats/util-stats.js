@@ -153,7 +153,7 @@ exports.getStats = (timeUnit, dtStart, accumulate, fill) => {
 
   return new Promise((resolve, reject) => {
     this.getStatsByRange(dtStart, dtEnd, accumulate, fill).then((calculatedBusyTime) => {
-      console.log(`getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
+      // console.log(`getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
         yScale: 'linear',
