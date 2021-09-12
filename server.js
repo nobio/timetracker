@@ -21,7 +21,6 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
-const serveStatic = require('serve-static');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
