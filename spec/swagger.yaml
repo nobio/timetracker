@@ -9,7 +9,7 @@ info:
 servers:
   - url: http://localhost:30000/api
   - url: https://localhost:30443/api
-  - url: https://nobio.myhome-server.de:30043/api
+  - url: https://nobio.myhome-server.de/api
   - url: https://timetracker-ui.web.app/api
 security:
   - bearerAuth: [] # use the same name as above
