@@ -8,8 +8,8 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 
 //const MONGO_URL_MLAB = 'mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack';
-//const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-const MONGO_URL_DOCKER = 'mongodb://192.168.178.42:27017/timetracker';
+const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
+//const MONGO_URL_DOCKER = 'mongodb://192.168.178.24:27017/timetracker';
 const MONGO_URL_MONGO = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 
 // const MONGO_URL_SOURCE = MONGO_URL_MLAB;
@@ -165,9 +165,6 @@ const app = async () => {
   try {
     let entries;
 
-    await deleteAllTarget(USER_TARGET);
-    entries = await getDataFromSource(USER_SOURCE);
-    await storeDataToTarget(entries, USER_TARGET);
 
     await deleteAllTarget(FAILURE_MODEL_TARGET);
     entries = await getDataFromSource(FAILURE_MODEL_SOURCE);
@@ -177,10 +174,13 @@ const app = async () => {
     entries = await getDataFromSource(GEO_TRACKING_MODEL_SOURCE);
     await storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET);
 
-
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     entries = await getDataFromSource(TIME_ENTRY_MODEL_SOURCE);
     await storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET);
+
+    await deleteAllTarget(USER_TARGET);
+    entries = await getDataFromSource(USER_SOURCE);
+    await storeDataToTarget(entries, USER_TARGET);
 
     //process.exit(0);
 
