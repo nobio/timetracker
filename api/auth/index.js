@@ -188,14 +188,16 @@ exports.authorize = async (req, res, next) => {
     (req.method === 'POST' && req.url.startsWith('/api/auth/login')) ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
     (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/geotrack')) ||
     (req.method === 'GET' && req.url.startsWith('/api-docs'))
   )) {
     // just continue...
     console.log('authorization disabled for ' + req.url)
     res.status(200);
     return next();
-  } else if (process.env.AUTHORIZATION === 'on' && req.method === 'POST' && req.url.startsWith('/api/geofence')) {
+  } else if (process.env.AUTHORIZATION === 'on' && (
+    (req.method === 'POST' && req.url.startsWith('/api/geofence')) ||
+    (req.method === 'POST' && req.url.startsWith('/api/geotrack')) 
+  )) {
     // basic authorisation
     return this.authorizeBasicAuth(req, res, next);
   } else {
