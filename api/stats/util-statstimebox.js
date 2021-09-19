@@ -79,12 +79,37 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
         reject(new Error(`time unit '${timeUnit}' is invalid`));
       }
 
+      // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
+      //console.log(JSON.stringify(data));
+      let avg = [];
+      let n = 0;
+      for (let idx = 0; idx < data.length; idx++) {
+        let sum = [];
+        if (idx >= 2) sum[n++] = data[idx - 2].y;
+        if (idx >= 1) sum[n++] = data[idx - 1].y;
+        sum[n++] = data[idx].y;
+        if (idx + 1 < data.length) sum[n++] = data[idx + 1].y;
+        if (idx + 2 < data.length) sum[n++] = data[idx + 2].y;
+
+        n = 0;
+        const average = Math.round(100 * sum.reduce((previous, current) => previous + current, 0) / sum.length) / 100;
+        avg.push({ 'x': data[idx].x, 'y': average });
+      }
+
+      /**
+      
+       data[idx] = {
+              x: lastTimeUnit,
+              y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+            };
+      */
+
       resolve({
         actual_working_time: 0,
         planned_working_time: 0,
         average_working_time: 1,
         inner_data: data,
-        inner_comp: {},
+        inner_comp: avg,
       });
     }
   });
