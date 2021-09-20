@@ -81,21 +81,8 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
       }
 
       // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
-      //console.log(JSON.stringify(data));
-      let avg = [];
-      let n = 0;
-      for (let idx = 0; idx < data.length; idx++) {
-        let sum = [];
-        if (idx >= 2) sum[n++] = data[idx - 2].y;
-        if (idx >= 1) sum[n++] = data[idx - 1].y;
-        sum[n++] = data[idx].y;
-        if (idx + 1 < data.length) sum[n++] = data[idx + 1].y;
-        if (idx + 2 < data.length) sum[n++] = data[idx + 2].y;
-
-        n = 0;
-        const average = Math.round(100 * sum.reduce((previous, current) => previous + current, 0) / sum.length) / 100;
-        avg.push({ 'x': data[idx].x, 'y': average });
-      }
+      // console.log(JSON.stringify(data));
+      let avg = calculateAverage(data);
 
       /**
       
@@ -116,6 +103,27 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
   });
 });
 
+/**
+ * calculates the average of n points depending on timeUnit
+ */
+function calculateAverage(data) {
+  let avg = [];
+
+  const avgLenth = data.length * 0.10; // 5% of data should be the number of averaged points
+  for (let idx = 0; idx < data.length; idx++) {
+    let sum = [];
+    // Beispiel: idx = 36; avgLen = 5 => idxStart = 31, idxEnd = 41
+    const idxStart = idx - parseInt(avgLenth / 2);
+    const idxEnd = idx + parseInt(avgLenth / 2);
+    for (let n = idxStart; n <= idxEnd; n++) {
+      if (n >= 0 && n < data.length) /*console.log(idx, n, parseInt(avgLenth / 2), data[n])*/sum.push(data[n].y);
+    }
+
+    const average = Math.round(100 * sum.reduce((previous, current) => previous + current, 0) / sum.length) / 100;
+    avg.push({ 'x': data[idx].x, 'y': average });
+  }
+  return avg;
+}
 
 /**
  * calculates the timeboxed stats for a time unit given by a format
