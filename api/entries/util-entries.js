@@ -237,12 +237,13 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
     //  } else if (timeentries.length % 2 !== 0) {
   } else if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') !== moment(timeentries[timeentries.length - 1].last_changed).format('DD.MM.YYYY'))) {
     latestTimeEntry = timeentries[timeentries.length - 1];
+    /*
     console.log(moment().format('DD.MM.YYYY'));
     console.log(moment(latestTimeEntry.last_changed).format('DD.MM.YYYY'));
     if (moment().format('DD.MM.YYYY') === moment(latestTimeEntry.last_changed).format('DD.MM.YYYY')) {
       console.log(latestTimeEntry);
     }
-
+    */
     reject(new Error('Bitte die Einträge für vervollständigen'), 0);
   } else {
     let busytime = 0;

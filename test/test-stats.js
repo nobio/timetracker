@@ -203,33 +203,43 @@ describe('test utilHistogram.getHistogramByTimeUnit', () => {
   });
 });
 
-describe('test utilTimebox.getStatsByTimeBox', () => {
+describe('test utilTimebox.getStatsByTimeBox by year', () => {
   it('getStatsByTimeBox with year', () => {
     utilTimebox.getStatsByTimeBox('year')
       .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
+});
+describe('test utilTimebox.getStatsByTimeBox by month', () => {
   it('getStatsByTimeBox with month', () => {
     utilTimebox.getStatsByTimeBox('month')
       .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
+});
+describe('test utilTimebox.getStatsByTimeBox by week', () => {
   it('getStatsByTimeBox with week', () => {
     utilTimebox.getStatsByTimeBox('week')
       .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
+});
+describe('test utilTimebox.getStatsByTimeBox by day', () => {
   it('getStatsByTimeBox with day', () => {
     utilTimebox.getStatsByTimeBox('day')
       .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
+});
+describe('test utilTimebox.getStatsByTimeBox by weekday', () => {
   it('getStatsByTimeBox with weekday', () => {
     utilTimebox.getStatsByTimeBox('weekday')
       .then((result) => { checkTimeboxResult(result); })
       .catch((err) => { throw err; });
   });
-  it('should throw exception when passing an invalid timeUnit', () => expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected);
+  it('should throw exception when passing an invalid timeUnit', () => {
+    expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected
+  });
 });
 
 
