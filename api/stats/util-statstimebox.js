@@ -77,6 +77,7 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
         data = getStatsByTimeBoxTimeWeekDay(stats);
       } else {
         reject(new Error(`time unit '${timeUnit}' is invalid`));
+        return
       }
 
       // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
