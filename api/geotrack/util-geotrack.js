@@ -97,7 +97,7 @@ exports.createGeoTrack = (req, res) => {
 
 exports.parseGeoTrackingObject = (req) => {
   let geoTrack;
-  // console.log(req.body);
+  console.log(req.body);
 
   // find out if this is hassio or OwnTracks data
   if (req.body.lon && req.body.lat) {
@@ -132,7 +132,7 @@ exports.parseGeoTrackingObject = (req) => {
       accuracy: req.body.acc,
       altitude: req.body.alt,
       velocity: req.body.vel,
-      battery: req.body.batt,
+      //battery: req.body.batt,
       date: moment.unix(req.body.tst),
       // eslint-disable-next-line no-nested-ternary
       source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
@@ -200,7 +200,6 @@ function transform(tracks) {
       altitude: (t.altitude || 0),
       timediff: 0,
       accuracy: (t.accuracy || 0),
-      battery: (t.battery || 0),
       sourc: (t.source || 'X')
     });
   });
@@ -217,7 +216,6 @@ function appendMetadata(tracks) {
       point.dist = dist;
       point.timediff = timeDiff;
       point.velocity = velocity;
-      point.height = point.height;
     }
     oldPoint = point;
   });
