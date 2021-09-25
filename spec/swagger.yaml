@@ -1129,7 +1129,7 @@ components:
           type: number
           description: the accuracy of the position measurement in meter (radius)
           example: 60.0
-        alt:
+        altitude:
           type: number
           description: altitude of the position
           example: 320.0
@@ -1174,7 +1174,7 @@ components:
           type: string
           description: identifier of the sender of this request
           example: HASSIO
-        alt:
+        altitude:
           type: number
           description: altitude of the position
           example: 320.0

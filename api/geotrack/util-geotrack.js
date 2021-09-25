@@ -97,6 +97,7 @@ exports.createGeoTrack = (req, res) => {
 
 exports.parseGeoTrackingObject = (req) => {
   let geoTrack;
+  console.log(JSON.parse(req.body))
 
   // find out if this is hassio or OwnTracks data
   if (req.body.lon && req.body.lat) {
@@ -142,7 +143,8 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
       date: options,
     }).skip(0).sort({ date: 1 })
       .then(transform)
-      .then(appendSpeed)
+      .then(appendMetadata
+      )
       .then(tracks => resolve(tracks))
       .catch(err => reject(err));
   });
@@ -170,15 +172,16 @@ function transform(tracks) {
       latitude: t.latitude,
       speed: 0,
       dist: 0,
+      altitude: (t.altitude || 0),
       timediff: 0,
-      accuracy: t.accuracy,
-      sourc: t.source
+      accuracy: (t.accuracy || 0),
+      sourc: (t.source || 'X')
     });
   });
   return tr;
 }
 
-function appendSpeed(tracks) {
+function appendMetadata(tracks) {
   let oldPoint;
   tracks.forEach(point => {
     if (oldPoint) {
@@ -188,6 +191,7 @@ function appendSpeed(tracks) {
       point.dist = dist;
       point.timediff = timeDiff;
       point.speed = speed;
+      point.height = point.height;
     }
     oldPoint = point;
   });
