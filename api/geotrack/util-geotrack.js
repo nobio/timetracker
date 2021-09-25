@@ -169,8 +169,7 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
       date: options,
     }).skip(0).sort({ date: 1 })
       .then(transform)
-      .then(appendMetadata
-      )
+      .then(appendMetadata)
       .then(tracks => resolve(tracks))
       .catch(err => reject(err));
   });
