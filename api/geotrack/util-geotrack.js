@@ -97,16 +97,42 @@ exports.createGeoTrack = (req, res) => {
 
 exports.parseGeoTrackingObject = (req) => {
   let geoTrack;
-  console.log(req.body);
+  // console.log(req.body);
 
   // find out if this is hassio or OwnTracks data
   if (req.body.lon && req.body.lat) {
     // OWN_TRACKS
+    /**
+     * https://owntracks.org/booklet/tech/json/
+    {
+      cog: 120,                              Course over ground (iOS/integer/degree/optional)
+      batt: 48,                              Device battery level (iOS,Android/integer/percent/optional)
+      lon: 10.875663,                        longitude (iOS,Android/float/degree/required)
+      acc: 32,                               Accuracy of the reported location in meters without unit (iOS,Android/integer/meters/optional)
+      bs: 2,                                 Battery Status 0=unknown, 1=unplugged, 2=charging, 3=full (iOS, Android)
+      p: 97.779,                             barometric pressure (iOS/float/kPa/optional/extended data)
+      created_at: 1632585236,
+      BSSID: 'c8:e:14:7b:5f:8d',
+      SSID: 'WLAN Kabel',
+      vel: 0,                                velocity (iOS,Android/integer/kmh/optional)
+      vac: 3,                                vertical accuracy of the alt element (iOS/integer/meters/optional)
+      lat: 49.514447,                        atitude (iOS,Android/float/degree/required)
+      topic: 'owntracks/owntracks-user/026D4FAA-69D0-4673-B216-1C464919F9A8',
+      t: 't',                                t: timer based publish in move move (iOS)
+      conn: 'w',                             w: WiFi, o offline, m mobile data
+      tst: 1632584826,                       UNIX epoch timestamp in seconds of the location fix (iOS,Android/integer/epoch/required)
+      alt: 309,                              Altitude measured above sea level (iOS,Android/integer/meters/optional)
+      _type: 'location',
+      tid: 'A8'                              Tracker ID used to display the initials of a user (iOS,Android/string/optional) required for http mode
+    }
+       */
     geoTrack = new GeoTracking({
       longitude: req.body.lon,
       latitude: req.body.lat,
       accuracy: req.body.acc,
       altitude: req.body.alt,
+      velocity: req.body.vel,
+      battery: req.body.batt,
       date: moment.unix(req.body.tst),
       // eslint-disable-next-line no-nested-ternary
       source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
@@ -170,11 +196,12 @@ function transform(tracks) {
       date: t.date,
       longitude: t.longitude,
       latitude: t.latitude,
-      speed: 0,
+      velocity: (t.velocity || 0),
       dist: 0,
       altitude: (t.altitude || 0),
       timediff: 0,
       accuracy: (t.accuracy || 0),
+      battery: (t.battery || 0),
       sourc: (t.source || 'X')
     });
   });
@@ -187,10 +214,10 @@ function appendMetadata(tracks) {
     if (oldPoint) {
       const dist = calcDist(oldPoint.longitude, oldPoint.latitude, point.longitude, point.latitude);  // distance in meter
       const timeDiff = moment(point.date).diff(moment(oldPoint.date)) / 1000;  // time difference in seconds
-      const speed = dist / timeDiff;  // speed in m/s
+      const velocity = (point.velocity || dist / timeDiff);  // velocity in m/s
       point.dist = dist;
       point.timediff = timeDiff;
-      point.speed = speed;
+      point.velocity = velocity;
       point.height = point.height;
     }
     oldPoint = point;

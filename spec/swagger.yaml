@@ -1158,9 +1158,9 @@ components:
           type: number
           description: the accuracy of the position measurement in meter (radius)
           example: 60.0
-        speed:
+        velocity:
           type: number
-          description: the speed in [m/s] between two points (this related to the last one in time)
+          description: the velocity in [m/s] between two points (this related to the last one in time)
           example: 22.3
         timediff:
           type: number
