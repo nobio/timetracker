@@ -172,6 +172,18 @@ exports.getErrorDates = (req, res) => {
  ****************************************************************************** */
 exports.geofence = (req, res) => {
   console.log(JSON.stringify(req.body));
+  let errMsg;
+  if (!req.body) errMsg = `body is empty; `;
+  if (!req.body.trigger) errMsg = `irigger is missing; `;
+  if (!req.body.id) errMsg = `id is missing; `;
+  if (!req.body.longitude) errMsg = `longitude is missing; `;
+  if (!req.body.latitude) errMsg = `latitude is missing; `;
+
+  if (errMsg) {
+    console.error(`invalid request: ${errMsg}`);
+    res.status(500).send({ message: `invalid request: ${errMsg}` });
+    return;
+  }
 
   const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
   if (req.body.id === 'Work') {
