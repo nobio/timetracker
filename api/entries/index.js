@@ -174,7 +174,7 @@ exports.geofence = (req, res) => {
   console.log(JSON.stringify(req.body));
   let errMsg = '';
   if (!req.body) errMsg += `body is empty; `;
-  if (!req.body.trigger) errMsg += `irigger is missing; `;
+  if (!req.body.trigger) errMsg += `trigger is missing; `;
   if (!req.body.id) errMsg += `id is missing; `;
   if (!req.body.longitude) errMsg += `longitude is missing; `;
   if (!req.body.latitude) errMsg += `latitude is missing; `;
