@@ -96,41 +96,58 @@ exports.create = async (timeEntry) => {
   if (!timeEntry) throw new Error('to update a record, the passed object must not be undefined');
   if (!timeEntry.datetime) timeEntry.datetime = moment();
 
-  return new Promise((resolve, reject) => {
-    this.getLastTimeEntryByDate(timeEntry.datetime)
-      .then((lastTimeEntry) => {
-        // console.log(JSON.stringify(timeEntry));
-        if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
-          if (timeEntry.direction != 'enter') {
-            reject(new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`));
-            return;
-          }
-        } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
-          reject(new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`));
-          return;
-        }
+  // ============== 1st check: Last Time Entry ==============
+  const lastTimeEntry = await this.getLastTimeEntryByDate(timeEntry.datetime);
+  // console.log(JSON.stringify(timeEntry));
+  if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
+    if (timeEntry.direction != 'enter') {
+      throw new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`);
+      return;
+    }
+  } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
+    throw new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`);
+    return;
+  }
 
-        // all checks successfully done, lets create the TimeEntry!
-        new TimeEntry({
-          entry_date: timeEntry.datetime,
-          direction: timeEntry.direction,
-          longitude: timeEntry.longitude,
-          latitude: timeEntry.latitude,
-        }).save()
-          .then((tEntry) => {
-            // in case the external URL is given, use it to render a deep link
-            const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
-            g_util.sendMessage('CREATE_ENTRY', msg);
-            return tEntry;
-          })
-          .then(tEntry => resolve(tEntry))
-          .catch((err) => {
-            g_util.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`);
-            reject(err);
-          });
+  // ============== 2nd check: is the new entry really a new entry or does it already exist? ==============
+  try {
+    const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
+    console.log(entriesByDate)
+    entriesByDate.forEach(entry => {
+      if (entry.entry_date.toISOString() == timeEntry.datetime &&
+        entry.direction == timeEntry.direction) {
+        console.error(`entry already exists; use update to modify`);
+        throw new Error(`entry already exists; use update to modify`);
+      }
+    });
+      
+  } catch (error) {
+    console.log(error)
+    throw error;    
+  }
+
+  return new Promise((resolve, reject) => {
+    // all checks successfully done, lets create the TimeEntry!
+    new TimeEntry({
+      entry_date: timeEntry.datetime,
+      direction: timeEntry.direction,
+      longitude: timeEntry.longitude,
+      latitude: timeEntry.latitude,
+    }).save()
+      .then((tEntry) => {
+        // in case the external URL is given, use it to render a deep link
+        const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
+        g_util.sendMessage('CREATE_ENTRY', msg);
+        return tEntry;
       })
-      .catch(err => reject(err));
-  });
+      .then(tEntry => resolve(tEntry))
+      .catch((err) => {
+        g_util.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`);
+        reject(err);
+      });
+  })
+    .catch(err => reject(err));
+
 };
 
 /**
