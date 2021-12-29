@@ -17,43 +17,42 @@ const Token = mongoose.model('Token');
  */
 exports.getAllUsers = async () => {
   const users = [];
+  try {
+    const dbUsers = await User.find()
+    dbUsers.forEach(user => {
+      users.push(
+        {
+          id: user._id,
+          username: user.username,
+          name: user.name,
+          mailAddress: user.mailaddress,
+        }
+      )
+    });
+    return users;
+  } catch (error) {
+    throw new Error(`cannot load users ${error}`);
+  }
 
-  return new Promise((resolve, reject) => {
-    User.find()
-      .then(res => {
-        res.forEach(user => {
-          users.push(
-            {
-              id: user._id,
-              username: user.username,
-              name: user.name,
-              mailAddress: user.mailaddress,
-            }
-          )
-        });
-        resolve(users);
-      })
-      .catch(err => reject("cannot load users "));
-  });
 }
 
 exports.getUser = async (id) => {
   if (!id) throw Error('id must be provided');
 
-  return new Promise((resolve, reject) => {
-    User.findById({ _id: id })
-      .then(res => {
-        resolve({
-          id: res._id,
-          username: res.username,
-          name: res.name,
-          mailAddress: res.mailaddress,
-        })
-      })
-      .then(ret => resolve(ret))
-      .catch(err => reject("cannot load user " + id));
-  });
+  try {
 
+    const user = await User.findById({ _id: id });
+
+    return {
+      id: user._id,
+      username: user.username,
+      name: user.name,
+      mailAddress: user.mailaddress,
+    }
+
+  } catch (error) {
+    throw new Error(`cannot load user ${id}: ${error}`);
+  }
 }
 
 /**
@@ -74,16 +73,18 @@ exports.createUser = async (username, password, name, mailAddress) => {
   if (user) throw Error('User already exists');
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  return new Promise((resolve, reject) => {
-    new User({
+
+  try {
+    const newUser = await new User({
       username,
       password: hashedPassword,
       name,
       mailaddress: mailAddress
-    }).save()
-      .then(ret => resolve(ret._id))
-      .catch(err => reject(err));
-  });
+    }).save();
+    return newUser._id;
+  } catch (error) {
+    throw error
+  }
 };
 
 /**
@@ -104,11 +105,12 @@ exports.updateUser = async (id, username, name, mailAddress) => {
   if (name) user.name = name;
   if (mailAddress) user.mailaddress = mailAddress;
 
-  return new Promise((resolve, reject) => {
-    user.save()
-      .then(ret => resolve(ret._id))
-      .catch(err => reject(err));
-  });
+  try {
+    const updatedUser = user.save();
+    return updatedUser._id;
+  } catch (error) {
+    throw error
+  }
 };
 
 exports.updateUsersPassword = async (id, password) => {

@@ -2,12 +2,13 @@ version: "3"
 services:
   timetracker:
     container_name: timetracker
-    restart: unless-stopped
+    restart: always
+    # build: .
     image: nobio/timetracker:latest
     #image: nobio/timetracker:_ionic5-frontend-DEV
     environment:
       - MONGO_URL=mongodb://mongo:27017/timetracker
-      - SLACK_TOKEN=xoxp-403948417110-402765462469-516600941136-ab7691a26fc04d92d8254229aa18abad
+      - SLACK_URL=https://hooks.slack.com/services/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
     volumes:
       # in-host:in-container
       - ./dump:/usr/src/app/dump
@@ -21,7 +22,7 @@ services:
       - mongo
   mongo:
     container_name: mongo
-    restart: unless-stopped
+    restart: always
     image: mongo:4.0
     volumes:
       # in-host:in-container
@@ -31,7 +32,7 @@ services:
   mongo-admin:
     container_name: mongo-admin
     image: nobio/mongo-admin:latest
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mongo
     ports:
