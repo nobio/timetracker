@@ -356,6 +356,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 999999
                 items:
                   type: object
                   additionalProperties: false
@@ -1051,6 +1052,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 999999
                 items:
                   type: object
                   additionalProperties: false
@@ -1095,6 +1097,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 999999
                 items:
                   type: object
                   additionalProperties: false
@@ -1275,7 +1278,7 @@ components:
           example: '2020-07-15T10:45:23.000Z'
     GeotrackResponses:
       type: array
-      additionalProperties: false
+      maxItems: 999999
       items:
         $ref: '#/components/schemas/GeotrackResp'
     GeotrackMetaDataResponse:
@@ -1292,6 +1295,7 @@ components:
           example: 21232
         accuracy:
           type: object
+          additionalProperties: false
           properties:
             mean:
               type: number
@@ -1303,7 +1307,7 @@ components:
               example: 11.031
     TimeEntries:
       type: array
-      additionalProperties: false
+      maxItems: 999999
       items:
         $ref: '#/components/schemas/TimeEntry'
     Toggle:
@@ -1331,7 +1335,7 @@ components:
           pattern: '^[\w-.]'
     Toggles:
       type: array
-      additionalProperties: false
+      maxItems: 999999
       items:
         $ref: '#/components/schemas/Toggle'
     Property:
@@ -1352,7 +1356,6 @@ components:
     Properties:
       type: array
       maxItems: 1000
-      additionalProperties: false
       items:
         $ref: '#/components/schemas/Property'
     StatsEntryResult:
@@ -1361,6 +1364,7 @@ components:
       properties:
         firstEntry:
           type: object
+          additionalProperties: false
           properties:
             _id:
               type: number
@@ -1372,6 +1376,7 @@ components:
               example: '2014-01-13T06:30:00.000Z'
         lastEntry:
           type: object
+          additionalProperties: false
           properties:
             _id:
               type: number
@@ -1387,6 +1392,7 @@ components:
       properties:
         chart_data:
           type: object
+          additionalProperties: false
           properties:
             yScale:
               type: string
@@ -1404,13 +1410,16 @@ components:
                 - line-dottet
             main:
               type: object
+              additionalProperties: false
               properties:
                 data:
                   type: array
+                  maxItems: 999999
                   items:
                     type: number
             comp:
               type: object
+              additionalProperties: false
               properties:
                 type:
                   type: string
@@ -1418,6 +1427,7 @@ components:
                     - line
                 data:
                   type: array
+                  maxItems: 999999
                   items:
                     type: number
     AggregatedStatistics:
@@ -1426,6 +1436,7 @@ components:
       properties:
         chart_data:
           type: object
+          additionalProperties: false
           properties:
             yScale:
               type: string
@@ -1445,9 +1456,11 @@ components:
               type: number
             main:
               type: object
+              additionalProperties: false
               properties:
                 data:
                   type: object
+                  additionalProperties: false
                   properties:
                     'y':
                       type: number
@@ -1459,6 +1472,7 @@ components:
                       type: string
             comp:
               type: object
+              additionalProperties: false
               properties:
                 type:
                   type: string
@@ -1466,11 +1480,12 @@ components:
                     - line
                 data:
                   type: array
+                  maxItems: 999999
                   items:
                     type: number
     UniqueUsers:
       type: array
-      additionalProperties: false
+      maxItems: 999999
       items:
         $ref: '#/components/schemas/UniqueUser'
     UniqueUser:
@@ -1492,7 +1507,8 @@ components:
     User:
       required:
         - username
-        - password
+        - name
+        - mailAddress
       type: object
       additionalProperties: false
       properties:
@@ -1523,7 +1539,6 @@ components:
           type: string
           pattern: '^[\w-.]'
           format: password
-          minLength: 5
           example: jshHfu3ek=fDÖ
         name:
           type: string
