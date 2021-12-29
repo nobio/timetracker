@@ -4,15 +4,14 @@ info:
   description: OpenaAPI SPEC oF my fancy timetracker app
   license:
     name: MIT
-    url: https://opensource.org/licenses/MIT
+    url: 'https://opensource.org/licenses/MIT'
   version: 6.0.0
 servers:
-  - url: http://localhost:30000/api
-  - url: https://localhost:30443/api
-  - url: https://nobio.myhome-server.de/api
-  - url: https://timetracker-ui.web.app/api
+  - url: 'https://localhost:30443/api'
+  - url: 'https://nobio.myhome-server.de/api'
+  - url: 'https://timetracker-ui.web.app/api'
 security:
-  - bearerAuth: [] # use the same name as above
+  - bearerAuth: []
 tags:
   - name: Time Tracker
     description: description goes here
@@ -22,7 +21,7 @@ paths:
       tags:
         - Authentication & Authorization
       summary: Login of a user
-      description:
+      description: >-
         A user (username, password) will be authenticated; a jwt access token
         (5min expiry) and a refresh token will be returned.
       requestBody:
@@ -31,39 +30,45 @@ paths:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               properties:
                 username:
                   type: string
                   example: tester
+                  maxLength: 128
+                  pattern: '^[\w-.]'
                 password:
                   type: string
                   format: password
+                  pattern: '^[\w-.]'
                   example: psiodjkÜsö93JKK=w8dj
         required: false
       responses:
-        200:
+        '200':
           description: access and refresh tokens are created
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   accessToken:
                     type: string
                     description: the accees JWT to be used to access
-                    example: eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",
+                    example: 'eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",'
                   refreshToken:
                     type: string
                     description: refresh JWT
-                    example: eyIjshJ9.eyJOOksW1lIjdasdihg0Mn0.kgR2dNsda2d8",
-        401:
-          description:
-            Unauthorized; usually when no password was provided or when
-            user is not registered or when password was incorrect
+                    example: 'eyIjshJ9.eyJOOksW1lIjdasdihg0Mn0.kgR2dNsda2d8",'
+        '401':
+          description: >-
+            Unauthorized; usually when no password was provided or when user is
+            not registered or when password was incorrect
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   message:
                     type: string
@@ -76,42 +81,47 @@ paths:
         - Authentication & Authorization
       summary: logout and destroy tokens; does not need bearer token
       requestBody:
-        description: long living refresh token will be invalidated (short living access token might still live until expiry)
+        description: >-
+          long living refresh token will be invalidated (short living access
+          token might still live until expiry)
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Token"
+              $ref: '#/components/schemas/Token'
         required: true
       responses:
-        200:
+        '200':
           description: Invalidates the refresh token of a user
-          content: {}
   /auth/token:
     post:
       tags:
         - Authentication & Authorization
       summary: Refresh the access token using the refresh token
       requestBody:
-        description: long living refresh token will be invalidated (short living access token might still live until expiry)
+        description: >-
+          long living refresh token will be invalidated (short living access
+          token might still live until expiry)
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Token"
+              $ref: '#/components/schemas/Token'
         required: true
       responses:
-        200:
+        '200':
           description: new access token
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   accessToken:
                     type: string
                     description: new accees JWT to be used to access
-                    example: eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",
+                    example: 'eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8",'
                   user:
                     type: object
+                    additionalProperties: false
                     properties:
                       name:
                         type: string
@@ -125,12 +135,13 @@ paths:
                         type: number
                         description: expire timetamp
                         example: 1618390174
-        401:
+        '401':
           description: refresh token is invalid
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   message:
                     type: string
@@ -141,10 +152,13 @@ paths:
       tags:
         - TimeEntries
       summary: Read all time entries
-      description:
-        "Reads all time entries; \nread entries by date getAllByDate ->\
-        \ List of Time Entry of the given day; \nRead busy time getBusyTime -> Busy\
-        \ Time of the given day (in ms)\n"
+      description: >
+        Reads all time entries; 
+
+        read entries by date getAllByDate -> List of Time Entry of the given
+        day; 
+
+        Read busy time getBusyTime -> Busy Time of the given day (in ms)
       parameters:
         - name: busy
           in: query
@@ -152,21 +166,25 @@ paths:
           required: false
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
         - name: dt
           in: query
           description: Zeitstempel
           required: false
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: All (or filtered) time entries
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntries"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntries'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - TimeEntries
@@ -177,19 +195,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TimeEntry"
+              $ref: '#/components/schemas/TimeEntry'
         required: false
       responses:
-        200:
+        '200':
           description: New entry is created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntry"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntry'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: timeentry
-  /entries/{id}:
+  '/entries/{id}':
     get:
       tags:
         - TimeEntries
@@ -201,15 +219,17 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: TimeEntry is found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntries"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntries'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     put:
       tags:
         - TimeEntries
@@ -221,22 +241,23 @@ paths:
           required: true
           schema:
             type: string
+            pattern: '^[\w-.]'
       requestBody:
         description: TimeEntry with new values of properties
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TimeEntry"
+              $ref: '#/components/schemas/TimeEntry'
         required: false
       responses:
-        200:
+        '200':
           description: Toggle is updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntry"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntry'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: TimeEntry
     delete:
       tags:
@@ -249,32 +270,35 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: Time Entry is deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntries"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntries'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /entries/dump:
     post:
       tags:
         - TimeEntries
       summary: Backup data to file system
-      description:
-        dump the mongodb to the local file system in order to be restored
-        if needed
+      description: >-
+        dump the mongodb to the local file system in order to be restored if
+        needed
       responses:
-        200:
+        '200':
           description: data dumped to file
           content:
             application/json:
               schema:
                 type: object
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                additionalProperties: false
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /entries/backup:
     post:
       tags:
@@ -282,15 +306,16 @@ paths:
       summary: Backup data to database
       description: backup data in an extra backup table
       responses:
-        200:
+        '200':
           description: data saved to database
           content:
             application/json:
               schema:
                 type: object
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+                additionalProperties: false
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
           description: something went wrong...
           content: {}
   /entries/error/evaluate:
@@ -298,20 +323,22 @@ paths:
       tags:
         - TimeEntries
       summary: Evaluate time entries
-      description:
-        Evaluate time entries on their consistency (completeness, order,
-        etc.). As a result, the failure data will be put to an own document in mongodb.
-        This data could be inquired by using the endpoint /api/entries/error/dates
+      description: >-
+        Evaluate time entries on their consistency (completeness, order, etc.).
+        As a result, the failure data will be put to an own document in mongodb.
+        This data could be inquired by using the endpoint
+        /api/entries/error/dates
       responses:
-        200:
+        '200':
           description: data saved to database
           content:
             application/json:
               schema:
                 type: object
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+                additionalProperties: false
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
           description: something went wrong...
           content: {}
   /entries/error/dates:
@@ -319,11 +346,11 @@ paths:
       tags:
         - TimeEntries
       summary: Inquire the error time entries
-      description:
-        Read all dates with error type that was written to database by
-        endpoint /api/entries/error/evaluate
+      description: >-
+        Read all dates with error type that was written to database by endpoint
+        /api/entries/error/evaluate
       responses:
-        200:
+        '200':
           description: data saved to database
           content:
             application/json:
@@ -331,51 +358,55 @@ paths:
                 type: array
                 items:
                   type: object
+                  additionalProperties: false
                   properties:
                     error-date:
                       type: string
                       description: There is an error at this date
-                      example: 2000-01-01T10:15:02.151Z
+                      example: '2000-01-01T10:15:02.151Z'
                     error-type:
                       type: string
-                      description:
-                        Type of the error - INCOMPLETE means that entries
-                        are missing and WRONG_ORDER means that the order of go and
+                      description: >-
+                        Type of the error - INCOMPLETE means that entries are
+                        missing and WRONG_ORDER means that the order of go and
                         enter is not correctly booked
                       example: INCOMPLETE or WRONG_ORDER
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
           description: something went wrong...
           content: {}
   /geofence:
     post:
       tags:
         - Geo Tracking
-      summary: |
-        Create new time entry from Geo Fence event coming from Locative for example. 
-        Please mind this service requires basic authentication in header: "Basic <base64 encoded 'user:password'>"
-      description:
-        Create new time entry in system using geo fencing; time entrie's
-        date will be "now"
+      summary: >
+        Create new time entry from Geo Fence event coming from Locative for
+        example. 
+
+        Please mind this service requires basic authentication in header: "Basic
+        <base64 encoded 'user:password'>"
+      description: >-
+        Create new time entry in system using geo fencing; time entrie's date
+        will be "now"
       requestBody:
         description: Time entry that we want to create using Geofencing
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Geofence"
+              $ref: '#/components/schemas/Geofence'
         required: false
       security:
         - basicAuth: []
       responses:
-        200:
+        '200':
           description: New entry is created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TimeEntry"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/TimeEntry'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: geo_timeentry
   /geotrack:
     get:
@@ -390,55 +421,58 @@ paths:
           required: false
           schema:
             type: string
+            pattern: '/([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/'
         - name: dateEnd
           in: query
           description: end date of the time range; format YYYY-MM-DD like 2020-03-10
           required: false
           schema:
             type: string
+            pattern: '/([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/'
       responses:
-        200:
+        '200':
           description: delivered a valid result
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GeotrackResponses"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/GeotrackResponses'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - Geo Tracking
-      summary:
-        Create new time entry from a geo tracking device like Hassio Mobil
-        App or OwnTrack
-      description:
-        "Create new time entry from a geo tracking device like Hassio Mobil
-        App or OwnTrack; the request body takes differen formats; internally they  will
-        be transformed to a internal general format before storing to database "
+      summary: >-
+        Create new time entry from a geo tracking device like Hassio Mobil App
+        or OwnTrack
+      description: >-
+        Create new time entry from a geo tracking device like Hassio Mobil App
+        or OwnTrack; the request body takes differen formats; internally they 
+        will be transformed to a internal general format before storing to
+        database 
       requestBody:
         description: Time entry that we want to create using Geofencing
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Geotrack"
+              $ref: '#/components/schemas/Geotrack'
         required: false
       responses:
-        200:
+        '200':
           description: New entry is created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GeotrackResp"
-        202:
-          description:
-            duplicate entry or encrypted data; does not change database
-            and will be ignored
+                $ref: '#/components/schemas/GeotrackResp'
+        '202':
+          description: >-
+            duplicate entry or encrypted data; does not change database and will
+            be ignored
           content: {}
-        400:
+        '400':
           description: some data is missing
           content: {}
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: geo_timeentry
   /geotrack/metadata:
     get:
@@ -453,35 +487,37 @@ paths:
           required: false
           schema:
             type: string
+            pattern: '/([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/'
         - name: dateEnd
           in: query
           description: end date of the time range; format YYYY-MM-DD like 2020-03-10
           required: false
           schema:
             type: string
+            pattern: '/([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/'
       responses:
-        200:
+        '200':
           description: delivered a valid result
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GeotrackMetaDataResponse"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/GeotrackMetaDataResponse'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /toggles:
     get:
       tags:
         - Toggles
       summary: Get all toggles in system
       responses:
-        200:
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggles"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/Toggles'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - Toggles
@@ -492,19 +528,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Toggle"
+              $ref: '#/components/schemas/Toggle'
         required: false
       responses:
-        200:
+        '200':
           description: New toggle is created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggle"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/Toggle'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: toggle
-  /toggles/{id}:
+  '/toggles/{id}':
     get:
       tags:
         - Toggles
@@ -516,15 +552,17 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: Toggle is found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggle"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/Toggle'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     put:
       tags:
         - Toggles
@@ -536,22 +574,24 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       requestBody:
         description: Toggle with new values of properties
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Toggle"
+              $ref: '#/components/schemas/Toggle'
         required: false
       responses:
-        200:
+        '200':
           description: Toggle is updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggle"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/Toggle'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: toggle
     delete:
       tags:
@@ -564,16 +604,18 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: Toggle is deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggle"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-  /toggles/name/{name}:
+                $ref: '#/components/schemas/Toggle'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+  '/toggles/name/{name}':
     get:
       tags:
         - Toggles
@@ -585,50 +627,53 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: All toggles status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Toggle"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/Toggle'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /toggles/status:
     get:
       tags:
         - Toggles
       summary: Toggle status (currently onl)
       responses:
-        200:
+        '200':
           description: All toggles status
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   NOTIFICATION_SLACK:
                     type: boolean
                     example: true
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /properties:
     get:
       tags:
         - Properties
       summary: Read a all persisted properties
       responses:
-        200:
+        '200':
           description: Read a property by it's key.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Properties"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+                $ref: '#/components/schemas/Properties'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
           description: unable to read key-value pairs from database
-  /properties/{key}:
+  '/properties/{key}':
     get:
       tags:
         - Properties
@@ -640,18 +685,20 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: Read a property by it's key.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Properties"
-        404:
+                $ref: '#/components/schemas/Properties'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
           description: Property for given key was not found
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+        '500':
           description: unable to read key-value pair from database
     put:
       tags:
@@ -664,18 +711,22 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
         - name: value
           in: query
           description: Value of key-value pair
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        201:
-          description: no body, please check http status code
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        500:
+        '201':
+          description: 'no body, please check http status code'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
           description: unable to store key-value pair
     delete:
       tags:
@@ -688,14 +739,16 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        204:
+        '204':
           description: successfully deleted key-value pair
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        404:
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
           description: Property for given key was not found
-        500:
+        '500':
           description: unable to delete key-value pair
   /users:
     get:
@@ -704,14 +757,14 @@ paths:
       summary: Read all users
       description: Reads all time users from database;
       responses:
-        200:
+        '200':
           description: All (or filtered) time entries
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UniqueUsers"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/UniqueUsers'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - Users
@@ -722,19 +775,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FullUser"
+              $ref: '#/components/schemas/FullUser'
         required: false
       responses:
-        201:
+        '201':
           description: New user is created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
       x-codegen-request-body-name: User
-  /users/{id}:
+  '/users/{id}':
     get:
       tags:
         - Users
@@ -747,15 +800,17 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        200:
+        '200':
           description: A user from database
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UniqueUser"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/UniqueUser'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     put:
       tags:
         - Users
@@ -768,23 +823,25 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       requestBody:
         description: The User object to be updated
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: '#/components/schemas/User'
         required: false
       responses:
-        201:
+        '201':
           description: User sucessfully updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        404:
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
           description: User (id) does not exist
       x-codegen-request-body-name: User
     delete:
@@ -799,12 +856,14 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       responses:
-        202:
+        '202':
           description: User was deleted; also returned if user did not exist
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-  /users/{id}/password:
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+  '/users/{id}/password':
     put:
       tags:
         - Users
@@ -817,67 +876,74 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
       requestBody:
         description: The password to be updated
         content:
           application/json:
             schema:
               type: object
+              additionalProperties: false
               properties:
                 password:
                   type: string
                   format: password
                   minimum: 5
+                  pattern: '^[\w-.]'
                   example: k9wPüä=kdHs2
         required: true
       responses:
-        201:
+        '201':
           description: User sucessfully updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-        404:
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
           description: User (id) does not exist
       x-codegen-request-body-name: User
-
   /stats:
     put:
       tags:
         - Statistics
       summary: calculate and fill database table with statistics
-      description:
-        calculates the statistics for today +/- one month and stores them
-        in database;
+      description: >-
+        calculates the statistics for today +/- one month and stores them in
+        database;
       responses:
-        200:
+        '200':
           description: Statistics have successfully been calculated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StatsEntryResult"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/StatsEntryResult'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
     delete:
       tags:
         - Statistics
       summary: Deletes all entries from statistics table
       responses:
-        200:
+        '200':
           description: Statistics data have successfully been deleted
           content:
             application/json:
               schema:
                 type: object
+                additionalProperties: false
                 properties:
                   size:
-                    type: number
-                    example: 953.0
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-  /stats/{date}/{timeUnit}:
+                    type: integer
+                    minimum: 0
+                    maximum: 9999999
+                    format: int32
+                    example: 953
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+  '/stats/{date}/{timeUnit}':
     get:
       tags:
         - Statistics
@@ -890,7 +956,7 @@ paths:
           required: true
           schema:
             type: number
-            default: 1.3912956E+12
+            default: 1391295600000
         - name: timeUnit
           in: path
           description: time unit
@@ -911,19 +977,21 @@ paths:
             default: false
         - name: fill
           in: query
-          description: indicates if the data should be filled with all days of this time range; if no measured value is available, the value is 0
+          description: >-
+            indicates if the data should be filled with all days of this time
+            range; if no measured value is available, the value is 0
           schema:
             type: boolean
             default: false
       responses:
-        200:
+        '200':
           description: statistics for the given date
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AggregatedStats"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                $ref: '#/components/schemas/AggregatedStats'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
   /statistics/aggregate:
     get:
       tags:
@@ -944,22 +1012,22 @@ paths:
               - week
               - day
       responses:
-        200:
+        '200':
           description: calculated aggregated statistics for this given timeUnit
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AggregatedStatistics"
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-  /statistics/histogram/{interval}:
+                $ref: '#/components/schemas/AggregatedStatistics'
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+  '/statistics/histogram/{interval}':
     get:
       tags:
         - Statistics
       summary: calculate historgram from statistic data
-      description:
-        returns a histogram with a given interval (time) and optionally
-        filtered by direction (enter, go or both)
+      description: >-
+        returns a histogram with a given interval (time) and optionally filtered
+        by direction (enter, go or both)
       parameters:
         - name: interval
           in: path
@@ -967,7 +1035,7 @@ paths:
           required: true
           schema:
             type: number
-            default: 60.0
+            default: 60
         - name: direction
           in: query
           description: filter entries by their direction
@@ -977,7 +1045,7 @@ paths:
               - enter
               - go
       responses:
-        200:
+        '200':
           description: histogramm according to the given parameters
           content:
             application/json:
@@ -985,24 +1053,28 @@ paths:
                 type: array
                 items:
                   type: object
+                  additionalProperties: false
                   properties:
                     time:
                       type: string
-                      example: 1970-01-01T08:20:00.000Z
+                      maxLength: 24
+                      pattern: >-
+                        ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+                      example: '1970-01-01T08:20:00.000Z'
                     histValue:
                       type: number
-                      example: 512.0
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
-  /statistics/breaktime/{interval}:
+                      example: 512
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
+  '/statistics/breaktime/{interval}':
     get:
       tags:
         - Statistics
       summary: calculate historgram of break times from statistic data
-      description:
+      description: >-
         returns a histogram of break times optionally filtered by "real"
-        measurement of breaks or, in case of only two entries this day, calculated
-        default breaks (45 min).
+        measurement of breaks or, in case of only two entries this day,
+        calculated default breaks (45 min).
       parameters:
         - name: interval
           in: path
@@ -1010,14 +1082,14 @@ paths:
           required: true
           schema:
             type: number
-            default: 60.0
+            default: 60
         - name: real
           in: query
           description: filter entries by their direction
           schema:
             type: boolean
       responses:
-        200:
+        '200':
           description: histogramm according to the given parameters
           content:
             application/json:
@@ -1025,15 +1097,16 @@ paths:
                 type: array
                 items:
                   type: object
+                  additionalProperties: false
                   properties:
                     time:
                       type: number
-                      example: 40.0
+                      example: 40
                     breaktime:
                       type: number
-                      example: 689.0
-        403:
-          $ref: "#/components/responses/UnauthorizedError"
+                      example: 689
+        '403':
+          $ref: '#/components/responses/UnauthorizedError'
 components:
   schemas:
     TimeEntry:
@@ -1041,19 +1114,27 @@ components:
         - direction
         - entry_date
       type: object
+      additionalProperties: false
       properties:
         entry_date:
           type: string
           description: The date this time entry represents
-          example: 2000-01-01T10:15:02.151Z
+          example: '2000-01-01T10:15:02.151Z'
+          maxLength: 24
+          pattern: >-
+            ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
         last_changed:
           type: string
           description: Date of last change on this time entry
-          example: 2000-01-01T10:15:02.151Z
+          example: '2000-01-01T10:15:02.151Z'
+          maxLength: 24
+          pattern: >-
+            ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
         direction:
           type: string
-          description: |
-            direction of this time entry; representing, if the time entry means a coming or going event:
+          description: >
+            direction of this time entry; representing, if the time entry means
+            a coming or going event:
              * `go` - leaving
              * `enter` - entering
           example: enter
@@ -1075,6 +1156,7 @@ components:
         - latitude
         - longitude
       type: object
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -1082,8 +1164,9 @@ components:
           example: Work
         direction:
           type: string
-          description: |
-            direction of this time entry; representing, if the time entry means a coming or going event:
+          description: >
+            direction of this time entry; representing, if the time entry means
+            a coming or going event:
              * `go` - leaving
              * `enter` - entering
           example: enter
@@ -1100,6 +1183,7 @@ components:
           example: 49.514135
     Geotrack:
       type: object
+      additionalProperties: false
       properties:
         longitude:
           type: number
@@ -1112,7 +1196,7 @@ components:
         accuracy:
           type: number
           description: the accuracy of the position measurement in meter (radius)
-          example: 60.0
+          example: 60
         source:
           type: string
           description: identifier of the sender of this request
@@ -1128,23 +1212,24 @@ components:
         acc:
           type: number
           description: the accuracy of the position measurement in meter (radius)
-          example: 60.0
+          example: 60
         altitude:
           type: number
           description: altitude of the position
-          example: 320.0
+          example: 320
         tst:
           type: number
           description: unix timestamp of this event
-          example: 1.59491316E+9
+          example: 1594913160
         desc:
           type: string
           description: description (?)
         tid:
           type: string
-          description: some source identifier; sometimes its desc, sometimes its tid
+          description: 'some source identifier; sometimes its desc, sometimes its tid'
     GeotrackResp:
       type: object
+      additionalProperties: false
       properties:
         longitude:
           type: number
@@ -1157,18 +1242,24 @@ components:
         accuracy:
           type: number
           description: the accuracy of the position measurement in meter (radius)
-          example: 60.0
+          example: 60
         velocity:
           type: number
-          description: the velocity in [m/s] between two points (this related to the last one in time)
+          description: >-
+            the velocity in [m/s] between two points (this related to the last
+            one in time)
           example: 22.3
         timediff:
           type: number
-          description: The time in [s] passed between two points (this related to the last one in time)
+          description: >-
+            The time in [s] passed between two points (this related to the last
+            one in time)
           example: 11620
         dist:
           type: number
-          description: The distance in [m] passed between two points (this related to the last one in time)
+          description: >-
+            The distance in [m] passed between two points (this related to the
+            last one in time)
           example: 320
         source:
           type: string
@@ -1177,17 +1268,19 @@ components:
         altitude:
           type: number
           description: altitude of the position
-          example: 320.0
+          example: 320
         date:
           type: string
           description: date of this entry in ISO format
-          example: 2020-07-15T10:45:23.000Z
+          example: '2020-07-15T10:45:23.000Z'
     GeotrackResponses:
       type: array
+      additionalProperties: false
       items:
-        $ref: "#/components/schemas/GeotrackResp"
+        $ref: '#/components/schemas/GeotrackResp'
     GeotrackMetaDataResponse:
       type: object
+      additionalProperties: false
       properties:
         size:
           type: number
@@ -1210,67 +1303,87 @@ components:
               example: 11.031
     TimeEntries:
       type: array
+      additionalProperties: false
       items:
-        $ref: "#/components/schemas/TimeEntry"
+        $ref: '#/components/schemas/TimeEntry'
     Toggle:
       required:
         - name
         - notification
         - toggle
       type: object
+      additionalProperties: false
       properties:
         name:
           type: string
           example: __TEST__
+          maxLength: 128
+          pattern: '^[\w-.]'
         toggle:
           type: string
-          example: "false"
+          example: 'false'
+          maxLength: 128
+          pattern: '^[\w-.]'
         notification:
           type: string
           example: some text
+          maxLength: 128
+          pattern: '^[\w-.]'
     Toggles:
       type: array
+      additionalProperties: false
       items:
-        $ref: "#/components/schemas/Toggle"
+        $ref: '#/components/schemas/Toggle'
     Property:
       required:
         - key
         - value
       type: object
+      additionalProperties: false
       properties:
         key:
           type: string
+          pattern: '^[\w-.]'
           example: de.nobio.timetracker.KEY_01
         value:
           type: string
-          example: "this is a value"
+          pattern: '^[\w-.]'
+          example: this is a value
     Properties:
       type: array
+      maxItems: 1000
+      additionalProperties: false
       items:
-        $ref: "#/components/schemas/Property"
+        $ref: '#/components/schemas/Property'
     StatsEntryResult:
       type: object
+      additionalProperties: false
       properties:
         firstEntry:
           type: object
           properties:
             _id:
               type: number
-              example: 0.0
+              example: 0
             age:
               type: string
-              example: 2014-01-13T06:30:00.000Z
+              pattern: >-
+                ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+              example: '2014-01-13T06:30:00.000Z'
         lastEntry:
           type: object
           properties:
             _id:
               type: number
-              example: 0.0
+              example: 0
             age:
               type: string
-              example: 2019-01-10T21:13:29.233Z
+              pattern: >-
+                ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+              example: '2019-01-10T21:13:29.233Z'
     AggregatedStats:
       type: object
+      additionalProperties: false
       properties:
         chart_data:
           type: object
@@ -1309,6 +1422,7 @@ components:
                     type: number
     AggregatedStatistics:
       type: object
+      additionalProperties: false
       properties:
         chart_data:
           type: object
@@ -1335,11 +1449,11 @@ components:
                 data:
                   type: object
                   properties:
-                    y:
+                    'y':
                       type: number
                     x:
                       type: number
-                    n:
+                    'n':
                       type: number
                     dev:
                       type: string
@@ -1356,10 +1470,12 @@ components:
                     type: number
     UniqueUsers:
       type: array
+      additionalProperties: false
       items:
-        $ref: "#/components/schemas/UniqueUser"
+        $ref: '#/components/schemas/UniqueUser'
     UniqueUser:
       type: object
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -1378,50 +1494,63 @@ components:
         - username
         - password
       type: object
+      additionalProperties: false
       properties:
         username:
           type: string
+          pattern: '^[\w-.]'
           example: tester
         name:
           type: string
+          pattern: '^[\w-.]'
           example: Tester
         mailAddress:
           type: string
+          pattern: '^[\w-.]'
           example: albert@einstein.edu
     FullUser:
       required:
         - username
         - password
       type: object
+      additionalProperties: false
       properties:
         username:
           type: string
+          pattern: '^[\w-.]'
           example: Tester
         password:
           type: string
+          pattern: '^[\w-.]'
           format: password
           minLength: 5
           example: jshHfu3ek=fDÖ
         name:
           type: string
+          pattern: '^[\w-.]'
           example: Tester
         mailAddress:
           type: string
+          pattern: '^[\w-.]'
           example: albert@einstein.edu
     Token:
       required:
         - token
       type: object
+      additionalProperties: false
       properties:
         token:
           type: string
           description: JWT
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+          pattern: '^[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*\.[A-Za-z0-9-_]*$'
+          maxLength: 256
+          example: >-
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT # optional, arbitrary value for documentation purposes
+      bearerFormat: JWT
     basicAuth:
       type: http
       scheme: basic
