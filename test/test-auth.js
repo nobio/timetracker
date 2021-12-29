@@ -476,7 +476,7 @@ describe('test index.authorize', () => {
     }
   });
 
-  it.only('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
+  it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
     try {
       const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
