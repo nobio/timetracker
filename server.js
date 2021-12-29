@@ -137,7 +137,6 @@ app.post('/api/auth/login', api_auth.login);
 app.post('/api/auth/logout', api_auth.logout);
 app.post('/api/auth/token', api_auth.refreshToken);
 
-console.log("SLACK_URL: " + process.env.SLACK_URL)
 if (process.env.SLACK_URL) {
   console.log('using Slack to notify');
 } else {
