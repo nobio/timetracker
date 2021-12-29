@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-require('dotenv').config();
+//require('dotenv').config(); - there is no .env after building with github actions
 require('../db');
 const mongoose = require('mongoose');
 
@@ -27,6 +27,14 @@ const TESTUSER_USERNAME = 'TEST_USER_USERNAME_DELETE_ME';
 const TESTUSER_PASSWORD = 'Test12345';
 const TESTUSER_NAME = 'TEST_USER_DELETE_ME';
 const TESTUSER_MAIL = 'TEST_USER_DELETE_ME@fake.com';
+
+process.env.AUTHORIZATION = 'on'
+
+process.env.ACCESS_TOKEN_SECRET='TEST_ACCESS_TOKEN_SECRET'
+process.env.REFRESH_TOKEN_SECRET='TEST_REFRESH_TOKEN_SECRET'
+
+process.env.ACCESS_TOKEN_EXPIRE='5m'
+process.env.REFRESH_TOKEN_EXPIRE='7d'
 
 /**
  * =============================================================
@@ -462,7 +470,7 @@ describe('test index.authorize', () => {
 
   it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
-    const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M' } });
+    const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRFU1RfVVNFUl9VU0VSTkFNRV9ERUxFVEVfTUUiLCJuYW1lIjoiVEVTVF9VU0VSX0RFTEVURV9NRSIsIm1haWxBZGRyZXNzIjoiVEVTVF9VU0VSX0RFTEVURV9NRUBmYWtlLmNvbSIsImlhdCI6MTY0MDgwODgxOCwiZXhwIjoxNjQwODA5MTE4fQ.tN0e8oXQnx2cazDJaum0hqTBNXo092G7PcH3lA2xZww' } });
     req.url = '/api/xyz';
     const res = mockResponse();
     const next = sinon.spy();
