@@ -423,6 +423,14 @@ describe('test utilAuth.updateUsersPassword', () => {
  * =============================================================
  */
 describe('test index.authorize', () => {
+  before(async () => {
+    db = require('../db');
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    // *** create a user with password
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
+    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+  });
+
   it('test for OK (200): call authorizeToken service with empty header and auth switch off', async () => {
     process.env.AUTHORIZATION = 'off';
     const req = mockRequest({ headers: [] });
@@ -468,13 +476,14 @@ describe('test index.authorize', () => {
     }
   });
 
-  it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
+  it.only('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
-    const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRFU1RfVVNFUl9VU0VSTkFNRV9ERUxFVEVfTUUiLCJuYW1lIjoiVEVTVF9VU0VSX0RFTEVURV9NRSIsIm1haWxBZGRyZXNzIjoiVEVTVF9VU0VSX0RFTEVURV9NRUBmYWtlLmNvbSIsImlhdCI6MTY0MDgwODgxOCwiZXhwIjoxNjQwODA5MTE4fQ.tN0e8oXQnx2cazDJaum0hqTBNXo092G7PcH3lA2xZww' } });
-    req.url = '/api/xyz';
-    const res = mockResponse();
-    const next = sinon.spy();
     try {
+      const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+      const req = mockRequest({ headers: { authorization: `Bearer ${result.accessToken}` } });
+      req.url = '/api/xyz';
+      const res = mockResponse();
+      const next = sinon.spy();
       await auth.authorize(req, res, next);
 
       expect(res.status).to.have.been.calledWith(200);
@@ -500,6 +509,9 @@ describe('test index.authorize', () => {
     } catch (err) {
       throw Error(err);
     }
+  });
+  after(async () => {
+    await User.deleteOne({ name: TESTUSER_USERNAME });
   });
   
 });
