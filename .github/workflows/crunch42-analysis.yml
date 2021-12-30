@@ -26,7 +26,7 @@ name: "42Crunch REST API Static Security Testing"
 # follow standard Code Scanning triggers
 on:
   push:
-    branches: [ master ]
+    branches: [ '**' ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]

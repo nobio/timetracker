@@ -1,15 +1,13 @@
 {
     "name": "timetracker",
-    "version": "7.7.0",
-    "last_build": "2021-10-28T11:37:13.941Z",
+    "version": "8.0.0",
+    "last_build": "2021-12-29T12:16:25.272Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
         "start": "node server",
         "start-noauth": "AUTHORIZATION=false node server",
-        "start-dbmlab": "MONGO_URL=mongodb://nobio:1gR7hW2cPhtkRlv2@ds061928.mlab.com:61928/timetrack npm start",
-        "start-dbdocker1": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
-        "start-dbdocker2": "MONGO_URL=mongodb://192.168.178.46:27017/timetracker npm start",
+        "start-dbdocker": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
         "test": "./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "test-dev": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "serve": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
@@ -33,7 +31,7 @@
         "sinon-chai": "^3.5.0"
     },
     "dependencies": {
-        "@slack/client": "^5.0.2",
+        "axios": "^0.24.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.1",
         "cookie-parser": "^1.4.6",

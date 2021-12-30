@@ -1,5 +1,6 @@
 const util = require('./util-auth');
 const jwt = require('jsonwebtoken');
+const g_util = require('../global_util');
 
 /**
  * reads all users from database
@@ -48,6 +49,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const result = await util.deleteUser(req.params.id);
+    g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
     console.error(err)
@@ -67,6 +69,7 @@ exports.deleteUser = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
+    g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
@@ -85,6 +88,7 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
+    g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
@@ -103,6 +107,7 @@ exports.updateUser = async (req, res) => {
 exports.updateUsersPassword = async (req, res) => {
   try {
     const result = await util.updateUsersPassword(req.params.id, req.body.password);
+    g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     console.error(err)
@@ -123,6 +128,7 @@ exports.updateUsersPassword = async (req, res) => {
  */
 exports.login = async (req, res) => {
   // console.log(req)
+  g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const password = req.body.password;
   if (password == null) {
     res.status(401).send();

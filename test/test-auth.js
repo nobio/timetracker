@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-require('dotenv').config();
+//require('dotenv').config(); - there is no .env after building with github actions
 require('../db');
 const mongoose = require('mongoose');
 
@@ -27,6 +27,14 @@ const TESTUSER_USERNAME = 'TEST_USER_USERNAME_DELETE_ME';
 const TESTUSER_PASSWORD = 'Test12345';
 const TESTUSER_NAME = 'TEST_USER_DELETE_ME';
 const TESTUSER_MAIL = 'TEST_USER_DELETE_ME@fake.com';
+
+process.env.AUTHORIZATION = 'on'
+
+process.env.ACCESS_TOKEN_SECRET='TEST_ACCESS_TOKEN_SECRET'
+process.env.REFRESH_TOKEN_SECRET='TEST_REFRESH_TOKEN_SECRET'
+
+process.env.ACCESS_TOKEN_EXPIRE='5m'
+process.env.REFRESH_TOKEN_EXPIRE='7d'
 
 /**
  * =============================================================
@@ -415,6 +423,14 @@ describe('test utilAuth.updateUsersPassword', () => {
  * =============================================================
  */
 describe('test index.authorize', () => {
+  before(async () => {
+    db = require('../db');
+    await User.deleteOne({ username: TESTUSER_USERNAME });
+    // *** create a user with password
+    await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
+    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+  });
+
   it('test for OK (200): call authorizeToken service with empty header and auth switch off', async () => {
     process.env.AUTHORIZATION = 'off';
     const req = mockRequest({ headers: [] });
@@ -462,11 +478,12 @@ describe('test index.authorize', () => {
 
   it('test for OK (200): call authorizeToken service with header incl. valid token and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
-    const req = mockRequest({ headers: { authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdGVyIiwiaWF0IjoxNTc4NzY0NzMwfQ.wvgbdBOxJBHc8PM1IH8bWXAv2YSgh-CPC9M9KQowJ4M' } });
-    req.url = '/api/xyz';
-    const res = mockResponse();
-    const next = sinon.spy();
     try {
+      const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+      const req = mockRequest({ headers: { authorization: `Bearer ${result.accessToken}` } });
+      req.url = '/api/xyz';
+      const res = mockResponse();
+      const next = sinon.spy();
       await auth.authorize(req, res, next);
 
       expect(res.status).to.have.been.calledWith(200);
@@ -492,6 +509,9 @@ describe('test index.authorize', () => {
     } catch (err) {
       throw Error(err);
     }
+  });
+  after(async () => {
+    await User.deleteOne({ name: TESTUSER_USERNAME });
   });
   
 });

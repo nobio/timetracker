@@ -137,10 +137,10 @@ app.post('/api/auth/login', api_auth.login);
 app.post('/api/auth/logout', api_auth.logout);
 app.post('/api/auth/token', api_auth.refreshToken);
 
-if (process.env.SLACK_TOKEN) {
+if (process.env.SLACK_URL) {
   console.log('using Slack to notify');
 } else {
-  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_TOKEN');
+  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
 }
 
 /* start the web service on http */
@@ -161,7 +161,6 @@ https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host')
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
-require('./api/global_util')
-  .sendMessage('SERVER_STARTED', `${moment().tz('Europe/Berlin').format('HH:mm:ss DD.MM.YYYY')} on http://${app.get('host')}:${app.get('port')}`)
-  .then(msg => console.log(JSON.stringify(msg)))
+require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
+  .then(msg => console.log(msg))
   .catch(err => console.log(err));
