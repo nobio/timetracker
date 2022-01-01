@@ -11,48 +11,46 @@ const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
-exports.dumpTimeEntries = () => new Promise((resolve, reject) => {
-  TimeEntry.find()
-    .then((timeEntries) => {
-      fs.stat('./dump', (err) => {
-        if (err) {
-          fs.mkdirSync('./dump');
-        }
+exports.dumpTimeEntries = async function () {
+  try {
+    const timeEntries = await TimeEntry.find();
+    fs.stat('./dump', (err) => {
+      if (err) fs.mkdirSync('./dump');
+    });
+    const dumpFile = `./dump/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
 
-        const dumpFile = `./dump/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
+    fs.writeFileSync(dumpFile, JSON.stringify(timeEntries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
+    console.log(`database dump saved ${timeEntries.length} items`);
+    return ({
+      size: timeEntries.length,
+      filename: dumpFile,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
-        fs.writeFileSync(dumpFile, JSON.stringify(timeEntries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
-        console.log(`database dump saved ${timeEntries.length} items`);
-        resolve({
-          size: timeEntries.length,
-          filename: dumpFile,
-        });
-      });
-    })
-    .then(g_util.sendMessage('DUMP_FS'))
-    .catch(err => reject(err));
-});
+exports.backupTimeEntries = async function () {
 
-exports.backupTimeEntries = () => new Promise((resolve, reject) => {
-  let len = 0;
-  TimeEntryBackup.deleteMany({})
-    .then(() => TimeEntry.find())
-    .then((timeEntries) => {
-      console.log(`${timeEntries.length} time entries found to be backed up`);
-      len = timeEntries.length;
-      timeEntries.forEach((timeentry) => {
-        // console.log('.')
-        new TimeEntryBackup({
-          _id: timeentry._id,
-          entry_date: timeentry.entry_date,
-          direction: timeentry.direction,
-          last_changed: timeentry.last_changed,
-          longitude: timeentry.longitude,
-          latitude: timeentry.latitude,
-        }).save();
-      });
-    })
-    .then(() => resolve({ backup_count: len }))
-    .then(g_util.sendMessage('BACKUP_DB'))
-    .catch(err => reject(err));
-});
+  try {
+    await TimeEntryBackup.deleteMany({});
+    const timeEntries = await TimeEntry.find();
+    console.log(`${timeEntries.length} time entries found to be backed up`);
+
+    for (const timeentry of timeEntries) {
+      new TimeEntryBackup({
+        _id: timeentry._id,
+        entry_date: timeentry.entry_date,
+        direction: timeentry.direction,
+        last_changed: timeentry.last_changed,
+        longitude: timeentry.longitude,
+        latitude: timeentry.latitude,
+      }).save();
+    };
+    g_util.sendMessage('BACKUP_DB');
+    return { backup_count: timeEntries.length };
+
+  } catch (error) {
+    throw error;
+  }
+};
