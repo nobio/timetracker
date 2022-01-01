@@ -8,14 +8,18 @@ const mongoose = require('mongoose');
 const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 
+const DUMP_DIR = './dump'
+
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
 exports.dumpTimeEntries = async function () {
   try {
+    if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
+    await deleteOldDumpfiles();
+
+    const dumpFile = `${DUMP_DIR}/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
     const timeEntries = await TimeEntry.find();
-    if (!fs.existsSync('./dump')) fs.mkdirSync('./dump');
-    const dumpFile = `./dump/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
 
     fs.writeFileSync(dumpFile, JSON.stringify(timeEntries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
     console.log(`database dump saved ${timeEntries.length} items`);
@@ -52,3 +56,21 @@ exports.backupTimeEntries = async function () {
     throw error;
   }
 };
+
+/**
+ * deletes files in DUMP_DIR which are older than 31 days regarding their file name:
+ * 'timeentry_<YYYY-MM-DD_HHmmss>.json'
+ */
+async function deleteOldDumpfiles() {
+  if(fs.existsSync(DUMP_DIR)) {
+    const fileNames = await fs.readdirSync(DUMP_DIR);
+
+    for (const fileName of fileNames) {
+      const fileDate = moment(fileName.split('.')[0].split('_')[1]);
+      const diffDays = Math.round(moment().diff(fileDate) / 86400000) - 1;
+      if(diffDays > 31) {
+        fs.rmSync(`${DUMP_DIR}/${fileName}`)
+      }
+    }
+  }
+}
