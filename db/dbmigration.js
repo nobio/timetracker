@@ -64,6 +64,15 @@ const User = new mongoose.Schema({
   name: { type: String, required: true, index: false, unique: false, },
   mailaddress: { type: String, required: true, default: false, index: false, },
 });
+const Toggle = new mongoose.Schema({
+  name: { type: String, required: true, index: true, unique: true, },
+  toggle: { type: Boolean, required: true, default: false, index: false, },
+  notification: { type: String, required: true, default: 'generic message', index: false, unique: false, },
+});
+const Properties = new mongoose.Schema({
+  key: { type: String, required: true, index: true, unique: true, },
+  value: { type: String, required: true, index: false, unique: false, },
+});
 
 /* ====================-================================================ */
 
@@ -78,6 +87,10 @@ const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', FailureDay);
 const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', FailureDay);
 const USER_SOURCE = connectionSource.model('User', User);
 const USER_TARGET = connectionTarget.model('User', User);
+const TOGGLE_SOURCE = connectionSource.model('Toggle', Toggle);
+const TOGGLE_TARGET = connectionTarget.model('Toggle', Toggle);
+const PROPS_SOURCE = connectionSource.model('Properties', Properties);
+const PROPS_TARGET = connectionTarget.model('Properties', Properties);
 
 mongoose.model('GeoTracking', GeoTracking);
 
@@ -95,7 +108,7 @@ console.log('\n--------------------------------------------------------------- '
 async function getDataFromSource(source) {
   try {
     const entries = await source.find();
-    console.log(`found ${entries.length} entries`);
+    console.log(`found ${entries.length} entries in <${source.modelName}>`);
     return entries;
   } catch (error) {
     throw new Error(error);
@@ -121,41 +134,25 @@ async function deleteAllTarget(target) {
  *
  * @param {entries} entries
  */
-function storeDataToTarget(entries, target) {
-  return new Promise((resolve, reject) => {
-    let n = 0;
-    entries.forEach((entry) => {
-      process.stdout.write('.');
-      // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
-      const t = new target();
-      Object.keys(target.schema.tree).forEach((element) => {
-        t[element] = entry[element];
-      });
-      t.save()
-        .then(() => {
-          // eslint-disable-next-line no-underscore-dangle
-          console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
-          n += 1;
-          if (n >= entries.length) {
-            //mongoose.connection.close();
-            resolve();
-            //process.exit(0);
-          }
-        })
-        .catch((err) => {
-          n += 1;
-          if (!SILENT && !SUCCESS_ONLY) console.error(`> ${n} ${err.message}`);
-          if (n >= entries.length) {
-            //mongoose.connection.close();
-            //process.exit(-1);
-          }
-          reject(err);
-        });
+async function storeDataToTarget(entries, target) {
+  for (const entry of entries) {
+    process.stdout.write('.');
+    // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
+    const t = new target();
+    Object.keys(target.schema.tree).forEach((element) => {
+      t[element] = entry[element];
     });
-
-    mongoose.connection.close();
-    resolve(`${entries.length} elements saved`);
-  });
+    try {
+      await t.save();
+      // eslint-disable-next-line no-underscore-dangle
+      console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
+    } catch (error) {
+      if (!SILENT && !SUCCESS_ONLY) console.error(`> ${error.message}`);
+    }
+  };
+  process.stdout.write(`\n`);
+  mongoose.connection.close();
+  return (`${entries.length} elements saved`);
 }
 
 if (HELP) process.exit(0);
@@ -163,26 +160,26 @@ if (HELP) process.exit(0);
 const app = async () => {
 
   try {
-    let entries;
-
 
     await deleteAllTarget(FAILURE_MODEL_TARGET);
-    entries = await getDataFromSource(FAILURE_MODEL_SOURCE);
-    await storeDataToTarget(entries, FAILURE_MODEL_TARGET);
-
-    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
-    entries = await getDataFromSource(GEO_TRACKING_MODEL_SOURCE);
-    await storeDataToTarget(entries, GEO_TRACKING_MODEL_TARGET);
-
-    await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
-    entries = await getDataFromSource(TIME_ENTRY_MODEL_SOURCE);
-    await storeDataToTarget(entries, TIME_ENTRY_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
 
     await deleteAllTarget(USER_TARGET);
-    entries = await getDataFromSource(USER_SOURCE);
-    await storeDataToTarget(entries, USER_TARGET);
+    await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
 
-    //process.exit(0);
+    await deleteAllTarget(TOGGLE_TARGET);
+    await storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET);
+
+    await deleteAllTarget(PROPS_TARGET);
+    await storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET);
+
+    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
+
+    await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);
+
+    process.exit(0);
 
   } catch (err) {
     console.error(err);
