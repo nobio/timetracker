@@ -43,17 +43,15 @@ describe('test util.dumpTimeEnties', () => {
   });
 
   it('dumping the database should lead to a new file in /dump', async () => {
-    await util.dumpTimeEntries()
-      .then((result) => {
-        console.log();
-        expect(result).to.have.property('size');
-        expect(result).to.have.property('filename');
-        return result.filename;
-      })
-      .then((filename) => {
-        const data = fs.readFileSync(filename);
-        expect(data).to.not.be.empty;
-      })
-      .catch((err) => { throw err; });
+    try {
+      const result = await util.dumpTimeEntries();
+      console.log(result)
+      expect(result).to.have.property('size');
+      expect(result).to.have.property('filename');
+      const data = fs.readFileSync(result.filename);
+      expect(data).to.not.be.empty;
+    } catch (error) {
+      throw error;
+    }
   }).timeout(10000);
 });

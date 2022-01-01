@@ -14,9 +14,7 @@ const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 exports.dumpTimeEntries = async function () {
   try {
     const timeEntries = await TimeEntry.find();
-    fs.stat('./dump', (err) => {
-      if (err) fs.mkdirSync('./dump');
-    });
+    if (!fs.existsSync('./dump')) fs.mkdirSync('./dump');
     const dumpFile = `./dump/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
 
     fs.writeFileSync(dumpFile, JSON.stringify(timeEntries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
