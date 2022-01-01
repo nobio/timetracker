@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 
 const mongoose = require('mongoose');
+const models = require('./models');
 
 mongoose.set('useUnifiedTopology', true);
 mongoose.set('useCreateIndex', true);
@@ -36,63 +37,21 @@ const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
 const SILENT = process.argv.includes('-s');
 const SUCCESS_ONLY = process.argv.includes('-c');
 
-/* ==================================================================== */
-// Schema
-const directions = 'enter go'.split(' ');
-const TimeEntry = new mongoose.Schema({
-  entry_date: { type: Date, required: true, default: Date.now, index: true, },
-  direction: { type: String, enum: directions, required: true },
-  last_changed: { type: Date, default: Date.now, required: true },
-  longitude: { type: Number, required: false },
-  latitude: { type: Number, required: false },
-});
-const GeoTracking = new mongoose.Schema({
-  longitude: { type: Number, required: true, index: true },
-  latitude: { type: Number, required: true, index: true },
-  accuracy: { type: Number, required: false },
-  source: { type: String, required: true },
-  date: { type: Date, required: true, index: true, unique: true, default: Date.now, },
-});
-const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
-const FailureDay = new mongoose.Schema({
-  date: { type: Date, required: true, index: false, unique: false, },
-  failure_type: { type: String, enum: failureTypes, required: true, index: false, unique: false, },
-});
-const User = new mongoose.Schema({
-  username: { type: String, required: true, index: true, unique: true, },
-  password: { type: String, required: true, default: false, index: false, },
-  name: { type: String, required: true, index: false, unique: false, },
-  mailaddress: { type: String, required: true, default: false, index: false, },
-});
-const Toggle = new mongoose.Schema({
-  name: { type: String, required: true, index: true, unique: true, },
-  toggle: { type: Boolean, required: true, default: false, index: false, },
-  notification: { type: String, required: true, default: 'generic message', index: false, unique: false, },
-});
-const Properties = new mongoose.Schema({
-  key: { type: String, required: true, index: true, unique: true, },
-  value: { type: String, required: true, index: false, unique: false, },
-});
-
-/* ====================-================================================ */
-
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
 const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
 
-const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', TimeEntry);
-const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', TimeEntry);
-const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', GeoTracking);
-const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', GeoTracking);
-const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', FailureDay);
-const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', FailureDay);
-const USER_SOURCE = connectionSource.model('User', User);
-const USER_TARGET = connectionTarget.model('User', User);
-const TOGGLE_SOURCE = connectionSource.model('Toggle', Toggle);
-const TOGGLE_TARGET = connectionTarget.model('Toggle', Toggle);
-const PROPS_SOURCE = connectionSource.model('Properties', Properties);
-const PROPS_TARGET = connectionTarget.model('Properties', Properties);
-
-mongoose.model('GeoTracking', GeoTracking);
+const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', models.TimeEntry);
+const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', models.TimeEntry);
+const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', models.GeoTracking);
+const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', models.GeoTracking);
+const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', models.FailureDay);
+const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', models.FailureDay);
+const USER_SOURCE = connectionSource.model('User', models.User);
+const USER_TARGET = connectionTarget.model('User', models.User);
+const TOGGLE_SOURCE = connectionSource.model('Toggle', models.Toggle);
+const TOGGLE_TARGET = connectionTarget.model('Toggle', models.Toggle);
+const PROPS_SOURCE = connectionSource.model('Properties', models.Properties);
+const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 
 console.log('--------------------------------------------------------------- \n');
 console.log('Usage: [MONGO_URL=MONGO | MLAB ] node db/dbmigration.js [-d] [-s]');
