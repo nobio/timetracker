@@ -35,7 +35,7 @@ function calcDist(lon1, lat1, lon2, lat2) {
  *
  * @param {*} tracks List of geo location points
  */
-function distance(tracks) {
+exports.distance = (tracks) => {
   return tracks.reduce((total, t, idx, ts) => {
     if (idx === 0) return 0;
     return total + calcDist(ts[idx - 1].longitude, ts[idx - 1].latitude, t.longitude, t.latitude);
@@ -47,7 +47,7 @@ function distance(tracks) {
  *
  * @param {*} tracks List of geo location points
  */
-function meanAccuracy(tracks) {
+ exports.meanAccuracy = (tracks) => {
   const meanAcc = tracks.reduce((total, t) => {
     if (t.accuracy) return total + t.accuracy;
     return total;
@@ -180,13 +180,13 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
  * distances (depend on accuracy)
  * @param {*} tracks tracking data
  */
-exports.getGeoTrackingMetadata = tracks => new Promise((resolve) => {
-  resolve({
+exports.getGeoTrackingMetadata = async function tracks() {
+  return {
     size: tracks.length,
     totalDistance: distance(tracks),
     accuracy: meanAccuracy(tracks),
-  });
-});
+  };
+};
 
 function transform(tracks) {
   const tr = [];
