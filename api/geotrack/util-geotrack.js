@@ -97,7 +97,6 @@ exports.createGeoTrack = (req, res) => {
 
 exports.parseGeoTrackingObject = (req) => {
   let geoTrack;
-  console.log(req.body);
 
   // find out if this is hassio or OwnTracks data
   if (req.body.lon && req.body.lat) {

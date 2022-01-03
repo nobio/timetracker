@@ -8,6 +8,7 @@ const geo = require('../api/geotrack');
 const util = require('../api/geotrack/util-geotrack');
 
 const chai = require('chai');
+chai.use(require('chai-datetime'));
 const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
 const sinon = require('sinon');
@@ -25,7 +26,7 @@ const should = chai.should;
  * Distance 
  * =============================================================
  */
- describe('test distance calculation', () => {
+describe('test distance calculation', () => {
 
   it('distance near by', async () => {
 
@@ -92,7 +93,7 @@ const should = chai.should;
  * Accuracy 
  * =============================================================
  */
- describe('test accuracy calculation', () => {
+describe('test accuracy calculation', () => {
 
   it('perfect accuracy', async () => {
 
@@ -142,7 +143,7 @@ const should = chai.should;
 
   it('accuracy with many many random accuracy entries', async () => {
     const track = [];
-    for(let n=0; n<100000; n++) {
+    for (let n = 0; n < 100000; n++) {
       track.push({
         accuracy: Math.random() * 50
       })
@@ -160,10 +161,102 @@ const should = chai.should;
 
 /**
  * =============================================================
+ * Parse Gro Tracking objects
+ * =============================================================
+ */
+describe('test parsing of GeoTrack objects', () => {
+
+  it('parse invalid GeoTrack object', async () => {
+    const req = mockRequest({ headers: [], body: {} });
+    const geoObj = util.parseGeoTrackingObject(req);
+    expect(geoObj).to.be.undefined;
+  });
+
+  it('parse owntrack GeoTrack object', async () => {
+    const req = mockRequest({
+      headers: [], body: {
+        lon: 10.875663,
+        acc: 32,
+        vel: 0,
+        lat: 49.514447,
+        tst: 1632584826,
+        alt: 309,
+        vel: 1,
+        tid: 'OWNTRACK',
+      }
+    });
+    const geoObj = util.parseGeoTrackingObject(req);
+
+    expect(geoObj).to.not.be.undefined;
+    expect(geoObj).to.have.property('_id');
+
+    expect(geoObj).to.have.property('longitude');
+    expect(geoObj.longitude).to.equal(10.875663);
+
+    expect(geoObj).to.have.property('latitude');
+    expect(geoObj.latitude).to.equal(49.514447);
+
+    expect(geoObj).to.have.property('accuracy');
+    expect(geoObj.accuracy).to.equal(32);
+
+    expect(geoObj).to.have.property('altitude');
+    expect(geoObj.altitude).to.equal('309');
+
+    expect(geoObj).to.have.property('date');
+    expect(moment(geoObj.date).toISOString()).to.equal(moment.unix(1632584826).toISOString());
+
+    expect(geoObj).to.have.property('source');
+    expect(geoObj.source).to.equal('OWNTRACK');
+
+  });
+
+  it('parse HASSIO GeoTrack object', async () => {
+    const req = mockRequest({
+      headers: [], body: {
+        longitude: 10.875663,
+        accuracy: 32,
+        latitude: 49.514447,
+        source: 'HASSIO',
+      }
+    });
+    const geoObj = util.parseGeoTrackingObject(req);
+
+    expect(geoObj).to.not.be.undefined;
+    expect(geoObj).to.have.property('_id');
+
+    expect(geoObj).to.have.property('longitude');
+    expect(geoObj.longitude).to.equal(10.875663);
+
+    expect(geoObj).to.have.property('latitude');
+    expect(geoObj.latitude).to.equal(49.514447);
+
+    expect(geoObj).to.have.property('accuracy');
+    expect(geoObj.accuracy).to.equal(32);
+
+    expect(geoObj).to.have.property('source');
+    expect(geoObj.source).to.equal('HASSIO');
+
+  });
+
+  it('parse encrypted GeoTrack object', async () => {
+    const req = mockRequest({
+      headers: [], body: {
+        _type: 'encrypted',
+      }
+    });
+    const geoObj = util.parseGeoTrackingObject(req);
+    expect(geoObj).to.be.null;
+  });
+
+});
+
+
+/**
+ * =============================================================
  * Load Gro Tracking
  * =============================================================
  */
- describe('test Geo Tracks', () => {
+describe('test get GeoTracks', () => {
 
   it('load geo tracks', async () => {
 
