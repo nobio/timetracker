@@ -10,8 +10,8 @@ const utilBreaktime = require('./util-breaktime');
  */
 exports.calcStats = (req, res) => {
   util.calcStats()
-    .then(timeentry => res.status(200).send(timeentry))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${err}`));
+    .then((timeentry) => res.status(200).send(timeentry))
+    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`));
 };
 
 /**
@@ -22,13 +22,13 @@ exports.calcStats = (req, res) => {
  */
 exports.getStats = (req, res) => {
   const dtStart = req.params.date;
-  const timeUnit = req.params.timeUnit;
-  const accumulate = req.query.accumulate;
-  const fill = req.query.fill;
+  const { timeUnit } = req.params;
+  const { accumulate } = req.query;
+  const { fill } = req.query;
 
   util.getStats(timeUnit, dtStart, accumulate, fill)
-    .then(timeentries => res.status(200).send(timeentries))
-    .catch(err => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+    .then((timeentries) => res.status(200).send(timeentries))
+    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
 };
 
 /**
@@ -39,8 +39,8 @@ exports.getStats = (req, res) => {
  */
 exports.deleteAllStatsDays = (req, res) => {
   util.deleteAllStatsDays()
-    .then(result => res.status(200).send(result))
-    .catch(err => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`));
+    .then((result) => res.status(200).send(result))
+    .catch((err) => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`));
 };
 
 /**
@@ -50,7 +50,7 @@ exports.deleteAllStatsDays = (req, res) => {
  * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
-  const timeUnit = req.query.timeUnit;
+  const { timeUnit } = req.query;
 
   utilTimebox.getStatsByTimeBox(timeUnit)
     .then((timeboxedStatistics) => {
@@ -75,7 +75,7 @@ exports.getStatsByTimeBox = (req, res) => {
         chart_data,
       });
     })
-    .catch(err => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`));
 };
 
 /**
@@ -87,12 +87,12 @@ exports.getStatsByTimeBox = (req, res) => {
  * @param {*} res
  */
 exports.histogram = (req, res) => {
-  const interval = req.params.interval;
-  const direction = req.query.direction;
+  const { interval } = req.params;
+  const { direction } = req.query;
 
   utilHistogram.getHistogramByTimeUnit(interval, direction)
-    .then(data => res.status(200).send(data))
-    .catch(err => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`));
+    .then((data) => res.status(200).send(data))
+    .catch((err) => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`));
 };
 
 /**
@@ -111,7 +111,7 @@ exports.breaktime = (req, res) => {
     res.status(500).send('invalid interval; must be numeric and > 0');
   } else {
     utilBreaktime.getBreakTime(interval, realCalc)
-      .then(data => res.status(200).send(data))
-      .catch(err => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
+      .then((data) => res.status(200).send(data))
+      .catch((err) => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
   }
 };

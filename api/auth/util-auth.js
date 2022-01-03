@@ -18,29 +18,27 @@ const Token = mongoose.model('Token');
 exports.getAllUsers = async () => {
   const users = [];
   try {
-    const dbUsers = await User.find()
-    dbUsers.forEach(user => {
+    const dbUsers = await User.find();
+    dbUsers.forEach((user) => {
       users.push(
         {
           id: user._id,
           username: user.username,
           name: user.name,
           mailAddress: user.mailaddress,
-        }
-      )
+        },
+      );
     });
     return users;
   } catch (error) {
     throw new Error(`cannot load users ${error}`);
   }
-
-}
+};
 
 exports.getUser = async (id) => {
   if (!id) throw Error('id must be provided');
 
   try {
-
     const user = await User.findById({ _id: id });
 
     return {
@@ -48,12 +46,11 @@ exports.getUser = async (id) => {
       username: user.username,
       name: user.name,
       mailAddress: user.mailaddress,
-    }
-
+    };
   } catch (error) {
     throw new Error(`cannot load user ${id}: ${error}`);
   }
-}
+};
 
 /**
  * creates a new user in database
@@ -79,11 +76,11 @@ exports.createUser = async (username, password, name, mailAddress) => {
       username,
       password: hashedPassword,
       name,
-      mailaddress: mailAddress
+      mailaddress: mailAddress,
     }).save();
     return newUser._id;
   } catch (error) {
-    throw error
+    throw error;
   }
 };
 
@@ -109,7 +106,7 @@ exports.updateUser = async (id, username, name, mailAddress) => {
     const updatedUser = user.save();
     return updatedUser._id;
   } catch (error) {
-    throw error
+    throw error;
   }
 };
 
@@ -125,30 +122,27 @@ exports.updateUsersPassword = async (id, password) => {
 
     return new Promise((resolve, reject) => {
       user.save()
-        .then(ret => resolve(ret._id))
-        .catch(err => reject(err));
+        .then((ret) => resolve(ret._id))
+        .catch((err) => reject(err));
     });
-
   } catch (error) {
     throw createError('User does not exists');
   }
 };
 
-
 /**
  * Delete a user by it's id
- * @param {*} id 
+ * @param {*} id
  */
 exports.deleteUser = async (id) => {
   if (!id) throw Error('id must be provided');
   return new Promise((resolve, reject) => {
     User.findByIdAndRemove(id)
-      .then(res => res)
-      .then(ret => resolve(ret))
-      .catch(err => reject("cannot delete user " + id));
+      .then((res) => res)
+      .then((ret) => resolve(ret))
+      .catch((err) => reject(`cannot delete user ${id}`));
   });
-
-}
+};
 
 /**
  * login with user and password (needs to be passed)
@@ -170,7 +164,7 @@ exports.login = async (username, password) => {
   const user = {
     username: mdbUser.username,
     name: mdbUser.name,
-    mailAddress: mdbUser.mailaddress
+    mailAddress: mdbUser.mailaddress,
   };
 
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRE });
@@ -208,9 +202,9 @@ exports.refreshToken = async (refreshToken) => {
 exports.logout = async (token) => {
   if (!token) throw createError(400, 'Token must be provided');
   try {
-    //await Token.deleteOne({ token });  // delete this refresh token
+    // await Token.deleteOne({ token });  // delete this refresh token
     const user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-    await Token.deleteMany({ user: user.username });  // delete all refresh tokens with the same username
+    await Token.deleteMany({ user: user.username }); // delete all refresh tokens with the same username
   } catch (err) {
     throw createError(400, err.message);
   }
@@ -220,10 +214,10 @@ exports.logout = async (token) => {
  * removes expired refresh tokens from database
  */
 exports.removeExpiredToken = async () => {
-  const now = parseInt(Date.now() / 1000);   // timestamp in s
+  const now = parseInt(Date.now() / 1000); // timestamp in s
   try {
     const tokens = await Token.find();
-    tokens.forEach(jwt => {
+    tokens.forEach((jwt) => {
       const payload = jwt.token.split('.')[1];
       const token = JSON.parse(Buffer.from(payload, 'base64').toString('ascii'));
       if (parseInt(token.exp), now - token.exp > 0) {
@@ -232,7 +226,7 @@ exports.removeExpiredToken = async () => {
       }
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     throw createError(500, err.message);
   }
 };
@@ -255,6 +249,4 @@ exports.validateBasicAuth = async (authorization) => {
   if (mdbUser == null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) throw createError(401, 'User not authenticated');
-
-  return;
 };

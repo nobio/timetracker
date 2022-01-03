@@ -6,20 +6,20 @@ const Toggle = mongoose.model('Toggle');
 // ============================= TOGGLES ====================================
 exports.getAllToggles = () => new Promise((resolve, reject) => {
   Toggle.find()
-    .then(result => resolve(result))
-    .catch(err => reject(err));
+    .then((result) => resolve(result))
+    .catch((err) => reject(err));
 });
 
-exports.getToggle = id => new Promise((resolve, reject) => {
+exports.getToggle = (id) => new Promise((resolve, reject) => {
   Toggle.findById(id)
-    .then(result => resolve(result))
-    .catch(err => reject(err));
+    .then((result) => resolve(result))
+    .catch((err) => reject(err));
 });
 
-exports.getToggleByName = name => new Promise((resolve, reject) => {
+exports.getToggleByName = (name) => new Promise((resolve, reject) => {
   Toggle.findOne({ name })
-    .then(result => resolve(result))
-    .catch(err => reject(err));
+    .then((result) => resolve(result))
+    .catch((err) => reject(err));
 });
 
 exports.getToggleStatus = () => new Promise((resolve, reject) => {
@@ -34,20 +34,20 @@ exports.createToggle = (name, toggle, notification) => new Promise((resolve, rej
     toggle,
     notification,
   }).save()
-    .then(toggle => resolve(toggle))
-    .catch(err => reject(err));
+    .then((toggle) => resolve(toggle))
+    .catch((err) => reject(err));
 });
 
-exports.deleteToggle = id => new Promise((resolve, reject) => {
+exports.deleteToggle = (id) => new Promise((resolve, reject) => {
   Toggle.findByIdAndRemove(id)
-    .then(toggle => resolve(toggle))
-    .catch(err => reject(err));
+    .then((toggle) => resolve(toggle))
+    .catch((err) => reject(err));
 });
 
 exports.deleteTestToggles = () => new Promise((resolve, reject) => {
   Toggle.deleteMany({ name: /TEST-TOGGLE/ })
     .then(resolve('all test tokens deleted'))
-    .catch(err => reject(err));
+    .catch((err) => reject(err));
 });
 
 exports.updateToggle = (id, toggle, notification) => new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ exports.updateToggle = (id, toggle, notification) => new Promise((resolve, rejec
       tog.notification = (notification === undefined || notification === null) ? '' : notification;
       return tog;
     })
-    .then(tog => tog.save())
-    .then(tog => resolve(tog))
-    .catch(err => reject(err));
+    .then((tog) => tog.save())
+    .then((tog) => resolve(tog))
+    .catch((err) => reject(err));
 });

@@ -21,9 +21,9 @@ function calcDist(lon1, lat1, lon2, lat2) {
   const Δφ = (lat2 - lat1) * Math.PI / 180;
   const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2)
+    + Math.cos(φ1) * Math.cos(φ2)
+    * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   const d = R * c; // in metres
@@ -35,19 +35,17 @@ function calcDist(lon1, lat1, lon2, lat2) {
  *
  * @param {*} tracks List of geo location points
  */
-exports.distance = (tracks) => {
-  return tracks.reduce((total, t, idx, ts) => {
-    if (idx === 0) return 0;
-    return total + calcDist(ts[idx - 1].longitude, ts[idx - 1].latitude, t.longitude, t.latitude);
-  }, 0);
-}
+exports.distance = (tracks) => tracks.reduce((total, t, idx, ts) => {
+  if (idx === 0) return 0;
+  return total + calcDist(ts[idx - 1].longitude, ts[idx - 1].latitude, t.longitude, t.latitude);
+}, 0);
 
 /**
  * calculates the average of measuerd accuracy of the singele geo locations of the given time span
  *
  * @param {*} tracks List of geo location points
  */
- exports.meanAccuracy = (tracks) => {
+exports.meanAccuracy = (tracks) => {
   const meanAcc = tracks.reduce((total, t) => {
     if (t.accuracy) return total + t.accuracy;
     return total;
@@ -61,7 +59,7 @@ exports.distance = (tracks) => {
     mean: meanAcc,
     stdt: Math.sqrt(variance),
   };
-}
+};
 
 /**
  * Creats a new data entry for one geo location event
@@ -75,14 +73,14 @@ exports.createGeoTrack = (req, res) => {
     console.error('data encrypted');
     res.status(202).send('data encrypted');
     return;
-  } else if (!geoTrack) {
+  } if (!geoTrack) {
     console.error('missing data (longitude, latitude, accuracy, source)');
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }
 
   geoTrack.save()
-    .then(gt => res.status(200).json(gt))
+    .then((gt) => res.status(200).json(gt))
     .catch((err) => {
       if (err.code === 11000) {
         console.error('ignoring duplication error');
@@ -93,7 +91,6 @@ exports.createGeoTrack = (req, res) => {
       }
     });
 };
-
 
 exports.parseGeoTrackingObject = (req) => {
   let geoTrack;
@@ -131,7 +128,7 @@ exports.parseGeoTrackingObject = (req) => {
       accuracy: req.body.acc,
       altitude: req.body.alt,
       velocity: req.body.vel,
-      //battery: req.body.batt,
+      // battery: req.body.batt,
       date: moment.unix(req.body.tst),
       // eslint-disable-next-line no-nested-ternary
       source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
@@ -169,8 +166,8 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
     }).skip(0).sort({ date: 1 })
       .then(transform)
       .then(appendMetadata)
-      .then(tracks => resolve(tracks))
-      .catch(err => reject(err));
+      .then((tracks) => resolve(tracks))
+      .catch((err) => reject(err));
   });
 };
 
@@ -189,7 +186,7 @@ exports.getGeoTrackingMetadata = async function tracks() {
 
 function transform(tracks) {
   const tr = [];
-  tracks.forEach(t => {
+  tracks.forEach((t) => {
     tr.push({
       date: t.date,
       longitude: t.longitude,
@@ -199,7 +196,7 @@ function transform(tracks) {
       altitude: (t.altitude || 0),
       timediff: 0,
       accuracy: (t.accuracy || 0),
-      sourc: (t.source || 'X')
+      sourc: (t.source || 'X'),
     });
   });
   return tr;
@@ -207,18 +204,18 @@ function transform(tracks) {
 
 function appendMetadata(tracks) {
   let oldPoint;
-  tracks.forEach(point => {
+  tracks.forEach((point) => {
     if (oldPoint) {
-      const dist = calcDist(oldPoint.longitude, oldPoint.latitude, point.longitude, point.latitude);  // distance in meter
-      const timeDiff = moment(point.date).diff(moment(oldPoint.date)) / 1000;  // time difference in seconds
-      const velocity = (point.velocity || dist / timeDiff);  // velocity in m/s
+      const dist = calcDist(oldPoint.longitude, oldPoint.latitude, point.longitude, point.latitude); // distance in meter
+      const timeDiff = moment(point.date).diff(moment(oldPoint.date)) / 1000; // time difference in seconds
+      const velocity = (point.velocity || dist / timeDiff); // velocity in m/s
       point.dist = dist;
       point.timediff = timeDiff;
       point.velocity = velocity;
     }
     oldPoint = point;
   });
-  //console.log(JSON.stringify(tracks, null, 2))
+  // console.log(JSON.stringify(tracks, null, 2))
 
   return tracks;
 }

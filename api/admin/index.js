@@ -9,8 +9,8 @@ const utilProps = require('./util-properties');
  */
 exports.dumpTimeEntries = (req, res) => {
   util.dumpTimeEntries()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while dumping data: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
 };
 
 /**
@@ -20,8 +20,8 @@ exports.dumpTimeEntries = (req, res) => {
  */
 exports.backupTimeEntries = (req, res) => {
   util.backupTimeEntries()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while backup data: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
 };
 
 /**
@@ -31,8 +31,8 @@ exports.backupTimeEntries = (req, res) => {
  */
 exports.getAllToggles = (req, res) => {
   utilToggles.getAllToggles()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while reading all toggles: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading all toggles: ${err}`));
 };
 
 /**
@@ -41,11 +41,11 @@ exports.getAllToggles = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
 exports.getToggleById = (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
   utilToggles.getToggle(id)
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`));
 };
 
 /**
@@ -54,11 +54,11 @@ exports.getToggleById = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/name/CREATE_ENTRY
  */
 exports.getToggleByName = (req, res) => {
-  const name = req.params.name;
+  const { name } = req.params;
 
   utilToggles.getToggleByName(name)
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while reading one toggle: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`));
 };
 
 /**
@@ -68,10 +68,9 @@ exports.getToggleByName = (req, res) => {
  */
 exports.getToggleStatus = (req, res) => {
   utilToggles.getToggleStatus()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while reading toggle status: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading toggle status: ${err}`));
 };
-
 
 /**
  * update the value of a toggle
@@ -81,13 +80,13 @@ exports.getToggleStatus = (req, res) => {
  * curl -X PUT  -H "Content-Type: application/json" -d '{"toggle":false, "notification":"test text"}' http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
 exports.saveToggle = (req, res) => {
-  const id = req.params.id;
-  const toggle = req.body.toggle;
-  const notification = req.body.notification;
+  const { id } = req.params;
+  const { toggle } = req.body;
+  const { notification } = req.body;
 
   utilToggles.updateToggle(id, toggle, notification)
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while saving toggle: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while saving toggle: ${err}`));
 };
 
 /**
@@ -96,15 +95,14 @@ exports.saveToggle = (req, res) => {
  * curl -X POST  -H "Content-Type: application/json" -d '{"name":"Create Entry", "toggle":true}' http://localhost:30000/api/toggles
  */
 exports.createToggle = (req, res) => {
-  const name = req.body.name;
-  const toggle = req.body.toggle;
-  const notification = req.body.notification;
+  const { name } = req.body;
+  const { toggle } = req.body;
+  const { notification } = req.body;
 
   utilToggles.createToggle(name, toggle, notification)
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while creating new toggle: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while creating new toggle: ${err}`));
 };
-
 
 /**
  * deletes one time entry by it's id
@@ -112,7 +110,7 @@ exports.createToggle = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
 exports.deleteToggle = (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
 
   utilToggles.deleteToggle(id)
     .then((toggle) => {
@@ -122,7 +120,7 @@ exports.deleteToggle = (req, res) => {
         res.status(200).send(toggle);
       }
     })
-    .catch(err => res.status(500).send(`Error while deleting existing toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while deleting existing toggle: ${err}`));
 };
 
 /**
@@ -139,8 +137,8 @@ app.delete('/api/properties/:key', api_admin.deleteProperty);
  */
 exports.getProperties = (req, res) => {
   utilProps.getProperties()
-    .then(response => res.status(200).send(response))
-    .catch(err => res.status(500).send(`Error while reading all properties: ${err}`));
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading all properties: ${err}`));
 };
 
 /**
@@ -149,17 +147,17 @@ exports.getProperties = (req, res) => {
  * curl -X GET http://localhost:30000/api/properties/TEST_KEY01
  */
 exports.getProperty = (req, res) => {
-  const key = req.params.key;
+  const { key } = req.params;
 
   utilProps.getProperty(key)
-    .then(response => {
+    .then((response) => {
       if (response) {
-        res.status(200).send(response)
+        res.status(200).send(response);
       } else {
         res.status(404).send();
       }
     })
-    .catch(err => res.status(500).send(`Error while reading one property: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading one property: ${err}`));
 };
 
 /**
@@ -168,12 +166,12 @@ exports.getProperty = (req, res) => {
  * curl -X PUT http://localhost:30000/api/properties/TEST_KEY01?value=TEST_VALUE
  */
 exports.setProperty = (req, res) => {
-  const key = req.params.key;
-  const value = req.query.value;
+  const { key } = req.params;
+  const { value } = req.query;
 
   utilProps.setProperty(key, value)
-    .then(response => res.status(201).send())
-    .catch(err => res.status(500).send(`Error while reading a property: ${err}`));
+    .then((response) => res.status(201).send())
+    .catch((err) => res.status(500).send(`Error while reading a property: ${err}`));
 };
 
 /**
@@ -182,14 +180,14 @@ exports.setProperty = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/properties/TEST_KEY01
  */
 exports.deleteProperty = (req, res) => {
-  const key = req.params.key;
+  const { key } = req.params;
 
   utilProps.deleteProperty(key)
-    .then(response => {
+    .then((response) => {
       if (response) {
-        res.status(204).send()
+        res.status(204).send();
       } else {
         res.status(404).send();
       }
-    }).catch(err => res.status(500).send(`Error while deleting a property: ${err}`));
+    }).catch((err) => res.status(500).send(`Error while deleting a property: ${err}`));
 };

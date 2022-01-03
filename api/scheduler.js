@@ -2,7 +2,7 @@ const scheduler = require('node-schedule');
 const admin = require('./admin/util-admin');
 const stats = require('./stats/util-stats');
 const entries = require('./entries/util-entries');
-const auth = require('./auth/util-auth')
+const auth = require('./auth/util-auth');
 
 /**
  * start scheduler to run tasks
@@ -51,7 +51,6 @@ exports.scheduleTasks = function () {
         console.log('schedule: ' + new Date());
     });
   */
-
 
   /*
     # .---------------- minute (0 - 59)

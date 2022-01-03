@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 
 const StatsDay = mongoose.model('StatsDay');
 
-
 /* function of reduce */
 function add(a, b) {
   // console.log("a=" + a + ", b=" + b);
@@ -45,7 +44,7 @@ function renderOneData(data, weekDay) {
   tmpData.avg = tmpData.sum / tmpData.count;
 
   // map to an array with quadratic distances from average
-  const distances = data.rawData.map(x => (Math.pow((x - tmpData.avg), 2)));
+  const distances = data.rawData.map((x) => (Math.pow((x - tmpData.avg), 2)));
   tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count); // varianz = sum of qudaratic distances / count; deviation = sqrt (varianz)
 
   // console.log(JSON.stringify(tmpData));
@@ -58,7 +57,7 @@ function renderOneData(data, weekDay) {
   };
 }
 
-exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
+exports.getStatsByTimeBox = (timeUnit) => new Promise((resolve, reject) => {
   let data;
 
   StatsDay.find().sort({ date: 1 }).exec((err, stats) => {
@@ -82,10 +81,10 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
 
       // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
       // console.log(JSON.stringify(data));
-      let avg = calculateAverage(data);
+      const avg = calculateAverage(data);
 
       /**
-      
+
        data[idx] = {
               x: lastTimeUnit,
               y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
@@ -107,20 +106,20 @@ exports.getStatsByTimeBox = timeUnit => new Promise((resolve, reject) => {
  * calculates the average of n points depending on timeUnit
  */
 function calculateAverage(data) {
-  let avg = [];
+  const avg = [];
 
   const avgLenth = data.length * 0.10; // 5% of data should be the number of averaged points
   for (let idx = 0; idx < data.length; idx++) {
-    let sum = [];
+    const sum = [];
     // Beispiel: idx = 36; avgLen = 5 => idxStart = 31, idxEnd = 41
     const idxStart = idx - parseInt(avgLenth / 2);
     const idxEnd = idx + parseInt(avgLenth / 2);
     for (let n = idxStart; n <= idxEnd; n++) {
-      if (n >= 0 && n < data.length) /*console.log(idx, n, parseInt(avgLenth / 2), data[n])*/sum.push(data[n].y);
+      if (n >= 0 && n < data.length) /* console.log(idx, n, parseInt(avgLenth / 2), data[n]) */sum.push(data[n].y);
     }
 
     const average = Math.round(100 * sum.reduce((previous, current) => previous + current, 0) / sum.length) / 100;
-    avg.push({ 'x': data[idx].x, 'y': average });
+    avg.push({ x: data[idx].x, y: average });
   }
   return avg;
 }
@@ -131,7 +130,6 @@ function calculateAverage(data) {
  * @param {*} timeUnitFormatString 'gggg-MM', 'ggg-ww', 'gggg'
  */
 function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
-
   const data = [{
     0: 0,
   }];
@@ -201,7 +199,6 @@ function getStatsByTimeBoxDay(stats) {
  * @param {*} stats
  */
 function getStatsByTimeBoxTimeWeekDay(stats) {
-
   const data = [{
     0: 0,
   }];

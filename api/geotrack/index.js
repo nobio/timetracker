@@ -16,21 +16,21 @@ exports.createGeoTrack = (req, res) => {
   const geoTrack = util.parseGeoTrackingObject(req);
 
   if (geoTrack === null) {
-    console.error('data encrypted')
+    console.error('data encrypted');
     res.status(202).send('data encrypted');
     return;
-  } else if (!geoTrack) {
-    console.error('missing data (longitude, latitude, accuracy, source)')
+  } if (!geoTrack) {
+    console.error('missing data (longitude, latitude, accuracy, source)');
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }
 
   geoTrack
     .save()
-    .then(gt => res.status(200).json(gt))
-    .catch(err => {
+    .then((gt) => res.status(200).json(gt))
+    .catch((err) => {
       if (err.code === 11000) {
-        console.error('ignoring duplication error')
+        console.error('ignoring duplication error');
         res.status(202).json(err.message);
       } else {
         console.log(err.code);
@@ -50,8 +50,8 @@ exports.getGeoTracking = (req, res) => {
   const dtEnd = moment(req.query.dateEnd);
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
-    .then(tracks => res.status(200).send(tracks))
-    .catch(err => res.status(err.status).json({ message: err.message }));
+    .then((tracks) => res.status(200).send(tracks))
+    .catch((err) => res.status(err.status).json({ message: err.message }));
 };
 
 /**
@@ -65,6 +65,6 @@ exports.getGeoTrackingMetadata = (req, res) => {
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then(util.getGeoTrackingMetadata)
-    .then(metaData => res.status(200).send(metaData))
-    .catch(err => res.status(err.status).json({ message: err.message }));
+    .then((metaData) => res.status(200).send(metaData))
+    .catch((err) => res.status(err.status).json({ message: err.message }));
 };

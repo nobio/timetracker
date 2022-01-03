@@ -4,10 +4,10 @@
  *
  */
 require('../../db');
-const g_util = require('../global_util');
-const auth_util = require('../auth/util-auth');
 const moment = require('moment');
 const mongoose = require('mongoose');
+const g_util = require('../global_util');
+const auth_util = require('../auth/util-auth');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const FailureDay = mongoose.model('FailureDay');
@@ -15,7 +15,7 @@ const FailureDay = mongoose.model('FailureDay');
 /**
  * function to check wheather an object is empty or not
  */
-exports.isEmpty = obj => isEmpty(obj);
+exports.isEmpty = (obj) => isEmpty(obj);
 
 function isEmpty(obj) {
   for (const key in obj) {
@@ -68,14 +68,13 @@ exports.stripdownToDateUTC = (date) => {
    "last_changed" : "2017-12-01T07:12:15.623Z"
 }
  */
-exports.findById = id =>
+exports.findById = (id) =>
   // console.log('entered findById ' + id)
   new Promise((resolve, reject) => {
     TimeEntry.findById(id)
-      .then(timeentries => resolve(timeentries))
-      .catch(err => reject(err));
+      .then((timeentries) => resolve(timeentries))
+      .catch((err) => reject(err));
   });
-
 
 /**
  * Creates a new TimeEntry itemt in database
@@ -112,18 +111,17 @@ exports.create = async (timeEntry) => {
   // ============== 2nd check: is the new entry really a new entry or does it already exist? ==============
   try {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
-    console.log(entriesByDate)
-    entriesByDate.forEach(entry => {
-      if (entry.entry_date.toISOString() == timeEntry.datetime &&
-        entry.direction == timeEntry.direction) {
-        console.error(`entry already exists; use update to modify`);
-        throw new Error(`entry already exists; use update to modify`);
+    console.log(entriesByDate);
+    entriesByDate.forEach((entry) => {
+      if (entry.entry_date.toISOString() == timeEntry.datetime
+        && entry.direction == timeEntry.direction) {
+        console.error('entry already exists; use update to modify');
+        throw new Error('entry already exists; use update to modify');
       }
     });
-      
   } catch (error) {
-    console.log(error)
-    throw error;    
+    console.log(error);
+    throw error;
   }
 
   return new Promise((resolve, reject) => {
@@ -140,14 +138,13 @@ exports.create = async (timeEntry) => {
         g_util.sendMessage('CREATE_ENTRY', msg);
         return tEntry;
       })
-      .then(tEntry => resolve(tEntry))
+      .then((tEntry) => resolve(tEntry))
       .catch((err) => {
         g_util.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`);
         reject(err);
       });
   })
-    .catch(err => reject(err));
-
+    .catch((err) => reject(err));
 };
 
 /**
@@ -183,9 +180,9 @@ exports.update = (timeEntry) => {
         // console.log(te)
         return te;
       })
-      .then(te => te.save())
-      .then(te => resolve(te))
-      .catch(err => reject(err));
+      .then((te) => te.save())
+      .then((te) => resolve(te))
+      .catch((err) => reject(err));
   });
 };
 
@@ -194,15 +191,14 @@ exports.update = (timeEntry) => {
  * @param id unique id of an entry like 5a2100cf87f1f368d087696a
  * @returns TimeEntry object that has been deleted
  */
-exports.deleteById = id =>
+exports.deleteById = (id) =>
   // console.log('entered deleteById ' + id)
   new Promise((resolve, reject) => {
     TimeEntry.findByIdAndRemove(id)
-      .then(timeentry => resolve(timeentry))
+      .then((timeentry) => resolve(timeentry))
       .then(g_util.sendMessage('DELETE_ENTRY', id))
-      .catch(err => reject(err));
+      .catch((err) => reject(err));
   });
-
 
 /**
  * lists all Time Entries for a given date (this particular day)
@@ -235,7 +231,7 @@ exports.getAllByDate = (date) => {
         */
         resolve(timeentries);
       })
-      .catch(err => reject(new Error(`Unable to read Time Entry for given date : ${date} (${err.message})`)));
+      .catch((err) => reject(new Error(`Unable to read Time Entry for given date : ${date} (${err.message})`)));
   });
 };
 
@@ -245,8 +241,8 @@ exports.getAllByDate = (date) => {
  * @param list of time entry objects (usually 2) from getAllByDate method
  * @returns Promise
  */
-exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
-  //console.log(timeentries);
+exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
+  // console.log(timeentries);
 
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
@@ -272,7 +268,7 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
         entry_date: moment().toISOString(),
         last_changed: moment().toISOString(),
         direction: 'go',
-      }))
+      }));
     }
 
     for (let n = timeentries.length - 1; n > 0; n -= 2) {
@@ -313,8 +309,8 @@ exports.calculateBusyTime = timeentries => new Promise((resolve, reject) => {
  */
 exports.getAll = () => new Promise((resolve, reject) => {
   TimeEntry.find().sort({ entry_date: 1 })
-    .then(timeentries => resolve(timeentries))
-    .catch(err => reject(err.message));
+    .then((timeentries) => resolve(timeentries))
+    .catch((err) => reject(err.message));
 });
 
 /*
@@ -322,8 +318,8 @@ exports.getAll = () => new Promise((resolve, reject) => {
  */
 exports.count = () => new Promise((resolve, reject) => {
   TimeEntry.find()
-    .then(timeentries => resolve(timeentries.length))
-    .catch(err => reject(err.message));
+    .then((timeentries) => resolve(timeentries.length))
+    .catch((err) => reject(err.message));
 });
 
 /**
@@ -359,7 +355,7 @@ exports.getLastTimeEntryByDate = (dt) => {
           resolve(timeentry[0]);
         }
       })
-      .catch(err => reject(new Error(`Unable to read Time Entry for given date : ${dt} (${err.message})`)));
+      .catch((err) => reject(new Error(`Unable to read Time Entry for given date : ${dt} (${err.message})`)));
   });
 };
 
@@ -375,7 +371,7 @@ exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
-    .catch(err => reject(new Error(`${'Unable to read first Time Entry: ' + ' ('}${err.message})`)));
+    .catch((err) => reject(new Error(`${'Unable to read first Time Entry: ' + ' ('}${err.message})`)));
 });
 
 exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
@@ -390,7 +386,7 @@ exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
-    .catch(err => reject(new Error(`${'Unable to read last Time Entry: ' + ' ('}${err.message})`)));
+    .catch((err) => reject(new Error(`${'Unable to read last Time Entry: ' + ' ('}${err.message})`)));
 });
 
 exports.removeDoublets = () => {
@@ -404,8 +400,8 @@ exports.removeDoublets = () => {
       .then((timeEntries) => {
         timeEntries.forEach((timeentry) => {
           if (lastTimeentry !== undefined) {
-            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 && // .diff -> milliseconds; < 1000 less than one second
-              timeentry.direction == lastTimeentry.direction) {
+            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
+              && timeentry.direction == lastTimeentry.direction) {
               timeentry.remove();
               count++;
               // console.log(`removing timeentry ${timeentry}`);
@@ -417,7 +413,7 @@ exports.removeDoublets = () => {
           }
         });
       })
-      .catch(err => reject(err));
+      .catch((err) => reject(err));
     // console.log(`${count} doublets removed`);
     resolve({ removed: count });
   });
@@ -425,67 +421,65 @@ exports.removeDoublets = () => {
 
 exports.sleep = (delay) => {
   console.log(`I 'm going to sleep now for ${delay} ms`);
-  return new Promise(resolve => setTimeout(resolve, delay));
+  return new Promise((resolve) => setTimeout(resolve, delay));
 };
 
-exports.evaluate = () =>
-  new Promise((resolve, reject) => {
-    let firstEntry;
-    let lastEntry;
+exports.evaluate = () => new Promise((resolve, reject) => {
+  let firstEntry;
+  let lastEntry;
 
-    this
-      .getFirstTimeEntry()
-      .then(firstTimeEntry => (firstEntry = firstTimeEntry))
-      .then(firstTimeEntry => this.getLastTimeEntry())
-      .then(lastTimeEntry => (lastEntry = lastTimeEntry))
-      .then(result => FailureDay.deleteMany())
-      .then(result => this.storeValidationErrors(firstEntry, lastEntry))
-      .then(result => resolve(result))
-      .then(g_util.sendMessage('EVALUATE_DATA'))
-      .catch(err => reject(err));
-  });
+  this
+    .getFirstTimeEntry()
+    .then((firstTimeEntry) => (firstEntry = firstTimeEntry))
+    .then((firstTimeEntry) => this.getLastTimeEntry())
+    .then((lastTimeEntry) => (lastEntry = lastTimeEntry))
+    .then((result) => FailureDay.deleteMany())
+    .then((result) => this.storeValidationErrors(firstEntry, lastEntry))
+    .then((result) => resolve(result))
+    .then(g_util.sendMessage('EVALUATE_DATA'))
+    .catch((err) => reject(err));
+});
 
-exports.storeValidationErrors = (firstEntry, lastEntry) =>
-  new Promise((resolve, reject) => {
-    // console.log(JSON.stringify(firstEntry), lastEntry);
-    const lastEntriesAge = moment(lastEntry.age);
-    const date = this.stripdownToDateUTC(firstEntry.age);
+exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
+  // console.log(JSON.stringify(firstEntry), lastEntry);
+  const lastEntriesAge = moment(lastEntry.age);
+  const date = this.stripdownToDateUTC(firstEntry.age);
 
-    for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
-      // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
-      const dt = moment(date);
+  for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
+    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+    const dt = moment(date);
 
-      this.getAllByDate(dt).then((timeentries) => {
-        // firstly evaluate the not (yet) complete entries and save them....
-        if (timeentries.length % 2 !== 0) {
+    this.getAllByDate(dt).then((timeentries) => {
+      // firstly evaluate the not (yet) complete entries and save them....
+      if (timeentries.length % 2 !== 0) {
+        new FailureDay({
+          date: dt,
+          failure_type: 'INCOMPLETE',
+        }).save((err) => {
+          if (err) {
+            reject(err);
+          }
+        });
+      }
+
+      // sencondly evaluate on wrong order of entries and save them too
+      for (let n = timeentries.length - 1; n > 0; n -= 2) {
+        // this must be a go-event to be good. Otherwise report a failure
+        if (timeentries[n].direction !== 'go') {
           new FailureDay({
-            date: dt,
-            failure_type: 'INCOMPLETE',
+            date: dt.toDate(),
+            failure_type: 'WRONG_ORDER',
           }).save((err) => {
             if (err) {
               reject(err);
             }
           });
         }
-
-        // sencondly evaluate on wrong order of entries and save them too
-        for (let n = timeentries.length - 1; n > 0; n -= 2) {
-          // this must be a go-event to be good. Otherwise report a failure
-          if (timeentries[n].direction !== 'go') {
-            new FailureDay({
-              date: dt.toDate(),
-              failure_type: 'WRONG_ORDER',
-            }).save((err) => {
-              if (err) {
-                reject(err);
-              }
-            });
-          }
-        }
-      });
-    }
-    resolve({ message: 'calculation ongoing in background' });
-  });
+      }
+    });
+  }
+  resolve({ message: 'calculation ongoing in background' });
+});
 
 /**
    * read all error dates from database; delivers an array like
@@ -513,6 +507,5 @@ exports.getErrorDates = () => new Promise((resolve, reject) => {
       }
       resolve(fDates);
     })
-    .catch(err => reject(err));
+    .catch((err) => reject(err));
 });
-

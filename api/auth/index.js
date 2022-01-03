@@ -1,5 +1,5 @@
-const util = require('./util-auth');
 const jwt = require('jsonwebtoken');
+const util = require('./util-auth');
 const g_util = require('../global_util');
 
 /**
@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
     const result = await util.getAllUsers();
     res.status(200).json(result);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -33,7 +33,7 @@ exports.getUser = async (req, res) => {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -52,11 +52,10 @@ exports.deleteUser = async (req, res) => {
     g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(500).json({ message: err });
   }
 };
-
 
 /**
  * create a new user
@@ -72,7 +71,7 @@ exports.createUser = async (req, res) => {
     g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -91,18 +90,16 @@ exports.updateUser = async (req, res) => {
     g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err)
-    if (err.message === 'User does not exists')
-      res.status(404).json({ message: err.message });
-    else
-      res.status(500).json({ message: err.message });
+    console.error(err);
+    if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
+    else res.status(500).json({ message: err.message });
   }
 };
 
 /**
  * updates only the password of a user
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 exports.updateUsersPassword = async (req, res) => {
   try {
@@ -110,11 +107,9 @@ exports.updateUsersPassword = async (req, res) => {
     g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err)
-    if (err.message === 'User does not exists')
-      res.status(404).json({ message: err.message });
-    else
-      res.status(500).json({ message: err.message });
+    console.error(err);
+    if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
+    else res.status(500).json({ message: err.message });
   }
 };
 
@@ -129,7 +124,7 @@ exports.updateUsersPassword = async (req, res) => {
 exports.login = async (req, res) => {
   // console.log(req)
   g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
-  const password = req.body.password;
+  const { password } = req.body;
   if (password == null) {
     res.status(401).send();
     return;
@@ -150,9 +145,9 @@ exports.login = async (req, res) => {
 /**
  * logout of a session
  * curl -X POST -H "Content-Type: application/json" -d '{"token": "eyJh...sw5c"}' http://localhost:30000/api/auth/logout
- * 
+ *
  * @param {token} req JWT Token
- * @param {*} res 
+ * @param {*} res
  */
 exports.logout = async (req, res) => {
   try {
@@ -166,9 +161,9 @@ exports.logout = async (req, res) => {
 /**
  * Use the refresh token to generate a new token
  * curl -X POST -H "Content-Type: application/json" -d '{"token": "eyJh...sw5c"}' http://localhost:30000/api/auth/token
- * 
+ *
  * @param {token} req JWT Token
- * @param {*} res 
+ * @param {*} res
  */
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.token;
@@ -181,7 +176,7 @@ exports.refreshToken = async (req, res) => {
     const token = await util.refreshToken(refreshToken);
     res.status(200).send(token);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     res.status(400).send({ message: err.message });
   }
 };
@@ -191,25 +186,24 @@ exports.authorize = async (req, res, next) => {
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
   if (process.env.AUTHORIZATION !== 'on' || (
-    (req.method === 'POST' && req.url.startsWith('/api/auth/login')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/auth/logout')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/auth/token')) ||
-    (req.method === 'GET' && req.url.startsWith('/api-docs'))
+    (req.method === 'POST' && req.url.startsWith('/api/auth/login'))
+    || (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
+    || (req.method === 'POST' && req.url.startsWith('/api/auth/token'))
+    || (req.method === 'GET' && req.url.startsWith('/api-docs'))
   )) {
     // just continue...
-    console.log('authorization disabled for ' + req.url)
+    console.log(`authorization disabled for ${req.url}`);
     res.status(200);
     return next();
-  } else if (process.env.AUTHORIZATION === 'on' && (
-    (req.method === 'POST' && req.url.startsWith('/api/geofence')) ||
-    (req.method === 'POST' && req.url.startsWith('/api/geotrack')) 
+  } if (process.env.AUTHORIZATION === 'on' && (
+    (req.method === 'POST' && req.url.startsWith('/api/geofence'))
+    || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
   )) {
     // basic authorisation
     return this.authorizeBasicAuth(req, res, next);
-  } else {
-    // token authorization for the rest of us
-    return this.authorizeToken(req, res, next);
   }
+  // token authorization for the rest of us
+  return this.authorizeToken(req, res, next);
 };
 
 /**
@@ -232,7 +226,7 @@ exports.authorizeToken = async (req, res, next) => {
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
       if (err.name == 'TokenExpiredError') return res.status(401).send(err.message);
-      else return res.status(403).send(err.message);
+      return res.status(403).send(err.message);
     }
 
     req.user = user; // store user in request object
@@ -255,7 +249,7 @@ exports.authorizeToken = async (req, res, next) => {
 exports.authorizeBasicAuth = async (req, res, next) => {
   const credentials = req.headers.authorization;
   try {
-    await util.validateBasicAuth(credentials)
+    await util.validateBasicAuth(credentials);
     res.status(200);
     next();
   } catch (err) {
@@ -263,4 +257,3 @@ exports.authorizeBasicAuth = async (req, res, next) => {
     res.status(400).json({ message: err.message });
   }
 };
-

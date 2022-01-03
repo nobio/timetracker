@@ -1,6 +1,6 @@
 const Axios = require('axios');
-const toggleUtil = require('./admin/util-toggles');
 const moment = require('moment');
+const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
 exports.DEFAULT_BREAK_TIME_SECONDS = 30 * 60;
@@ -27,10 +27,8 @@ exports.sendMessage = async function (notificationKey, addedContent) {
       addedContent = (addedContent) || ''; // if addedContent is undefined set it with blank string
       const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedContent}`;
       return this.sendTextMessage(msg);
-    } else {
-      return (`toggle ${notificationKey} switched off`);
     }
-
+    return (`toggle ${notificationKey} switched off`);
   } catch (error) {
     return error.message;
   }
@@ -38,8 +36,8 @@ exports.sendMessage = async function (notificationKey, addedContent) {
 
 /**
  * just send any text to slack; please mind that it could be markd down formatted
- * @param {*} message 
- * @returns 
+ * @param {*} message
+ * @returns
  */
 exports.sendTextMessage = async function (message) {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
@@ -59,8 +57,6 @@ exports.sendTextMessage = async function (message) {
       },
     );
     return result;
-  } else {
-    return (`could not send message <'${message}'> to SLACK (no slack url provided); logging instead to stderr`);
   }
-
-}
+  return (`could not send message <'${message}'> to SLACK (no slack url provided); logging instead to stderr`);
+};

@@ -1,5 +1,5 @@
-const g_util = require('../global_util');
 const moment = require('moment');
+const g_util = require('../global_util');
 const utilEntry = require('../entries/util-entries');
 
 const COUNT_MINUTES = 120; // 120 minutes for histogram (0..120)
@@ -10,17 +10,17 @@ const COUNT_MINUTES = 120; // 120 minutes for histogram (0..120)
 exports.getBreakTime = (interval, realCalc) => new Promise((resolve, reject) => {
   utilEntry.getAll()
     .then(this.getAllTimeEntriesGroupedByDate)
-    .then(timeEntries => this.prepareBreakTimes(timeEntries, realCalc))
-    .then(preparedBreakTimes => this.calculateHistogram(preparedBreakTimes, interval, realCalc))
-    .then(breakTimes => resolve(breakTimes))
-    .catch(err => reject(err));
+    .then((timeEntries) => this.prepareBreakTimes(timeEntries, realCalc))
+    .then((preparedBreakTimes) => this.calculateHistogram(preparedBreakTimes, interval, realCalc))
+    .then((breakTimes) => resolve(breakTimes))
+    .catch((err) => reject(err));
 });
 
 /**
  * create a Map with the date as key and an array of entry_dates as value (entry_date in unix timestamp)
  * @param {all time entries sorted by entry_date} timeEntries
  */
-exports.getAllTimeEntriesGroupedByDate = timeEntries => new Promise((resolve, reject) => {
+exports.getAllTimeEntriesGroupedByDate = (timeEntries) => new Promise((resolve, reject) => {
   try {
     const datesFromArray = timeEntries.reduce((acc, timeEntry) => {
       const date_time = moment(timeEntry.entry_date).locale('de');

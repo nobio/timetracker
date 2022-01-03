@@ -25,9 +25,9 @@ exports.getHistogramByTimeUnit = (interval, direction) => new Promise((resolve, 
   }
 
   utilEntry.getAll()
-    .then(timeEntries => calculateHistogram(timeEntries, interval, direction, data))
-    .then(filledData => resolve(data))
-    .catch(err => reject(err));
+    .then((timeEntries) => calculateHistogram(timeEntries, interval, direction, data))
+    .then((filledData) => resolve(data))
+    .catch((err) => reject(err));
 });
 
 /**

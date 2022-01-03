@@ -10,10 +10,10 @@ const packageJson = require('../../package.json');
  * curl -X GET http://localhost:30000/api/ping
  */
 exports.ping = (req, res) => {
-  const ip = (req.headers['x-forwarded-for'] ||
-    req.connection.remoteAddress ||
-    req.socket.remoteAddress ||
-    req.connection.socket.remoteAddress).split(',')[0];
+  const ip = (req.headers['x-forwarded-for']
+    || req.connection.remoteAddress
+    || req.socket.remoteAddress
+    || req.connection.socket.remoteAddress).split(',')[0];
 
   res.status(200).send({
     response: 'pong',
@@ -48,7 +48,7 @@ exports.experiment = (req, res) => {
   let actualDate;
 
   TimeEntry.find().sort({ entry_date: 1 })
-    .catch(err => res.send(err))
+    .catch((err) => res.send(err))
     .then((timeentries) => {
       timeentries.forEach((timeEntry) => {
         const myDate = moment(timeEntry.entry_date).format('YYYY-MM-DD');
