@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
     const result = await util.getAllUsers();
     res.status(200).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -33,7 +33,7 @@ exports.getUser = async (req, res) => {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -52,7 +52,7 @@ exports.deleteUser = async (req, res) => {
     g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -71,7 +71,7 @@ exports.createUser = async (req, res) => {
     g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: err });
   }
 };
@@ -90,7 +90,7 @@ exports.updateUser = async (req, res) => {
     g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
     else res.status(500).json({ message: err.message });
   }
@@ -107,7 +107,7 @@ exports.updateUsersPassword = async (req, res) => {
     g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
     else res.status(500).json({ message: err.message });
   }
@@ -176,7 +176,7 @@ exports.refreshToken = async (req, res) => {
     const token = await util.refreshToken(refreshToken);
     res.status(200).send(token);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(400).send({ message: err.message });
   }
 };
@@ -253,7 +253,8 @@ exports.authorizeBasicAuth = async (req, res, next) => {
     res.status(200);
     next();
   } catch (err) {
-    console.log(err);
-    res.status(400).json({ message: err.message });
+    // console.log(err);
+    if(err.status) res.status(err.status).json({ message: err.message });
+    else res.status(400).json({ message: err.message });
   }
 };

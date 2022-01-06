@@ -494,7 +494,7 @@ describe('test index.authorize', () => {
     }
   });
 
-  it('test for OK (400): call authorizeBasic service with header incl. valid basic authentication  and auth switch on', async () => {
+  it('test for OK (401): call Baisc auth service with header incl. invalid basic authentication  and auth switch on', async () => {
     process.env.AUTHORIZATION = 'on';
     const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
     req.url = '/api/geofence/';
@@ -504,12 +504,13 @@ describe('test index.authorize', () => {
     try {
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(400);
+      expect(res.status).to.have.been.calledWith(401);
       expect(next).not.to.have.been.called;
     } catch (err) {
       throw Error(err);
     }
   });
+  
   after(async () => {
     await User.deleteOne({ name: TESTUSER_USERNAME });
   });

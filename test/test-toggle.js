@@ -98,7 +98,7 @@ describe('test util.getToggle', () => {
     util.getAllToggles()
       .then(result => util.getToggle(result[0]._id))
       .then((result) => {
-        expect(result).to.have.property('toggle');
+        expect(result).to.have.property('toggleXXX');
         expect(result).to.have.property('name');
       })
       .catch((err) => { throw err; });
