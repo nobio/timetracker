@@ -2,6 +2,7 @@ require('../db');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
+const StatsDay = mongoose.model('StatsDay');
 const util = require('../api/stats/util-stats');
 const utilTimeEntry = require('../api/entries/util-entries');
 const utilTimebox = require('../api/stats/util-statstimebox');
@@ -16,6 +17,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const moment = require('moment');
+const { assert } = require('chai');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
@@ -23,257 +25,192 @@ const DEFAULT_DATE = moment('1967-03-16');
 /** ************************************************************ */
 
 describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry', () => {
-  it('getFirstTimeEntry', () => {
-    utilTimeEntry
-      .getFirstTimeEntry()
-      .then((result) => {
-        expect(result).to.have.property('_id');
-        expect(result).to.have.property('age');
-      })
-      .catch((err) => {
-        throw err;
-      });
+  it('getFirstTimeEntry', async () => {
+    result = await utilTimeEntry.getFirstTimeEntry();
+    expect(result).to.have.property('_id');
+    expect(result).to.have.property('age');
   });
 
-  it('getLastTimeEntry', () => {
-    utilTimeEntry
-      .getLastTimeEntry()
-      .then((result) => {
-        expect(result).to.have.property('_id');
-        expect(result).to.have.property('age');
-      })
-      .catch((err) => {
-        throw err;
-      });
+  it('getLastTimeEntry', async () => {
+    result = await utilTimeEntry.getLastTimeEntry();
+    expect(result).to.have.property('_id');
+    expect(result).to.have.property('age');
   });
 });
 
 describe('utilTimeEntry util.removeDoublets', () => {
-  it('test for doubletts (should be no in)', () => {
-    utilTimeEntry
-      .removeDoublets()
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.have.property('removed');
-        expect(result.removed).to.equal(0);
-      })
-      .catch((err) => {
-        throw err;
-      });
+  it('test for doubletts (should be no in)', async () => {
+    const result = await utilTimeEntry.removeDoublets();
+    expect(result).to.have.property('removed');
+    expect(result.removed).to.equal(0);
   });
 
-  it('add a doublette and check if one has been removed', () => {
-    createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE })
-      .then(result => createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE }))
-      .then(result => utilTimeEntry.removeDoublets())
-      .then((result) => {
-        expect(result).to.have.property('removed');
-        expect(result.removed).to.equal(0);
-      })
-      .catch((err) => {
-        throw err;
-      });
+  it('add a doublette and check if one has been removed', async () => {
+    await createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE });
+    await createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE });
+    const result = await utilTimeEntry.removeDoublets();
+    expect(result).to.have.property('removed');
+    expect(result.removed).to.equal(0);
   });
 
-  after(() => {
-    clearAllEntries(DEFAULT_DATE);
+  after(async () => {
+    await clearAllEntries(DEFAULT_DATE);
   });
 });
 
 describe('test util.getStats and getStatsByRange', () => {
-  it('getStatsByRange', () => {
+  it('getStatsByRange', async () => {
     const dtStart = moment.unix(1391295600000 / 1000);
     const dtEnd = moment(dtStart).add(1, 'months');
 
-    util.getStatsByRange(dtStart, dtEnd)
-      .then((result) => {
-        //console.log(result)
-        expect(result).to.have.property('planned_working_time');
-        expect(result).to.have.property('average_working_time');
-        expect(result).to.have.property('actual_working_time');
-        expect(result).to.have.property('inner_data');
-        expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
-        expect(result.inner_data[0]).to.have.property('x');
-        expect(result.inner_data[0]).to.have.property('y');
-        expect(result).to.have.property('inner_comp');
-        expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0);
-        expect(result.inner_comp[0]).to.have.property('x');
-        expect(result.inner_comp[0]).to.have.property('y');
-      })
-      .catch((err) => { throw err; });
+    const result = await util.getStatsByRange(dtStart, dtEnd);
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('inner_data');
+    expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_data[0]).to.have.property('x');
+    expect(result.inner_data[0]).to.have.property('y');
+    expect(result).to.have.property('inner_comp');
+    expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_comp[0]).to.have.property('x');
+    expect(result.inner_comp[0]).to.have.property('y');
   });
 
-  it('getStats', () => {
-    util.getStats('year', 1391295600000)
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.have.property('planned_working_time');
-        expect(result).to.have.property('average_working_time');
-        expect(result).to.have.property('actual_working_time');
-        expect(result).to.have.property('chart_data');
-        expect(result.chart_data).to.have.property('xScale');
-        expect(result.chart_data).to.have.property('yScale');
-        expect(result.chart_data).to.have.property('type');
-        expect(result.chart_data).to.have.property('main');
-        expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0);
-        expect(result.chart_data.main[0]).to.have.property('data');
-        expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0);
-        expect(result.chart_data.main[0].data[0]).to.have.property('x');
-        expect(result.chart_data.main[0].data[0]).to.have.property('y');
-        expect(result.chart_data).to.have.property('comp');
-        expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0);
-        expect(result.chart_data.comp[0]).to.have.property('data');
-        expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0);
-        expect(result.chart_data.comp[0].data[0]).to.have.property('x');
-        expect(result.chart_data.comp[0].data[0]).to.have.property('y');
-      })
-      .catch((err) => { throw err; });
+  it('getStats', async () => {
+    const result = await util.getStats('year', 1391295600000);
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('chart_data');
+    expect(result.chart_data).to.have.property('xScale');
+    expect(result.chart_data).to.have.property('yScale');
+    expect(result.chart_data).to.have.property('type');
+    expect(result.chart_data).to.have.property('main');
+    expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0]).to.have.property('data');
+    expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0].data[0]).to.have.property('x');
+    expect(result.chart_data.main[0].data[0]).to.have.property('y');
+    expect(result.chart_data).to.have.property('comp');
+    expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0]).to.have.property('data');
+    expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0].data[0]).to.have.property('x');
+    expect(result.chart_data.comp[0].data[0]).to.have.property('y');
   });
 });
 
 describe('test utilHistogram.getHistogramByTimeUnit', () => {
-  it('utilHistogram with interval 240', () => {
-    utilHistogram.getHistogramByTimeUnit(240)
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(6); // 1440 / 240
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-      })
-      .catch((err) => { throw err; });
+  it('utilHistogram with interval 240', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(240);
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(6); // 1440 / 240
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
   });
-  it('utilHistogram with interval 1', () => {
-    utilHistogram.getHistogramByTimeUnit(1)
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(1440); // numbers of minutes in one day
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-      })
-      .catch((err) => { throw err; });
+  it('utilHistogram with interval 1', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(1);
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(1440); // numbers of minutes in one day
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
   });
-  it('utilHistogram with interval 1440', () => {
-    utilHistogram.getHistogramByTimeUnit(1440) // numbers of minutes in one day
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(1);
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-      })
-      .catch((err) => { throw err; });
+  it('utilHistogram with interval 1440', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(1440); // numbers of minutes in one day
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(1);
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
   });
-  it('should throw exception when passing an invertval less 1', () => expect(utilHistogram.getHistogramByTimeUnit(0)).to.be.rejected);
-  it('utilHistogram with interval 60 with go', () => {
-    utilHistogram.getHistogramByTimeUnit(60, 'go') // numbers of minutes in one day
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24);
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-      })
-      .catch((err) => { throw err; });
+  it('should throw exception when passing an interval less 1', async () => {
+    try {
+      await utilHistogram.getHistogramByTimeUnit(0);
+      assert.fail('should not reach this point but throw error instead');
+    } catch (error) {
+      expect(error.message).to.be.equal('interval must not be less 1');
+    }
   });
-  it('utilHistogram with interval 60 with enter', () => {
-    utilHistogram.getHistogramByTimeUnit(60, 'enter') // numbers of minutes in one day
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24);
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-      })
-      .catch((err) => { throw err; });
+  it('utilHistogram with interval 60 with go', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'go') // numbers of minutes in one day
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(24);
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
   });
-  it('utilHistogram with interval 60 with invalid direction', () => {
-    utilHistogram.getHistogramByTimeUnit(60, 'XXXX') // numbers of minutes in one day
-      .then((result) => {
-        // console.log(result)
-        expect(result).to.be.an('array').with.length.greaterThan(0);
-        expect(result).to.be.an('array').with.lengthOf(24);
-        expect(result[0]).to.have.property('time');
-        expect(result[0]).to.have.property('histValue');
-        expect(result[0].histValue).to.equal(0);
-        expect(result[result.length - 1].histValue).to.equal(0);
-      })
-      .catch((err) => { throw err; });
+  it('utilHistogram with interval 60 with enter', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'enter') // numbers of minutes in one day
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(24);
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
+  });
+  it('utilHistogram with interval 60 with invalid direction', async () => {
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'XXXX') // numbers of minutes in one day
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result).to.be.an('array').with.lengthOf(24);
+    expect(result[0]).to.have.property('time');
+    expect(result[0]).to.have.property('histValue');
+    expect(result[0].histValue).to.equal(0);
+    expect(result[result.length - 1].histValue).to.equal(0);
   });
 });
 
-describe('test utilTimebox.getStatsByTimeBox by year', () => {
-  it('getStatsByTimeBox with year', () => {
-    utilTimebox.getStatsByTimeBox('year')
-      .then((result) => { checkTimeboxResult(result); })
-      .catch((err) => { throw err; });
+describe('test utilTimebox.getStatsByTimeBox', () => {
+  it('getStatsByTimeBox with year', async () => {
+    const result = await utilTimebox.getStatsByTimeBox('year');
+    checkTimeboxResult(result);
   });
-});
-describe('test utilTimebox.getStatsByTimeBox by month', () => {
-  it('getStatsByTimeBox with month', () => {
-    utilTimebox.getStatsByTimeBox('month')
-      .then((result) => { checkTimeboxResult(result); })
-      .catch((err) => { throw err; });
+  it('getStatsByTimeBox with month', async () => {
+    const result = await utilTimebox.getStatsByTimeBox('month');
+    checkTimeboxResult(result);
   });
-});
-describe('test utilTimebox.getStatsByTimeBox by week', () => {
-  it('getStatsByTimeBox with week', () => {
-    utilTimebox.getStatsByTimeBox('week')
-      .then((result) => { checkTimeboxResult(result); })
-      .catch((err) => { throw err; });
+  it('getStatsByTimeBox with week', async () => {
+    const result = await utilTimebox.getStatsByTimeBox('week');
+    checkTimeboxResult(result);
   });
-});
-describe('test utilTimebox.getStatsByTimeBox by day', () => {
-  it('getStatsByTimeBox with day', () => {
-    utilTimebox.getStatsByTimeBox('day')
-      .then((result) => { checkTimeboxResult(result); })
-      .catch((err) => { throw err; });
+  it('getStatsByTimeBox with day', async () => {
+    const result = await utilTimebox.getStatsByTimeBox('day');
+    checkTimeboxResult(result);
   });
-});
-describe('test utilTimebox.getStatsByTimeBox by weekday', () => {
-  it('getStatsByTimeBox with weekday', () => {
-    utilTimebox.getStatsByTimeBox('weekday')
-      .then((result) => { checkTimeboxResult(result); })
-      .catch((err) => { throw err; });
+  it('getStatsByTimeBox with weekday', async () => {
+    const result = await utilTimebox.getStatsByTimeBox('weekday');
+    checkTimeboxResult(result);
   });
-  it('should throw exception when passing an invalid timeUnit', () => {
-    expect(utilTimebox.getStatsByTimeBox('XXXX')).to.be.rejected
-  });
-});
+  it('should throw exception when passing an invalid timeUnit', async () => {
+    try {
+      await utilTimebox.getStatsByTimeBox('XXXX');
+      assert.fail('should not reach this point but throw error instead');
+    } catch (error) {
+      expect(error.message).to.be.equal("time unit 'XXXX' is invalid");
+    }
 
+  });
+});
 
 /*
 describe("test util.deleteAllStatsDays", () => {
   var db;
-  before(function() {
+  before(function () {
     db = require("../db");
   });
 
-  it("load StatsDays", () => {
-    StatsDay.find()
-    .then(statsDays => {
-      expect(statsDays).to.have.length > 0;
-      return statsDays;
-    })
-    .then(result => util.deleteAllStatsDays())
-    .then(result => {
-      //console.log(result)
-      expect(result).to.have.property("size");
-      expect(result.size).to.equal(0);
-    })
-    .then(StatsDay.find())
-    .then(statsDays => {
-      expect(statsDays).to.be.undefined;
-    })
-    .catch(err => { throw err; });
+  it.only("load StatsDays", async () => {
+    let statsDays = await StatsDay.find();
+    expect(statsDays).to.have.length > 0;
+    const result = await util.deleteAllStatsDays();
+    expect(result).to.have.property("size");
+    expect(result.size).to.equal(0);
+    statsDays = StatsDay.find();
+    expect(statsDays).to.be.undefined;
   });
 
-  after(function() {
+  after(function () {
     //db.closeConnection()
   });
 });
 */
+
 // ========================================================================================================
 /**
  * create a new TimeEntry regardless other entries. No checks will be performed
@@ -298,13 +235,11 @@ function createTimeEntry(timeEntry) {
  *
  * @param {*} date date to delete all entries which might have stayed because of any error
  */
-function clearAllEntries(dt) {
-  utilTimeEntry.getAllByDate(dt).then((timeentries) => {
-    // console.log(`removing ${timeentries.length} entries`);
-    timeentries.forEach((timeentry) => {
-      utilTimeEntry.deleteById(timeentry._id);
-    });
-  });
+async function clearAllEntries(dt) {
+  const timeentries = await utilTimeEntry.getAllByDate(dt);
+  for (const timeentry of timeentries) {
+    await utilTimeEntry.deleteById(timeentry._id);
+  }
 }
 
 function checkTimeboxResult(result) {
@@ -316,6 +251,6 @@ function checkTimeboxResult(result) {
   expect(result.inner_data[0]).to.have.property('x');
   expect(result.inner_data[0]).to.have.property('y');
   expect(result).to.have.property('inner_comp');
-  expect(result.inner_comp).to.be.empty;
+  expect(result.inner_comp).to.not.be.empty;
 }
 // ========================================================================================================

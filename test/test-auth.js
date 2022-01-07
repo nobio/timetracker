@@ -81,7 +81,7 @@ describe('test utilAuth.createUser', () => {
       expect(user.name).to.eq(TESTUSER_NAME);
       expect(user.mailAddress).to.eq(TESTUSER_MAIL);
     } catch (err) {
-      throw Error(err);
+      assert.fail('should not throw exception')
     }
   });
 
@@ -207,9 +207,8 @@ describe('test utilAuth.deleteUser', () => {
 
       const resultDelete = await util.deleteUser(resultCreate);
       expect(resultCreate).to.be.an.integer;
-
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
   it('delete a non-existing user', async () => {
@@ -250,7 +249,7 @@ describe('test utilAuth.login', () => {
       refreshToken = result.refreshToken;
       expect(refreshToken).to.be.a('string');
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -332,7 +331,7 @@ describe('test utilAuth.login', () => {
       await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     } finally {
       await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
       await User.deleteOne({ name: TESTUSER_USERNAME });
@@ -391,7 +390,7 @@ describe('test utilAuth.updateUsersPassword', () => {
       }
 
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -441,7 +440,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -456,7 +455,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -472,7 +471,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(403);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -490,7 +489,7 @@ describe('test index.authorize', () => {
       expect(req.user).to.have.property('name'); // name: <Username> was added to request
       expect(next).to.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -507,7 +506,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).not.to.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
   
@@ -550,7 +549,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -564,7 +563,7 @@ describe('test index.refreshToken', () => {
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -577,7 +576,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -623,7 +622,7 @@ describe('test index.logout', () => {
       expect(res.status).to.have.been.calledWith(403); // Forbidden
       expect(next).to.not.have.been.called;
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -636,7 +635,7 @@ describe('test index.logout', () => {
       await auth.logout(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 
@@ -650,7 +649,7 @@ describe('test index.logout', () => {
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      throw Error(err);
+       assert.fail('should not throw exception')
     }
   });
 

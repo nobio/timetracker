@@ -51,7 +51,7 @@ describe('test util.dumpTimeEnties', () => {
       const data = fs.readFileSync(result.filename);
       expect(data).to.not.be.empty;
     } catch (error) {
-      throw error;
+      assert.fail('should not throw exception')
     }
   }).timeout(10000);
 });

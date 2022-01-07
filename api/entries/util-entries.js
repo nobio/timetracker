@@ -101,17 +101,15 @@ exports.create = async (timeEntry) => {
   if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
     if (timeEntry.direction != 'enter') {
       throw new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`);
-      return;
     }
   } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
     throw new Error(`this entry has direction ${timeEntry.direction} but last entry has also direction ${lastTimeEntry.direction}`);
-    return;
   }
 
   // ============== 2nd check: is the new entry really a new entry or does it already exist? ==============
   try {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
-    console.log(entriesByDate);
+    // console.log(entriesByDate);
     entriesByDate.forEach((entry) => {
       if (entry.entry_date.toISOString() == timeEntry.datetime
         && entry.direction == timeEntry.direction) {
@@ -249,15 +247,7 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
     resolve([]);
     //  } else if (timeentries.length % 2 !== 0) {
   } else if (timeentries.length % 2 !== 0 && (moment().format('DD.MM.YYYY') !== moment(timeentries[timeentries.length - 1].last_changed).format('DD.MM.YYYY'))) {
-    latestTimeEntry = timeentries[timeentries.length - 1];
-    /*
-    console.log(moment().format('DD.MM.YYYY'));
-    console.log(moment(latestTimeEntry.last_changed).format('DD.MM.YYYY'));
-    if (moment().format('DD.MM.YYYY') === moment(latestTimeEntry.last_changed).format('DD.MM.YYYY')) {
-      console.log(latestTimeEntry);
-    }
-    */
-    reject(new Error('Bitte die Einträge für vervollständigen'), 0);
+    reject(new Error('Bitte vervollständigen Sie die Einträge'), 0);
   } else {
     let busytime = 0;
     let pause = 0;
