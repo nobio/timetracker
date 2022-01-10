@@ -173,19 +173,18 @@ describe('test parsing of GeoTrack objects', () => {
   });
 
   it('parse owntrack GeoTrack object', async () => {
-    const req = mockRequest({
-      headers: [], body: {
-        lon: 10.875663,
-        acc: 32,
-        vel: 0,
-        lat: 49.514447,
-        tst: 1632584826,
-        alt: 309,
-        vel: 1,
-        tid: 'OWNTRACK',
-      }
-    });
-    const geoObj = util.parseGeoTrackingObject(req);
+    const body = {
+      lon: 10.875663,
+      acc: 32,
+      vel: 0,
+      lat: 49.514447,
+      tst: 1632584826,
+      alt: 309,
+      vel: 1,
+      tid: 'OWNTRACK',
+    };
+
+    const geoObj = util.parseGeoTrackingObject(body);
 
     expect(geoObj).to.not.be.undefined;
     expect(geoObj).to.have.property('_id');
@@ -211,15 +210,14 @@ describe('test parsing of GeoTrack objects', () => {
   });
 
   it('parse HASSIO GeoTrack object', async () => {
-    const req = mockRequest({
-      headers: [], body: {
-        longitude: 10.875663,
-        accuracy: 32,
-        latitude: 49.514447,
-        source: 'HASSIO',
-      }
-    });
-    const geoObj = util.parseGeoTrackingObject(req);
+    const body = {
+      longitude: 10.875663,
+      accuracy: 32,
+      latitude: 49.514447,
+      source: 'HASSIO',
+    };
+
+    const geoObj = util.parseGeoTrackingObject(body);
 
     expect(geoObj).to.not.be.undefined;
     expect(geoObj).to.have.property('_id');
@@ -239,12 +237,11 @@ describe('test parsing of GeoTrack objects', () => {
   });
 
   it('parse encrypted GeoTrack object', async () => {
-    const req = mockRequest({
-      headers: [], body: {
-        _type: 'encrypted',
-      }
-    });
-    const geoObj = util.parseGeoTrackingObject(req);
+    const body = {
+      _type: 'encrypted',
+    };
+
+    const geoObj = util.parseGeoTrackingObject(body);
     expect(geoObj).to.be.null;
   });
 

@@ -66,37 +66,29 @@ exports.meanAccuracy = (tracks) => {
  * @param {*} req Request object
  * @param {*} res Response object
  */
-exports.createGeoTrack = (req, res) => {
-  const geoTrack = this.parseGeoTrackingObject(req);
+exports.createGeoTrack = async (geoTrack) => {
+  if (!geoTrack) return;
 
-  if (geoTrack === null) {
-    console.error('data encrypted');
-    res.status(202).send('data encrypted');
-    return;
-  } if (!geoTrack) {
-    console.error('missing data (longitude, latitude, accuracy, source)');
-    res.status(400).send('missing data (longitude, latitude, accuracy, source)');
-    return;
+  try {
+    const result = await geoTrack.save();
+    return result;
+  } catch (error) {
+    if (error.code === 11000) {
+      console.error('ignoring duplication error');
+      const err = new Error('ignoring duplication error'); err.status = 202;
+      throw err;
+    } else {
+      const err = new Error(error.message); err.status = 500;
+      throw err;
+    }
   }
+}
 
-  geoTrack.save()
-    .then((gt) => res.status(200).json(gt))
-    .catch((err) => {
-      if (err.code === 11000) {
-        console.error('ignoring duplication error');
-        res.status(202).json(err.message);
-      } else {
-        console.log(err.code);
-        res.status(500).json(err.message);
-      }
-    });
-};
-
-exports.parseGeoTrackingObject = (req) => {
+exports.parseGeoTrackingObject = (body) => {
   let geoTrack;
 
   // find out if this is hassio or OwnTracks data
-  if (req.body.lon && req.body.lat) {
+  if (body.lon && body.lat) {
     // OWN_TRACKS
     /**
      * https://owntracks.org/booklet/tech/json/
@@ -123,26 +115,26 @@ exports.parseGeoTrackingObject = (req) => {
     }
        */
     geoTrack = new GeoTracking({
-      longitude: req.body.lon,
-      latitude: req.body.lat,
-      accuracy: req.body.acc,
-      altitude: req.body.alt,
-      velocity: req.body.vel,
-      // battery: req.body.batt,
-      date: moment.unix(req.body.tst),
+      longitude: body.lon,
+      latitude: body.lat,
+      accuracy: body.acc,
+      altitude: body.alt,
+      velocity: body.vel,
+      // battery: body.batt,
+      date: moment.unix(body.tst),
       // eslint-disable-next-line no-nested-ternary
-      source: (req.body.desc) ? req.body.desc : (req.body.tid) ? req.body.tid : 'unknown',
+      source: (body.desc) ? body.desc : (body.tid) ? body.tid : 'unknown',
     });
-  } else if (req.body.longitude && req.body.latitude) {
+  } else if (body.longitude && body.latitude) {
     // HASSIO
     geoTrack = new GeoTracking({
-      longitude: req.body.longitude,
-      latitude: req.body.latitude,
-      accuracy: req.body.accuracy,
-      source: req.body.source,
+      longitude: body.longitude,
+      latitude: body.latitude,
+      accuracy: body.accuracy,
+      source: body.source,
     });
     // eslint-disable-next-line no-underscore-dangle
-  } else if (req.body._type === 'encrypted') {
+  } else if (body._type === 'encrypted') {
     // encrypted...
     geoTrack = null;
   }
@@ -218,4 +210,21 @@ function appendMetadata(tracks) {
   // console.log(JSON.stringify(tracks, null, 2))
 
   return tracks;
+}
+
+/**
+  * loads the geo track of today and sends it to the websocket client
+  */
+function notifyWSClient() {
+  /*
+    const dtStart = moment().subtract(3, 'months').format('YYYY-MM-DD');
+    const dtEnd = moment().add(1, 'days').format('YYYY-MM-DD');
+  
+    try {
+      const data = await this.getGeoTrackingDataByTime(dtStart, dtEnd);
+      wsSocket.emitGeoData(data);  // async; it's ok
+    } catch (error) {
+      console.error(error);
+    }
+  */
 }

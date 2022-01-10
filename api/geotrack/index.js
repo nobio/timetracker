@@ -13,7 +13,7 @@ const util = require('./util-geotrack');
  * curl -X POST -H "Content-Type: application/json" -d '{"_type":"encrypted","data":"O5O4V7PF0o90tfmGg04TnGDJ73sA9iIxHpEvQ3J3qwHs3Vqh77lH1/Kh5PxMnZLDZzLn7AWtz+87GZ5+q04PzmqVJcoCud1qg5tEVAQOrlxRS8XZKhc3tLUJm6B2t5Cjb3Ro51+y1MX2lLe+1KMhhpWjZkSvQNf4trFfoOpN5w38rlrBB4VCFJeLFKJzICEFkE0kTwYyJpeHUKJ/wmed20fPT3RXWd6ozYhxa7NrUl+aa15gB7f0BemdhoVJ6EZJHeo9zsRevqEfF0wOiQnul4PujceCL41JFE2iuAtDRyN0yns="}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = (req, res) => {
-  const geoTrack = util.parseGeoTrackingObject(req);
+  const geoTrack = util.parseGeoTrackingObject(req.body);
 
   if (geoTrack === null) {
     console.error('data encrypted');
@@ -25,18 +25,9 @@ exports.createGeoTrack = (req, res) => {
     return;
   }
 
-  geoTrack
-    .save()
-    .then((gt) => res.status(200).json(gt))
-    .catch((err) => {
-      if (err.code === 11000) {
-        console.error('ignoring duplication error');
-        res.status(202).json(err.message);
-      } else {
-        console.log(err.code);
-        res.status(500).json(err.message);
-      }
-    });
+  util.createGeoTrack(geoTrack)
+    .then((tracks) => res.status(200).send(tracks))
+    .catch((err) => res.status(err.status).json({ message: err.message }));
 };
 
 /**
