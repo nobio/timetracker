@@ -3,6 +3,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
+const assert = chai.assert;
 
 const util = require('../api/admin/util-toggles');
 
@@ -15,7 +16,7 @@ describe('test util.getAllToggles', () => {
       expect(result[0]).to.have.property('toggle');
       expect(result[0]).to.have.property('name');
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 });
@@ -28,7 +29,7 @@ describe('test util.getToggle', () => {
       expect(toggle).to.have.property('toggle');
       expect(toggle).to.have.property('name');
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 
@@ -41,7 +42,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName('CREATE_ENTRY')
       expect(result.name).to.equal('CREATE_ENTRY');
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
   it('test to load notification toggle by a not existing name', async () => {
@@ -49,7 +50,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName('xxx')
       expect(result).to.be.null;
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
   it('test to load notification toggle without any name (null)', async () => {
@@ -57,7 +58,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName()
       expect(result).to.be.null;
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 });
@@ -76,7 +77,7 @@ describe('test util.updateToggle', () => {
       expect(result.toggle).to.equal(true);
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
   it('update existing toggle but only notification text', async () => {
@@ -90,7 +91,7 @@ describe('test util.updateToggle', () => {
       expect(result).not.to.be.null;
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 
@@ -98,7 +99,7 @@ describe('test util.updateToggle', () => {
     try {
       const toggle = await util.updateToggle('41224d776a326fb40f000001', true);
       expect(toggle).to.be.null;
-    } catch (error) {  assert.fail('should not throw exception') }
+    } catch (error) { assert.fail('should not throw exception') }
   });
 });
 
@@ -112,7 +113,7 @@ describe('test util.deleteToggle', () => {
       const result = await util.getToggle(deletedToggle._id);
       expect(result).to.be.null;
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 
@@ -121,83 +122,83 @@ describe('test util.deleteToggle', () => {
   });
 
 
-describe('test util.getToggleStatus', () => {
-  it('check Slack status without SLACK_URL', async () => {
-    // console.log(process.env.SLACK_URL);
-    try {
-      const result = await util.getToggleStatus();
-      expect(result).to.have.property('NOTIFICATION_SLACK');
-      expect(result.NOTIFICATION_SLACK).to.equal(false);
-    } catch (error) {
-       assert.fail('should not throw exception')
-    }
-  });
-  it('check Slack status with SLACK_URL', async () => {
-    process.env.SLACK_URL = '1234567890';
-    try {
-      const result = await util.getToggleStatus();
-      expect(result).to.have.property('NOTIFICATION_SLACK');
-      expect(result.NOTIFICATION_SLACK).to.equal(true);
-    } catch (error) {
-       assert.fail('should not throw exception')
-    }
-  });
-});
-
-describe('test util.createToggle', () => {
-  it('creating a new toggle with name, that does not exist without toggle value', async () => {
-    const toggleName = getToggleTestName();
-
-    try {
-      const result = await util.createToggle(toggleName);
-      expect(result).to.have.property('toggle');
-      expect(result.toggle).to.equal(false); // Default value is "false"
-      expect(result).to.have.property('name');
-      expect(result.name).to.equal(toggleName);
-      expect(result).to.have.property('notification');
-      expect(result.notification).to.equal('generic message');
-    } catch (error) {
-       assert.fail('should not throw exception')
-    }
+  describe('test util.getToggleStatus', () => {
+    it('check Slack status without SLACK_TOKEN', async () => {
+      // console.log(process.env.SLACK_TOKEN);
+      try {
+        const result = await util.getToggleStatus();
+        expect(result).to.have.property('NOTIFICATION_SLACK');
+        expect(result.NOTIFICATION_SLACK).to.equal(false);
+      } catch (error) {
+        assert.fail('should not throw exception')
+      }
+    });
+    it('check Slack status with SLACK_URL', async () => {
+      process.env.SLACK_TOKEN = '1234567890';
+      try {
+        const result = await util.getToggleStatus();
+        expect(result).to.have.property('NOTIFICATION_SLACK');
+        expect(result.NOTIFICATION_SLACK).to.equal(false);
+      } catch (error) {
+        assert.fail('should not throw exception')
+      }
+    });
   });
 
-  it('creating a new toggle with name, that does not exist with given toggle value', async () => {
-    const toggleName = getToggleTestName();
+  describe('test util.createToggle', () => {
+    it('creating a new toggle with name, that does not exist without toggle value', async () => {
+      const toggleName = getToggleTestName();
 
-    try {
-      const result = await util.createToggle(toggleName, true)
-      expect(result).to.have.property('toggle');
-      expect(result.toggle).to.equal(true); // Default value is "false"
-      expect(result).to.have.property('name');
-      expect(result.name).to.equal(toggleName);
-      expect(result).to.have.property('notification');
-      expect(result.notification).to.equal('generic message');
-    } catch (error) {
-       assert.fail('should not throw exception')
-    }
+      try {
+        const result = await util.createToggle(toggleName);
+        expect(result).to.have.property('toggle');
+        expect(result.toggle).to.equal(false); // Default value is "false"
+        expect(result).to.have.property('name');
+        expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('generic message');
+      } catch (error) {
+        assert.fail('should not throw exception')
+      }
+    });
 
+    it('creating a new toggle with name, that does not exist with given toggle value', async () => {
+      const toggleName = getToggleTestName();
+
+      try {
+        const result = await util.createToggle(toggleName, true)
+        expect(result).to.have.property('toggle');
+        expect(result.toggle).to.equal(true); // Default value is "false"
+        expect(result).to.have.property('name');
+        expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('generic message');
+      } catch (error) {
+        assert.fail('should not throw exception')
+      }
+
+    });
+
+    it('creating a new toggle with name, notification text that does not exist with given toggle value', async () => {
+      const toggleName = getToggleTestName();
+
+      try {
+        const result = await util.createToggle(toggleName, true, 'DELETE_ME')
+        expect(result).to.have.property('toggle');
+        expect(result.toggle).to.equal(true); // Default value is "false"
+        expect(result).to.have.property('name');
+        expect(result.name).to.equal(toggleName);
+        expect(result).to.have.property('notification');
+        expect(result.notification).to.equal('DELETE_ME');
+      } catch (error) {
+        assert.fail('should not throw exception')
+      }
+    });
+
+    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle()).to.be.rejectedWith(Error) });
+    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle('')).to.be.rejectedWith(Error) });
+    it('creating a new toggle without name but toggle; should fail', async () => { await expect(util.createToggle('', true)).to.be.rejectedWith(Error) });
   });
-
-  it('creating a new toggle with name, notification text that does not exist with given toggle value', async () => {
-    const toggleName = getToggleTestName();
-
-    try {
-      const result = await util.createToggle(toggleName, true, 'DELETE_ME')
-      expect(result).to.have.property('toggle');
-      expect(result.toggle).to.equal(true); // Default value is "false"
-      expect(result).to.have.property('name');
-      expect(result.name).to.equal(toggleName);
-      expect(result).to.have.property('notification');
-      expect(result.notification).to.equal('DELETE_ME');
-    } catch (error) {
-       assert.fail('should not throw exception')
-    }
-  });
-
-  it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle()).to.be.rejectedWith(Error) });
-  it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle('')).to.be.rejectedWith(Error) });
-  it('creating a new toggle without name but toggle; should fail', async () => { await expect(util.createToggle('', true)).to.be.rejectedWith(Error) });
-});
 
 
   after(async () => {
@@ -205,7 +206,7 @@ describe('test util.createToggle', () => {
       const result = await util.deleteTestToggles()
       console.log(JSON.stringify(result));
     } catch (error) {
-       assert.fail('should not throw exception')
+      assert.fail('should not throw exception')
     }
   });
 
