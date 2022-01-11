@@ -18,9 +18,11 @@ www
 .vscode
 .classpath
 .DS_Store
+.nyc_output
 npm-debug.log
 node_modules
 dump
+coverage
 ./Dockerfile
 docker-compose.yaml
 *.xcodeproj
