@@ -122,8 +122,8 @@ describe('test util.deleteToggle', () => {
 
 
 describe('test util.getToggleStatus', () => {
-  it('check Slack status without SLACK_TOKEN', async () => {
-    // console.log(process.env.SLACK_TOKEN);
+  it('check Slack status without SLACK_URL', async () => {
+    // console.log(process.env.SLACK_URL);
     try {
       const result = await util.getToggleStatus();
       expect(result).to.have.property('NOTIFICATION_SLACK');
@@ -132,8 +132,8 @@ describe('test util.getToggleStatus', () => {
        assert.fail('should not throw exception')
     }
   });
-  it('check Slack status with SLACK_TOKEN', async () => {
-    process.env.SLACK_TOKEN = '1234567890';
+  it('check Slack status with SLACK_URL', async () => {
+    process.env.SLACK_URL = '1234567890';
     try {
       const result = await util.getToggleStatus();
       expect(result).to.have.property('NOTIFICATION_SLACK');
