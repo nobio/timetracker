@@ -55,3 +55,14 @@ describe('test util.dumpTimeEnties', () => {
     }
   }).timeout(10000);
 });
+describe('test util.backupTimeEnties', () => {
+  it('backing up the database', async () => {
+    try {
+      const result = await util.backupTimeEntries();
+      console.log(result)
+      expect(result).to.have.property('backup_count');
+    } catch (error) {
+      assert.fail('should not throw exception')
+    }
+  }).timeout(10000);
+});
