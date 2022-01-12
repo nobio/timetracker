@@ -103,8 +103,8 @@ exports.updateUser = async (id, username, name, mailAddress) => {
   if (mailAddress) user.mailaddress = mailAddress;
 
   try {
-    const updatedUser = user.save();
-    return updatedUser._id;
+    const updatedUser = await user.save();
+    return updatedUser.id;
   } catch (error) {
     throw error;
   }
