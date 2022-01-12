@@ -12,23 +12,21 @@ const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 /**
  * Orchestrate the calculation of statistics
  */
-exports.calcStats = () => {
-  let firstEntry;
-  let deletedDoublets;
+exports.calcStats = async () => {
 
-  return new Promise((resolve, reject) => {
-    utilEntry
-      .removeDoublets()
-      .then((removed) => (deletedDoublets = removed.removed))
-      .then((doubs) => this.deleteAllStatsDays())
-      .then((result) => utilEntry.getFirstTimeEntry())
-      .then((firstTimeEntry) => (firstEntry = firstTimeEntry))
-      .then((firstTimeEntry) => utilEntry.getLastTimeEntry())
-      .then((lastEntry) => this.calculateStatistics(firstEntry, lastEntry))
-      .then((result) => resolve(result))
-      .then(g_util.sendMessage('RECALCULATE'))
-      .catch((err) => reject(err));
-  });
+  try {
+    const deletedDoublets = await utilEntry.removeDoublets();
+    await this.deleteAllStatsDays();
+    const firstEntry = await utilEntry.getFirstTimeEntry();
+    const lastEntry = await utilEntry.getLastTimeEntry();
+    const result = await this.calculateStatistics(firstEntry, lastEntry);
+    g_util.sendMessage('RECALCULATE'); // do this asynchronously
+
+    return result;
+
+  } catch (error) {
+    throw error;
+  }
 };
 
 /**
@@ -38,39 +36,37 @@ exports.calcStats = () => {
  * @param {*} firstEntry the first entry in database
  * @param {*} lastEntry  the last entry in database
  */
-exports.calculateStatistics = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
+exports.calculateStatistics = async (firstEntry, lastEntry) => {
+  console.log(firstEntry, lastEntry)
   let date = utilEntry.stripdownToDateUTC(firstEntry.age);
+  try {
+    while (date <= moment(lastEntry.age)) {
+      // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+      const dt = moment(date);
+      const busytime = await this.getBusytimeByDate(dt);
+      //console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+      if (busytime && busytime.busytime != 0) {
+        new StatsDay({
+          date: dt,
+          actual_working_time: busytime.busytime / 1,
+          planned_working_time: DEFAULT_WORKING_TIME,
+          is_working_day: true,
+          is_complete: true,
+          last_changed: new Date(),
+        }).save((err) => {
+          if (err) throw (err);
+        });
+      }
+      date = date.add(1, 'day');
+    }
 
-  while (date <= moment(lastEntry.age)) {
-    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
-    const dt = moment(date);
-    this.getBusytimeByDate(dt)
-      .then((busytime) => {
-        // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
-        if (busytime && busytime.busytime != 0) {
-          new StatsDay({
-            date: dt,
-            actual_working_time: busytime.busytime / 1,
-            planned_working_time: DEFAULT_WORKING_TIME,
-            is_working_day: true,
-            is_complete: true,
-            last_changed: new Date(),
-          }).save((err) => {
-            if (err) {
-              reject(err);
-            }
-          });
-        }
-      })
-      .catch((err) => console.log(err));
-    date = date.add(1, 'day');
-    // console.log(`> ${date}`);
+    return { firstEntry, lastEntry, }
+
+  } catch (error) {
+    throw error;
   }
-  resolve({
-    firstEntry,
-    lastEntry,
-  });
-});
+
+};
 
 /**
  * Calculates the time of "busyness" for the given day;
@@ -239,8 +235,8 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
           (sumActual += Math.round(
             (stat.actual_working_time / 60 / 60 / 1000) * 100,
           ) / 100), // rounding 2 digits after comma
-          (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
-          obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
+            (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
+            obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
           obj.y = sumActual;
           obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
           obj.y = sumNominal;

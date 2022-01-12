@@ -77,8 +77,110 @@ describe('test util.getStats and getStatsByRange', () => {
     expect(result.inner_comp[0]).to.have.property('y');
   });
 
-  it('getStats', async () => {
+  it('getStatsByRange with fill=true', async () => {
+    const dtStart = moment.unix(1391295600000 / 1000);
+    const dtEnd = moment(dtStart).add(1, 'months');
+
+    const result = await util.getStatsByRange(dtStart, dtEnd, 'false', 'true');
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('inner_data');
+    expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_data[0]).to.have.property('x');
+    expect(result.inner_data[0]).to.have.property('y');
+    expect(result).to.have.property('inner_comp');
+    expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_comp[0]).to.have.property('x');
+    expect(result.inner_comp[0]).to.have.property('y');
+  });
+
+  it('getStatsByRange with accumulate=true', async () => {
+    const dtStart = moment.unix(1391295600000 / 1000);
+    const dtEnd = moment(dtStart).add(1, 'months');
+
+    const result = await util.getStatsByRange(dtStart, dtEnd, 'true', 'false');
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('inner_data');
+    expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_data[0]).to.have.property('x');
+    expect(result.inner_data[0]).to.have.property('y');
+    expect(result).to.have.property('inner_comp');
+    expect(result.inner_comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.inner_comp[0]).to.have.property('x');
+    expect(result.inner_comp[0]).to.have.property('y');
+  });
+
+  it('getStats (year)', async () => {
     const result = await util.getStats('year', 1391295600000);
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('chart_data');
+    expect(result.chart_data).to.have.property('xScale');
+    expect(result.chart_data).to.have.property('yScale');
+    expect(result.chart_data).to.have.property('type');
+    expect(result.chart_data).to.have.property('main');
+    expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0]).to.have.property('data');
+    expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0].data[0]).to.have.property('x');
+    expect(result.chart_data.main[0].data[0]).to.have.property('y');
+    expect(result.chart_data).to.have.property('comp');
+    expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0]).to.have.property('data');
+    expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0].data[0]).to.have.property('x');
+    expect(result.chart_data.comp[0].data[0]).to.have.property('y');
+  });
+  it('getStats (month)', async () => {
+    const result = await util.getStats('month', 1391295600000);
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('chart_data');
+    expect(result.chart_data).to.have.property('xScale');
+    expect(result.chart_data).to.have.property('yScale');
+    expect(result.chart_data).to.have.property('type');
+    expect(result.chart_data).to.have.property('main');
+    expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0]).to.have.property('data');
+    expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0].data[0]).to.have.property('x');
+    expect(result.chart_data.main[0].data[0]).to.have.property('y');
+    expect(result.chart_data).to.have.property('comp');
+    expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0]).to.have.property('data');
+    expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0].data[0]).to.have.property('x');
+    expect(result.chart_data.comp[0].data[0]).to.have.property('y');
+  });
+  it('getStats (week)', async () => {
+    const result = await util.getStats('week', 1391295600000);
+    expect(result).to.have.property('planned_working_time');
+    expect(result).to.have.property('average_working_time');
+    expect(result).to.have.property('actual_working_time');
+    expect(result).to.have.property('chart_data');
+    expect(result.chart_data).to.have.property('xScale');
+    expect(result.chart_data).to.have.property('yScale');
+    expect(result.chart_data).to.have.property('type');
+    expect(result.chart_data).to.have.property('main');
+    expect(result.chart_data.main).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0]).to.have.property('data');
+    expect(result.chart_data.main[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.main[0].data[0]).to.have.property('x');
+    expect(result.chart_data.main[0].data[0]).to.have.property('y');
+    expect(result.chart_data).to.have.property('comp');
+    expect(result.chart_data.comp).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0]).to.have.property('data');
+    expect(result.chart_data.comp[0].data).to.be.an('array').with.length.greaterThan(0);
+    expect(result.chart_data.comp[0].data[0]).to.have.property('x');
+    expect(result.chart_data.comp[0].data[0]).to.have.property('y');
+  });
+  it('getStats (day)', async () => {
+    const result = await util.getStats('day', 1491295600000);
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -185,6 +287,31 @@ describe('test utilTimebox.getStatsByTimeBox', () => {
       expect(error.message).to.be.equal("time unit 'XXXX' is invalid");
     }
 
+  });
+});
+describe("test util.calculateStatistics", () => {
+  var db;
+  before(function () {
+    db = require("../db");
+  });
+
+  it('calcStats', async () => {
+    const firstEntry = { _id: 0, age: moment('2016-01-01T06:30:00.000Z') };
+    const lastEntry = { _id: 0, age: moment('2016-01-15T06:30:00.000Z') };
+
+    const result = await util.calculateStatistics(firstEntry, lastEntry);
+
+    expect(result).to.have.property('firstEntry');
+    expect(result.firstEntry).to.have.property('_id');
+    expect(result.firstEntry).to.have.property('age');
+
+    expect(result).to.have.property('lastEntry');
+    expect(result.lastEntry).to.have.property('_id');
+    expect(result.lastEntry).to.have.property('age');
+  });
+
+  after(function () {
+    //db.closeConnection()
   });
 });
 
