@@ -86,7 +86,10 @@ exports.createGeoTrack = async (geoTrack) => {
 
 exports.parseGeoTrackingObject = (body) => {
   let geoTrack;
-
+  if (body === null || !body) {
+    // encrypted...
+    return null;
+  }
   // find out if this is hassio or OwnTracks data
   if (body.lon && body.lat) {
     // OWN_TRACKS
@@ -137,7 +140,7 @@ exports.parseGeoTrackingObject = (body) => {
   } else if (body._type === 'encrypted') {
     // encrypted...
     geoTrack = null;
-  }
+  } 
   return geoTrack;
 };
 

@@ -12,6 +12,7 @@ chai.use(require('chai-datetime'));
 const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
 const sinon = require('sinon');
+const { stub, match } = require('sinon')
 const sinonChai = require('sinon-chai');
 
 chai.use(chaiAsPromised);
@@ -161,7 +162,7 @@ describe('test accuracy calculation', () => {
 
 /**
  * =============================================================
- * Parse Gro Tracking objects
+ * Parse Geo Tracking objects
  * =============================================================
  */
 describe('test parsing of GeoTrack objects', () => {
@@ -247,16 +248,108 @@ describe('test parsing of GeoTrack objects', () => {
 
 });
 
+/**
+ * =============================================================
+ * Create Geo Track
+ * =============================================================
+ */
+describe('test creating of GeoTrack', () => {
+
+  it('create GeoTrack', async () => {
+    const timestamp = 1630000000 + Math.round((Math.random() * 10000000));
+    const res = mockResponse();
+    const req = mockRequest({
+      headers: [], body: {
+        lon: 10.875663,
+        acc: 32,
+        vel: 0,
+        lat: 49.514447,
+        tst: timestamp,
+        alt: 309,
+        vel: 1,
+        tid: 'OWNTRACK',
+      }
+    });
+
+    try {
+      await geo.createGeoTrack(req, res);
+      expect(res.status).to.have.been.calledWith(200); //duplicate
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('create GeoTrack', async () => {
+    const res = mockResponse();
+    const req = mockRequest({
+      headers: [], body: {
+        lon: 10.875663,
+        acc: 32,
+        vel: 0,
+        lat: 49.514447,
+        tst: 1632584826,
+        alt: 309,
+        vel: 1,
+        tid: 'OWNTRACK',
+      }
+    });
+
+    try {
+      await geo.createGeoTrack(req, res);
+      await geo.createGeoTrack(req, res);
+      expect(res.status).to.have.been.calledWith(202); //duplicate
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('create GeoTrack with empty geo track (error expected)', async () => {
+    const res = mockResponse();
+    const req = mockRequest({ headers: [], body: {} });
+
+    try {
+      await geo.createGeoTrack(req, res);
+      expect(res.status).to.have.been.calledWith(400);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('create GeoTrack with geo track = null (error expected)', async () => {
+    const res = mockResponse();
+    const req = mockRequest({ headers: [], body: null });
+
+    try {
+      await geo.createGeoTrack(req, res);
+      expect(res.status).to.have.been.calledWith(202);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('create GeoTrack with geo track = undefined (error expected)', async () => {
+    const res = mockResponse();
+    const req = mockRequest({ headers: [] });
+
+    try {
+      await geo.createGeoTrack(req, res);
+      expect(res.status).to.have.been.calledWith(400); //duplicate
+    } catch (error) {
+      throw error;
+    }
+  });
+
+});
+
 
 /**
  * =============================================================
- * Load Gro Tracking
+ * Load Geo Tracking
  * =============================================================
  */
 describe('test get GeoTracks', () => {
 
   it('load geo tracks', async () => {
-
     const track = await util.getGeoTrackingDataByTime(moment('2021-09-01'), moment('2021-09-02'));
     const dist = util.distance(track);
     const acc = util.meanAccuracy(track);
@@ -265,8 +358,31 @@ describe('test get GeoTracks', () => {
     expect(dist).to.equal(43425);
     expect(acc.mean).to.be.approximately(343, 2);
     expect(acc.stdt).to.be.approximately(607, 1);
-
-
   });
+
+  it('load geo tracks', async () => {
+    const res = mockResponse();
+    const req = mockRequest({ headers: [], body: {} });
+    req.query = { dateStart: '2021-09-01', dateEnd: '2021-09-02' };
+
+    try {
+      await geo.getGeoTracking(req, res);
+    } catch (error) {
+      assert.fail("should not throw error");       
+    }
+  });
+
+  it('load geo tracks metadata', async () => {
+    const res = mockResponse();
+    const req = mockRequest({ headers: [], body: {} });
+    req.query = { dateStart: '2021-09-01', dateEnd: '2021-09-02' };
+
+    try {
+      await geo.getGeoTrackingMetadata(req, res);
+    } catch (error) {
+      assert.fail("should not throw error");       
+    }
+  });
+
 });
 
