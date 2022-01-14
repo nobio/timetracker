@@ -183,6 +183,8 @@ exports.login = async (username, password) => {
  * validates input and creates a new token with expire time using (validating) the refresh token
  */
 exports.refreshToken = async (refreshToken) => {
+  if (!refreshToken) throw createError(400, 'Refresh token must be provided');
+  
   const storedRefreshToken = await Token.findOne({ token: refreshToken });
   if (storedRefreshToken == null) {
     throw createError(401, 'Unauthorized (invalid refresh token)');
