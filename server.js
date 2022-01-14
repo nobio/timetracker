@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 require('dotenv').config();
-console.log(process.env);
 require('./db');
 const express = require('express');
 const api_entries = require('./api/entries');
