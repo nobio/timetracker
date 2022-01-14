@@ -3,10 +3,8 @@ const fs = require('fs');
 const util = require('../api/admin/util-admin');
 
 const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-
+//const chaiAsPromised = require('chai-as-promised');
+//chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 require('moment-timezone');
@@ -39,6 +37,7 @@ const rmDir = function (dirPath, removeSelf) {
 
 describe('test util.dumpTimeEnties', () => {
   before(() => {
+    db = require('../db');
     rmDir('./dump');
   });
 
@@ -56,7 +55,7 @@ describe('test util.dumpTimeEnties', () => {
   }).timeout(10000);
 });
 describe('test util.backupTimeEnties', () => {
-  it('backing up the database', async () => {
+  it.skip('backing up the database', async () => {
     try {
       const result = await util.backupTimeEntries();
       console.log(result)
