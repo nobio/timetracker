@@ -184,8 +184,8 @@ exports.login = async (username, password) => {
  */
 exports.refreshToken = async (refreshToken) => {
   if (!refreshToken) throw createError(400, 'Refresh token must be provided');
-  
-  const storedRefreshToken = await Token.findOne({ token: refreshToken });
+
+  const storedRefreshToken = await Token.findOne({ token: { $eq: refreshToken } });
   if (storedRefreshToken == null) {
     throw createError(401, 'Unauthorized (invalid refresh token)');
   }
@@ -247,7 +247,7 @@ exports.validateBasicAuth = async (authorization) => {
   const password = credentials.split(':')[1];
   // console.log(user, password);
 
-  const mdbUser = await User.findOne({ username });
+  const mdbUser = await User.findOne({ username: { $eq: username } });
   if (mdbUser == null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) throw createError(401, 'User not authenticated');
