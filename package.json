@@ -7,7 +7,7 @@
     "scripts": {
         "start": "node server",
         "start-noauth": "AUTHORIZATION=false node server",
-        "start-dbdocker": "MONGO_URL=mongodb://qnap-nas:27017/timetracker npm start",
+        "start-dbdocker": "MONGODB_URL=mongodb://qnap-nas:27017/timetracker npm start",
         "test": "nyc --reporter=html --reporter=text ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "test-dev": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "serve": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
