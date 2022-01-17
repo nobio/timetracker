@@ -1,4 +1,4 @@
-require('dotenv').config(); process.env.SLACK_URL = '';
+require('./init');
 const { assert } = require('chai');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');

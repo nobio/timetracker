@@ -1,4 +1,4 @@
-require('dotenv').config(); process.env.SLACK_URL = '';
+require('./init');
 const utilBreaktime = require('../api/stats/util-breaktime');
 
 const chai = require('chai');

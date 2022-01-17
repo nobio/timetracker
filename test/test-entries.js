@@ -1,4 +1,4 @@
-require('dotenv').config(); process.env.SLACK_URL = '';
+require('./init');
 const utilEntries = require('../api/entries/util-entries');
 const g_util = require('../api/global_util');
 
