@@ -24,7 +24,7 @@ exports.getToggleByName = (name) => new Promise((resolve, reject) => {
 
 exports.getToggleStatus = () => new Promise((resolve, reject) => {
   resolve({
-    NOTIFICATION_SLACK: (process.env.SLACK_URL != null && process.env.SLACK_URL != undefined),
+    NOTIFICATION_SLACK: (process.env.SLACK_URL != null && process.env.SLACK_URL != undefined && process.env.SLACK_URL != ''),
   });
 });
 

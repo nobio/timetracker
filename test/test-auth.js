@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-//require('dotenv').config(); - there is no .env after building with github actions
+require('dotenv').config(); process.env.SLACK_URL = '';
 require('../db');
 const mongoose = require('mongoose');
 

@@ -1,8 +1,8 @@
+require('dotenv').config(); process.env.SLACK_URL = '';
 const utilBreaktime = require('../api/stats/util-breaktime');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 

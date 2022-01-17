@@ -1,3 +1,4 @@
+require('dotenv').config(); process.env.SLACK_URL = '';
 const utilEntries = require('../api/entries/util-entries');
 const g_util = require('../api/global_util');
 
@@ -7,7 +8,6 @@ const { response } = require('express');
 const { assert } = require('chai');
 
 chai.use(chaiAsPromised);
-
 const expect = chai.expect;
 chai.should();
 

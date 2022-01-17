@@ -1,3 +1,4 @@
+require('dotenv').config(); process.env.SLACK_URL = '';
 require('../db');
 const mongoose = require('mongoose');
 const moment = require('moment');

@@ -1,3 +1,4 @@
+require('dotenv').config(); process.env.SLACK_URL = '';
 const fs = require('fs');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -123,23 +124,26 @@ describe('test util.deleteToggle', () => {
 
 
   describe('test util.getToggleStatus', () => {
-    it('check Slack status without SLACK_TOKEN', async () => {
-      // console.log(process.env.SLACK_TOKEN);
+    it('check Slack status without SLACK_URL', async () => {
+      process.env.SLACK_URL = '';
+
       try {
         const result = await util.getToggleStatus();
         expect(result).to.have.property('NOTIFICATION_SLACK');
         expect(result.NOTIFICATION_SLACK).to.equal(false);
       } catch (error) {
+        console.log(error)
         assert.fail('should not throw exception')
       }
     });
     it('check Slack status with SLACK_URL', async () => {
-      process.env.SLACK_TOKEN = '1234567890';
+      process.env.SLACK_URL = '1234567890';
       try {
         const result = await util.getToggleStatus();
         expect(result).to.have.property('NOTIFICATION_SLACK');
-        expect(result.NOTIFICATION_SLACK).to.equal(false);
+        expect(result.NOTIFICATION_SLACK).to.equal(true);
       } catch (error) {
+        console.log(error)
         assert.fail('should not throw exception')
       }
     });

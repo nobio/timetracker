@@ -1,3 +1,4 @@
+require('dotenv').config(); process.env.SLACK_URL = '';
 require('../db');
 const mongoose = require('mongoose');
 
@@ -6,13 +7,10 @@ const util = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-
 chai.use(chaiAsPromised);
-
-const expect = chai.expect;
+const { assert, expect } = require('chai');
 
 const moment = require('moment');
-const { assert } = require('chai');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
