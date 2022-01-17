@@ -155,7 +155,7 @@ exports.login = async (username, password) => {
   if (!username) throw createError(400, 'User must be provided');
   if (!password) throw createError(400, 'No password provided');
 
-  const mdbUser = await User.findOne({ username });
+  const mdbUser = await User.findOne({ username: { $eq: username } });
   if (mdbUser == null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) {
