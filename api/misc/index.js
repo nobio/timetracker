@@ -46,23 +46,7 @@ exports.experiment = async (req, res) => {
   const admin = require('../admin/util-admin');
   let result;
 
-  result = await admin.dumpModel(mongoose.model('User'));
+  result = await admin.dumpModels();
   console.log(result);
-  result = await admin.undumpModel(mongoose.model('User'), result.filename)
-  console.log(result);
-  /*
-  result = await admin.dumpModel(mongoose.model('StatsDay'));
-  console.log(result);
-  result = await admin.dumpModel(mongoose.model('Toggle'));
-  console.log(result);
-  result = await admin.dumpModel(mongoose.model('Properties'));
-  console.log(result);
-  result = await admin.dumpModel(mongoose.model('FailureDay'));
-  console.log(result);
-  result = await admin.dumpModel(mongoose.model('TimeEntry'));
-  console.log(result);
-  result = await admin.dumpModel(mongoose.model('GeoTracking'));
-  console.log(result);
-  */
   res.status(200).send(result);
 };

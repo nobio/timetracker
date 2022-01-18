@@ -7,8 +7,8 @@ const utilProps = require('./util-properties');
  *
  * curl -X POST http://localhost:30000/api/entries/dump
  */
-exports.dumpTimeEntries = (req, res) => {
-  util.dumpTimeEntries()
+exports.dumpModels = (req, res) => {
+  util.dumpModels()
     .then((response) => res.status(200).send(response))
     .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
 };

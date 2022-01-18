@@ -36,7 +36,7 @@ const rmDir = function (dirPath, removeSelf) {
 /** ************************************************************ */
 
 
-describe('test util.dumpTimeEnties', () => {
+describe('test util.dumpModels', () => {
   before(() => {
     db = require('../db');
     rmDir('./dump');
@@ -44,16 +44,17 @@ describe('test util.dumpTimeEnties', () => {
 
   it('dumping the database should lead to a new file in /dump', async () => {
     try {
-      const result = await util.dumpTimeEntries();
+      const result = await util.dumpModels();
       console.log(result)
-      expect(result).to.have.property('size');
-      expect(result).to.have.property('filename');
-      const data = fs.readFileSync(result.filename);
+      expect(result).to.be.an('array');
+      expect(result[0]).to.have.property('size');
+      expect(result[0]).to.have.property('filename');
+      const data = fs.readFileSync(result[0].filename);
       expect(data).to.not.be.empty;
     } catch (error) {
       assert.fail('should not throw exception')
     }
-  }).timeout(10000);
+  }).timeout(20000);
 });
 describe('test util.backupTimeEnties', () => {
   it.skip('backing up the database', async () => {

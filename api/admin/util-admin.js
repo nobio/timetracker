@@ -13,26 +13,31 @@ const DUMP_DIR = './dump';
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
- exports.dumpTimeEntries = async function () {
+exports.dumpModels = async () => {
+  res = [];
   try {
-    if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
-    await deleteOldDumpfiles();
+    result = await dumpModel(mongoose.model('User'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('StatsDay'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('Toggle'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('Properties'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('FailureDay'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('TimeEntry'));
+    res.push(result);
+    result = await dumpModel(mongoose.model('GeoTracking'));
+    res.push(result);
 
-    const dumpFile = `${DUMP_DIR}/timeentry_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
-    const timeEntries = await TimeEntry.find();
-
-    fs.writeFileSync(dumpFile, JSON.stringify(timeEntries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
-    console.log(`database dump saved ${timeEntries.length} items`);
-    return ({
-      size: timeEntries.length,
-      filename: dumpFile,
-    });
+    return res;
   } catch (error) {
     throw error;
   }
-};
+}
 
-exports.dumpModel = async (model) => {
+async function dumpModel(model) {
   try {
     if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
     await deleteOldDumpfiles();
@@ -41,41 +46,10 @@ exports.dumpModel = async (model) => {
     const entries = await model.find();
 
     fs.writeFileSync(dumpFile, JSON.stringify(entries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
-    console.log(`database dump saved ${entries.length} items`);
+    console.log(`database dump saved model ${model.modelName} ${entries.length} items`);
     return ({
       size: entries.length,
       filename: dumpFile,
-    });
-  } catch (error) {
-    throw error;
-  }
-};
-/****************************************************************************
-
-var Potato = mongoose.model('Potato', PotatoSchema);
-
-var potatoBag = [...];
-
-Potato.collection.insert(potatoBag, onInsert);
-
-function onInsert(err, docs) {
-    if (err) {
-        // TODO: handle error
-    } else {
-        console.info('%d potatoes were successfully stored.', docs.length);
-    }
-}
-*****************************************************************************/
-exports.undumpModel = async (model, filename) => {
-  try {
-    if (!fs.existsSync(filename)) throw new Error('please provide a path to an exported model JSON file');
-    const json = fs.readFileSync(filename);
-    console.log(json);
-
-    //console.log(`database dump saved ${entries.length} items`);
-    return ({
-      //size: entries.length,
-      filename: filename,
     });
   } catch (error) {
     throw error;

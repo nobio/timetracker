@@ -36,6 +36,10 @@ const HELP = process.argv.includes('-h');
 const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
 const SILENT = process.argv.includes('-s');
 const SUCCESS_ONLY = process.argv.includes('-c');
+let PAST_MONTHS;
+if (process.argv.find(element => element.startsWith('-t='))) {
+  PAST_MONTHS = process.argv.find(element => element.startsWith('-t=')).split('-t=')[1];
+}
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
 const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
@@ -54,11 +58,12 @@ const PROPS_SOURCE = connectionSource.model('Properties', models.Properties);
 const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 
 console.log('--------------------------------------------------------------- \n');
-console.log('Usage: [MONGO_URL=MONGO | MLAB ] node db/dbmigration.js [-d] [-s]');
+console.log('Usage: node db/dbmigration.js [-d] [-s]');
 console.log('   -h: display this');
 console.log('   -d: emtpy target collection');
 console.log('   -s: silent');
 console.log('   -c: only success, no errors');
+console.log('   -t=<number>: time in month from today to not copy data older now - t months');
 console.log('\n--------------------------------------------------------------- ');
 
 /**
@@ -80,7 +85,7 @@ async function deleteAllTarget(target) {
   }
   try {
     console.log('connecting to target database');
-    console.log('deleting target data');
+    console.log(`deleting target data from ${target.modelName}`);
     await target.deleteMany({});
   } catch (error) {
     throw new Error(error);
@@ -94,6 +99,15 @@ async function deleteAllTarget(target) {
  * @param {entries} entries
  */
 async function storeDataToTarget(entries, target) {
+  console.log(entries.length, target.modelName);
+  try {
+    const r = await target.collection.insertMany(entries);
+    console.log(`success = ${r.result.ok}, inserted ${r.result.n} items`);      
+  } catch (error) {
+    console.error(error.message);
+  }
+  //console.log(await target.find());
+  /*
   for (const entry of entries) {
     process.stdout.write('.');
     // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
@@ -109,6 +123,7 @@ async function storeDataToTarget(entries, target) {
       if (!SILENT && !SUCCESS_ONLY) console.error(`> ${error.message}`);
     }
   };
+  */
   process.stdout.write(`\n`);
   mongoose.connection.close();
   return (`${entries.length} elements saved`);
@@ -120,11 +135,11 @@ const app = async () => {
 
   try {
 
-    await deleteAllTarget(FAILURE_MODEL_TARGET);
-    await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
-
     await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
+
+    await deleteAllTarget(FAILURE_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
 
     await deleteAllTarget(TOGGLE_TARGET);
     await storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET);
