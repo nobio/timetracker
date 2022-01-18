@@ -42,7 +42,7 @@ describe('test util.dumpModels', () => {
     rmDir('./dump');
   });
 
-  it('dumping the database should lead to a new file in /dump', async () => {
+  it,skip('dumping the database should lead to a new file in /dump', async () => {
     try {
       const result = await util.dumpModels();
       console.log(result)
