@@ -379,34 +379,32 @@ exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
     .catch((err) => reject(new Error(`${'Unable to read last Time Entry: ' + ' ('}${err.message})`)));
 });
 
-exports.removeDoublets = () => {
+exports.removeDoublets = async () => {
   let lastTimeentry;
   let count = 0;
 
-  return new Promise((resolve, reject) => {
-    TimeEntry.find().sort({
-      entry_date: 1,
-    })
-      .then((timeEntries) => {
-        timeEntries.forEach((timeentry) => {
-          if (lastTimeentry !== undefined) {
-            if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
-              && timeentry.direction == lastTimeentry.direction) {
-              timeentry.remove();
-              count++;
-              // console.log(`removing timeentry ${timeentry}`);
-            } else {
-              lastTimeentry = timeentry;
-            }
-          } else {
-            lastTimeentry = timeentry;
-          }
-        });
-      })
-      .catch((err) => reject(err));
-    // console.log(`${count} doublets removed`);
-    resolve({ removed: count });
-  });
+  try {
+    const timeEntries = await TimeEntry.find().sort({ entry_date: 1 });
+    timeEntries.forEach((timeentry) => {
+      if (lastTimeentry !== undefined) {
+        if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
+          && timeentry.direction == lastTimeentry.direction) {
+          timeentry.remove();
+          count++;
+          // console.log(`removing timeentry ${timeentry}`);
+        } else {
+          lastTimeentry = timeentry;
+        }
+      } else {
+        lastTimeentry = timeentry;
+      }
+    });
+
+    return { removed: count };
+
+  } catch (error) {
+    throw error;
+  }
 };
 
 exports.sleep = (delay) => {
@@ -414,21 +412,23 @@ exports.sleep = (delay) => {
   return new Promise((resolve) => setTimeout(resolve, delay));
 };
 
-exports.evaluate = () => new Promise((resolve, reject) => {
+exports.evaluate = async () => {
   let firstEntry;
   let lastEntry;
 
-  this
-    .getFirstTimeEntry()
-    .then((firstTimeEntry) => (firstEntry = firstTimeEntry))
-    .then((firstTimeEntry) => this.getLastTimeEntry())
-    .then((lastTimeEntry) => (lastEntry = lastTimeEntry))
-    .then((result) => FailureDay.deleteMany())
-    .then((result) => this.storeValidationErrors(firstEntry, lastEntry))
-    .then((result) => resolve(result))
-    .then(g_util.sendMessage('EVALUATE_DATA'))
-    .catch((err) => reject(err));
-});
+  try {
+    const firstTimeEntry = await this.getFirstTimeEntry();
+    const lastTimeEntry = await this.getLastTimeEntry();
+    await FailureDay.deleteMany({});
+    const result = await this.storeValidationErrors(firstTimeEntry, lastTimeEntry);
+    g_util.sendMessage('EVALUATE_DATA');
+
+    return result;
+
+  } catch (error) {
+    throw error;
+  }
+}
 
 exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
   // console.log(JSON.stringify(firstEntry), lastEntry);
