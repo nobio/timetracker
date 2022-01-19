@@ -12,37 +12,37 @@ exports.scheduleTasks = function () {
   console.log('job scheduler: calcStats (every hour at ??:00)');
   scheduler.scheduleJob({ minute: 0 }, () => { // every hour at ??:00
     console.log('scheduled task "calcStats" started');
-    stats.calcStats();
+    stats.calcStats().catch(err => console.error(err));
   });
 
   console.log('job scheduler: dumpModels (every day at 12:05)');
   scheduler.scheduleJob({ hour: 12, minute: 5 }, () => { // every day at 12:05
     console.log('scheduled task "dumpModels" started');
-    admin.dumpModels();
+    admin.dumpModels().catch(err => console.error(err));
   });
 
   console.log('job scheduler: backupTimeEntry (every hour at 10 past (??:10)');
   scheduler.scheduleJob({ minute: 10 }, () => {
     console.log('scheduled task "backupTimeEntry" started');
-    admin.backupTimeEntries();
+    admin.backupTimeEntries().catch(err => console.error(err));
   });
 
   console.log('job scheduler: data evaluate (every hour at ??:12)');
   scheduler.scheduleJob({ minute: 12 }, () => {
     console.log('scheduled task "evaluate" started');
-    entries.evaluate();
+    entries.evaluate().catch(err => console.error(err));
   });
 
   console.log('job scheduler: remove tokens of user \'Tester\' (every day at 21:59)');
   scheduler.scheduleJob({ hour: 21, minute: 50 }, () => { // every hour at ??:13
     console.log('scheduled task "removeTesterToken" started');
-    auth.removeTesterToken();
+    auth.removeTesterToken().catch(err => console.error(err));
   });
 
   console.log('job scheduler: remove expired Tokens (every day at 21:59)');
   scheduler.scheduleJob({ hour: 23 }, () => { // every hour at ??:13
     console.log('scheduled task "removeExpiredTokens" started');
-    auth.removeExpiredToken();
+    auth.removeExpiredToken().catch(err => console.error(err));
   });
 
   /*
