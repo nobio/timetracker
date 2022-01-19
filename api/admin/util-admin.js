@@ -1,5 +1,6 @@
 require('../../db');
 const fs = require('fs');
+const zlib = require('zlib');
 
 const moment = require('moment');
 const mongoose = require('mongoose');
@@ -42,11 +43,20 @@ async function dumpModel(model) {
     if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
     await deleteOldDumpfiles();
 
-    const dumpFile = `${DUMP_DIR}/${model.modelName}_${moment().format('YYYY-MM-DD_HHmmss')}.json`;
+    const dumpFile = `${DUMP_DIR}/${model.modelName}_${moment().format('YYYY-MM-DD_HHmmss')}.json.gz`;
     const entries = await model.find();
 
-    fs.writeFileSync(dumpFile, JSON.stringify(entries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
-    console.log(`database dump saved model ${model.modelName} ${entries.length} items`);
+    console.log(`database dump model ${model.modelName} ${entries.length} items`);
+
+    zlib.gzip(JSON.stringify(entries), (err, buffer) => {
+      if (err) {
+        console.error(err);
+      } else {
+        fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
+      }
+    });
+
+    //    fs.writeFileSync(dumpFile, JSON.stringify(entries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
     return ({
       size: entries.length,
       filename: dumpFile,
