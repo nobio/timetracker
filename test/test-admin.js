@@ -1,4 +1,5 @@
 require('./init');
+const mongoose = require('mongoose');
 const fs = require('fs');
 
 const util = require('../api/admin/util-admin');
@@ -7,6 +8,7 @@ const chai = require('chai');
 //const chaiAsPromised = require('chai-as-promised');
 //chai.use(chaiAsPromised);
 const expect = chai.expect;
+const assert = chai.assert;
 
 require('moment-timezone');
 
@@ -42,16 +44,18 @@ describe('test util.dumpModels', () => {
     rmDir('./dump');
   });
 
-  it.skip('dumping the database should lead to a new file in /dump', async () => {
+  it('dumping the Model Toggle; should lead to a new file in /dump', async () => {
     try {
-      const result = await util.dumpModels();
-      console.log(result)
-      expect(result).to.be.an('array');
-      expect(result[0]).to.have.property('size');
-      expect(result[0]).to.have.property('filename');
-      const data = fs.readFileSync(result[0].filename);
+      const result = await util.dumpModel(mongoose.model('Toggle'));
+      //console.log(result)
+      expect(result).to.have.property('size');
+      expect(result).to.have.property('filename');
+
+      const data = fs.readFileSync(result.filename);
       expect(data).to.not.be.empty;
+
     } catch (error) {
+      console.log(error);
       assert.fail('should not throw exception')
     }
   }).timeout(20000);

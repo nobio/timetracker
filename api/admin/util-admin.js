@@ -38,7 +38,7 @@ exports.dumpModels = async () => {
   }
 }
 
-async function dumpModel(model) {
+exports.dumpModel = async (model) => {
   try {
     if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
     await deleteOldDumpfiles();
@@ -48,19 +48,20 @@ async function dumpModel(model) {
 
     console.log(`database dump model ${model.modelName} ${entries.length} items`);
 
-    zlib.gzip(JSON.stringify(entries), (err, buffer) => {
-      if (err) {
-        console.error(err);
-      } else {
-        fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
-      }
+    return await new Promise((resolve, reject) => {
+      zlib.gzip(JSON.stringify(entries), (err, buffer) => {
+        if (err) {
+          rejcet(err);
+        } else {
+          fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
+          resolve ({
+            size: entries.length,
+            filename: dumpFile,
+          });
+        }
+      });
     });
 
-    //    fs.writeFileSync(dumpFile, JSON.stringify(entries, null, 2), 'UTF8'); // use JSON.stringify for nice format of output
-    return ({
-      size: entries.length,
-      filename: dumpFile,
-    });
   } catch (error) {
     throw error;
   }
