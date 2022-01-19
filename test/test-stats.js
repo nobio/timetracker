@@ -49,9 +49,13 @@ describe('utilTimeEntry util.removeDoublets', () => {
   it('add a doublette and check if one has been removed', async () => {
     await createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE });
     await createTimeEntry({ direction: 'go', datetime: DEFAULT_DATE });
+
+    const r = await TimeEntry.find({ entry_date: DEFAULT_DATE });
+    expect(r).to.have.length(2);
+
     const result = await utilTimeEntry.removeDoublets();
     expect(result).to.have.property('removed');
-    expect(result.removed).to.equal(0);
+    expect(result.removed).to.equal(1);
   });
 
   after(async () => {
