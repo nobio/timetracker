@@ -24,13 +24,14 @@ if (!targetMongodbUrl) {
 } else if (targetMongodbUrl === 'MONGO') {
   targetMongodbUrl = MONGO_URL_MONGO;
 }
-console.error(`target Mongo database: ${targetMongodbUrl}`);
 
 const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
 //const MONGO_URL_TARGET = MONGO_URL_DOCKER;
 //const MONGO_URL_TARGET = MONGO_URL_MLAB;
 //const MONGO_URL_TARGET = MONGO_URL_MONGO;
 const MONGO_URL_TARGET = targetMongodbUrl;
+
+console.error(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
 const HELP = process.argv.includes('-h');
 const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
