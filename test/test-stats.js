@@ -65,10 +65,11 @@ describe('utilTimeEntry util.removeDoublets', () => {
 
 describe('test util.getStats and getStatsByRange', () => {
   it('getStatsByRange', async () => {
-    const dtStart = moment.unix(1391295600000 / 1000);
+    const dtStart = moment.unix(1638206460000 / 1000);
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd);
+    console.log(result)
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -83,7 +84,7 @@ describe('test util.getStats and getStatsByRange', () => {
   });
 
   it('getStatsByRange with fill=true', async () => {
-    const dtStart = moment.unix(1391295600000 / 1000);
+    const dtStart = moment.unix(1638206460000 / 1000);
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd, 'false', 'true');
@@ -101,7 +102,7 @@ describe('test util.getStats and getStatsByRange', () => {
   });
 
   it('getStatsByRange with accumulate=true', async () => {
-    const dtStart = moment.unix(1391295600000 / 1000);
+    const dtStart = moment.unix(1638206460000 / 1000);
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd, 'true', 'false');
@@ -119,7 +120,7 @@ describe('test util.getStats and getStatsByRange', () => {
   });
 
   it('getStats (year)', async () => {
-    const result = await util.getStats('year', 1391295600000);
+    const result = await util.getStats('year', 1638206460000);
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -141,7 +142,7 @@ describe('test util.getStats and getStatsByRange', () => {
     expect(result.chart_data.comp[0].data[0]).to.have.property('y');
   });
   it('getStats (month)', async () => {
-    const result = await util.getStats('month', 1391295600000);
+    const result = await util.getStats('month', 1638206460000);
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -163,7 +164,7 @@ describe('test util.getStats and getStatsByRange', () => {
     expect(result.chart_data.comp[0].data[0]).to.have.property('y');
   });
   it('getStats (week)', async () => {
-    const result = await util.getStats('week', 1391295600000);
+    const result = await util.getStats('week', 1638206460000);
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
