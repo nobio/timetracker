@@ -34,7 +34,7 @@ if (!mongodbUrl) {
   console.error('overwriting mongodb_url');
   mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}`;
 }
-console.log(`connecting to mongodb`);
+console.log(`connecting to mongodb (${mongodbUrl})`);
 
 mongoose.connect(mongodbUrl, MONGODB_OPTIONS).then(
   () => {
