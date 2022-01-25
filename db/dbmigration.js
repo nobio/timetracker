@@ -55,8 +55,9 @@ console.log('\n--------------------------------------------------------------- '
  */
 async function getDataFromSource(source) {
   try {
+    console.log(`reading entries of <${source.modelName}> from source`);
     const entries = await source.find();
-    console.log(`found ${entries.length} entries in <${source.modelName}>`);
+    console.log(`found ${entries.length} entries of <${source.modelName}> in source`);
     return entries;
   } catch (error) {
     throw new Error(error);
@@ -69,7 +70,7 @@ async function deleteAllTarget(target) {
   }
   try {
     console.log('connecting to target database');
-    console.log(`deleting target data from ${target.modelName}`);
+    console.log(`deleting target data of ${target.modelName} in target`);
     await target.deleteMany({});
   } catch (error) {
     throw new Error(error);
@@ -86,7 +87,7 @@ async function storeDataToTarget(entries, target) {
   console.log(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
-    console.log(`success = ${r.result.ok}, inserted ${r.result.n} items`);      
+    console.log(`success = ${r.result.ok}, inserted ${r.result.n} items of ${target.modelName} in target`);      
   } catch (error) {
     console.error(error.message);
   }
@@ -131,11 +132,11 @@ const app = async () => {
     await deleteAllTarget(PROPS_TARGET);
     await storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET);
 
-    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
-    await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
-
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);
+
+    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
 
     process.exit(0);
 
