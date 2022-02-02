@@ -14,6 +14,7 @@ class WebSocketFacade {
   }
 
   init(server) {
+    console.log('initializing web socket server on path /ws');
     const wss = new WebSocketServer.Server({ server, clientTracking: true, path: '/ws' });
 
     wss.on("connection", (ws, req) => {
