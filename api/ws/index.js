@@ -14,11 +14,11 @@ class WebSocketFacade {
   }
 
   init(server) {
-    const wss = new WebSocketServer.Server({ server, clientTracking: true, /*path: '/ws'*/ });
+    const wss = new WebSocketServer.Server({ server, clientTracking: true, path: '/ws' });
 
-    wss.on("connection", ws => {
+    wss.on("connection", (ws, req) => {
 
-      console.log("new webservice client connected");
+      console.log(`new webservice client connected with url ${req.url}`);
 
       // handling what to do when clients disconnects from server
       ws.on("close", () => {
