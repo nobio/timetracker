@@ -1,7 +1,8 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-console */
-const mongoose = require('mongoose');
+const ws = require('../ws');
 const moment = require('moment');
+const mongoose = require('mongoose');
 
 const GeoTracking = mongoose.model('GeoTracking');
 
@@ -70,8 +71,8 @@ exports.createGeoTrack = async (geoTrack) => {
   if (!geoTrack) return;
 
   try {
-    const result = await geoTrack.save();
-    return result;
+    ws.sendGeoLocation(geoTrack);
+    return await geoTrack.save();
   } catch (error) {
     if (error.code === 11000) {
       console.error('ignoring duplication error');
@@ -140,7 +141,7 @@ exports.parseGeoTrackingObject = (body) => {
   } else if (body._type === 'encrypted') {
     // encrypted...
     geoTrack = null;
-  } 
+  }
   return geoTrack;
 };
 
@@ -222,7 +223,7 @@ function notifyWSClient() {
   /*
     const dtStart = moment().subtract(3, 'months').format('YYYY-MM-DD');
     const dtEnd = moment().add(1, 'days').format('YYYY-MM-DD');
-  
+
     try {
       const data = await this.getGeoTrackingDataByTime(dtStart, dtEnd);
       wsSocket.emitGeoData(data);  // async; it's ok

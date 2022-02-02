@@ -29,6 +29,7 @@ const app = express();
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
+app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
 //app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(path.join(__dirname, 'www')));
 //app.use(serveStatic('www', { 'index': ['index.html'] }));
@@ -143,19 +144,23 @@ if (process.env.SLACK_URL) {
   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
 }
 
-/* start the web service on http */
+/* ================= start the web service on http ================= */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
-/* start the web service on https */
+/* ================= start the web service on https ================= */
 const ssl_options = {
   key: fs.readFileSync('keys/key.pem'),
   cert: fs.readFileSync('keys/cert.pem'),
 };
-https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
+const httpsServer = https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
   console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
+
+/* init and start Websocket Server */
+const webSocketFacade = require('./api/ws');
+webSocketFacade.init(httpsServer)
 
 /* start scheduler */
 require('./api/scheduler').scheduleTasks();
