@@ -191,6 +191,7 @@ exports.authorize = async (req, res, next) => {
     || (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
     || (req.method === 'POST' && req.url.startsWith('/api/auth/token'))
     || (req.method === 'GET' && req.url.startsWith('/api-docs'))
+    || (req.method === 'GET' && req.url.startsWith('/ws'))
   )) {
     // just continue...
     console.log(`authorization disabled for ${req.url}`);
@@ -255,7 +256,7 @@ exports.authorizeBasicAuth = async (req, res, next) => {
     next();
   } catch (err) {
     // console.log(err);
-    if(err.status) res.status(err.status).json({ message: err.message });
+    if (err.status) res.status(err.status).json({ message: err.message });
     else res.status(400).json({ message: err.message });
   }
 };
