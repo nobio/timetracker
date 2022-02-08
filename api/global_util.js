@@ -43,9 +43,8 @@ exports.sendMessage = async function (notificationKey, addedContent) {
 exports.sendTextMessage = async function (message) {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
   if (SLACK_URL) {
-    const result = await Axios.post(
-      `${SLACK_URL}`,
-      {
+    try {
+      return await Axios.post(`${SLACK_URL}`, {
         blocks: [
           {
             type: 'section',
@@ -55,9 +54,10 @@ exports.sendTextMessage = async function (message) {
             },
           },
         ],
-      },
-    );
-    return result;
+      });
+    } catch (error) {
+      return `Error sending message to Slack: ${error.message}`;
+    }
   }
 
   return (`could not send message <'${message}'> to SLACK (no slack url provided); logging to stderr instead`);
