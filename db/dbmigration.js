@@ -4,9 +4,9 @@
 const mongoose = require('mongoose');
 const models = require('./models');
 
-mongoose.set('useUnifiedTopology', true);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useNewUrlParser', true);
+//mongoose.set('useUnifiedTopology', true);
+//mongoose.set('useCreateIndex', true);
+//mongoose.set('useNewUrlParser', true);
 
 const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
@@ -30,6 +30,8 @@ const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
 
 const TIME_ENTRY_MODEL_SOURCE = connectionSource.model('TimeEntry', models.TimeEntry);
 const TIME_ENTRY_MODEL_TARGET = connectionTarget.model('TimeEntry', models.TimeEntry);
+const STATSDAY_MODEL_SOURCE = connectionSource.model('StatsDay', models.StatsDay);
+const STATSDAY_MODEL_TARGET = connectionTarget.model('StatsDay', models.StatsDay);
 const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', models.GeoTracking);
 const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', models.GeoTracking);
 const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', models.FailureDay);
@@ -87,7 +89,7 @@ async function storeDataToTarget(entries, target) {
   console.log(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
-    console.log(`success = ${r.result.ok}, inserted ${r.result.n} items of ${target.modelName} in target`);      
+    console.log(`success = ${r.result.ok}, inserted ${r.result.n} items of ${target.modelName} in target`);
   } catch (error) {
     console.error(error.message);
   }
@@ -121,7 +123,7 @@ const app = async () => {
   try {
 
     await deleteAllTarget(USER_TARGET);
-    await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
+    //await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
 
     await deleteAllTarget(FAILURE_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
@@ -131,6 +133,9 @@ const app = async () => {
 
     await deleteAllTarget(PROPS_TARGET);
     await storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET);
+
+    await deleteAllTarget(STATSDAY_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET);
 
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);

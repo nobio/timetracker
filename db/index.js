@@ -2,15 +2,15 @@ const models = require('./models');
 
 /* eslint-disable no-console */
 const MONGODB_OPTIONS = {
-    // reconnectTries: 1000,
-    // reconnectInterval: 500,
-    poolSize: 5,
-    keepAlive: 120,
-    // bufferMaxEntries: -1,
-    useCreateIndex: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
+  // reconnectTries: 1000,
+  // reconnectInterval: 500,
+  // poolSize: 5,
+  keepAlive: true,
+  // bufferMaxEntries: -1,
+  // useCreateIndex: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  // useFindAndModify: false,
 };
 
 /**
