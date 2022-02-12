@@ -12,12 +12,15 @@ const expect = chai.expect;
 chai.should();
 
 describe('test global_util.sendMessage()', () => {
-  it('should not throw exception because SLACK Token is not set; response is some error message', async () => {
+  it('should not throw exception because SLACK URL is not set; response is some error message', async () => {
+    process.env.SLACK_TOKEN = '';
     try {
       const response = await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX');
+      //console.log(response)
       expect(response).to.be.string;
-      expect(response).to.contains('logging to stderr instead');
+      expect(response).to.contains('toggle CREATE_ENTRY switched off');
     } catch (error) {
+      console.log(error)
       assert.fail('should not throw exception')
     }
   });
@@ -41,4 +44,3 @@ describe('test utilEntries.getBusytimeByDate()', () => {
   it('response array should have length of 2', async () => expect(await utilEntries.getAllByDate(1393455600000)).to.have.length(2));
   it('response array should have length of 0', async () => expect(await utilEntries.getAllByDate(0)).to.have.length(0));
 });
-

@@ -166,10 +166,10 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       // 1. crete a time entry....
       let timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
-      // console.log(timeEntry)
+      console.log(timeEntry._id)
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
-      expect(timeEntry._id).to.not.be.empty;
+      expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
       expect(timeEntry).to.have.property('last_changed');
@@ -222,7 +222,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
       // console.log(timeEntry)
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
-      expect(timeEntry._id).to.not.be.empty;
+      expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
       expect(timeEntry).to.have.property('last_changed');
@@ -276,7 +276,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       let timeEntry = await create({ direction: 'enter', datetime: DEFAULT_DATE });
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
-      expect(timeEntry._id).to.not.be.empty;
+      expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
       expect(timeEntry).to.have.property('last_changed');
@@ -291,7 +291,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       timeEntry = await util.update(timeEntry);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
-      expect(timeEntry._id).to.not.be.empty;
+      expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
       expect(timeEntry).to.have.property('last_changed');
@@ -305,7 +305,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       timeEntry = await util.findById(timeEntry.id);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
-      expect(timeEntry._id).to.not.be.empty;
+      expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
       expect(timeEntry).to.have.property('last_changed');
@@ -412,4 +412,3 @@ async function clearAllEntries(dt) {
     await util.deleteById(timeentry._id);
   };
 }
-
