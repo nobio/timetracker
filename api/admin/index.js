@@ -14,15 +14,26 @@ exports.dumpModels = (req, res) => {
 };
 
 /**
- * function to backup data in an extra backup table
+ * restores data from lastest written file, exported by dumModels method
  *
- * curl -X POST http://localhost:30000/api/entries/backup
+ * curl -k -X POST https://localhost:30443/api/entries/restore
  */
-exports.backupTimeEntries = (req, res) => {
-  util.backupTimeEntries()
+exports.restoreFromFile = (req, res) => {
+  util.restoreDataFromFile()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
-};
+    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
+},
+
+  /**
+   * function to backup data in an extra backup table
+   *
+   * curl -X POST http://localhost:30000/api/entries/backup
+   */
+  exports.backupTimeEntries = (req, res) => {
+    util.backupTimeEntries()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
+  };
 
 /**
  * read the list of all toggles

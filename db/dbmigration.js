@@ -11,8 +11,10 @@ const models = require('./models');
 const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 
-const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
-const MONGO_URL_TARGET = MONGO_URL_ATLAS;
+//const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
+//const MONGO_URL_TARGET = MONGO_URL_ATLAS;
+const MONGO_URL_SOURCE = MONGO_URL_ATLAS;
+const MONGO_URL_TARGET = MONGO_URL_DOCKER;
 
 console.error(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
@@ -123,7 +125,7 @@ const app = async () => {
   try {
 
     await deleteAllTarget(USER_TARGET);
-    //await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
+    await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
 
     await deleteAllTarget(FAILURE_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);

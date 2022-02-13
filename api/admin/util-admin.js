@@ -1,5 +1,6 @@
 require('../../db');
 const fs = require('fs');
+const path = require("path");
 const zlib = require('zlib');
 
 const moment = require('moment');
@@ -54,7 +55,7 @@ exports.dumpModel = async (model) => {
           rejcet(err);
         } else {
           fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
-          resolve ({
+          resolve({
             size: entries.length,
             filename: dumpFile,
           });
@@ -65,6 +66,51 @@ exports.dumpModel = async (model) => {
   } catch (error) {
     throw error;
   }
+};
+
+exports.restoreDataFromFile = async function () {
+  if (!fs.existsSync(DUMP_DIR)) return 'dup directory does not exist - restore not possible';
+  res = [];
+
+  res.push(restoreFile('User'));
+  res.push(restoreFile('StatsDay'));
+  res.push(restoreFile('Toggle'));
+  res.push(restoreFile('Properties'));
+  res.push(restoreFile('FailureDay'));
+  res.push(restoreFile('TimeEntry'));
+  res.push(restoreFile('GeoTracking'));
+  return res;
+}
+
+/**
+ * restore data of a specific data type
+ * @param {*} dbType
+ */
+const restoreFile = async (dbType) => {
+  const f = recentFile(DUMP_DIR, dbType);
+  const model = mongoose.model(dbType);
+
+  const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
+  for (const item of data) {
+    try {
+      await new model(item).save();
+      console.log(`model ${model.modelName} ${item._id} saved`);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+}
+
+const recentFile = (dir, type) => {
+
+  const files = fs.readdirSync(dir)
+    .filter((file) => fs.lstatSync(path.join(dir, file)).isFile())
+    .filter((file) => file.startsWith(type))
+    .map((file) => ({ file, mtime: fs.lstatSync(path.join(dir, file)).mtime }))
+    .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
+
+  return files.length ? files[0] : undefined;
 };
 
 exports.backupTimeEntries = async function () {
