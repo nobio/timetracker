@@ -39,7 +39,7 @@ exports.dumpModels = async () => {
   }
 }
 
-exports.dumpModel = async (model) => {
+const dumpModel = async (model) => {
   try {
     if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
     await deleteOldDumpfiles();
