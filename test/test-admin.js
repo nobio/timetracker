@@ -5,6 +5,7 @@ const fs = require('fs');
 const util = require('../api/admin/util-admin');
 
 const chai = require('chai');
+const { resolve } = require('path');
 //const chaiAsPromised = require('chai-as-promised');
 //chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -44,14 +45,17 @@ describe('test util.dumpModels', () => {
     rmDir('./dump');
   });
 
-  it('dumping the Model Toggle; should lead to a new file in /dump', async () => {
+  it.only('dumping the Model Toggle; should lead to a new file in /dump', async () => {
     try {
-      const result = await util.dumpModel(mongoose.model('Toggle'));
-      //console.log(result)
-      expect(result).to.have.property('size');
-      expect(result).to.have.property('filename');
+      //const result = await util.dumpModel(mongoose.model('Toggle'));
+      const result = await util.dumpModels();
+      console.log(result)
+      expect(result).to.be.an('array');
+      expect(result.length).to.gt(0);
+      expect(result[0]).to.have.property('size');
+      expect(result[0]).to.have.property('filename');
 
-      const data = fs.readFileSync(result.filename);
+      const data = fs.readFileSync(result[0].filename);
       expect(data).to.not.be.empty;
 
     } catch (error) {
