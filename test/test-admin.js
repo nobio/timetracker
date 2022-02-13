@@ -42,7 +42,7 @@ const rmDir = function (dirPath, removeSelf) {
 describe('test util.dumpModels', () => {
   before(() => {
     db = require('../db');
-    rmDir('./dump');
+    rmdirSync('./dump');
   });
 
   it('dumping the Model Toggle; should lead to a new file in /dump', async () => {
@@ -57,7 +57,7 @@ describe('test util.dumpModels', () => {
 
       const data = fs.readFileSync(result[0].filename);
       expect(data).to.not.be.empty;
-
+      rmDir('./dump');
     } catch (error) {
       console.log(error);
       assert.fail('should not throw exception')
