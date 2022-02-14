@@ -91,7 +91,7 @@ async function storeDataToTarget(entries, target) {
   console.log(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
-    console.log(`inserted ${r} items of ${target.modelName} in target`);
+    console.log(`success = ${r.acknowledged} in ${target.modelName}`);
   } catch (error) {
     console.error(error.message);
   }
