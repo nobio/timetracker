@@ -32,7 +32,7 @@ mongoose.Promise = global.Promise;
 let mongodbUrl = process.env.MONGODB_URL; // try to use environment variable, perhaps given by container
 if (!mongodbUrl) {
   console.error('overwriting mongodb_url');
-  mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}`;
+  mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}?authSource=admin`;
 }
 console.log(`connecting to mongodb (${mongodbUrl})`);
 
