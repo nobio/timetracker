@@ -13,7 +13,7 @@ const GeoTracking = mongoose.model('GeoTracking');
  * @param {*} lon2 longitude of geo loc 2
  * @param {*} lat2 latitude of geo loc 2
  */
-function calcDist(lon1, lat1, lon2, lat2) {
+const calcDist = (lon1, lat1, lon2, lat2) => {
   if ((lat1 === lat2) && (lon1 === lon2)) return 0;
 
   const R = 6371e3; // metres
@@ -47,15 +47,16 @@ exports.distance = (tracks) => tracks.reduce((total, t, idx, ts) => {
  * @param {*} tracks List of geo location points
  */
 exports.meanAccuracy = (tracks) => {
-  const meanAcc = tracks.reduce((total, t) => {
+  const meanAcc = (tracks.length == 0 ? 0 : tracks.reduce((total, t) => {
     if (t.accuracy) return total + t.accuracy;
     return total;
-  }, 0) / tracks.length;
+  }, 0) / tracks.length);
 
   const variance = tracks.reduce((total, t) => {
     if (t.accuracy) return total + ((t.accuracy - meanAcc) * (t.accuracy - meanAcc) / tracks.length);
     return total;
   }, 0);
+
   return {
     mean: meanAcc,
     stdt: Math.sqrt(variance),
@@ -172,15 +173,15 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
  * distances (depend on accuracy)
  * @param {*} tracks tracking data
  */
-exports.getGeoTrackingMetadata = async function tracks() {
+exports.getGeoTrackingMetadata = async (tracks) => {
   return {
     size: tracks.length,
-    totalDistance: distance(tracks),
-    accuracy: meanAccuracy(tracks),
+    totalDistance: this.distance(tracks),
+    accuracy: this.meanAccuracy(tracks),
   };
 };
 
-function transform(tracks) {
+const transform = (tracks) => {
   const tr = [];
   tracks.forEach((t) => {
     tr.push({
@@ -198,7 +199,7 @@ function transform(tracks) {
   return tr;
 }
 
-function appendMetadata(tracks) {
+const appendMetadata = (tracks) => {
   let oldPoint;
   tracks.forEach((point) => {
     if (oldPoint) {
@@ -214,21 +215,4 @@ function appendMetadata(tracks) {
   // console.log(JSON.stringify(tracks, null, 2))
 
   return tracks;
-}
-
-/**
-  * loads the geo track of today and sends it to the websocket client
-  */
-function notifyWSClient() {
-  /*
-    const dtStart = moment().subtract(3, 'months').format('YYYY-MM-DD');
-    const dtEnd = moment().add(1, 'days').format('YYYY-MM-DD');
-
-    try {
-      const data = await this.getGeoTrackingDataByTime(dtStart, dtEnd);
-      wsSocket.emitGeoData(data);  // async; it's ok
-    } catch (error) {
-      console.error(error);
-    }
-  */
 }

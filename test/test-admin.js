@@ -26,7 +26,7 @@ describe('test util.dumpModels', () => {
     fs.rmSync('./dump', { recursive: true, force: true }, err => { console.log(err) });
   });
 
-  it.only('dumping the Model Toggle; should lead to a new file in /dump', async () => {
+  it('dumping the Model Toggle; should lead to a new file in /dump', async () => {
     try {
       //const result = await util.dumpModel(mongoose.model('Toggle'));
       const result = await util.dumpModels();

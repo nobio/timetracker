@@ -25,7 +25,7 @@ const should = chai.should;
 
 /**
  * =============================================================
- * Distance 
+ * Distance
  * =============================================================
  */
 describe('test distance calculation', () => {
@@ -92,7 +92,7 @@ describe('test distance calculation', () => {
 
 /**
  * =============================================================
- * Accuracy 
+ * Accuracy
  * =============================================================
  */
 describe('test accuracy calculation', () => {
@@ -128,7 +128,7 @@ describe('test accuracy calculation', () => {
   it('accuracy with 0 entries', async () => {
 
     let acc = util.meanAccuracy([]);
-    expect(acc.mean).to.be.NaN;
+    expect(acc.mean).to.equal(0);
     expect(acc.stdt).to.equal(0);
 
   });
@@ -369,7 +369,7 @@ describe('test get GeoTracks', () => {
     try {
       await geo.getGeoTracking(req, res);
     } catch (error) {
-      assert.fail("should not throw error");       
+      assert.fail("should not throw error");
     }
   });
 
@@ -381,9 +381,8 @@ describe('test get GeoTracks', () => {
     try {
       await geo.getGeoTrackingMetadata(req, res);
     } catch (error) {
-      assert.fail("should not throw error");       
+      assert.fail("should not throw error");
     }
   });
 
 });
-

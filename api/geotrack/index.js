@@ -58,5 +58,5 @@ exports.getGeoTrackingMetadata = (req, res) => {
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then(util.getGeoTrackingMetadata)
     .then((metaData) => res.status(200).send(metaData))
-    .catch((err) => res.status(err.status).json({ message: err.message }));
+    .catch((err) => res.status(err.status ? err.status : 500).json({ message: err.message }));
 };
