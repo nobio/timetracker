@@ -144,6 +144,16 @@ if (process.env.SLACK_URL) {
   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
 }
 
+// .......................................................................
+// Optional fallthrough error handler
+// .......................................................................
+app.use(function onError(err, req, res, next) {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  res.statusCode = 500;
+  res.end(res + "\n");
+  //res.end(res.sentry + "\n");
+});
 /* ================= start the web service on http ================= */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
