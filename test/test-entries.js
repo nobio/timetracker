@@ -18,7 +18,8 @@ describe('test global_util.sendMessage()', () => {
       const response = await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX');
       //console.log(response)
       expect(response).to.be.string;
-      expect(response).to.contains('toggle CREATE_ENTRY switched off');
+      expect(response).to.contain('could not send message');
+      expect(response).to.contain('no slack url provided');
     } catch (error) {
       console.log(error)
       assert.fail('should not throw exception')

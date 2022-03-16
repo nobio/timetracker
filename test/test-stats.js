@@ -69,7 +69,7 @@ describe('test util.getStats and getStatsByRange', () => {
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd);
-    console.log(result)
+    //console.log(result)
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
