@@ -21,6 +21,8 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -30,6 +32,33 @@ app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
+
+Sentry.init({
+  dsn: process.env.SENTRY_DNS,
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({
+      // to trace all requests to the default router
+      app,
+      // alternatively, you can specify the routes you want to trace:
+      // router: someRouter,
+    }),
+    new Tracing.Integrations.Mongo({
+      useMongoose: true // Default: false
+    }),
+  ],
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+});
+// The request handler must be the first middleware on the app
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+
 //app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.static(path.join(__dirname, 'www')));
 //app.use(serveStatic('www', { 'index': ['index.html'] }));
@@ -147,13 +176,15 @@ if (process.env.SLACK_URL) {
 // .......................................................................
 // Optional fallthrough error handler
 // .......................................................................
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 app.use(function onError(err, req, res, next) {
   // The error id is attached to `res.sentry` to be returned
   // and optionally displayed to the user for support.
   res.statusCode = 500;
-  res.end(res + "\n");
-  //res.end(res.sentry + "\n");
+  res.end(res.sentry + "\n");
 });
+
 /* ================= start the web service on http ================= */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
