@@ -5,8 +5,8 @@ require('dotenv').config();
 require('./db');
 const rateLimit = require('express-rate-limit');
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5
+  windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
+  max: process.env.RATE_LIMIT_RQEUESTS
 });
 
 const express = require('express');
