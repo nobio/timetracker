@@ -3,6 +3,12 @@
  */
 require('dotenv').config();
 require('./db');
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5
+});
+
 const express = require('express');
 const api_entries = require('./api/entries');
 const api_admin = require('./api/admin');
@@ -37,6 +43,9 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - st
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
 app.use(cookieParser());
+// apply rate limiter to all requests
+app.use(limiter);
+
 app.use(cors());
 app.use(api_auth.authorize);
 
@@ -176,6 +185,6 @@ webSocketFacade.init(httpsServer)
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
+require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')} (${process.env.NODE}, ${process.env.USER}, ${process.env.LANG})`)
   .then(msg => console.log(msg))
   .catch(err => console.log(err));
