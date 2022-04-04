@@ -185,6 +185,6 @@ webSocketFacade.init(httpsServer)
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')} (${process.env.NODE}, ${process.env.USER}, ${process.env.LANG})`)
+require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
   .then(msg => console.log(msg))
   .catch(err => console.log(err));
