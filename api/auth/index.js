@@ -190,6 +190,7 @@ exports.authorize = async (req, res, next) => {
     (req.method === 'POST' && req.url.startsWith('/api/auth/login'))
     || (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
     || (req.method === 'POST' && req.url.startsWith('/api/auth/token'))
+    || (req.method === 'GET' && req.url.startsWith('/api/health'))
     || (req.method === 'GET' && req.url.startsWith('/api-docs'))
     || (req.method === 'GET' && req.url.startsWith('/ws'))
   )) {
