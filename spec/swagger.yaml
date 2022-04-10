@@ -1142,11 +1142,11 @@ paths:
                 $ref: "#/components/schemas/VersionResp"
         "403":
           $ref: "#/components/responses/UnauthorizedError"
-  /healthcheck:
+  /health:
     get:
       tags:
         - Misc
-      summary: Healthcheck
+      summary: Healthcheck endpoint
       description: Performs a healthcheck if this app (no auth required)
       responses:
         "200":

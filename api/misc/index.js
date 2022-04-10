@@ -37,6 +37,10 @@ exports.version = (req, res) => {
   }
 };
 
+exports.healtchckech = async (req, res) => {
+
+};
+
 /*
  * test and experiment endpoint
  *
