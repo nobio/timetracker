@@ -1127,6 +1127,37 @@ paths:
                       example: 689
         "403":
           $ref: "#/components/responses/UnauthorizedError"
+  /version:
+    get:
+      tags:
+        - Misc
+      summary: Version of this application
+      description: reveals the actual version of this application
+      responses:
+        "200":
+          description: version information regarding this application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionResp"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+  /health:
+    get:
+      tags:
+        - Misc
+      summary: Healthcheck endpoint
+      description: Performs a healthcheck if this app (no auth required)
+      responses:
+        "200":
+          description: Healthcheck was performed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthcheckResp"
+        "503":
+          description: Healthcheck could not be performed successfully because this or a dependend service was not available.
+          content: {}
 components:
   schemas:
     TimeEntry:
@@ -1578,6 +1609,82 @@ components:
           maxLength: 256
           example: >-
             eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    VersionResp:
+      required:
+        - version
+        - last_build
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: string
+          description: version of this application
+          pattern: '^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$'
+          example: 11.2.3
+        last_build:
+          type: string
+          description: date/time of last build
+          example: "2000-01-01T10:15:02.151Z"
+          maxLength: 24
+          pattern: >-
+            ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+    HealthcheckResp:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum:
+            - pass
+            - fail
+            - warn
+          description: >-
+            Status of healthcheck.
+            “pass”: healthy
+            “fail”: unhealthy
+            “warn”: healthy, with some concerns
+          example: pass
+        version:
+          type: string
+          description: version of this application
+          pattern: '^(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)$'
+          example: 11.2.3
+        time:
+          type: string
+          description: date/time of this health check
+          example: "2000-01-01T10:15:02.151Z"
+          maxLength: 24
+          pattern: ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+        details:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            properties:
+              name:
+                type: string
+                description: Name of this component
+                example: "database"
+              componentType:
+                description: Types of component.
+                type: string
+                enum:
+                  - component
+                  - datastore
+                  - system
+              metricUnit:
+                description: Unit of the measured metric value
+                type: string
+                enum:
+                  - ms
+                  - s
+                  - percent
+                  - GiB
+                  - MiB
+              metricValue:
+                description: the value of the given metricUnit. Needs to be a common data type to hold all other data types; currently it consists of time and byte and percentage
+                type: string
   securitySchemes:
     bearerAuth:
       type: http
