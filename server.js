@@ -130,6 +130,7 @@ app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
+app.get('/api/health', api_misc.healtchckech);
 // app.delete('/experiment/entries', experimental.deleteAllTimeEntries);
 // app.put('/experiment/rnd_entries', experimental.setRandomTimeEntries);
 
