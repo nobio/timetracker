@@ -4,7 +4,34 @@ const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
 exports.DEFAULT_BREAK_TIME_SECONDS = 30 * 60;
-exports.DEFAULT_BREAK_TIME_MILLISECONDS = this.DEFAULT_BREAK_TIME_SECONDS * 1000;
+exports.DEFAULT_BREAK_TIME_MILLISECONDS = 30 * 60 * 1000;  // 60 min Pause
+
+/**
+ * calculates the break time dependeing on the date (needed to use the right employer) and
+ * the numbers of entries per day
+ */
+exports.getBreakTimeSeconds = (date, numbersOfEntriesPerDay) => {
+  console.log(date);
+  console.log(numbersOfEntriesPerDay);
+
+  let milliSeconds;
+
+  // if date > 01.09.2021
+  if (moment(date.toISOString()).isAfter('2021.08.31')) {
+    // AOK Bayernª
+    console.log("AOK BY")
+  }
+
+  if (numbersOfEntriesPerDay === 2) {
+    milliSeconds = this.DEFAULT_BREAK_TIME_MILLISECONDS;
+  }
+  return milliSeconds;
+}
+exports.getBreakTimeMilliSeconds = (date, numbersOfEntriesPerDay) => {
+  console.log(date);
+  console.log(numbersOfEntriesPerDay);
+  return this.getBreakTimeSeconds(date, numbersOfEntriesPerDay) * 1000;
+}
 
 const { SLACK_URL } = process.env;
 /*
@@ -19,7 +46,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
 /**
  * use Slack's 'incoming Webhooks' to publish messages
  */
-exports.sendMessage = async function (notificationKey, addedContent) {
+exports.sendMessage = async (notificationKey, addedContent) => {
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
@@ -40,7 +67,7 @@ exports.sendMessage = async function (notificationKey, addedContent) {
  * @param {*} message
  * @returns
  */
-exports.sendTextMessage = async function (message) {
+exports.sendTextMessage = async (message) => {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
   if (SLACK_URL) {
     try {

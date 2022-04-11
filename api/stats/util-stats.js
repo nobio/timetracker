@@ -102,7 +102,7 @@ exports.getBusytimeByDate = (dt) => new Promise((resolve, reject) => {
       }
       // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
       if (timeentries.length === 2) {
-        busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
+        busytime -= g_util.getBreakTimeMilliSeconds(timeentries[0].entry_date, timeentries.length);
       }
       // console.log(`${dt} => ${busytime} ${busytime / 1000 / 60 / 60}`);
 
