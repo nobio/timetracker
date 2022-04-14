@@ -1,11 +1,12 @@
 require('../../db');
+require('../../db/cache');
 const mongoose = require('mongoose');
-
 const Toggle = mongoose.model('Toggle');
 
 // ============================= TOGGLES ====================================
 exports.getAllToggles = () => new Promise((resolve, reject) => {
   Toggle.find()
+    .cache(10)
     .then((result) => resolve(result))
     .catch((err) => reject(err));
 });
@@ -19,7 +20,7 @@ exports.getToggle = (id) => new Promise((resolve, reject) => {
 exports.getToggleByName = (name) => new Promise((resolve, reject) => {
   Toggle.findOne({ name })
     .then((result) => resolve(result))
-    .catch((err) => reject(err));
+    .catch((err) => reject(err))
 });
 
 exports.getToggleStatus = () => new Promise((resolve, reject) => {
