@@ -18,7 +18,7 @@ const Token = mongoose.model('Token');
 exports.getAllUsers = async () => {
   const users = [];
   try {
-    const dbUsers = await User.find();
+    const dbUsers = await User.find().cache();
     dbUsers.forEach((user) => {
       users.push(
         {
@@ -39,7 +39,7 @@ exports.getUser = async (id) => {
   if (!id) throw Error('id must be provided');
 
   try {
-    const user = await User.findById({ _id: id });
+    const user = await User.findById({ _id: id }).cache(300);
 
     return {
       id: user._id,
@@ -95,7 +95,7 @@ exports.createUser = async (username, password, name, mailAddress) => {
 exports.updateUser = async (id, username, name, mailAddress) => {
   if (!id) throw Error('User must be provided');
 
-  const user = await User.findById(id);
+  const user = await User.findById(id).cache();
   if (!user) throw Error('User does not exists');
 
   if (username) user.username = username;

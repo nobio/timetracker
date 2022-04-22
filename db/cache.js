@@ -1,101 +1,78 @@
-/*
-const Hash = require("mix-hash"),
-  redis = require("redis"),
-  util = require("util");
-
-module.exports = (mongoose, option) => {
-  console.log('----------------------------- mongoose cache initialize -----------------------------');
-
-  var exec = mongoose.Query.prototype.exec;
-  // var execFind = mongoose.Query.prototype.execFind;
-  // const aggregate = mongoose.Model.aggregate;
-  var client = redis.createClient(option || "redis://127.0.0.1:6379");
-  client.get = util.promisify(client.get);
-
-  mongoose.Query.prototype.cache = function (ttl, customKey) {
-    if (typeof ttl === 'string') {
-      customKey = ttl;
-      ttl = 60;
-    }
-
-    this._ttl = ttl;
-    this._key = customKey;
-    return this;
-  }
-
-  mongoose.Query.prototype.exec = async () => {
-    console.log('mongoose.Query.prototype.exec ' + this._ttl)
-
-    if (!this._ttl) {
-      return exec.apply(this, arguments);
-    }
-    const key = this._key || Hash.md5(JSON.stringify(Object.assign({}, { name: this.model.collection.name, conditions: this._conditions, fields: this._fields, o: this.options })));
-    console.log(key)
-
-    const cached = await client.get(key);
-    if (cached) {
-      // console.log(`[LOG] Serving from cache`);
-      const doc = JSON.parse(cached);
-      return Array.isArray(doc) ? doc.map(d => new this.model(d)) : new this.model(doc);
-    }
-
-    const result = await exec.apply(this, arguments);
-    if (result) {
-      client.set(key, JSON.stringify(result), "EX", this._ttl);
-    }
-    return result;
-  }
-
-}
-*/
-
 const Hash = require('mix-hash')
 const mongoose = require('mongoose');
-const util = require('util');
-const cache = require('memory-cache');
+const Cache = require('memory-cache');
 
 const exec = mongoose.Query.prototype.exec;
 
-//mongoose.Query.prototype.cache = function (options = { time: 60 }) {
+/**
+ * prepares to cache values; this method only takes an optional expire time and optional key
+ * @param {*} time optional expire time in seconds; default: 60s
+ * @param {*} key  optional key to store/read values from cache
+ * @returns this
+ */
 mongoose.Query.prototype.cache = function (time, key) {
 
   this.useCache = true;
-  //  this.time = options.time;
-  if (time && typeof time === 'number') this.time = time * 1000;
-  //  this.hashKey = JSON.stringify(options.key || this.mongooseCollection.name);
-  if (key) this.key = key;
+  if (!time || isNaN(time)) this.time = 60 * 1000;  // default: 60 seconds
+  if (typeof time === 'number') this.time = time * 1000;
+  this.key = (key) ? key : calcHash(this);
+
+  //console.log("...cache: " + this.key)
 
   return this;
 };
-
 mongoose.Query.prototype.exec = async function () {
 
+  // console.log("...exec: " + this.key)
+  // if not using the cache (i.e. if not prototype.cache() was called, just use mongoose as usual)
   if (!this.useCache) {
     return await exec.apply(this, arguments);
   }
 
-  const key = (this.key || Hash.md5(JSON.stringify(Object.assign({}, { name: this.model.collection.name, conditions: this._conditions, fields: this._fields, o: this.options }))));
-  console.log(`key: ${key}`)
-  //console.log(cache.exportJson());
-  const cacheValue = cache.get(key);
+  // -------------------------- Use cache! ----------------------------
+
+  // 2. try to read value from cache
+  const cacheValue = Cache.get(this.key);
   //console.log(cacheValue);
 
+  // 3. if a value has been cached return it (btw: do some magic tricks on Arrays)
   if (cacheValue) {
+    //console.log('cached value')
     return Array.isArray(cacheValue)
       ? cacheValue.map(d => new this.model(d))
       : new this.model(cacheValue);
 
   }
 
+  // 4. ok, value has not been cached yet or has expired. Let's just call mongo db
   const result = await exec.apply(this, arguments);
-  //log(this.time);
-  cache.put(key, result, this.time)
 
-  console.log("Response from MongoDB stored to cache");
+  // 5. before returning the value, cache it!
+  //console.log("this.time: " + this.time)
+  Cache.put(this.key, result, this.time)
+  //console.log("Response from MongoDB stored to cache");
+
+  // 6. and return it
   return result;
 };
 
-mongoose.Query.prototype.clearCache = async () => {
-  const key = Hash.md5(JSON.stringify(Object.assign({}, { name: this.model.collection.name, conditions: this._conditions, fields: this._fields, o: this.options })));
-  cache.del(key);
-};
+/**
+ * creates a unique key to store a value in the cache
+ * @returns calculated key
+ */
+function calcHash(THIS) {
+  const hash = Hash.md5(
+    JSON.stringify(
+      Object.assign(
+        {},
+        {
+          name: THIS.model.collection.name,
+          conditions: THIS._conditions,
+          fields: THIS._fields,
+          o: THIS.options,
+        }
+      )
+    )
+  );
+  return hash;
+}

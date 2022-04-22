@@ -44,7 +44,7 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - st
 app.use(express.json());
 app.use(cookieParser());
 // apply rate limiter to all requests
-app.use(limiter);
+//app.use(limiter);
 
 app.use(cors());
 app.use(api_auth.authorize);

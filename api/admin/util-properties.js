@@ -18,7 +18,7 @@ function castProperties(mongooseProperties) {
 
 // ============================= PROPERTIES ====================================
 exports.getProperties = () => new Promise((resolve, reject) => {
-  Properties.find()
+  Properties.find().cache(300)
     .then((properties) => resolve(castProperties(properties)))
     .catch((err) => reject(err));
 });
@@ -26,7 +26,7 @@ exports.getProperties = () => new Promise((resolve, reject) => {
 exports.getProperty = (key) => new Promise((resolve, reject) => {
   if (!key) reject(new Error('the key must not be undefined'));
 
-  Properties.findOne({ key })
+  Properties.findOne({ key }).cache(300)
     .then((property) => resolve(castProperty(property)))
     .catch((err) => reject(err));
 });
