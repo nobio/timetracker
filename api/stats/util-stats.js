@@ -15,12 +15,15 @@ const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 exports.calcStats = async () => {
 
   try {
-    const deletedDoublets = await utilEntry.removeDoublets();
+    g_util.sendMessage('RECALCULATE', 'delete doublets');
+    await utilEntry.removeDoublets();
+    g_util.sendMessage('RECALCULATE', 'delete stats');
     await this.deleteAllStatsDays();
     const firstEntry = await utilEntry.getFirstTimeEntry();
     const lastEntry = await utilEntry.getLastTimeEntry();
+    g_util.sendMessage('RECALCULATE', 'start calculating...');
     const result = await this.calculateStatistics(firstEntry, lastEntry);
-    g_util.sendMessage('RECALCULATE'); // do this asynchronously
+    g_util.sendMessage('RECALCULATE', '...calculation done');
 
     return result;
 
