@@ -3,8 +3,48 @@ const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-exports.DEFAULT_BREAK_TIME_SECONDS = 30 * 60;
-exports.DEFAULT_BREAK_TIME_MILLISECONDS = this.DEFAULT_BREAK_TIME_SECONDS * 1000;
+const DEFAULT_BREAK_TIME_SECONDS = 60 * 60;  // 30 min Pause
+const AOK_BREAK_TIME_SECONDS = 30 * 60;  // 60 min Pause
+const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
+const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
+/**
+ * calculates the break time dependeing on the date (needed to use the right employer) and
+ * the numbers of entries per day
+ */
+exports.getBreakTimeSeconds = (date) => {
+  // console.log(date, moment(date, 'X'));
+  // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
+  const dateMoment = moment(date, 'X');  // format 'X' is 'Unix timestamp'
+
+  // if date is AOK
+  if (dateMoment.isAfter('2021-08-31')) {
+    // AOK Bayern
+    return AOK_BREAK_TIME_SECONDS;
+  } else {
+    return DEFAULT_BREAK_TIME_SECONDS
+  }
+
+}
+exports.getBreakTimeMilliSeconds = (date) => {
+  return this.getBreakTimeSeconds(date) * 1000;
+}
+exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
+  // console.log(busytime, pause, date, entriesPerDay)
+  let bookedTime;
+  if (moment(date, 'X').isAfter('2021-08-31')) {
+    // AOK Bayern
+    if (entriesPerDay > 2) {
+      bookedTime = busytime + AOK_WEGEZEIT_SECONDS; // 'Wegegeld'
+    } else {
+      bookedTime = busytime - pause + AOK_WEGEZEIT_SECONDS;
+    }
+    bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
+  } else {
+    // vor AOK Bayern
+    bookedTime = busytime - pause;
+  }
+  return bookedTime;
+};
 
 const { SLACK_URL } = process.env;
 /*
@@ -19,7 +59,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
 /**
  * use Slack's 'incoming Webhooks' to publish messages
  */
-exports.sendMessage = async function (notificationKey, addedContent) {
+exports.sendMessage = async (notificationKey, addedContent) => {
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
@@ -40,7 +80,7 @@ exports.sendMessage = async function (notificationKey, addedContent) {
  * @param {*} message
  * @returns
  */
-exports.sendTextMessage = async function (message) {
+exports.sendTextMessage = async (message) => {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
   if (SLACK_URL) {
     try {

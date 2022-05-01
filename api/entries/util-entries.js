@@ -240,7 +240,7 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
-  // console.log(timeentries);
+  //console.log(timeentries);
 
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
@@ -270,20 +270,20 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
 
       const end = timeentries[n].entry_date;
       const start = timeentries[n - 1].entry_date;
-      busytime += (end - start);
+      busytime += moment(end).diff(moment(start));
 
       if (n > 2) {
-        pause += (start - timeentries[n - 2].entry_date);
+        pause += moment(start).diff(moment(timeentries[n - 2].entry_date))
       }
     }
 
-    // when there have been only 2 entries we reduce the busytime by 45 minutes (default pause)
     if (timeentries.length === 2) {
-      busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
-      pause = g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
+      pause = g_util.getBreakTimeMilliSeconds(timeentries[0].entry_date);
     }
 
-    const duration = timeentries[timeentries.length - 1].entry_date - timeentries[0].entry_date;
+    // calculate break time depending on the dates in timeentries (all entries for this given day)
+    busytime = g_util.getBookedTimeMilliSeconds(busytime, pause, timeentries[0].entry_date, timeentries.length);
+    const duration = moment(timeentries[timeentries.length - 1].entry_date).diff(moment(timeentries[0].entry_date));
 
     resolve({
       duration,

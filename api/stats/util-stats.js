@@ -38,15 +38,15 @@ exports.calcStats = async () => {
  * @param {*} lastEntry  the last entry in database
  */
 exports.calculateStatistics = async (firstEntry, lastEntry) => {
-  console.log(firstEntry, lastEntry)
+  // console.log(firstEntry, lastEntry)
   let date = utilEntry.stripdownToDateUTC(firstEntry.age);
   try {
     while (date <= moment(lastEntry.age)) {
       // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
       const dt = moment(date);
       const busytime = await this.getBusytimeByDate(dt);
-      // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
-      if (busytime && busytime.busytime != 0) {
+      //console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+      if (busytime && busytime.busytime && busytime.busytime != 0) {
         new StatsDay({
           date: dt,
           actual_working_time: busytime.busytime / 1,
@@ -77,39 +77,16 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
  *
  * @param {*} dt calculate the busytime for given date
  */
-exports.getBusytimeByDate = (dt) => new Promise((resolve, reject) => {
-  // console.log(`getBusytimeByDate: ${dt}`);
-  // first get all entries for this day....
-  utilEntry
-    .getAllByDate(dt)
-    .then((timeentries) => {
-      let busytime = 0;
-      for (let n = timeentries.length - 1; n > 0; n -= 2) {
-        // this must be a go-event
-        if (timeentries[n].direction !== 'go') {
-          reject(
-            new Error(`Die Reihenfolge der Kommen/Gehen-Einträge am ${dt.format('DD.MM.YYYY')} scheint nicht zu stimmen.`),
-            0,
-          );
-          return;
-        }
+exports.getBusytimeByDate = async (dt) => {
+  try {
+    const timeEntries = await utilEntry.getAllByDate(dt);
+    const calculated = await utilEntry.calculateBusyTime(timeEntries);
 
-        const end = timeentries[n].entry_date;
-        const start = timeentries[n - 1].entry_date;
+    return { busytime: calculated.busytime };
+  } catch (error) {
 
-        busytime += end - start;
-        // console.log(`${dt}: ${start} -> ${end}    = ${busytime} (${busytime / 1000 / 60 / 60})`);
-      }
-      // when ther have been only 2 entries we reduce the busytime by 45 minutes (default pause)
-      if (timeentries.length === 2) {
-        busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
-      }
-      // console.log(`${dt} => ${busytime} ${busytime / 1000 / 60 / 60}`);
-
-      resolve({ busytime });
-    })
-    .catch((err) => reject(err));
-});
+  }
+}
 
 /**
  * clears the MongoDB collection for statistics
@@ -191,6 +168,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         reject(err);
         return;
       }
+
       const innerData = [];
       const innerComp = [];
       let actual_working_time = -1;
