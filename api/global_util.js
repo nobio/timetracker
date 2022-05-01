@@ -3,35 +3,48 @@ const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-exports.DEFAULT_BREAK_TIME_SECONDS = 30 * 60;
-exports.DEFAULT_BREAK_TIME_MILLISECONDS = 30 * 60 * 1000;  // 60 min Pause
-
+const DEFAULT_BREAK_TIME_SECONDS = 60 * 60;  // 30 min Pause
+const AOK_BREAK_TIME_SECONDS = 30 * 60;  // 60 min Pause
+const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
+const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 /**
  * calculates the break time dependeing on the date (needed to use the right employer) and
  * the numbers of entries per day
  */
-exports.getBreakTimeSeconds = (date, numbersOfEntriesPerDay) => {
-  console.log(date);
-  console.log(numbersOfEntriesPerDay);
+exports.getBreakTimeSeconds = (date) => {
+  // console.log(date, moment(date, 'X'));
+  // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
+  const dateMoment = moment(date, 'X');  // format 'X' is 'Unix timestamp'
 
-  let milliSeconds;
-
-  // if date > 01.09.2021
-  if (moment(date.toISOString()).isAfter('2021.08.31')) {
-    // AOK Bayernª
-    console.log("AOK BY")
+  // if date is AOK
+  if (dateMoment.isAfter('2021-08-31')) {
+    // AOK Bayern
+    return AOK_BREAK_TIME_SECONDS;
+  } else {
+    return DEFAULT_BREAK_TIME_SECONDS
   }
 
-  if (numbersOfEntriesPerDay === 2) {
-    milliSeconds = this.DEFAULT_BREAK_TIME_MILLISECONDS;
+}
+exports.getBreakTimeMilliSeconds = (date) => {
+  return this.getBreakTimeSeconds(date) * 1000;
+}
+exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
+  // console.log(busytime, pause, date, entriesPerDay)
+  let bookedTime;
+  if (moment(date, 'X').isAfter('2021-08-31')) {
+    // AOK Bayern
+    if (entriesPerDay > 2) {
+      bookedTime = busytime + AOK_WEGEZEIT_SECONDS; // 'Wegegeld'
+    } else {
+      bookedTime = busytime - pause + AOK_WEGEZEIT_SECONDS;
+    }
+    bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
+  } else {
+    // vor AOK Bayern
+    bookedTime = busytime - pause;
   }
-  return milliSeconds;
-}
-exports.getBreakTimeMilliSeconds = (date, numbersOfEntriesPerDay) => {
-  console.log(date);
-  console.log(numbersOfEntriesPerDay);
-  return this.getBreakTimeSeconds(date, numbersOfEntriesPerDay) * 1000;
-}
+  return bookedTime;
+};
 
 const { SLACK_URL } = process.env;
 /*

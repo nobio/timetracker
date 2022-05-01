@@ -61,7 +61,7 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
       breakTime = 0;
     }
     if (!realCalc && timeItem.length === 2) {
-      breakTime = g_util.getBreakTimeSeconds(timeItem[0], timeItem.length);
+      breakTime = g_util.getBreakTimeSeconds(timeItem[0]);
     }
 
     if (breakTime === -1) {

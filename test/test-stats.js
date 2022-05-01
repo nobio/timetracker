@@ -302,8 +302,8 @@ describe("test util.calculateStatistics", () => {
   });
 
   it('calcStats', async () => {
-    const firstEntry = { _id: 0, age: moment('2016-01-01T06:30:00.000Z') };
-    const lastEntry = { _id: 0, age: moment('2016-01-15T06:30:00.000Z') };
+    const firstEntry = { _id: 0, age: moment('2019-03-01T06:30:00.000Z') };
+    const lastEntry = { _id: 0, age: moment('2019-03-31T06:30:00.000Z') };
 
     const result = await util.calculateStatistics(firstEntry, lastEntry);
 

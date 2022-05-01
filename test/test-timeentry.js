@@ -43,6 +43,18 @@ const ONE_ENTRY =
     },
   ];
 
+const TWO_ENTRIES_AOK = [
+  { direction: 'enter', entry_date: '2022-02-20T07:00:00.00Z', last_changed: '2022-02-20T07:00:00.00Z', },
+  { direction: 'go', entry_date: '2022-02-20T16:00:00.000Z', last_changed: '2022-02-20T16:00:00.000Z' },
+];
+
+const FOUR_ENTRIES_AOK = [
+  { direction: 'enter', entry_date: '2022-02-20T07:30:00.00Z', last_changed: '2022-02-20T07:30:00.00Z' },
+  { direction: 'go', entry_date: '2022-02-20T12:00:00.000Z', last_changed: '2022-02-20T12:00:00.000Z' },
+  { direction: 'enter', entry_date: '2022-02-20T12:45:00.00Z', last_changed: '2022-02-20T12:45:00.00Z' },
+  { direction: 'go', entry_date: '2022-02-20T17:00:00.000Z', last_changed: '2022-02-20T17:00:00.000Z' },
+];
+
 // ####################################################################################
 // ##
 // ##  TEST Cases
@@ -70,6 +82,13 @@ describe('test util.calculateBusyTime', () => {
     }
   });
 
+  it('should not be rejected if the second entry is a go', async () => {
+    try {
+      await util.calculateBusyTime(TWO_ENTRIES)
+    } catch (error) {
+      assert.fail('should not throw an exception!');
+    }
+  });
   it('should be rejected if the second entry is not a go', async () => {
     const ENTRIES =
       [
@@ -86,23 +105,53 @@ describe('test util.calculateBusyTime', () => {
     }
 
   });
-  it('pause should be the same as global_util.DEFAULT_BREAK_TIME_SECONDS', async () => {
+  it('calculate duration, bustyme, pause (before AOK, 2 Entries)', async () => {
+    let result;
     try {
-      const result = await util.calculateBusyTime(TWO_ENTRIES);
-      expect(result).to.have.property('duration');
-      expect(result).to.have.property('busytime');
-      expect(result).to.have.property('pause');
-      expect(result).to.have.property('count');
+      result = await util.calculateBusyTime(TWO_ENTRIES);
     } catch (error) {
       throw error;
     }
+    expect(result).to.have.property('duration');
+    expect(result.duration).to.equal(29880000);
+    expect(result).to.have.property('busytime');
+    expect(result.busytime).to.equal(26280000);
+    expect(result).to.have.property('pause');
+    expect(result.pause).to.equal(3600000);
+    expect(result).to.have.property('count');
+    expect(result.count).to.equal(2);
   });
-  it('should not be rejected if the second entry is a go', async () => {
+  it('calculate duration, bustyme, pause (AOK, 2 Entries)', async () => {
+    let result;
     try {
-      await util.calculateBusyTime(TWO_ENTRIES)
+      result = await util.calculateBusyTime(TWO_ENTRIES_AOK);
     } catch (error) {
-      assert.fail('should not throw an exception!');
+      throw error;
     }
+    expect(result).to.have.property('duration');
+    expect(result.duration).to.equal(32400000);
+    expect(result).to.have.property('busytime');
+    expect(result.busytime).to.equal(28800000);
+    expect(result).to.have.property('pause');
+    expect(result.pause).to.equal(3600000);
+    expect(result).to.have.property('count');
+    expect(result.count).to.equal(2);
+  });
+  it('calculate duration, bustyme, pause (AOK, 4 Entries)', async () => {
+    let result;
+    try {
+      result = await util.calculateBusyTime(FOUR_ENTRIES_AOK);
+    } catch (error) {
+      throw error;
+    }
+    expect(result).to.have.property('duration');
+    expect(result.duration).to.equal(34200000);
+    expect(result).to.have.property('busytime');
+    expect(result.busytime).to.equal(28800000);
+    expect(result).to.have.property('pause');
+    expect(result.pause).to.equal(2700000);
+    expect(result).to.have.property('count');
+    expect(result.count).to.equal(4);
   });
 })
 
@@ -166,7 +215,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       // 1. crete a time entry....
       let timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
-      console.log(timeEntry._id)
+      // console.log(timeEntry._id)
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
       expect(timeEntry._id).to.not.be.undefined;
