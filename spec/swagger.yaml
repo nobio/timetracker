@@ -42,6 +42,7 @@ paths:
                   format: password
                   pattern: '^[\w-.]'
                   example: psiodjkÜsö93JKK=w8dj
+                  maxLength: 20
         required: false
       responses:
         "200":
@@ -910,6 +911,7 @@ paths:
                   minimum: 5
                   pattern: '^[\w-.]'
                   example: k9wPüä=kdHs2
+                  maxLength: 20
         required: true
       responses:
         "201":
@@ -1588,6 +1590,7 @@ components:
           pattern: '^[\w-.]'
           format: password
           example: jshHfu3ek=fDÖ
+          maxLength: 20
         name:
           type: string
           pattern: '^[\w-.]'
