@@ -243,6 +243,7 @@ paths:
           schema:
             type: string
             pattern: '^[\w-.]'
+            maxLength: 128
       requestBody:
         description: TimeEntry with new values of properties
         content:
