@@ -57,6 +57,16 @@ Content-Type: application/json
 
 ###
 
+PUT http://localhost:30000/api/toggles/5c3e491416de19002a6770e5
+Content-Type: application/json
+
+{
+    "toggle": "true",
+    "notification": "statistics have been calculated",
+}
+
+###
+
 DELETE http://localhost:30000/api/toggles/61cc9966f30fd42491b46ed2
 Authorization: Bearer xxx.yyy.zzz
 
