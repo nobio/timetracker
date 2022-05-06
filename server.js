@@ -4,18 +4,13 @@
 require('dotenv').config();
 require('./db');
 const rateLimit = require('express-rate-limit');
+
 const limiter = rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
-  max: process.env.RATE_LIMIT_RQEUESTS
+  max: process.env.RATE_LIMIT_RQEUESTS,
 });
 
 const express = require('express');
-const api_entries = require('./api/entries');
-const api_admin = require('./api/admin');
-const api_stats = require('./api/stats');
-const api_misc = require('./api/misc');
-const api_auth = require('./api/auth');
-const api_geotrack = require('./api/geotrack');
 
 const http = require('http');
 const https = require('https');
@@ -27,6 +22,12 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
+const api_geotrack = require('./api/geotrack');
+const api_auth = require('./api/auth');
+const api_misc = require('./api/misc');
+const api_stats = require('./api/stats');
+const api_admin = require('./api/admin');
+const api_entries = require('./api/entries');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -36,9 +37,9 @@ app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
-//app.use(express.static(path.join(__dirname, 'public')));
-//app.use(express.static(path.join(__dirname, 'www')));
-//app.use(serveStatic('www', { 'index': ['index.html'] }));
+// app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'www')));
+// app.use(serveStatic('www', { 'index': ['index.html'] }));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
@@ -155,12 +156,12 @@ if (process.env.SLACK_URL) {
 // .......................................................................
 // Optional fallthrough error handler
 // .......................................................................
-app.use(function onError(err, req, res, next) {
+app.use((err, req, res, next) => {
   // The error id is attached to `res.sentry` to be returned
   // and optionally displayed to the user for support.
   res.statusCode = 500;
-  res.end(res + "\n");
-  //res.end(res.sentry + "\n");
+  res.end(`${res}\n`);
+  // res.end(res.sentry + "\n");
 });
 /* ================= start the web service on http ================= */
 http.createServer(app).listen(app.get('port'), app.get('host'), () => {
@@ -178,12 +179,13 @@ const httpsServer = https.createServer(ssl_options, app).listen(app.get('ssl-por
 
 /* init and start Websocket Server */
 const webSocketFacade = require('./api/ws');
-webSocketFacade.init(httpsServer)
+
+webSocketFacade.init(httpsServer);
 
 /* start scheduler */
 require('./api/scheduler').scheduleTasks();
 
 /* send message that server has been started */
 require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
-  .then(msg => console.log(msg))
-  .catch(err => console.log(err));
+  .then((msg) => console.log(msg))
+  .catch((err) => console.log(err));

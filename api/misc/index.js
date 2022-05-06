@@ -1,5 +1,6 @@
 const moment = require('moment');
 const mongoose = require('mongoose');
+
 const User = mongoose.model('User');
 const packageJson = require('../../package.json');
 
@@ -60,7 +61,7 @@ exports.healtchckech = async (req, res) => {
     version: packageJson.version,
     time: moment().toISOString(),
     status: 'pass',
-    details: []
+    details: [],
   };
 
   // ------------ 1. test slack ------------
@@ -84,7 +85,7 @@ exports.healtchckech = async (req, res) => {
     databaseDetail.metricValue = true;
   } catch (error) {
     databaseDetail.metricValue = false;
-  };
+  }
 
   res.status(200).json(healthData);
 };

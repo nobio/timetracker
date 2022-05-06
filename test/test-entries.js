@@ -1,14 +1,14 @@
 require('./init');
-const utilEntries = require('../api/entries/util-entries');
-const g_util = require('../api/global_util');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const { response } = require('express');
 const { assert } = require('chai');
+const g_util = require('../api/global_util');
+const utilEntries = require('../api/entries/util-entries');
 
 chai.use(chaiAsPromised);
-const expect = chai.expect;
+const { expect } = chai;
 chai.should();
 
 describe('test global_util.sendMessage()', () => {
@@ -16,13 +16,13 @@ describe('test global_util.sendMessage()', () => {
     process.env.SLACK_TOKEN = '';
     try {
       const response = await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX');
-      //console.log(response)
+      // console.log(response)
       expect(response).to.be.string;
       expect(response).to.contain('could not send message');
       expect(response).to.contain('no slack url provided');
     } catch (error) {
-      console.log(error)
-      assert.fail('should not throw exception')
+      console.log(error);
+      assert.fail('should not throw exception');
     }
   });
 
@@ -33,7 +33,7 @@ describe('test global_util.sendMessage()', () => {
       expect(result).to.be.string;
       expect(result).to.equal('toggle UNKNOWN_KEY switched off');
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 });

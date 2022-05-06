@@ -1,8 +1,8 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-console */
-const ws = require('../ws');
 const moment = require('moment');
 const mongoose = require('mongoose');
+const ws = require('../ws');
 
 const GeoTracking = mongoose.model('GeoTracking');
 
@@ -29,7 +29,7 @@ const calcDist = (lon1, lat1, lon2, lat2) => {
 
   const d = R * c; // in metres
   return Math.round(d, 0);
-}
+};
 
 /**
  * calculates the total distance of the singele geo locations of the given time span
@@ -84,7 +84,7 @@ exports.createGeoTrack = async (geoTrack) => {
       throw err;
     }
   }
-}
+};
 
 exports.parseGeoTrackingObject = (body) => {
   let geoTrack;
@@ -173,13 +173,11 @@ exports.getGeoTrackingDataByTime = (dtStart, dtEnd) => {
  * distances (depend on accuracy)
  * @param {*} tracks tracking data
  */
-exports.getGeoTrackingMetadata = async (tracks) => {
-  return {
-    size: tracks.length,
-    totalDistance: this.distance(tracks),
-    accuracy: this.meanAccuracy(tracks),
-  };
-};
+exports.getGeoTrackingMetadata = async (tracks) => ({
+  size: tracks.length,
+  totalDistance: this.distance(tracks),
+  accuracy: this.meanAccuracy(tracks),
+});
 
 const transform = (tracks) => {
   const tr = [];
@@ -197,7 +195,7 @@ const transform = (tracks) => {
     });
   });
   return tr;
-}
+};
 
 const appendMetadata = (tracks) => {
   let oldPoint;
@@ -215,4 +213,4 @@ const appendMetadata = (tracks) => {
   // console.log(JSON.stringify(tracks, null, 2))
 
   return tracks;
-}
+};

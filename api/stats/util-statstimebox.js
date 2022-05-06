@@ -44,7 +44,7 @@ function renderOneData(data, weekDay) {
   tmpData.avg = tmpData.sum / tmpData.count;
 
   // map to an array with quadratic distances from average
-  const distances = data.rawData.map((x) => (Math.pow((x - tmpData.avg), 2)));
+  const distances = data.rawData.map((x) => ((x - tmpData.avg) ** 2));
   tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count); // varianz = sum of qudaratic distances / count; deviation = sqrt (varianz)
 
   // console.log(JSON.stringify(tmpData));

@@ -7,6 +7,7 @@ const util = require('../api/entries/util-entries');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
 const { assert, expect } = require('chai');
 
@@ -14,37 +15,35 @@ const moment = require('moment');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
-const TWO_ENTRIES =
-  [
-    {
-      last_changed: '2014-02-27T07:37:02.543Z',
-      entry_date: '2014-02-27T07:37:00.000Z',
-      __v: 0,
-      _id: '530eeb1ea8ee5e0000000917',
-      direction: 'enter',
-    },
-    {
-      __v: 0,
-      last_changed: '2014-02-27T15:55:56.607Z',
-      entry_date: '2014-02-27T15:55:00.000Z',
-      _id: '530f600ca8ee5e00000009f0',
-      direction: 'go',
-    },
-  ];
+const TWO_ENTRIES = [
+  {
+    last_changed: '2014-02-27T07:37:02.543Z',
+    entry_date: '2014-02-27T07:37:00.000Z',
+    __v: 0,
+    _id: '530eeb1ea8ee5e0000000917',
+    direction: 'enter',
+  },
+  {
+    __v: 0,
+    last_changed: '2014-02-27T15:55:56.607Z',
+    entry_date: '2014-02-27T15:55:00.000Z',
+    _id: '530f600ca8ee5e00000009f0',
+    direction: 'go',
+  },
+];
 
-const ONE_ENTRY =
-  [
-    {
-      last_changed: '2014-02-27T07:37:02.543Z',
-      entry_date: '2014-02-27T07:37:00.000Z',
-      __v: 0,
-      _id: '530eeb1ea8ee5e0000000917',
-      direction: 'enter',
-    },
-  ];
+const ONE_ENTRY = [
+  {
+    last_changed: '2014-02-27T07:37:02.543Z',
+    entry_date: '2014-02-27T07:37:00.000Z',
+    __v: 0,
+    _id: '530eeb1ea8ee5e0000000917',
+    direction: 'enter',
+  },
+];
 
 const TWO_ENTRIES_AOK = [
-  { direction: 'enter', entry_date: '2022-02-20T07:00:00.00Z', last_changed: '2022-02-20T07:00:00.00Z', },
+  { direction: 'enter', entry_date: '2022-02-20T07:00:00.00Z', last_changed: '2022-02-20T07:00:00.00Z' },
   { direction: 'go', entry_date: '2022-02-20T16:00:00.000Z', last_changed: '2022-02-20T16:00:00.000Z' },
 ];
 
@@ -61,10 +60,10 @@ const FOUR_ENTRIES_AOK = [
 // ##
 // ####################################################################################
 describe('test util.getAllByDate ', () => {
-  it('response array should have length of 0', async () => { expect(await util.getAllByDate(-1)).to.have.length(0) });
-  it('response array should have length of 2', async () => { expect(await util.getAllByDate(1393455600000)).to.have.length(2) });
-  it('response array should have length of 0', async () => { expect(await util.getAllByDate(1000000000000)).to.have.length(0) });
-  it('response array should have length of 0', async () => { expect(await util.getAllByDate(0)).to.have.length(0) });
+  it('response array should have length of 0', async () => { expect(await util.getAllByDate(-1)).to.have.length(0); });
+  it('response array should have length of 2', async () => { expect(await util.getAllByDate(1393455600000)).to.have.length(2); });
+  it('response array should have length of 0', async () => { expect(await util.getAllByDate(1000000000000)).to.have.length(0); });
+  it('response array should have length of 0', async () => { expect(await util.getAllByDate(0)).to.have.length(0); });
 });
 
 describe('test util.calculateBusyTime', () => {
@@ -75,7 +74,7 @@ describe('test util.calculateBusyTime', () => {
   it('should be rejected if only one entry', async () => {
     try {
       await util.calculateBusyTime(ONE_ENTRY);
-      assert.fail("should throw Error but did not :-("); // should not reach this...
+      assert.fail('should throw Error but did not :-('); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('Bitte vervollständigen Sie die Einträge');
@@ -84,26 +83,24 @@ describe('test util.calculateBusyTime', () => {
 
   it('should not be rejected if the second entry is a go', async () => {
     try {
-      await util.calculateBusyTime(TWO_ENTRIES)
+      await util.calculateBusyTime(TWO_ENTRIES);
     } catch (error) {
       assert.fail('should not throw an exception!');
     }
   });
   it('should be rejected if the second entry is not a go', async () => {
-    const ENTRIES =
-      [
-        { direction: 'enter' },
-        { direction: 'enter' },
-      ];
+    const ENTRIES = [
+      { direction: 'enter' },
+      { direction: 'enter' },
+    ];
 
     try {
       await util.calculateBusyTime(ENTRIES);
-      assert.fail("should throw Error but did not :-("); // should not reach this...
+      assert.fail('should throw Error but did not :-('); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('Die Reihenfolge der Kommen/Gehen-Einträge scheint nicht zu stimmen.');
     }
-
   });
   it('calculate duration, bustyme, pause (before AOK, 2 Entries)', async () => {
     let result;
@@ -153,7 +150,7 @@ describe('test util.calculateBusyTime', () => {
     expect(result).to.have.property('count');
     expect(result.count).to.equal(4);
   });
-})
+});
 
 describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
   it('should find one Time Entry by its id', async () => {
@@ -240,7 +237,6 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
       // 4. now read the time entry -> should be null
       timeEntry = await util.findById(id);
       expect(timeEntry).to.be.null;
-
     } catch (error) {
       console.log(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
@@ -256,7 +252,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       const timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
       await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
-      assert.fail("should throw Error but did not :-("); // should not reach this...
+      assert.fail('should throw Error but did not :-('); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('this entry has direction enter but last entry has also direction enter');
@@ -293,7 +289,6 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
       // 4. now read the time entry -> should be null
       timeEntry = await util.findById(id);
       expect(timeEntry).to.be.null;
-
     } catch (error) {
       console.log(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
@@ -301,7 +296,6 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     }
   });
 });
-
 
 describe('test delete one TimeEntry by its id:  -> util.deleteById() ', () => {
   it('should delete one Time Entry by its id', async () => {
@@ -370,7 +364,6 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       // 5. now read the time entry -> should be null
       timeEntry = await util.findById(timeEntry.id);
       expect(timeEntry).to.be.null;
-
     } catch (error) {
       console.log(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
@@ -381,7 +374,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
   it('should throw exception when passing an undefined object', async () => {
     try {
       await util.update();
-      assert.fail("should throw Error but did not :-("); // should not reach this...
+      assert.fail('should throw Error but did not :-('); // should not reach this...
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('to update a record, the passed object must not be undefined');
@@ -411,7 +404,7 @@ describe('test util.storeValidationErrors ', () => {
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
     try {
-      const result = await util.storeValidationErrors(firstTime, lastTime)
+      const result = await util.storeValidationErrors(firstTime, lastTime);
       expect(result).to.have.property('message');
       expect(result.message).to.equal('calculation ongoing in background');
     } catch (error) {
@@ -427,7 +420,6 @@ describe('test util.storeValidationErrors ', () => {
     clearAllEntries(DEFAULT_DATE);
   });
 });
-
 
 // ########################################################################################################
 // #
@@ -446,8 +438,8 @@ function create(timeEntry) {
       longitude: timeEntry.longitude,
       latitude: timeEntry.latitude,
     }).save()
-      .then(timeEntry => resolve(timeEntry))
-      .catch(err => reject(err));
+      .then((timeEntry) => resolve(timeEntry))
+      .catch((err) => reject(err));
   });
 }
 
@@ -459,5 +451,5 @@ async function clearAllEntries(dt) {
   const timeentries = await util.getAllByDate(dt);
   for (const timeentry of timeentries) {
     await util.deleteById(timeentry._id);
-  };
+  }
 }

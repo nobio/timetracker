@@ -2,28 +2,26 @@ require('./init');
 const { assert } = require('chai');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
-const expect = chai.expect;
+const { expect } = chai;
 const util = require('../api/admin/util-properties');
 
 const TEST_KEY = 'TEST_KEY';
 const TEST_VALUE = 'TEST_VALUE';
 
 describe('test read properties', () => {
-
   it('read all properties', async () => {
     props = await util.getProperties();
     expect(props).to.be.a('array');
-    expect(props.length).to.be.greaterThan(0)
+    expect(props.length).to.be.greaterThan(0);
     expect(props[0]).to.be.a('object');
     expect(props[0]).to.have.property('key');
     expect(props[0]).to.have.property('value');
-  })
-
+  });
 });
 
 describe('test read one perticular property', () => {
-
   before(async () => {
     // make sure, TEST_KEY property is available
     await util.setProperty(TEST_KEY, TEST_VALUE);
@@ -65,11 +63,9 @@ describe('test read one perticular property', () => {
     // delete the test property again
     await util.deleteProperty(TEST_KEY);
   });
-
 });
 
 describe('test set a property', () => {
-
   before(async () => {
     // delete the test property again
     await util.deleteProperty(TEST_KEY);
@@ -92,7 +88,7 @@ describe('test set a property', () => {
     prop = await util.setProperty(TEST_KEY, `${TEST_VALUE}_NEW`);
     expect(prop.value).to.equal(`${TEST_VALUE}_NEW`);
 
-    //read the propertie's new value
+    // read the propertie's new value
     prop = await util.getProperty(TEST_KEY);
     expect(prop.value).to.equal(`${TEST_VALUE}_NEW`);
   });
@@ -136,11 +132,9 @@ describe('test set a property', () => {
     // delete the test property again
     await util.deleteProperty(TEST_KEY);
   });
-
 });
 
 describe('test delete a property', () => {
-
   before(async () => {
     // delete the test property again
     await util.deleteProperty(TEST_KEY);
@@ -164,7 +158,7 @@ describe('test delete a property', () => {
 
   it('try to delete a not exisiting property', async () => {
     try {
-      prop = await util.deleteProperty('LIAJSOUHNALSKDNKABSIBAKJSN')
+      prop = await util.deleteProperty('LIAJSOUHNALSKDNKABSIBAKJSN');
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('the key must not be undefined');
@@ -189,10 +183,8 @@ describe('test delete a property', () => {
     }
   });
 
-
   after(async () => {
     // delete the test property again
     await util.deleteProperty(TEST_KEY);
   });
-
 });

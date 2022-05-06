@@ -240,7 +240,7 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
-  //console.log(timeentries);
+  // console.log(timeentries);
 
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
@@ -273,7 +273,7 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
       busytime += moment(end).diff(moment(start));
 
       if (n > 2) {
-        pause += moment(start).diff(moment(timeentries[n - 2].entry_date))
+        pause += moment(start).diff(moment(timeentries[n - 2].entry_date));
       }
     }
 
@@ -401,7 +401,6 @@ exports.removeDoublets = async () => {
     });
 
     return { removed: count };
-
   } catch (error) {
     throw error;
   }
@@ -424,11 +423,10 @@ exports.evaluate = async () => {
     g_util.sendMessage('EVALUATE_DATA');
 
     return result;
-
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
   // console.log(JSON.stringify(firstEntry), lastEntry);

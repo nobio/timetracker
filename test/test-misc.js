@@ -18,14 +18,12 @@ const assert = chai.assert;
 const auth = require('../api/auth');
 const misc = require('../api/misc');
 
-
 /**
  * =============================================================
  * authorize
  * =============================================================
  */
 describe('test misc functions', () => {
-
   it('test version', async () => {
     const req = mockRequest({ headers: [], body: {} });
     const res = mockResponse();
@@ -35,16 +33,15 @@ describe('test misc functions', () => {
     try {
       await misc.version(req, res, next);
       response = res.json.getCalls()[0].lastArg;
-      //console.log(res.json.getCalls()[0].lastArg)
-
+      // console.log(res.json.getCalls()[0].lastArg)
     } catch (err) {
-      //console.log(err)
-      assert.fail('should not throw exception\n' + err.message);
+      // console.log(err)
+      assert.fail(`should not throw exception\n${err.message}`);
     }
 
     expect(res.status).to.have.been.calledWith(200);
-    expect(response).to.have.property('version')
-    expect(response).to.have.property('last_build')
+    expect(response).to.have.property('version');
+    expect(response).to.have.property('last_build');
   });
 
   it('test healthcheck', async () => {
@@ -56,11 +53,10 @@ describe('test misc functions', () => {
     try {
       await misc.healtchckech(req, res, next);
       response = res.json.getCalls()[0].lastArg;
-      //console.log(res.json.getCalls()[0].lastArg)
-
+      // console.log(res.json.getCalls()[0].lastArg)
     } catch (err) {
-      //console.log(err)
-      assert.fail('should not throw exception\n' + err.message);
+      // console.log(err)
+      assert.fail(`should not throw exception\n${err.message}`);
     }
 
     expect(res.status).to.have.been.calledWith(200);
@@ -90,5 +86,4 @@ describe('test misc functions', () => {
     expect(response.details[1]).to.have.property('metricValue');
     expect(response.details[1].metricValue).to.equal(true);
   });
-
 });

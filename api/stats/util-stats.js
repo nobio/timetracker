@@ -13,7 +13,6 @@ const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
  * Orchestrate the calculation of statistics
  */
 exports.calcStats = async () => {
-
   try {
     g_util.sendMessage('RECALCULATE', 'delete doublets');
     await utilEntry.removeDoublets();
@@ -26,7 +25,6 @@ exports.calcStats = async () => {
     g_util.sendMessage('RECALCULATE', '...calculation done');
 
     return result;
-
   } catch (error) {
     console.log(error);
     throw error;
@@ -48,7 +46,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
       // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
       const dt = moment(date);
       const busytime = await this.getBusytimeByDate(dt);
-      //console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+      // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
       if (busytime && busytime.busytime && busytime.busytime != 0) {
         new StatsDay({
           date: dt,
@@ -64,12 +62,10 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
       date = date.add(1, 'day');
     }
 
-    return { firstEntry, lastEntry, }
-
+    return { firstEntry, lastEntry };
   } catch (error) {
     throw error;
   }
-
 };
 
 /**
@@ -89,7 +85,7 @@ exports.getBusytimeByDate = async (dt) => {
   } catch (error) {
 
   }
-}
+};
 
 /**
  * clears the MongoDB collection for statistics
@@ -217,8 +213,8 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
           (sumActual += Math.round(
             (stat.actual_working_time / 60 / 60 / 1000) * 100,
           ) / 100), // rounding 2 digits after comma
-            (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
-            obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
+          (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
+          obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
           obj.y = sumActual;
           obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
           obj.y = sumNominal;

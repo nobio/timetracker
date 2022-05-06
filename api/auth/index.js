@@ -29,7 +29,7 @@ exports.getAllUsers = async (req, res) => {
  * @param {*} res Response object
  */
 exports.getUser = async (req, res) => {
-  console.log(req.params.url)
+  console.log(req.params.url);
   try {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);

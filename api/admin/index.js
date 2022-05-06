@@ -24,16 +24,16 @@ exports.restoreFromFile = (req, res) => {
     .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
 },
 
-  /**
+/**
    * function to backup data in an extra backup table
    *
    * curl -X POST http://localhost:30000/api/entries/backup
    */
-  exports.backupTimeEntries = (req, res) => {
-    util.backupTimeEntries()
-      .then((response) => res.status(200).send(response))
-      .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
-  };
+exports.backupTimeEntries = (req, res) => {
+  util.backupTimeEntries()
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
+};
 
 /**
  * read the list of all toggles

@@ -4,21 +4,19 @@ const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const StatsDay = mongoose.model('StatsDay');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const moment = require('moment');
+const { assert } = require('chai');
 const util = require('../api/stats/util-stats');
 const utilTimeEntry = require('../api/entries/util-entries');
 const utilTimebox = require('../api/stats/util-statstimebox');
 const utilHistogram = require('../api/stats/util-histogram');
 
-const chai = require('chai');
-
-const chaiAsPromised = require('chai-as-promised');
-
 chai.use(chaiAsPromised);
 
-const expect = chai.expect;
+const { expect } = chai;
 
-const moment = require('moment');
-const { assert } = require('chai');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
@@ -69,7 +67,7 @@ describe('test util.getStats and getStatsByRange', () => {
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd);
-    //console.log(result)
+    // console.log(result)
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -240,21 +238,21 @@ describe('test utilHistogram.getHistogramByTimeUnit', () => {
     }
   });
   it('utilHistogram with interval 60 with go', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'go') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'go'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('histValue');
   });
   it('utilHistogram with interval 60 with enter', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'enter') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'enter'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('histValue');
   });
   it('utilHistogram with interval 60 with invalid direction', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'XXXX') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'XXXX'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
@@ -292,13 +290,12 @@ describe('test utilTimebox.getStatsByTimeBox', () => {
     } catch (error) {
       expect(error.message).to.be.equal("time unit 'XXXX' is invalid");
     }
-
   });
 });
-describe("test util.calculateStatistics", () => {
-  var db;
-  before(function () {
-    db = require("../db");
+describe('test util.calculateStatistics', () => {
+  let db;
+  before(() => {
+    db = require('../db');
   });
 
   it('calcStats', async () => {
@@ -316,8 +313,8 @@ describe("test util.calculateStatistics", () => {
     expect(result.lastEntry).to.have.property('age');
   });
 
-  after(function () {
-    //db.closeConnection()
+  after(() => {
+    // db.closeConnection()
   });
 });
 
@@ -359,8 +356,8 @@ function createTimeEntry(timeEntry) {
       signature: 'HARD_CODED',
     })
       .save()
-      .then(timeEntry => resolve(timeEntry))
-      .catch(err => reject(err));
+      .then((timeEntry) => resolve(timeEntry))
+      .catch((err) => reject(err));
   });
 }
 

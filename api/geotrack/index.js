@@ -13,14 +13,13 @@ const util = require('./util-geotrack');
  * curl -X POST -H "Content-Type: application/json" -d '{"_type":"encrypted","data":"O5O4V7PF0o90tfmGg04TnGDJ73sA9iIxHpEvQ3J3qwHs3Vqh77lH1/Kh5PxMnZLDZzLn7AWtz+87GZ5+q04PzmqVJcoCud1qg5tEVAQOrlxRS8XZKhc3tLUJm6B2t5Cjb3Ro51+y1MX2lLe+1KMhhpWjZkSvQNf4trFfoOpN5w38rlrBB4VCFJeLFKJzICEFkE0kTwYyJpeHUKJ/wmed20fPT3RXWd6ozYhxa7NrUl+aa15gB7f0BemdhoVJ6EZJHeo9zsRevqEfF0wOiQnul4PujceCL41JFE2iuAtDRyN0yns="}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = async (req, res) => {
-
   const geoTrack = util.parseGeoTrackingObject(req.body);
 
   if (geoTrack === null) {
     console.error('data encrypted');
     res.status(202).send('data encrypted');
     return;
-  } else if (!geoTrack) {
+  } if (!geoTrack) {
     console.error('missing data (longitude, latitude, accuracy, source)');
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;

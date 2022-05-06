@@ -1,6 +1,6 @@
 require('../../db');
 const fs = require('fs');
-const path = require("path");
+const path = require('path');
 const zlib = require('zlib');
 
 const moment = require('moment');
@@ -37,7 +37,7 @@ exports.dumpModels = async () => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 const dumpModel = async (model) => {
   try {
@@ -62,7 +62,6 @@ const dumpModel = async (model) => {
         }
       });
     });
-
   } catch (error) {
     throw error;
   }
@@ -80,7 +79,7 @@ exports.restoreDataFromFile = async function () {
   res.push(restoreFile('TimeEntry'));
   res.push(restoreFile('GeoTracking'));
   return res;
-}
+};
 
 /**
  * restore data of a specific data type
@@ -99,11 +98,9 @@ const restoreFile = async (dbType) => {
       console.error(error.message);
     }
   }
-
-}
+};
 
 const recentFile = (dir, type) => {
-
   const files = fs.readdirSync(dir)
     .filter((file) => fs.lstatSync(path.join(dir, file)).isFile())
     .filter((file) => file.startsWith(type))

@@ -3,8 +3,8 @@ const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-const DEFAULT_BREAK_TIME_SECONDS = 60 * 60;  // 30 min Pause
-const AOK_BREAK_TIME_SECONDS = 30 * 60;  // 60 min Pause
+const DEFAULT_BREAK_TIME_SECONDS = 60 * 60; // 30 min Pause
+const AOK_BREAK_TIME_SECONDS = 30 * 60; // 60 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 /**
@@ -14,20 +14,16 @@ const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 exports.getBreakTimeSeconds = (date) => {
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
-  const dateMoment = moment(date, 'X');  // format 'X' is 'Unix timestamp'
+  const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
 
   // if date is AOK
   if (dateMoment.isAfter('2021-08-31')) {
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
-  } else {
-    return DEFAULT_BREAK_TIME_SECONDS
   }
-
-}
-exports.getBreakTimeMilliSeconds = (date) => {
-  return this.getBreakTimeSeconds(date) * 1000;
-}
+  return DEFAULT_BREAK_TIME_SECONDS;
+};
+exports.getBreakTimeMilliSeconds = (date) => this.getBreakTimeSeconds(date) * 1000;
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
   // console.log(busytime, pause, date, entriesPerDay)
   let bookedTime;
@@ -67,9 +63,8 @@ exports.sendMessage = async (notificationKey, addedContent) => {
       addedContent = (addedContent) || ''; // if addedContent is undefined set it with blank string
       const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedContent}`;
       return this.sendTextMessage(msg);
-    } else {
-      return (`toggle ${notificationKey} switched off`);
     }
+    return (`toggle ${notificationKey} switched off`);
   } catch (error) {
     return error.message;
   }
