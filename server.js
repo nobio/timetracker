@@ -51,7 +51,7 @@ app.use(cors());
 app.use(api_auth.authorize);
 
 /* ============================================================================= */
-const spec = fs.readFileSync(path.join(__dirname, 'spec/swagger.yaml'), 'utf8');
+const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
 const swaggerDoc = jsyaml.safeLoad(spec);
 
 /*
