@@ -1081,9 +1081,7 @@ paths:
                   properties:
                     time:
                       type: string
-                      maxLength: 24
-                      pattern: >-
-                        ^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$
+                      format: date-time
                       example: "1970-01-01T08:20:00.000Z"
                     histValue:
                       type: number
@@ -1640,7 +1638,7 @@ components:
           type: string
           description: date/time of last build
           example: "2000-01-01T10:15:02.151Z"
-          format: date
+          format: date-time
     HealthcheckResp:
       type: object
       additionalProperties: false
@@ -1664,7 +1662,7 @@ components:
           type: string
           description: date/time of this health check
           example: "2000-01-01T10:15:02.151Z"
-          format: date
+          format: date-time
         details:
           type: array
           maxItems: 100
