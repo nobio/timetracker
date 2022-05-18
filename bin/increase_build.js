@@ -8,6 +8,7 @@
  */
 
 const fs = require('fs');
+const { exec } = require('child_process');
 const package_json = require('../package.json');
 
 const arg = process.argv.slice(2);
@@ -49,4 +50,12 @@ if (modified) { // only write file if version has changed
     'UTF8',
   );
   fs.writeFileSync('./VERSION', `${major_version}.${minor_version}.${build_version}`);
+
+  // tag the branch
+  exec(`git tag ${major_version}.${minor_version}.${build_version}`, (err) => {
+    if (err) {
+      console.error(`exec error: ${err}`);
+      return;
+    }
+  });
 }
