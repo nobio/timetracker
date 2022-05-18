@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:18-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -18,7 +18,7 @@ CMD [ "npm", "start" ]
 # docker images
 
 # --- build image:
-# docker build -t nobio/timetracker .   
+# docker build -t nobio/timetracker .
 
 # --- delete image:
 # docker rmi <node - name or hash>
@@ -45,7 +45,7 @@ CMD [ "npm", "start" ]
 # --- list running container
 # docker container list
 # docker ps
-# docker ps -a 
+# docker ps -a
 
 # --- log running container
 # docker container logs <container-id>
