@@ -93,7 +93,7 @@ exports.healtchckech = async (req, res) => {
 /*
  * test and experiment endpoint
  *
- * curl -X GET http://localhost:30000/experiment
+ * curl -X GET http://localhost:30000/api/experiment
  */
 exports.experiment = async (req, res) => {
   const admin = require('../admin/util-admin');
@@ -102,4 +102,26 @@ exports.experiment = async (req, res) => {
   result = await admin.dumpModels();
   console.log(result);
   res.status(200).json(result);
+};
+
+/**
+ * logs several parameters of request like body, header, etc.
+ *
+ * curl -X GET http://localhost:30000/api/log
+ * curl -X POST http://localhost:30000/api/log
+ * curl -X PUT http://localhost:30000/api/log
+ */
+exports.log = async (req, res) => {
+  const resp = {};
+
+  resp.url = req.url;
+  resp.method = req.method;
+  //  resp.headers = JSON.stringify(req.headers);
+  //  resp.body = JSON.stringify(req.body);
+  if (Object.keys(req.headers).length) resp.headers = req.headers;
+  if (Object.keys(req.body).length) resp.body = req.body;
+
+  console.log(JSON.stringify(resp));
+
+  res.status(200).json(resp);
 };

@@ -132,6 +132,10 @@ app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
 app.get('/api/health', api_misc.healtchckech);
+// log the request on different methods
+app.get('/api/log', api_misc.log);
+app.post('/api/log', api_misc.log);
+app.put('/api/log', api_misc.log);
 
 // .......................................................................
 // users and authentication
