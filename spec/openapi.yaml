@@ -1163,6 +1163,19 @@ paths:
             Healthcheck could not be performed successfully because this or a
             dependend service was not available.
           content: {}
+  /log:
+    get:
+      tags:
+        - Misc
+      summary: Log request object
+      description: Logs several values of request to console of server
+      responses:
+        "200":
+          description: version information regarding this application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogResp"
 components:
   schemas:
     TimeEntry:
@@ -1696,6 +1709,37 @@ components:
                   type to hold all other data types; currently it consists of
                   time and byte and percentage
                 type: string
+    LogResp:
+      type: object
+      additionalProperties: false
+      properties:
+        url:
+          type: string
+          maxLength: 60
+          description: url of this method
+          example: /api/url
+        method:
+          type: string
+          description: the method of this request
+          example: "2000-01-01T10:15:02.151Z"
+          format: date-time
+        headers:
+          type: object
+          description: JSON object of headers for this request
+          example:
+            {
+              "host": "localhost:30000",
+              "user-agent": "curl/7.71.1",
+              "accept": "*/*",
+              "content-length": "41",
+              "content-type": "application/x-www-form-urlencoded",
+            }
+          format: json
+        body:
+          type: object
+          description: JSON object of body for this request; optional - only when passed
+          example: { "key": "value" }
+          format: json
   securitySchemes:
     bearerAuth:
       type: http
