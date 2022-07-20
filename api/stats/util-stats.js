@@ -189,7 +189,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
           };
           i++;
         }
-        console.table(innerComp)
+        //console.table(innerComp)
       }
 
       // calculating actual working time
