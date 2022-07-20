@@ -189,6 +189,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
           };
           i++;
         }
+        console.table(innerComp)
       }
 
       // calculating actual working time
@@ -202,7 +203,6 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
 
       let sumActual = 0;
       let sumNominal = 0;
-      let idx = 0;
       stats.forEach((stat) => {
         const statDateYMD = moment(stat.date).format('YYYY-MM-DD');
         // console.log(" >>>>   " + moment(stat.date).format('YYYY-MM-DD') + " " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
@@ -224,7 +224,6 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
           obj = getXYObjectByXValue(innerComp, statDateYMD);
           obj.y = Math.round(average_working_time * 100) / 100; // rounding 2 digits after comma;
         }
-        idx++;
       });
 
       // console.log(JSON.stringify(innerData));
@@ -244,10 +243,10 @@ function getXYObjectByXValue(arr, xVal) {
   for (let n = 0; n < arr.length - 1; n++) {
     if (arr[n].x === xVal) {
       return arr[n];
-      break;
     }
   }
-  // in case there has not been any array value (return see above did not work); add a new object and return it's reference
+  // in case there has not been any array value
+  // (return see above did not work); add a new object and return it's reference
   arr.push({ x: xVal, y: null });
   return (arr[arr.length - 1]);
 }
