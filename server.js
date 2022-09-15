@@ -28,6 +28,7 @@ const api_misc = require('./api/misc');
 const api_stats = require('./api/stats');
 const api_admin = require('./api/admin');
 const api_entries = require('./api/entries');
+const api_schedule = require('./api/schedule');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -96,6 +97,7 @@ app.get('/api/geotrack/metadata', api_geotrack.getGeoTrackingMetadata);
 app.post('/api/entries/dump', api_admin.dumpModels);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
 app.post('/api/entries/restore', api_admin.restoreFromFile);
+
 // .......................................................................
 // toggles
 // .......................................................................
@@ -151,6 +153,13 @@ app.post('/api/auth/login', api_auth.login);
 app.post('/api/auth/logout', api_auth.logout);
 app.post('/api/auth/token', api_auth.refreshToken);
 
+// .......................................................................
+// export functionalities that are supposed to run regulary. If
+// timetracker does not do scheduling (see process.env.START_CRONJOBS)
+// the jobs should be triggered from outside (for example by a CronJob pod)
+// .......................................................................
+app.put('/api/schedule', api_schedule.schedule);
+
 if (process.env.SLACK_URL) {
   console.log('using Slack to notify');
 } else {
@@ -189,7 +198,7 @@ webSocketFacade.init(httpsServer);
 /* start scheduler */
 console.log(process.env.START_CRONJOBS);
 if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up". I need to explicitly switch startup off
-  require('./api/scheduler').scheduleTasks();
+  require('./api/schedule/scheduler').scheduleTasks();
 }
 
 /* send message that server has been started */

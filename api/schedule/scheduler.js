@@ -1,8 +1,8 @@
 const scheduler = require('node-schedule');
-const admin = require('./admin/util-admin');
-const stats = require('./stats/util-stats');
-const entries = require('./entries/util-entries');
-const auth = require('./auth/util-auth');
+const admin = require('../admin/util-admin');
+const stats = require('../stats/util-stats');
+const entries = require('../entries/util-entries');
+const auth = require('../auth/util-auth');
 
 /**
  * start scheduler to run tasks
@@ -62,4 +62,10 @@ exports.scheduleTasks = function () {
     # *  *  *  *  * user-name  command to be executed
     schedule.scheduleJob('0 17 ? * 0,4-6', function(){
     */
+};
+
+exports.getEntryById = (req, res) => {
+  util.findById(req.params.id)
+    .then((timeentry) => res.status(200).send(timeentry))
+    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
 };

@@ -1,0 +1,15 @@
+PUT http://localhost:30000/api/schedule?jobclass=calcStats
+###
+PUT http://localhost:30000/api/schedule?jobclass=dumpModels
+###
+PUT http://localhost:30000/api/schedule?jobclass=backupTimeEntries
+###
+PUT http://localhost:30000/api/schedule?jobclass=evaluate
+###
+PUT http://localhost:30000/api/schedule?jobclass=removeTesterToken
+###
+PUT http://localhost:30000/api/schedule?jobclass=removeExpiredToken
+###
+PUT http://localhost:30000/api/schedule?jobclass=xxx
+###
+PUT http://localhost:30000/api/schedule
