@@ -321,18 +321,18 @@ describe('test creating of GeoTrack', () => {
  * =============================================================
  */
 describe('test get GeoTracks', () => {
-  it('load geo tracks', async () => {
+  it('load geo tracks (1)', async () => {
     const track = await util.getGeoTrackingDataByTime(moment('2021-09-01'), moment('2021-09-02'));
     const dist = util.distance(track);
     const acc = util.meanAccuracy(track);
 
-    expect(track.length).to.equal(110);
-    expect(dist).to.equal(43425);
+    expect(track.length).to.equal(111);
+    expect(dist).to.equal(43460);
     expect(acc.mean).to.be.approximately(343, 2);
-    expect(acc.stdt).to.be.approximately(607, 1);
+    expect(acc.stdt).to.be.approximately(605, 1);
   });
 
-  it('load geo tracks', async () => {
+  it('load geo tracks (2)', async () => {
     const res = mockResponse();
     const req = mockRequest({ headers: [], body: {} });
     req.query = { dateStart: '2021-09-01', dateEnd: '2021-09-02' };
