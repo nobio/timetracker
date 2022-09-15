@@ -41,7 +41,7 @@ mongoose.connect(mongodbUrl, MONGODB_OPTIONS).then(
     console.log('mongodb is ready to use.');
   },
   (err) => {
-    console.error(`error while connecting mongodb:${err}`);
+    console.error(`error while connecting mongodb: ${err}`);
   },
 );
 

@@ -196,7 +196,6 @@ const webSocketFacade = require('./api/ws');
 webSocketFacade.init(httpsServer);
 
 /* start scheduler */
-console.log(process.env.START_CRONJOBS);
 if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up". I need to explicitly switch startup off
   require('./api/schedule/scheduler').scheduleTasks();
 }
