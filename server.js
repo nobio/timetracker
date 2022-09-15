@@ -187,7 +187,10 @@ const webSocketFacade = require('./api/ws');
 webSocketFacade.init(httpsServer);
 
 /* start scheduler */
-require('./api/scheduler').scheduleTasks();
+console.log(process.env.START_CRONJOBS);
+if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up". I need to explicitly switch startup off
+  require('./api/scheduler').scheduleTasks();
+}
 
 /* send message that server has been started */
 require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
