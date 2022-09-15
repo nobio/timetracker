@@ -1,15 +1,16 @@
-PUT http://localhost:30000/api/schedule?jobclass=calcStats
+PUT http://localhost:30000/api/schedule?jobclass=CALC_STATS
 ###
-PUT http://localhost:30000/api/schedule?jobclass=dumpModels
+PUT http://localhost:30000/api/schedule?jobclass=DUMP_MODELS
 ###
-PUT http://localhost:30000/api/schedule?jobclass=backupTimeEntries
+PUT http://localhost:30000/api/schedule?jobclass=BACKUP_TIME_ENTRIES
 ###
-PUT http://localhost:30000/api/schedule?jobclass=evaluate
+PUT http://localhost:30000/api/schedule?jobclass=EVALUATE
 ###
-PUT http://localhost:30000/api/schedule?jobclass=removeTesterToken
+PUT http://localhost:30000/api/schedule?jobclass=REMOVE_TESTER_TOKEN
 ###
-PUT http://localhost:30000/api/schedule?jobclass=removeExpiredToken
+PUT http://localhost:30000/api/schedule?jobclass=REMOVE_EXIRED_TOKEN
 ###
 PUT http://localhost:30000/api/schedule?jobclass=xxx
 ###
 PUT http://localhost:30000/api/schedule
+###

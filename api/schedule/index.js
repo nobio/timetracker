@@ -14,28 +14,28 @@ exports.schedule = (req, res) => {
   console.log(`job class found: [${jobClass}]`);
 
   switch (jobClass) {
-    case 'calcStats':
-      stats.calcStats().then(res.status(200).send('calcStats ok')).catch((err) => console.error(err));
+    case 'CALC_STATS':
+      stats.calcStats().then(res.status(200).send('calc statistics ok')).catch((err) => console.error(err));
       break;
 
-    case 'dumpModels':
-      admin.dumpModels().then(res.status(200).send('dumpModels ok')).catch((err) => console.error(err));
+    case 'DUMP_MODELS':
+      admin.dumpModels().then(res.status(200).send('dump models to database ok')).catch((err) => console.error(err));
       break;
 
-    case 'backupTimeEntries':
-      admin.backupTimeEntries().then(res.status(200).send('backupTimeEntries ok')).catch((err) => console.error(err));
+    case 'BACKUP_TIME_ENTRIES':
+      admin.backupTimeEntries().then(res.status(200).send('backup time entries to file system ok')).catch((err) => console.error(err));
       break;
 
-    case 'evaluate':
-      entries.evaluate().then(res.status(200).send('evaluate ok')).catch((err) => console.error(err));
+    case 'EVALUATE':
+      entries.evaluate().then(res.status(200).send('evaluate data ok')).catch((err) => console.error(err));
       break;
 
-    case 'removeTesterToken':
-      auth.removeTesterToken().then(res.status(200).send('removeTesterToken ok')).catch((err) => console.error(err));
+    case 'REMOVE_TESTER_TOKEN':
+      auth.removeTesterToken().then(res.status(200).send('remove tester tokens ok')).catch((err) => console.error(err));
       break;
 
-    case 'removeExpiredToken':
-      auth.removeExpiredToken().then(res.status(200).send('removeExpiredToken ok')).catch((err) => console.error(err));
+    case 'REMOVE_EXIRED_TOKEN':
+      auth.removeExpiredToken().then(res.status(200).send('remove expired tokens ok')).catch((err) => console.error(err));
       break;
 
     default:

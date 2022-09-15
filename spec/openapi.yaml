@@ -1145,6 +1145,32 @@ paths:
                 $ref: "#/components/schemas/VersionResp"
         "403":
           $ref: "#/components/responses/UnauthorizedError"
+  /schedule:
+    put:
+      tags:
+        - Misc
+      summary: API to schedule jobs
+      description: Exposes an API to jobs trigger by an external scheduler (like kubernetes CronJob)
+      parameters:
+        - name: jobclass
+          in: query
+          description: job class defines the job to be triggered
+          required: true
+          schema:
+            type: string
+            example: enter
+            enum:
+              - CALC_STATS
+              - DUMP_MODELS
+              - BACKUP_TIME_ENTRIES
+              - EVALUATE
+              - REMOVE_TESTER_TOKEN
+              - REMOVE_EXIRED_TOKEN
+      responses:
+        "200":
+          description: job successfully triggered; please mind that it runs in the background and there is no error code in case it fails
+        "400":
+          description: job class invalid or not provided
   /health:
     get:
       tags:
