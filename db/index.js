@@ -35,7 +35,7 @@ if (process.env.MONGODB_URL) {
 } else if(process.env.MONGODB_PROTOCOL && process.env.MONGODB_USER && process.env.MONGODB_PASSWORD && process.env.MONGODB_URI) {
   mongodbUrl = `${process.env.MONGODB_PROTOCOL}://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_URI}`;
 } else {
-  console.log(`error configuring database: please provide env variables MONGODB_USER (${process.env.MONGODB_USER}) and MONGODB_PASSWORD (${process.env.MONGODB_PASSWORD}) and MONGODB_URI (${process.env.MONGODB_URI})`);
+  console.log(`error configuring database: please provide env variables MONGODB_PROTOCOL (${process.env.MONGODB_PROTOCOL}) MONGODB_USER (${process.env.MONGODB_USER}) and MONGODB_PASSWORD (${process.env.MONGODB_PASSWORD}) and MONGODB_URI (${process.env.MONGODB_URI})`);
   process.exit(1);
 }
 console.log(`connecting to mongodb (${mongodbUrl})`);
