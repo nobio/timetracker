@@ -1,0 +1,333 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: timetracker
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: timetracker
+data:
+  authorization: "off"
+  access_token_expire: "15m"
+  refresh_token_expire: "7d"
+  start_cronjobs: "false"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-secret
+  namespace: timetracker
+type: Opaque
+data:
+  # slack_url: https://hooks.slack.com/services/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
+  slack_url: aHR0cHM6Ly9ob29rcy5zbGFjay5jb20vc2VydmljZXMvVEJWVFdDOTM4L0IwMzRXOFhFNkhaL3lkNnpXUG1DckpwNUtPdGxDY21SVEV4ago=
+  # access_token_secret: b2d6e0e3866d020a29cb89f887ea81e8cdd1bc59325f70028b40f5d52db93d5c7ba0b86356483f7683030dde1330286b3b0f3c3cde9ccb108ac28f55a1c89ef3e63621d9bf7a37d62dced28987de7e90a6a18b6824b4d70dd4adee378d33d379d74135dbc89678b81bb188d1117e47fe08402bf81a9235458e11ce12d9b254da1dde10ae3f55a392d853866c801a62020f5859bc48fe799c5efe6471260c5d2899a34b470a59382037578e01500ff1a45443b23055803001d5bd6d93e0c5dfc8cabefb55c7fa1442592b61a63597f6544f540da46a48b9ec7bc0f706765e7b438268f5330b81f6c0904cdec5c6bde4b9fc99934b085692ca26a87ec616e3dc84
+  access_token_secret: YjJkNmUwZTM4NjZkMDIwYTI5Y2I4OWY4ODdlYTgxZThjZGQxYmM1OTMyNWY3MDAyOGI0MGY1ZDUyZGI5M2Q1YzdiYTBiODYzNTY0ODNmNzY4MzAzMGRkZTEzMzAyODZiM2IwZjNjM2NkZTljY2IxMDhhYzI4ZjU1YTFjODllZjNlNjM2MjFkOWJmN2EzN2Q2MmRjZWQyODk4N2RlN2U5MGE2YTE4YjY4MjRiNGQ3MGRkNGFkZWUzNzhkMzNkMzc5ZDc0MTM1ZGJjODk2NzhiODFiYjE4OGQxMTE3ZTQ3ZmUwODQwMmJmODFhOTIzNTQ1OGUxMWNlMTJkOWIyNTRkYTFkZGUxMGFlM2Y1NWEzOTJkODUzODY2YzgwMWE2MjAyMGY1ODU5YmM0OGZlNzk5YzVlZmU2NDcxMjYwYzVkMjg5OWEzNGI0NzBhNTkzODIwMzc1NzhlMDE1MDBmZjFhNDU0NDNiMjMwNTU4MDMwMDFkNWJkNmQ5M2UwYzVkZmM4Y2FiZWZiNTVjN2ZhMTQ0MjU5MmI2MWE2MzU5N2Y2NTQ0ZjU0MGRhNDZhNDhiOWVjN2JjMGY3MDY3NjVlN2I0MzgyNjhmNTMzMGI4MWY2YzA5MDRjZGVjNWM2YmRlNGI5ZmM5OTkzNGIwODU2OTJjYTI2YTg3ZWM2MTZlM2RjODQK
+  #refresh_token_secret: 552b94e6b1498534970a55e9b604bf29e831957c37becd449aa3c9eb03a63798f785a5085a052349b24e38c377d839fa3e83ef7e8c93572b902e06424b501b59eb1b1bc601c9fef99959d8a6af5ca3c4375d0c78b68d0b9558506c71473c8f005a79ab3847f0509793fd46c8268995280c0eed8e795953009e2dbf63914c676aafc154659893524739f5db2661009feb8454c77b38d4b723574a401fc4486e2ceb88c111be3c4f7ba951b3c705bbd74b014f0b5553721bae3941d990f7414f373b8359a3a490c9b7f7fb4da76f48cc3d7f566595b88bfa052bd3f0bbec36d4267b805d1e8d11f590ba52345354b729a6d8376018ae559d719331db5a7c98a21a
+  refresh_token_secret: NTUyYjk0ZTZiMTQ5ODUzNDk3MGE1NWU5YjYwNGJmMjllODMxOTU3YzM3YmVjZDQ0OWFhM2M5ZWIwM2E2Mzc5OGY3ODVhNTA4NWEwNTIzNDliMjRlMzhjMzc3ZDgzOWZhM2U4M2VmN2U4YzkzNTcyYjkwMmUwNjQyNGI1MDFiNTllYjFiMWJjNjAxYzlmZWY5OTk1OWQ4YTZhZjVjYTNjNDM3NWQwYzc4YjY4ZDBiOTU1ODUwNmM3MTQ3M2M4ZjAwNWE3OWFiMzg0N2YwNTA5NzkzZmQ0NmM4MjY4OTk1MjgwYzBlZWQ4ZTc5NTk1MzAwOWUyZGJmNjM5MTRjNjc2YWFmYzE1NDY1OTg5MzUyNDczOWY1ZGIyNjYxMDA5ZmViODQ1NGM3N2IzOGQ0YjcyMzU3NGE0MDFmYzQ0ODZlMmNlYjg4YzExMWJlM2M0ZjdiYTk1MWIzYzcwNWJiZDc0YjAxNGYwYjU1NTM3MjFiYWUzOTQxZDk5MGY3NDE0ZjM3M2I4MzU5YTNhNDkwYzliN2Y3ZmI0ZGE3NmY0OGNjM2Q3ZjU2NjU5NWI4OGJmYTA1MmJkM2YwYmJlYzM2ZDQyNjdiODA1ZDFlOGQxMWY1OTBiYTUyMzQ1MzU0YjcyOWE2ZDgzNzYwMThhZTU1OWQ3MTkzMzFkYjVhN2M5OGEyMWEK
+---
+---
+# -----------------------------------------------------------
+# Deployment/Pod
+# -----------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: timetracker
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+      annotations:
+        author: Gernot H. Reichel
+    spec:
+      #      initContainers:
+      #        - name: init-busybox
+      #          image: busybox
+      #          command: ["echo", "let's run timetracker api"]
+      #          # command: ["ping", "-c1", "-t2", "mongodb-service"]
+      containers:
+        - name: api
+          image: nobio/timetracker:k8s
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 30000
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          env:
+            - name: AUTHORIZATION
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: authorization
+            - name: ACCESS_TOKEN_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: access_token_expire
+            - name: REFRESH_TOKEN_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: refresh_token_expire
+            - name: START_CRONJOBS
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: start_cronjobs
+            - name: SLACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: slack_url
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: access_token_secret
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: refresh_token_secret
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-user
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-password
+            - name: MONGODB_URI
+              value: mongodb-service
+            - name: MONGODB_PROTOCOL
+              value: mongodb
+          volumeMounts:
+            - name: api-storage
+              mountPath: "/data/api"
+      volumes:
+        - name: api-storage
+          persistentVolumeClaim:
+            claimName: api-data-claim
+
+---
+# -----------------------------------------------------------
+# Service
+# -----------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: timetracker
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 30000
+      targetPort: http
+      nodePort: 30000
+---
+# -----------------------------------------------------------
+# Volume
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: api-data
+  namespace: timetracker
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /data/api
+---
+# -----------------------------------------------------------
+# Volume Claim
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: api-data-claim
+  namespace: timetracker
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  volumeName: api-data
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongodb-config
+  namespace: timetracker
+data:
+  mongodb-url: mongodb-service.timtetracker.svc.cluster.local
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secret
+  namespace: timetracker
+type: Opaque
+data:
+  mongodb-user: bW9uZ291c2Vy
+  mongodb-password: bW9uZ29wYXNzd29yZA==
+---
+---
+# -----------------------------------------------------------
+# Deployment/Pod
+# -----------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-deployment
+  namespace: timetracker
+  labels:
+    app: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4.4
+          args: ["--dbpath", "/data/db"]
+          ports:
+            - containerPort: 27017
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          livenessProbe:
+            exec:
+              command:
+                - mongo
+                - --disableImplicitSessions
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - mongo
+                - --disableImplicitSessions
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-user
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-password
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: "/data/db"
+      volumes:
+        - name: mongodb-storage
+          persistentVolumeClaim:
+            claimName: mongodb-data-claim
+---
+# -----------------------------------------------------------
+# Service
+# -----------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: timetracker
+spec:
+  type: NodePort # NodePort to access externally (dbmigration); otherwise use ClusterPort and remove 'nodePort'
+  selector:
+    app: mongodb
+    #app.kubernetes.io/name: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      nodePort: 30001
+---
+# -----------------------------------------------------------
+# Volume
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb-data
+  namespace: timetracker
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /data/mongodb
+---
+# -----------------------------------------------------------
+# Volume Claim
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-data-claim
+  namespace: timetracker
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  volumeName: mongodb-data
+  resources:
+    requests:
+      storage: 1Gi
+---

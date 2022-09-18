@@ -84,7 +84,7 @@ metadata:
   name: mongodb-service
   namespace: timetracker
 spec:
-  type: NodePort
+  type: NodePort # NodePort to access externally (dbmigration); otherwise use ClusterPort and remove 'nodePort'
   selector:
     app: mongodb
     #app.kubernetes.io/name: mongodb
