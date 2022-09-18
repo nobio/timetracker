@@ -26,13 +26,17 @@ if (!String.prototype.contains) {
 // The top element always is a 'noodle' which represents an appointment
 
 console.log('init database');
-
+let mongodbUrl;
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-let mongodbUrl = process.env.MONGODB_URL; // try to use environment variable, perhaps given by container
-if (!mongodbUrl) {
-  console.error('overwriting mongodb_url');
-  mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}?authSource=admin`;
+
+if (process.env.MONGODB_URL) {
+  mongodbUrl = process.env.MONGODB_URL;
+} else if(process.env.MONGODB_PROTOCOL && process.env.MONGODB_USER && process.env.MONGODB_PASSWORD && process.env.MONGODB_URI) {
+  mongodbUrl = `${process.env.MONGODB_PROTOCOL}://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_URI}`;
+} else {
+  console.log(`error configuring database: please provide env variables MONGODB_PROTOCOL (${process.env.MONGODB_PROTOCOL}) MONGODB_USER (${process.env.MONGODB_USER}) and MONGODB_PASSWORD (${process.env.MONGODB_PASSWORD}) and MONGODB_URI (${process.env.MONGODB_URI})`);
+  process.exit(1);
 }
 console.log(`connecting to mongodb (${mongodbUrl})`);
 
@@ -41,7 +45,8 @@ mongoose.connect(mongodbUrl, MONGODB_OPTIONS).then(
     console.log('mongodb is ready to use.');
   },
   (err) => {
-    console.error(`error while connecting mongodb:${err}`);
+    console.error(`error while connecting mongodb: ${err}`);
+    process.exit(1);
   },
 );
 

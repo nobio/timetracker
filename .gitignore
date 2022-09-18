@@ -27,3 +27,4 @@ coverage
 docker-compose.yaml
 *.xcodeproj
 timetracker.code-workspace
+**/k8s/app.yaml
