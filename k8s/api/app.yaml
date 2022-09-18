@@ -1,0 +1,153 @@
+---
+# -----------------------------------------------------------
+# Deployment/Pod
+# -----------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: timetracker
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+      annotations:
+        author: Gernot H. Reichel
+    spec:
+      #      initContainers:
+      #        - name: init-busybox
+      #          image: busybox
+      #          command: ["echo", "let's run timetracker api"]
+      #          # command: ["ping", "-c1", "-t2", "mongodb-service"]
+      containers:
+        - name: api
+          image: nobio/timetracker:k8s
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 30000
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          env:
+            - name: AUTHORIZATION
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: authorization
+            - name: ACCESS_TOKEN_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: access_token_expire
+            - name: REFRESH_TOKEN_EXPIRE
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: refresh_token_expire
+            - name: START_CRONJOBS
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: start_cronjobs
+            - name: SLACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: slack_url
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: access_token_secret
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: refresh_token_secret
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-user
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongodb-password
+            - name: MONGODB_URI
+              value: mongodb-service
+            - name: MONGODB_PROTOCOL
+              value: mongodb
+          volumeMounts:
+            - name: api-storage
+              mountPath: "/data/api"
+      volumes:
+        - name: api-storage
+          persistentVolumeClaim:
+            claimName: api-data-claim
+
+---
+# -----------------------------------------------------------
+# Service
+# -----------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: timetracker
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 30000
+      targetPort: http
+      nodePort: 30000
+---
+# -----------------------------------------------------------
+# Volume
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: api-data
+  namespace: timetracker
+  labels:
+    type: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /data/api
+---
+# -----------------------------------------------------------
+# Volume Claim
+# -----------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: api-data-claim
+  namespace: timetracker
+spec:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  volumeName: api-data
+  resources:
+    requests:
+      storage: 1Gi
