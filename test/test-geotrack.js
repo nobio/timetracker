@@ -326,10 +326,10 @@ describe('test get GeoTracks', () => {
     const dist = util.distance(track);
     const acc = util.meanAccuracy(track);
 
-    expect(track.length).to.equal(111);
-    expect(dist).to.equal(43460);
+    expect(track.length).to.equal(110);
+    expect(dist).to.equal(43425);
     expect(acc.mean).to.be.approximately(343, 2);
-    expect(acc.stdt).to.be.approximately(605, 1);
+    expect(acc.stdt).to.be.approximately(607, 1);
   });
 
   it('load geo tracks (2)', async () => {
