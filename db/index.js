@@ -34,6 +34,9 @@ if (!mongodbUrl) {
   console.error('overwriting mongodb_url');
   mongodbUrl = `mongodb+srv://${db_config.atlas.user}:${db_config.atlas.password}@${db_config.atlas.uri}?authSource=admin`;
 }
+if(process.env.MONGODB_USER && process.env.MONGODB_PASSWORD) {
+  mongodbUrl = `${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${mongodbUrl}`;
+}
 console.log(`connecting to mongodb (${mongodbUrl})`);
 
 mongoose.connect(mongodbUrl, MONGODB_OPTIONS).then(
