@@ -6,7 +6,7 @@ const auth = require('../auth/util-auth');
 /** ******************************************************************************
  * Get one Time Entry by it's id
  *
- * curl -X PUT http://localhost:30000/api/schedule?jobclass=calcStats
+ * curl -X PUT http://localhost:30000/api/schedule?jobclass=CALC_STATS
  ****************************************************************************** */
 exports.schedule = (req, res) => {
   const jobClass = req.query.jobclass;
