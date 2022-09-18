@@ -42,6 +42,7 @@ mongoose.connect(mongodbUrl, MONGODB_OPTIONS).then(
   },
   (err) => {
     console.error(`error while connecting mongodb: ${err}`);
+    process.exit(1);
   },
 );
 
