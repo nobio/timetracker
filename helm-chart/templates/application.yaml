@@ -1,0 +1,60 @@
+kind: Deployment
+apiVersion: extension/v1
+metadata:
+  name: timetracker
+  namespace: timetracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timetracker
+    template:
+      metadata:
+        labels:
+          app: timetracker
+      spec:
+        containers:
+          - name: timetracker
+            image: nobio/timetracker:master
+            env:
+              - name: AUTHORIZATION
+                value: "off"
+              - name: ACCESS_TOKEN_EXPIRE
+                value: "15m"
+              - name: REFRESH_TOKEN_EXPIRE
+                value: "7d"
+              - name: START_CRONJOBS
+                value: "false"
+              - name: SLACK_URL
+                value: https://hooks.slack.com/services/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
+              - name: ACCESS_TOKEN_SECRET
+                value: b2d6e0e3866d020a29cb89f887ea81e8cdd1bc59325f70028b40f5d52db93d5c7ba0b86356483f7683030dde1330286b3b0f3c3cde9ccb108ac28f55a1c89ef3e63621d9bf7a37d62dced28987de7e90a6a18b6824b4d70dd4adee378d33d379d74135dbc89678b81bb188d1117e47fe08402bf81a9235458e11ce12d9b254da1dde10ae3f55a392d853866c801a62020f5859bc48fe799c5efe6471260c5d2899a34b470a59382037578e01500ff1a45443b23055803001d5bd6d93e0c5dfc8cabefb55c7fa1442592b61a63597f6544f540da46a48b9ec7bc0f706765e7b438268f5330b81f6c0904cdec5c6bde4b9fc99934b085692ca26a87ec616e3dc84
+              - name: REFRESH_TOKEN_SECRET
+                value: 552b94e6b1498534970a55e9b604bf29e831957c37becd449aa3c9eb03a63798f785a5085a052349b24e38c377d839fa3e83ef7e8c93572b902e06424b501b59eb1b1bc601c9fef99959d8a6af5ca3c4375d0c78b68d0b9558506c71473c8f005a79ab3847f0509793fd46c8268995280c0eed8e795953009e2dbf63914c676aafc154659893524739f5db2661009feb8454c77b38d4b723574a401fc4486e2ceb88c111be3c4f7ba951b3c705bbd74b014f0b5553721bae3941d990f7414f373b8359a3a490c9b7f7fb4da76f48cc3d7f566595b88bfa052bd3f0bbec36d4267b805d1e8d11f590ba52345354b729a6d8376018ae559d719331db5a7c98a21a
+              - name: MONGODB_USER
+                value: nobio
+              - name: MONGODB_PASSWORD
+                value: asduhsdknkjbsd8s87wzbkshbdf
+              - name: MONGODB_URI
+                value: mongodb-service
+              - name: MONGODB_PROTOCOL
+                value: mongodb
+              - name: RATE_LIMIT_WINDOW_MS
+                value: "1000"
+              - name: RATE_LIMIT_RQEUESTS
+                value: "20"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: timetracker
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 30000
+      targetPort: 30000
+      nodePort: 30000
