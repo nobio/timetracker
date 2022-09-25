@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: remove-expire-token
+  namespace: timetracker
+spec:
+  # every day at 21:50
+  schedule: "50 21 * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: remove-expire-token
+              image: yauritux/busybox-curl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+                - curl -X PUT http://api-service:30000/api/schedule?jobclass=REMOVE_EXIRED_TOKEN
+          restartPolicy: Never

@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: calc-stats
+  namespace: timetracker
+spec:
+  # every hour
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: calc-stats
+              image: yauritux/busybox-curl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+                - curl -X PUT http://api-service:30000/api/schedule?jobclass=CALC_STATS
+          restartPolicy: Never

@@ -40,7 +40,7 @@ exports.scheduleTasks = function () {
   });
 
   console.log('job scheduler: remove expired Tokens (every day at 21:59)');
-  scheduler.scheduleJob({ hour: 23 }, () => { // every hour at ??:13
+  scheduler.scheduleJob({ hour: 21, minute: 15 }, () => { // every hour at ??:13
     console.log('scheduled task "removeExpiredTokens" started');
     auth.removeExpiredToken().catch((err) => console.error(err));
   });
