@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: remove-tester-token
+  namespace: timetracker
+spec:
+  # every day at 21:15
+  schedule: "15 21 * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: remove-tester-token
+              #image: busybox:1.28
+              image: yauritux/busybox-curl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+                - curl -X PUT http://api-service:30000/api/schedule?jobclass=REMOVE_TESTER_TOKEN
+          restartPolicy: Never

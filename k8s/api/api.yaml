@@ -33,6 +33,20 @@ spec:
           ports:
             - name: http
               containerPort: 30000
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /api/health
+              port: 30000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /api/health
+              port: 30000
+            initialDelaySeconds: 10
+            periodSeconds: 5
           resources:
             limits:
               memory: 512Mi
@@ -90,6 +104,10 @@ spec:
               value: mongodb-service
             - name: MONGODB_PROTOCOL
               value: mongodb
+            - name: RATE_LIMIT_WINDOW_MS
+              value: "1000"
+            - name: RATE_LIMIT_RQEUESTS
+              value: "20"
           volumeMounts:
             - name: api-storage
               mountPath: "/data/api"
