@@ -40,7 +40,7 @@ describe('test util.dumpModels', () => {
       console.log(error);
       assert.fail('should not throw exception');
     }
-  }).timeout(20000);
+  }).timeout(50000);
 });
 
 describe('test util.backupTimeEnties', () => {
@@ -52,5 +52,5 @@ describe('test util.backupTimeEnties', () => {
     } catch (error) {
       assert.fail('should not throw exception');
     }
-  }).timeout(10000);
+  }).timeout(15000);
 });
