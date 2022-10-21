@@ -126,7 +126,7 @@ exports.login = async (req, res) => {
   // console.log(req)
   g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const { password } = req.body;
-  if (password == null) {
+  if (password === null) {
     res.status(401).send();
     return;
   }
@@ -168,7 +168,7 @@ exports.logout = async (req, res) => {
  */
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.token;
-  if (refreshToken == null) {
+  if (refreshToken === null) {
     res.status(400).send('Unauthorized refresh token');
     return;
   }
@@ -225,11 +225,11 @@ exports.authorizeToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.status(401).send('Unauthorized');
+  if (!token) return res.status(401).send('Unauthorized');
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      if (err.name == 'TokenExpiredError') return res.status(401).send(err.message);
+      if (err.name === 'TokenExpiredError') return res.status(401).send(err.message);
       return res.status(403).send(err.message);
     }
 

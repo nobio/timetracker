@@ -47,7 +47,7 @@ exports.distance = (tracks) => tracks.reduce((total, t, idx, ts) => {
  * @param {*} tracks List of geo location points
  */
 exports.meanAccuracy = (tracks) => {
-  const meanAcc = (tracks.length == 0 ? 0 : tracks.reduce((total, t) => {
+  const meanAcc = (tracks.length === 0 ? 0 : tracks.reduce((total, t) => {
     if (t.accuracy) return total + t.accuracy;
     return total;
   }, 0) / tracks.length);

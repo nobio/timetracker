@@ -111,8 +111,8 @@ exports.create = async (timeEntry) => {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
     // console.log(entriesByDate);
     entriesByDate.forEach((entry) => {
-      if (entry.entry_date.toISOString() == timeEntry.datetime
-        && entry.direction == timeEntry.direction) {
+      if (entry.entry_date.toISOString() === timeEntry.datetime
+        && entry.direction === timeEntry.direction) {
         console.error('entry already exists; use update to modify');
         throw new Error('entry already exists; use update to modify');
       }
@@ -388,7 +388,7 @@ exports.removeDoublets = async () => {
     timeEntries.forEach((timeentry) => {
       if (lastTimeentry !== undefined) {
         if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
-          && timeentry.direction == lastTimeentry.direction) {
+          && timeentry.direction === lastTimeentry.direction) {
           timeentry.remove();
           count++;
           // console.log(`removing timeentry ${timeentry}`);

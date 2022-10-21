@@ -179,13 +179,13 @@ exports.geofence = (req, res) => {
   if (!req.body.longitude) errMsg += 'longitude is missing; ';
   if (!req.body.latitude) errMsg += 'latitude is missing; ';
 
-  if (errMsg != '') {
+  if (errMsg !== '') {
     console.error(`invalid request: ${errMsg}`);
     res.status(500).send({ message: `invalid request: ${errMsg}` });
     return;
   }
 
-  const direction = (req.body.trigger == 'enter' ? 'enter' : 'go');
+  const direction = (req.body.trigger === 'enter' ? 'enter' : 'go');
   if (req.body.id === 'Work') {
     const timeEntry = {
       direction,

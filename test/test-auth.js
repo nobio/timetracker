@@ -702,7 +702,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 

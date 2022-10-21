@@ -4,29 +4,20 @@
 const mongoose = require('mongoose');
 const models = require('./models');
 
-//mongoose.set('useUnifiedTopology', true);
-//mongoose.set('useCreateIndex', true);
-//mongoose.set('useNewUrlParser', true);
+// mongoose.set('useUnifiedTopology', true);
+// mongoose.set('useCreateIndex', true);
+// mongoose.set('useNewUrlParser', true);
 
-//const MONGO_URL_DOCKER = 'mongodb://qnap-nas:27017/timetracker';
-const MONGO_URL_DOCKER = 'mongodb://192.168.178.23:27017/timetracker';
+// const MONGO_URL_QNAP = 'mongodb://qnap-nas:27017/timetracker';
+const MONGO_URL_QNAP = 'mongodb://192.168.178.23:27017/timetracker';
 const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
-const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
+// const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
 
-const MONGO_URL_SOURCE = MONGO_URL_DOCKER;
-//const MONGO_URL_TARGET = MONGO_URL_K8S;
+const MONGO_URL_SOURCE = MONGO_URL_QNAP;
+// const MONGO_URL_TARGET = MONGO_URL_K8S;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
 
-console.error(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
-
-const HELP = process.argv.includes('-h');
-const SHOULD_EMPTY_TARGET = !process.argv.includes('-d');
-const SILENT = process.argv.includes('-s');
-const SUCCESS_ONLY = process.argv.includes('-c');
-let PAST_MONTHS;
-if (process.argv.find(element => element.startsWith('-t='))) {
-  PAST_MONTHS = process.argv.find(element => element.startsWith('-t=')).split('-t=')[1];
-}
+console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
 const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
@@ -70,17 +61,14 @@ async function getDataFromSource(source) {
 }
 
 async function deleteAllTarget(target) {
-  if (SHOULD_EMPTY_TARGET) {
-    return 'no delete';
-  }
   try {
     console.log('connecting to target database');
     console.log(`deleting target data of ${target.modelName} in target`);
     await target.deleteMany({});
+    return `all data deleted from ${target}`;
   } catch (error) {
     throw new Error(error);
   }
-
 }
 
 /**
@@ -96,35 +84,14 @@ async function storeDataToTarget(entries, target) {
   } catch (error) {
     console.error(error.message);
   }
-  //console.log(await target.find());
-  /*
-  for (const entry of entries) {
-    process.stdout.write('.');
-    // console.log(Object.keys(TIME_ENTRY_MODEL_TARGET.schema.tree))
-    const t = new target();
-    Object.keys(target.schema.tree).forEach((element) => {
-      t[element] = entry[element];
-    });
-    try {
-      await t.save();
-      // eslint-disable-next-line no-underscore-dangle
-      console.log(`saved: ${target.modelName} - ObjectId('${entry._id}')`);
-    } catch (error) {
-      if (!SILENT && !SUCCESS_ONLY) console.error(`> ${error.message}`);
-    }
-  };
-  */
-  process.stdout.write(`\n`);
+
+  process.stdout.write('\n');
   mongoose.connection.close();
   return (`${entries.length} elements saved`);
 }
 
-if (HELP) process.exit(0);
-
 const app = async () => {
-
   try {
-
     await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
 
@@ -147,7 +114,6 @@ const app = async () => {
     await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
 
     process.exit(0);
-
   } catch (err) {
     console.error(err);
     console.error('***********************************************************************');

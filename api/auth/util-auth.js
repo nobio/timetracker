@@ -156,7 +156,7 @@ exports.login = async (username, password) => {
   if (!password) throw createError(400, 'No password provided');
 
   const mdbUser = await User.findOne({ username: { $eq: username } });
-  if (mdbUser == null) throw createError(401, 'User not authenticated');
+  if (mdbUser === null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) {
     throw createError(401, 'User not authenticated');
@@ -186,7 +186,7 @@ exports.refreshToken = async (refreshToken) => {
   if (!refreshToken) throw createError(400, 'Refresh token must be provided');
 
   const storedRefreshToken = await Token.findOne({ token: { $eq: refreshToken } });
-  if (storedRefreshToken == null) {
+  if (storedRefreshToken === null) {
     throw createError(401, 'Unauthorized (invalid refresh token)');
   }
   const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -248,7 +248,7 @@ exports.validateBasicAuth = async (authorization) => {
   // console.log(user, password);
 
   const mdbUser = await User.findOne({ username: { $eq: username } });
-  if (mdbUser == null) throw createError(401, 'User not authenticated');
+  if (mdbUser === null) throw createError(401, 'User not authenticated');
 
   if (!(await bcrypt.compare(password, mdbUser.password))) throw createError(401, 'User not authenticated');
 };

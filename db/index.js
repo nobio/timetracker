@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+const mongoose = require('mongoose');
 const models = require('./models');
 
 /* eslint-disable no-console */
@@ -13,26 +15,16 @@ const MONGODB_OPTIONS = {
   // useFindAndModify: false,
 };
 
-/**
- * adding the contains method to the String object
- */
-if (!String.prototype.contains) {
-  String.prototype.contains = function (arg) {
-    return !!~this.indexOf(arg);
-  };
-}
-
 // Here you can find the schema definition of noodle data.
 // The top element always is a 'noodle' which represents an appointment
 
 console.log('init database');
 let mongodbUrl;
-const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 if (process.env.MONGODB_URL) {
   mongodbUrl = process.env.MONGODB_URL;
-} else if(process.env.MONGODB_PROTOCOL && process.env.MONGODB_USER && process.env.MONGODB_PASSWORD && process.env.MONGODB_URI) {
+} else if (process.env.MONGODB_PROTOCOL && process.env.MONGODB_USER && process.env.MONGODB_PASSWORD && process.env.MONGODB_URI) {
   mongodbUrl = `${process.env.MONGODB_PROTOCOL}://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_URI}`;
 } else {
   console.log(`error configuring database: please provide env variables MONGODB_PROTOCOL (${process.env.MONGODB_PROTOCOL}) MONGODB_USER (${process.env.MONGODB_USER}) and MONGODB_PASSWORD (${process.env.MONGODB_PASSWORD}) and MONGODB_URI (${process.env.MONGODB_URI})`);
@@ -59,7 +51,6 @@ mongoose.model('FailureDay', models.FailureDay);
 mongoose.model('GeoTracking', models.GeoTracking);
 mongoose.model('User', models.User);
 mongoose.model('Token', models.Token);
-
 
 exports.closeConnection = () => {
   mongoose.connection.close(

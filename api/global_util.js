@@ -56,12 +56,12 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  * use Slack's 'incoming Webhooks' to publish messages
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
+  const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
       // console.log(`toggle '${notificationKey}' switched on`);
-      addedContent = (addedContent) || ''; // if addedContent is undefined set it with blank string
-      const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedContent}`;
+      const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedCtnt}`;
       return this.sendTextMessage(msg);
     }
     return (`toggle ${notificationKey} switched off`);
