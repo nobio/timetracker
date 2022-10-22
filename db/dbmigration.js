@@ -38,12 +38,7 @@ const PROPS_SOURCE = connectionSource.model('Properties', models.Properties);
 const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 
 console.log('--------------------------------------------------------------- \n');
-console.log('Usage: node db/dbmigration.js [-d] [-s]');
-console.log('   -h: display this');
-console.log('   -d: emtpy target collection');
-console.log('   -s: silent');
-console.log('   -c: only success, no errors');
-console.log('   -t=<number>: time in month from today to not copy data older now - t months');
+console.log('Backing up mongodb');
 console.log('\n--------------------------------------------------------------- ');
 
 /**
@@ -91,6 +86,7 @@ async function storeDataToTarget(entries, target) {
 }
 
 const app = async () => {
+  let t1, t1;
   try {
     await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
@@ -110,8 +106,8 @@ const app = async () => {
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);
 
-    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
-    await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
+    // await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
+    // await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
 
     process.exit(0);
   } catch (err) {
