@@ -40,8 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: 42Crunch REST API Static Security Testing
-        uses: 42Crunch/api-security-audit-action@v3
+      - uses: 42Crunch/api-security-audit-action@v3
         with:
           # Please create free account at https://platform.42crunch.com/register
           # Follow these steps to configure API_TOKEN https://docs.42crunch.com/latest/content/tasks/integrate_github_actions.htm
@@ -49,7 +48,7 @@ jobs:
           # Fail if any OpenAPI file scores lower than 75
           min-score: 75
           # set root directory of spec files in order not to evaluate all yaml files in the project
-          root-directory: "../spec"
+          root-directory: "../spec/"
           # Upload results to Github code scanning
           upload-to-code-scanning: true
           # Github token for uploading the results
