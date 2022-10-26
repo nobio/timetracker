@@ -2,6 +2,11 @@
 /* eslint-disable no-console */
 
 const mongoose = require('mongoose');
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
 const models = require('./models');
 
 // mongoose.set('useUnifiedTopology', true);
@@ -80,34 +85,46 @@ async function storeDataToTarget(entries, target) {
     console.error(error.message);
   }
 
-  process.stdout.write('\n');
   mongoose.connection.close();
   return (`${entries.length} elements saved`);
 }
 
 const app = async () => {
-  let t1, t1;
   try {
+    console.time('backup User');
     await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
+    console.timeEnd('backup User'); process.stdout.write('\n');
 
+    console.time('failures');
     await deleteAllTarget(FAILURE_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
+    console.timeEnd('failures'); process.stdout.write('\n');
 
+    console.time('toggles');
     await deleteAllTarget(TOGGLE_TARGET);
     await storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET);
+    console.timeEnd('toggles'); process.stdout.write('\n');
 
+    console.time('properties');
     await deleteAllTarget(PROPS_TARGET);
     await storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET);
+    console.timeEnd('properties'); process.stdout.write('\n');
 
+    console.time('system status');
     await deleteAllTarget(STATSDAY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET);
+    console.timeEnd('system status'); process.stdout.write('\n');
 
+    console.time('time entries');
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);
+    console.timeEnd('time entries'); process.stdout.write('\n');
 
-    // await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
-    // await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
+    console.time('geo tracking');
+    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
+    console.timeEnd('geo tracking'); process.stdout.write('\n');
 
     process.exit(0);
   } catch (err) {
@@ -117,4 +134,10 @@ const app = async () => {
   }
 };
 
-app();
+console.log(`backup from ${MONGO_URL_SOURCE} to ${MONGO_URL_TARGET}`);
+readline.question('Continue? (y) - to abort any other key ', (cont) => {
+  if (cont === '' || cont === 'y' || cont === 'Y') app();
+  else process.exit(0);
+
+  readline.close();
+});
