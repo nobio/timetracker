@@ -34,6 +34,8 @@ require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')
 
 const app = express();
 
+morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
+
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
@@ -41,12 +43,12 @@ app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
 // app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.static(path.join(__dirname, 'www')));
 // app.use(serveStatic('www', { 'index': ['index.html'] }));
-app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - status: :status'));
+app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status - headers: :req-headers'));
 // app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
 app.use(cookieParser());
 // apply rate limiter to all requests
-//app.use(limiter);
+// app.use(limiter);
 
 app.use(cors());
 app.use(api_auth.authorize);
@@ -57,10 +59,10 @@ const swaggerDoc = jsyaml.safeLoad(spec);
 
 /*
 app.use((req, res, next) => {
-   console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
-   console.log(`▶ params:${JSON.stringify(req.params)}`);
-   console.log(`▶ body:${JSON.stringify(req.body)}`);
-   next();
+  console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
+  console.log(`▶ params:${JSON.stringify(req.params)}`);
+  console.log(`▶ body:${JSON.stringify(req.body)}`);
+  next();
 });
 */
 /*
