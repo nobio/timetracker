@@ -33,6 +33,8 @@ const STATSDAY_MODEL_SOURCE = connectionSource.model('StatsDay', models.StatsDay
 const STATSDAY_MODEL_TARGET = connectionTarget.model('StatsDay', models.StatsDay);
 const GEO_TRACKING_MODEL_SOURCE = connectionSource.model('GeoTracking', models.GeoTracking);
 const GEO_TRACKING_MODEL_TARGET = connectionTarget.model('GeoTracking', models.GeoTracking);
+const GEO_FENCE_MODEL_SOURCE = connectionSource.model('GeoFence', models.GeoFence);
+const GEO_FENCE_MODEL_TARGET = connectionTarget.model('GeoFence', models.GeoFence);
 const FAILURE_MODEL_SOURCE = connectionSource.model('FailureDay', models.FailureDay);
 const FAILURE_MODEL_TARGET = connectionTarget.model('FailureDay', models.FailureDay);
 const USER_SOURCE = connectionSource.model('User', models.User);
@@ -115,6 +117,11 @@ const app = async () => {
     await deleteAllTarget(STATSDAY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET);
     console.timeEnd('system status'); process.stdout.write('\n');
+
+    console.time('geofences');
+    await deleteAllTarget(GEO_FENCE_MODEL_TARGET);
+    await storeDataToTarget(await getDataFromSource(GEO_FENCE_MODEL_SOURCE), GEO_FENCE_MODEL_TARGET);
+    console.timeEnd('geofences'); process.stdout.write('\n');
 
     console.time('time entries');
     await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
