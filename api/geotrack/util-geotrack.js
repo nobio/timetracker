@@ -2,7 +2,6 @@
 /* eslint-disable no-console */
 const moment = require('moment');
 const mongoose = require('mongoose');
-const { util } = require('chai');
 const ws = require('../ws');
 const utilEntry = require('../entries/util-entries');
 const utilProperty = require('../admin/util-properties');
