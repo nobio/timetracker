@@ -3,4 +3,4 @@ TimeTracker
 
 TODO...
 
-[https://stackblitz.com/fork/github/nobio/timetracker](https://stackblitz.com/github/nobio/timetracker)
+[<img src="https://developer.stackblitz.com/img/open_in_stackblitz.svg">](https://stackblitz.com/github/nobio/timetracker)
