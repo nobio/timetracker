@@ -4,7 +4,6 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 const ws = require('../ws');
 const utilEntry = require('../entries/util-entries');
-const utilProperty = require('../admin/util-properties');
 
 const GeoTracking = mongoose.model('GeoTracking');
 const GeoFence = mongoose.model('GeoFence');
@@ -255,6 +254,7 @@ exports.geoFence = async (geoTrack) => {
         try { await utilEntry.create(timeEntry); } catch (error) { console.error(error.message); }
         try {
           gf.isCheckedIn = (direction === 'enter');
+          gf.lastChange = moment().toISOString();
           await gf.save();
         } catch (error) {
           console.error(error.message);
