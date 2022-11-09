@@ -254,7 +254,7 @@ exports.geoFence = async (geoTrack) => {
         try { await utilEntry.create(timeEntry); } catch (error) { console.error(error.message); }
         try {
           gf.isCheckedIn = (direction === 'enter');
-          gf.lastChange = moment().toISOString();
+          gf.lastChange = geoTrack.date;
           await gf.save();
         } catch (error) {
           console.error(error.message);
