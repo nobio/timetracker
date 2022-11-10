@@ -396,38 +396,38 @@ paths:
         "500":
           description: something went wrong...
           content: {}
-  /geofence:
-    post:
-      tags:
-        - Geo Tracking
-      summary: >
-        Create new time entry from Geo Fence event coming from Locative for
-        example.
-
-        Please mind this service requires basic authentication in header: "Basic
-        <base64 encoded 'user:password'>"
-      description: >-
-        Create new time entry in system using geo fencing; time entrie's date
-        will be "now"
-      requestBody:
-        description: Time entry that we want to create using Geofencing
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Geofence"
-        required: false
-      security:
-        - basicAuth: []
-      responses:
-        "200":
-          description: New entry is created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TimeEntry"
-        "403":
-          $ref: "#/components/responses/UnauthorizedError"
-      x-codegen-request-body-name: geo_timeentry
+  #  /geofence:
+  #    post:
+  #      tags:
+  #        - Geo Tracking
+  #      summary: >
+  #        Create new time entry from Geo Fence event coming from Locative for
+  #        example.
+  #
+  #        Please mind this service requires basic authentication in header: "Basic
+  #        <base64 encoded 'user:password'>"
+  #      description: >-
+  #        Create new time entry in system using geo fencing; time entrie's date
+  #        will be "now"
+  #      requestBody:
+  #        description: Time entry that we want to create using Geofencing
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/Geofence"
+  #        required: false
+  #      security:
+  #        - basicAuth: []
+  #      responses:
+  #        "200":
+  #          description: New entry is created
+  #          content:
+  #            application/json:
+  #              schema:
+  #                $ref: "#/components/schemas/TimeEntry"
+  #        "403":
+  #          $ref: "#/components/responses/UnauthorizedError"
+  #      x-codegen-request-body-name: geo_timeentry
   /geotrack:
     get:
       tags:
@@ -772,6 +772,116 @@ paths:
           description: Property for given key was not found
         "500":
           description: unable to delete key-value pair
+  /geofences:
+    get:
+      tags:
+        - Geofences
+      summary: Read a all geofences
+      responses:
+        "200":
+          description: Read a geofence by it's key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Geofences"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: unable to read geofences from database
+  "/geofences/{id}":
+    get:
+      tags:
+        - Geofences
+      summary: Read one geofences by it's id
+      parameters:
+        - name: id
+          in: path
+          description: id of a geofence object
+          required: true
+          schema:
+            type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
+      responses:
+        "200":
+          description: Read a geofence by it's key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Geofence"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: Property for given key was not found
+        "500":
+          description: unable to read key-value pair from database
+    post:
+      tags:
+        - Geofences
+      summary: Creates a new geofence
+      requestBody:
+        description: Geofence with new values of properties
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Geofence"
+        required: false
+      responses:
+        "201":
+          description: "successfully created a new geofence"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: unable to store key-value pair
+    put:
+      tags:
+        - Geofences
+      summary: Update a geofence
+      parameters:
+        - name: id
+          in: path
+          description: ID of geofence
+          required: true
+          schema:
+            type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
+      requestBody:
+        description: Geofence with new values of properties
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Geofence"
+        required: false
+      responses:
+        "204":
+          description: "no body, please check http status code"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: unable to store key-value pair
+    delete:
+      tags:
+        - Geofences
+      summary: Delete a geofence
+      parameters:
+        - name: id
+          in: path
+          description: id of a geofence
+          required: true
+          schema:
+            type: string
+            maxLength: 128
+            pattern: '^[\w-.]'
+      responses:
+        "204":
+          description: successfully deleted geofence
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: Property for given key was not found
+        "500":
+          description: unable to delete geofence
   /users:
     get:
       tags:
@@ -1267,28 +1377,22 @@ components:
     Geofence:
       required:
         - id
-        - direction
-        - latitude
         - longitude
+        - latitude
+        - radius
+        - description
+        - isCheckedIn
+        - lastChange
       type: object
       additionalProperties: false
       properties:
         id:
-          type: string
-          description: Identifier of sender
-          example: Work
-        direction:
-          type: string
-          maxLength: 10
-          description: >
-            direction of this time entry; representing, if the time entry means
-            a coming or going event:
-             * `go` - leaving
-             * `enter` - entering
-          example: enter
-          enum:
-            - enter
-            - go
+          type: number
+          example: 6367e7c3a94ff60017d7c1ce
+        radius:
+          type: number
+          description: radius of the geofence within it matches
+          example: 150
         longitude:
           type: number
           description: the longitude geo coordinate
@@ -1297,6 +1401,22 @@ components:
           type: number
           description: the latitude geo coordinate
           example: 49.514135
+        description:
+          type: string
+          description: Home
+        isCheckedIn:
+          type: boolean
+          description: flag that indicates if one is chacked in at this geofence
+        lastChange:
+          type: string
+          format: date
+          description: date of last checkin or checkout
+          example: "2020-07-15T10:45:23.000Z"
+    Geofences:
+      type: array
+      maxItems: 100
+      items:
+        $ref: "#/components/schemas/Geofence"
     Geotrack:
       type: object
       additionalProperties: false
@@ -1474,6 +1594,28 @@ components:
       maxItems: 1000
       items:
         $ref: "#/components/schemas/Property"
+    #    Geofence:
+    #      required:
+    #        - key
+    #        - value
+    #      type: object
+    #      additionalProperties: false
+    #      properties:
+    #        key:
+    #          type: string
+    #          pattern: '^[\w-.]'
+    #          maxLength: 30
+    #          example: de.nobio.timetracker.KEY_01
+    #        value:
+    #          type: string
+    #          pattern: '^[\w-.]'
+    #          maxLength: 100
+    #          example: this is a value
+    #    Geofences:
+    #      type: array
+    #      maxItems: 1000
+    #      items:
+    #        $ref: "#/components/schemas/Geofence"
     StatsEntryResult:
       type: object
       additionalProperties: false
