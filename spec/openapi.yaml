@@ -788,6 +788,24 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "500":
           description: unable to read geofences from database
+    post:
+      tags:
+        - Geofences
+      summary: Creates a new geofence
+      requestBody:
+        description: Geofence with new values of properties
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Geofence"
+        required: false
+      responses:
+        "201":
+          description: "successfully created a new geofence"
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          description: unable to store key-value pair
   "/geofences/{id}":
     get:
       tags:
@@ -815,24 +833,6 @@ paths:
           description: Property for given key was not found
         "500":
           description: unable to read key-value pair from database
-    post:
-      tags:
-        - Geofences
-      summary: Creates a new geofence
-      requestBody:
-        description: Geofence with new values of properties
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Geofence"
-        required: false
-      responses:
-        "201":
-          description: "successfully created a new geofence"
-        "403":
-          $ref: "#/components/responses/UnauthorizedError"
-        "500":
-          description: unable to store key-value pair
     put:
       tags:
         - Geofences

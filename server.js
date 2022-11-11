@@ -46,7 +46,7 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url - st
 app.use(express.json());
 app.use(cookieParser());
 // apply rate limiter to all requests
-//app.use(limiter);
+// app.use(limiter);
 
 app.use(cors());
 app.use(api_auth.authorize);
@@ -86,10 +86,16 @@ app.get('/api/entries/error/dates', api_entries.getErrorDates);
 // .......................................................................
 // geofencing
 // .......................................................................
-app.post('/api/geofence', api_entries.geofence);
+// app.post('/api/geofence', api_entries.geofence);
 app.post('/api/geotrack', api_geotrack.createGeoTrack);
 app.get('/api/geotrack', api_geotrack.getGeoTracking);
 app.get('/api/geotrack/metadata', api_geotrack.getGeoTrackingMetadata);
+
+app.get('/api/geofences', api_admin.getGeofences);
+app.get('/api/geofences/:id', api_admin.getGeofence);
+app.post('/api/geofences', api_admin.createGeofence);
+app.put('/api/geofences/:id', api_admin.saveGeofence);
+app.delete('/api/geofences/:id', api_admin.deleteGeofence);
 
 // .......................................................................
 // admin
