@@ -61,19 +61,19 @@ exports.setGeofence = async (id, longitude, latitude, radius, description, isChe
     if (geoFence == null) {
       throw new Error('geo fence object could not be updated because it does not exist');
     }
-    geoFence.longitude = longitude;
-    geoFence.latitude = latitude;
-    geoFence.radius = radius;
-    geoFence.description = description;
-    geoFence.isCheckedIn = isCheckedIn;
-    geoFence.lastChange = lastChange;
+    if (longitude) geoFence.longitude = longitude;
+    if (geoFence)geoFence.latitude = latitude;
+    if (geoFence)geoFence.radius = radius;
+    if (geoFence)geoFence.description = description;
+    if (geoFence)geoFence.isCheckedIn = isCheckedIn;
+    if (geoFence)geoFence.lastChange = lastChange;
 
     await geoFence.save();
 
     return castGeofence(geoFence);
   } catch (error) {
     console.error(error.message);
-    throw new Error('could not create new geofence');
+    throw new Error(`could not create new geofence: ${error.message}`);
   }
 };
 

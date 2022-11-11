@@ -102,6 +102,6 @@ const GeoFence = new mongoose.Schema({
   radius: { type: Number, required: true, default: 50, index: false },
   description: { type: String, required: false },
   isCheckedIn: { type: Boolean, required: true },
-  lastChange: { type: Date, required: false, default: Date.now, index: true, unique: true },
+  lastChange: { type: Date, required: false, default: Date.now },
 });
 module.exports.GeoFence = GeoFence;
