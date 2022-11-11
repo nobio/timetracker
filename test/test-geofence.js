@@ -13,7 +13,6 @@ let GEOFENCE;
 describe('test read geofences', () => {
   it('read all geofences', async () => {
     const gf = await util.getGeofences();
-    console.log(gf);
 
     expect(gf).to.be.a('array');
     expect(gf.length).to.be.greaterThan(0);
