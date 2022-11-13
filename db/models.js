@@ -74,7 +74,7 @@ const GeoTracking = new mongoose.Schema({
 module.exports.GeoTracking = GeoTracking;
 
 // --------------------------------------------------
-// -------------- Users -------------- --------------
+// -------------- Users -----------------------------
 // --------------------------------------------------
 const User = new mongoose.Schema({
   username: { type: String, required: true, index: true, unique: true },
@@ -85,10 +85,23 @@ const User = new mongoose.Schema({
 module.exports.User = User;
 
 // --------------------------------------------------
-// -------------- Token -------------- --------------
+// -------------- Token -----------------------------
 // --------------------------------------------------
 const Token = new mongoose.Schema({
   token: { type: String, required: true, index: true, unique: true },
   user: { type: String, required: false, index: true, unique: false, default: 'ANONYMOUS' },
 });
 module.exports.Token = Token;
+
+// --------------------------------------------------
+// -------------- GeoFence --------------------------
+// --------------------------------------------------
+const GeoFence = new mongoose.Schema({
+  longitude: { type: Number, required: true, index: false },
+  latitude: { type: Number, required: true, index: false },
+  radius: { type: Number, required: true, default: 50, index: false },
+  description: { type: String, required: false },
+  isCheckedIn: { type: Boolean, required: true },
+  lastChange: { type: Date, required: false, default: Date.now },
+});
+module.exports.GeoFence = GeoFence;

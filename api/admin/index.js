@@ -1,6 +1,7 @@
 const util = require('./util-admin');
 const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
+const utilGeofence = require('./util-geofences');
 
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
@@ -201,4 +202,67 @@ exports.deleteProperty = (req, res) => {
         res.status(404).send();
       }
     }).catch((err) => res.status(500).send(`Error while deleting a property: ${err}`));
+};
+
+/** ********************************
+app.get('/api/gefences', api_admin.getGeofences);
+app.get('/api/gefences/:id', api_admin.getGeofence);
+app.post('/api/gefences', api_admin.createGeofence);
+app.put('/api/gefences/:id', api_admin.saveGeofence);
+app.delete('/api/gefences/:id', api_admin.deleteGeofence);
+ */
+
+exports.getGeofences = (req, res) => {
+  utilGeofence.getGeofences()
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading all geofences: ${err.message}`));
+};
+
+exports.getGeofence = (req, res) => {
+  const { id } = req.params;
+  utilGeofence.getGeofence(id)
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading a geofence: ${err.message}`));
+};
+
+exports.createGeofence = (req, res) => {
+  const { longitude } = req.body;
+  const { latitude } = req.body;
+  const { radius } = req.body;
+  const { description } = req.body;
+  const { isCheckedIn } = req.body;
+  const { lastChange } = req.body;
+
+  utilGeofence.createGeofence(
+    longitude,
+    latitude,
+    radius,
+    description,
+    isCheckedIn,
+    lastChange,
+  )
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while creating a new geofence: ${err.message}`));
+};
+
+exports.saveGeofence = (req, res) => {
+  const { id } = req.params;
+  const { longitude } = req.body;
+  const { latitude } = req.body;
+  const { radius } = req.body;
+  const { description } = req.body;
+  const { isCheckedIn } = req.body;
+  const { lastChange } = req.body;
+
+  utilGeofence.setGeofence(id, longitude, latitude, radius, description, isCheckedIn, lastChange)
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`));
+};
+
+exports.deleteGeofence = (req, res) => {
+  const { id } = req.params;
+
+  utilGeofence.deleteGeofence(id)
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while deleting a geofence: ${err.message}`));
 };

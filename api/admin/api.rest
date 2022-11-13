@@ -70,4 +70,45 @@ Content-Type: application/json
 DELETE http://localhost:30000/api/toggles/61cc9966f30fd42491b46ed2
 Authorization: Bearer xxx.yyy.zzz
 
+# -----------------------------------------------------------------------------
+### ######################## GEOFENCE #########################################
+# -----------------------------------------------------------------------------
+
+GET http://localhost:30000/api/geofences
+Authorization: : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vYmlvIiwibmFtZSI6Ikdlcm5vdCBILiBSZWljaGVsIiwibWFpbEFkZHJlc3MiOiJnZXJub3RAZGllLXJlaWNoZWxzLmRlIiwiaWF0IjoxNjQwNzk4MzkyLCJleHAiOjE2NDA3OTg2OTJ9.wtP4usT6WVlyXmM5Dc7YbMgnh2i4rUk0rnKRP7DzjwI
+
 ###
+
+GET http://localhost:30000/api/geofences/636e28116c627a97ce0273e0
+
+###
+
+POST  http://localhost:30000/api/geofences
+Content-Type: application/json
+
+{
+  "longitude": 11.1111,
+  "latitude": 12.2222,
+  "radius": 120,
+  "description": "Test",
+  "isCheckedIn": false,
+  "lastChange": "2020-01-01T06:00:00.000Z"
+}
+
+###
+
+PUT http://localhost:30000/api/geofences/636e46938983cbf1f26e522a
+Content-Type: application/json
+
+{
+  "longitude": 5,
+  "latitude": 0,
+  "radius": 99,
+  "description": "updated Test",
+  "isCheckedIn": false,
+  "lastChange": "2020-01-01T06:00:00.000Z"
+}
+
+###
+
+DELETE http://localhost:30000/api/geofences/636e47d627cadff11e22fbf6

@@ -3,8 +3,10 @@
 const moment = require('moment');
 const mongoose = require('mongoose');
 const ws = require('../ws');
+const utilEntry = require('../entries/util-entries');
 
 const GeoTracking = mongoose.model('GeoTracking');
+const GeoFence = mongoose.model('GeoFence');
 
 /**
  * calculate the distance in m between two geo coordinates
@@ -65,12 +67,13 @@ exports.meanAccuracy = (tracks) => {
 
 /**
  * Creats a new data entry for one geo location event
- * @param {*} req Request object
+ * @param {*} geoTrack GeoTracking object
  * @param {*} res Response object
  */
 exports.createGeoTrack = async (geoTrack) => {
   if (!geoTrack) return;
 
+  try { await this.geoFence(geoTrack); } catch (error) { console.error(error.message); }
   try {
     ws.sendGeoLocation(geoTrack);
     return await geoTrack.save();
@@ -213,4 +216,53 @@ const appendMetadata = (tracks) => {
   // console.log(JSON.stringify(tracks, null, 2))
 
   return tracks;
+};
+
+/**
+ * Calculates the distance from this point to all the configured geo fences
+ * If ths distance is smaller then check the status and eventually create
+ * a geo fence
+ * @param {} geoTrack
+ curl -X POST  -H "Content-Type: application/json"  -d '{"lat": "49.51429653451733", "lon": "10.87531216443598", "acc": 10, "alt": 320, "tid": "A8", "tst": 1694722307}' http://localhost:30000/api/geotrack
+ */
+exports.geoFence = async (geoTrack) => {
+  try {
+    const geoFences = await GeoFence.find();
+    // console.log(JSON.stringify(geoFences));
+    // eslint-disable-next-line no-restricted-syntax
+    for (const gf of geoFences) {
+      let direction;
+      const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
+      console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
+
+      if (dist <= gf.radius && !gf.isCheckedIn) {
+        console.log('Treffer - einchecken!!!');
+        direction = 'enter';
+      } else if (dist > gf.radius && gf.isCheckedIn) {
+        console.log('Treffer - auschecken!!!!');
+        direction = 'go';
+      }
+
+      // if no direction was found then do not create a new time entry
+      if (direction) {
+        const timeEntry = {
+          direction,
+          longitude: geoTrack.longitude,
+          latitude: geoTrack.latitude,
+          datetime: geoTrack.date,
+        };
+        try { await utilEntry.create(timeEntry); } catch (error) { console.error(error.message); }
+        try {
+          gf.isCheckedIn = (direction === 'enter');
+          gf.lastChange = geoTrack.date;
+          await gf.save();
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    throw (error);
+  }
 };

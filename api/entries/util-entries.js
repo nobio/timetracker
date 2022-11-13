@@ -99,7 +99,7 @@ exports.create = async (timeEntry) => {
   const lastTimeEntry = await this.getLastTimeEntryByDate(timeEntry.datetime);
   // console.log(JSON.stringify(timeEntry));
   if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
-    if (timeEntry.direction != 'enter') {
+    if (timeEntry.direction !== 'enter') {
       throw new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`);
     }
   } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite

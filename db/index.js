@@ -49,6 +49,7 @@ mongoose.model('Toggle', models.Toggle);
 mongoose.model('Properties', models.Properties);
 mongoose.model('FailureDay', models.FailureDay);
 mongoose.model('GeoTracking', models.GeoTracking);
+mongoose.model('GeoFence', models.GeoFence);
 mongoose.model('User', models.User);
 mongoose.model('Token', models.Token);
 
