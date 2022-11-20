@@ -1268,7 +1268,7 @@ paths:
           required: true
           schema:
             type: string
-            example: enter
+            example: CALC_STATS
             enum:
               - CALC_STATS
               - DUMP_MODELS
@@ -1387,7 +1387,8 @@ components:
       additionalProperties: false
       properties:
         id:
-          type: number
+          type: string
+          description: identifier of this geofence
           example: 6367e7c3a94ff60017d7c1ce
         radius:
           type: number
@@ -1403,10 +1404,12 @@ components:
           example: 49.514135
         description:
           type: string
-          description: Home
+          description: A (unique) description of this geofence; name it after the location
+          example: Home
         isCheckedIn:
           type: boolean
           description: flag that indicates if one is chacked in at this geofence
+          example: false
         lastChange:
           type: string
           format: date
