@@ -1377,6 +1377,7 @@ components:
     Geofence:
       required:
         - id
+        - enabled
         - longitude
         - latitude
         - radius
@@ -1390,6 +1391,10 @@ components:
           type: string
           description: identifier of this geofence
           example: 6367e7c3a94ff60017d7c1ce
+        enabled:
+          type: boolean
+          description: flag that indicates if the geo fence should trigger or not
+          example: true
         radius:
           type: number
           description: radius of the geofence within it matches

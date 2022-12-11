@@ -226,14 +226,12 @@ exports.getGeofence = (req, res) => {
 };
 
 exports.createGeofence = (req, res) => {
-  const { longitude } = req.body;
-  const { latitude } = req.body;
-  const { radius } = req.body;
-  const { description } = req.body;
-  const { isCheckedIn } = req.body;
-  const { lastChange } = req.body;
+  const {
+    enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  } = req.body;
 
   utilGeofence.createGeofence(
+    enabled,
     longitude,
     latitude,
     radius,
@@ -247,14 +245,11 @@ exports.createGeofence = (req, res) => {
 
 exports.saveGeofence = (req, res) => {
   const { id } = req.params;
-  const { longitude } = req.body;
-  const { latitude } = req.body;
-  const { radius } = req.body;
-  const { description } = req.body;
-  const { isCheckedIn } = req.body;
-  const { lastChange } = req.body;
+  const {
+    enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  } = req.body;
 
-  utilGeofence.setGeofence(id, longitude, latitude, radius, description, isCheckedIn, lastChange)
+  utilGeofence.setGeofence(id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange)
     .then((response) => res.status(200).send(response))
     .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`));
 };
