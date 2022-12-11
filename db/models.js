@@ -97,6 +97,7 @@ module.exports.Token = Token;
 // -------------- GeoFence --------------------------
 // --------------------------------------------------
 const GeoFence = new mongoose.Schema({
+  enabled: { type: Boolean, required: true },
   longitude: { type: Number, required: true, index: false },
   latitude: { type: Number, required: true, index: false },
   radius: { type: Number, required: true, default: 50, index: false },

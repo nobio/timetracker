@@ -8,6 +8,7 @@ function castGeofence(mongooseGeofence) {
   if (!mongooseGeofence) return null;
   return {
     id: mongooseGeofence._id,
+    enabled: mongooseGeofence.enabled,
     longitude: mongooseGeofence.longitude,
     latitude: mongooseGeofence.latitude,
     radius: mongooseGeofence.radius,
@@ -43,10 +44,10 @@ exports.getGeofence = async (id) => {
   }
 };
 
-exports.createGeofence = async (longitude, latitude, radius, description, isCheckedIn, lastChange) => {
+exports.createGeofence = async (enabled, longitude, latitude, radius, description, isCheckedIn, lastChange) => {
   try {
     const newGeoFence = await new GeoFence({
-      longitude, latitude, radius, description, isCheckedIn, lastChange,
+      enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
     }).save();
     return castGeofence(newGeoFence);
   } catch (error) {
@@ -55,12 +56,13 @@ exports.createGeofence = async (longitude, latitude, radius, description, isChec
   }
 };
 
-exports.setGeofence = async (id, longitude, latitude, radius, description, isCheckedIn, lastChange) => {
+exports.setGeofence = async (id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange) => {
   try {
     const geoFence = await GeoFence.findOne({ _id: id });
     if (geoFence == null) {
       throw new Error('geo fence object could not be updated because it does not exist');
     }
+    if (enabled) geoFence.enabled = enabled;
     if (longitude) geoFence.longitude = longitude;
     if (geoFence)geoFence.latitude = latitude;
     if (geoFence)geoFence.radius = radius;

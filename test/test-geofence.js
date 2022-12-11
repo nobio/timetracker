@@ -19,6 +19,7 @@ describe('test read geofences', () => {
     expect(gf[0]).to.be.a('object');
 
     expect(gf[0]).to.have.property('id');
+    expect(gf[0]).to.have.property('enabled');
     expect(gf[0]).to.have.property('longitude');
     expect(gf[0]).to.have.property('latitude');
     expect(gf[0]).to.have.property('radius');
@@ -29,7 +30,7 @@ describe('test read geofences', () => {
 });
 describe('test read one perticular geofence', () => {
   before(async () => {
-    GEOFENCE = await util.createGeofence(10, 20, 30, 'test', false);
+    GEOFENCE = await util.createGeofence(true, 10, 20, 30, 'test', false);
     // console.log(GEOFENCE);
   });
 
@@ -37,6 +38,7 @@ describe('test read one perticular geofence', () => {
     const gf = await util.getGeofence(GEOFENCE.id);
     expect(gf).to.be.a('object');
     expect(gf).to.have.property('id');
+    expect(gf).to.have.property('enabled');
     expect(gf).to.have.property('longitude');
     expect(gf.longitude).to.equal(10);
     expect(gf).to.have.property('latitude');
@@ -87,14 +89,15 @@ describe('test set a geofence', () => {
   before(async () => {
     // delete the test geofence again
     try { await util.deleteGeofence(GEOFENCE.id); } catch (error) { }
-    GEOFENCE = await util.createGeofence(10, 20, 30, 'test', false);
+    GEOFENCE = await util.createGeofence(true, 10, 20, 30, 'test', false);
   });
 
   it('set an existing geofence', async () => {
     // console.log(GEOFENCE);
-    const gf = await util.setGeofence(GEOFENCE.id, -10, -20, 100, 'new test', true, moment().toISOString());
+    const gf = await util.setGeofence(GEOFENCE.id, false, -10, -20, 100, 'new test', true, moment().toISOString());
     expect(gf).to.be.a('object');
     expect(gf).to.have.property('id');
+    expect(gf).to.have.property('enabled');
     expect(gf).to.have.property('longitude');
     expect(gf.longitude).to.equal(-10);
     expect(gf).to.have.property('latitude');
@@ -137,9 +140,10 @@ describe('test set a geofence', () => {
 
 describe('test create a geofence', () => {
   it('create a proper geofence', async () => {
-    const gf = await util.createGeofence(10, 20, 30, 'test', false);
+    const gf = await util.createGeofence(true, 10, 20, 30, 'test', false);
     expect(gf).to.be.a('object');
     expect(gf).to.have.property('id');
+    expect(gf).to.have.property('enabled');
     expect(gf).to.have.property('longitude');
     expect(gf.longitude).to.equal(10);
     expect(gf).to.have.property('latitude');
@@ -174,7 +178,7 @@ describe('test delete a geofence', () => {
 
   it('set a new geofence and delete it', async () => {
     // create a new geofence
-    GEOFENCE = await util.createGeofence(10, 20, 30, 'test', false);
+    GEOFENCE = await util.createGeofence(true, 10, 20, 30, 'test', false);
 
     // delete the geofence
     const gf = await util.deleteGeofence(GEOFENCE.id);
