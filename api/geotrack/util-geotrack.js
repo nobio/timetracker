@@ -244,14 +244,18 @@ exports.geoFence = async (geoTrack) => {
       }
 
       // if no direction was found then do not create a new time entry
-      if (direction) {
+      if (direction && gf.enabled) {
         const timeEntry = {
           direction,
           longitude: geoTrack.longitude,
           latitude: geoTrack.latitude,
           datetime: geoTrack.date,
         };
-        try { await utilEntry.create(timeEntry); } catch (error) { console.error(error.message); }
+        try {
+          await utilEntry.create(timeEntry);
+        } catch (error) {
+          console.error(error.message);
+        }
         try {
           gf.isCheckedIn = (direction === 'enter');
           gf.lastChange = geoTrack.date;
