@@ -256,13 +256,13 @@ exports.geoFence = async (geoTrack) => {
         } catch (error) {
           console.error(error.message);
         }
-        try {
-          gf.isCheckedIn = (direction === 'enter');
-          gf.lastChange = geoTrack.date;
-          await gf.save();
-        } catch (error) {
-          console.error(error.message);
-        }
+      }
+      try {
+        gf.isCheckedIn = (direction === 'enter');
+        gf.lastChange = geoTrack.date;
+        await gf.save();
+      } catch (error) {
+        console.error(error.message);
       }
     }
   } catch (error) {
