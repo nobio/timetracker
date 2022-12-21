@@ -1,4 +1,4 @@
-5 require('../../db');
+require('../../db');
 const mongoose = require('mongoose');
 const g_util = require('../global_util');
 
