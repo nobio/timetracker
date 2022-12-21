@@ -26,6 +26,8 @@ exports.dumpModels = async () => {
     res.push(result);
     result = await dumpModel(mongoose.model('Properties'));
     res.push(result);
+    result = await dumpModel(mongoose.model('GeoFence'));
+    res.push(result);
     result = await dumpModel(mongoose.model('FailureDay'));
     res.push(result);
     result = await dumpModel(mongoose.model('TimeEntry'));

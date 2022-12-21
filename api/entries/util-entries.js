@@ -381,7 +381,7 @@ exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
 
 exports.removeDoublets = async () => {
   let lastTimeentry;
-  const count = 0;
+  let count = 0;
 
   /*
   try {
@@ -421,6 +421,7 @@ exports.removeDoublets = async () => {
       lastTimeentry = timeentry;
     }
   }
+  return { removed: count };
 };
 
 exports.sleep = (delay) => {

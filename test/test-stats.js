@@ -40,6 +40,7 @@ describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry', () => {
 describe('utilTimeEntry util.removeDoublets', () => {
   it('test for doubletts (should be no in)', async () => {
     const result = await utilTimeEntry.removeDoublets();
+
     expect(result).to.have.property('removed');
     expect(result.removed).to.equal(0);
   });
@@ -288,7 +289,7 @@ describe('test utilTimebox.getStatsByTimeBox', () => {
       await utilTimebox.getStatsByTimeBox('XXXX');
       assert.fail('should not reach this point but throw error instead');
     } catch (error) {
-      expect(error.message).to.be.equal("time unit 'XXXX' is invalid");
+      expect(error.message).to.be.equal('time unit \'XXXX\' is invalid');
     }
   });
 });
@@ -345,20 +346,16 @@ describe("test util.deleteAllStatsDays", () => {
 /**
  * create a new TimeEntry regardless other entries. No checks will be performed
  */
-function createTimeEntry(timeEntry) {
+async function createTimeEntry(timeEntry) {
   // console.log('entered save ' + id)
-  return new Promise((resolve, reject) => {
-    new TimeEntry({
-      entry_date: timeEntry.datetime,
-      direction: timeEntry.direction,
-      longitude: timeEntry.longitude,
-      latitude: timeEntry.latitude,
-      signature: 'HARD_CODED',
-    })
-      .save()
-      .then((timeEntry) => resolve(timeEntry))
-      .catch((err) => reject(err));
-  });
+  // console.log(timeEntry);
+  await new TimeEntry({
+    entry_date: timeEntry.datetime,
+    direction: timeEntry.direction,
+    longitude: timeEntry.longitude,
+    latitude: timeEntry.latitude,
+    signature: 'HARD_CODED',
+  }).save();
 }
 
 /**
