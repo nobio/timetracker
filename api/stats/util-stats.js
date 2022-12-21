@@ -1,4 +1,4 @@
-require('../../db');
+5 require('../../db');
 const mongoose = require('mongoose');
 const g_util = require('../global_util');
 
@@ -16,12 +16,16 @@ exports.calcStats = async () => {
   try {
     g_util.sendMessage('RECALCULATE', 'delete doublets');
     await utilEntry.removeDoublets();
+
     g_util.sendMessage('RECALCULATE', 'delete stats');
-    await this.deleteAllStatsDays();
+    await StatsDay.deleteMany();
     const firstEntry = await utilEntry.getFirstTimeEntry();
     const lastEntry = await utilEntry.getLastTimeEntry();
+    g_util.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
+
     g_util.sendMessage('RECALCULATE', 'start calculating...');
     const result = await this.calculateStatistics(firstEntry, lastEntry);
+
     g_util.sendMessage('RECALCULATE', '...calculation done');
 
     return result;
@@ -41,31 +45,28 @@ exports.calcStats = async () => {
 exports.calculateStatistics = async (firstEntry, lastEntry) => {
   // console.log(firstEntry, lastEntry)
   let date = utilEntry.stripdownToDateUTC(firstEntry.age);
-  try {
-    while (date <= moment(lastEntry.age)) {
-      // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
-      const dt = moment(date);
-      const busytime = await this.getBusytimeByDate(dt);
-      // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
-      if (busytime && busytime.busytime && busytime.busytime != 0) {
-        new StatsDay({
-          date: dt,
-          actual_working_time: busytime.busytime / 1,
-          planned_working_time: DEFAULT_WORKING_TIME,
-          is_working_day: true,
-          is_complete: true,
-          last_changed: new Date(),
-        }).save((err) => {
-          if (err) throw (err);
-        });
-      }
-      date = date.add(1, 'day');
-    }
 
-    return { firstEntry, lastEntry };
-  } catch (error) {
-    throw error;
+  while (date <= moment(lastEntry.age)) {
+    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+    const dt = moment(date);
+    const busytime = this.getBusytimeByDate(dt);
+    // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
+    if (busytime && busytime.busytime && busytime.busytime != 0) {
+      new StatsDay({
+        date: dt,
+        actual_working_time: busytime.busytime / 1,
+        planned_working_time: DEFAULT_WORKING_TIME,
+        is_working_day: true,
+        is_complete: true,
+        last_changed: new Date(),
+      }).save((err) => {
+        if (err) throw (err);
+      });
+    }
+    date = date.add(1, 'day');
   }
+
+  return { firstEntry, lastEntry };
 };
 
 /**
