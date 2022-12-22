@@ -62,12 +62,13 @@ exports.setGeofence = async (id, enabled, longitude, latitude, radius, descripti
     if (geoFence == null) {
       throw new Error('geo fence object could not be updated because it does not exist');
     }
-    if (enabled) geoFence.enabled = enabled;
+    geoFence.enabled = enabled;
+    geoFence.isCheckedIn = isCheckedIn;
+
     if (longitude) geoFence.longitude = longitude;
     if (geoFence)geoFence.latitude = latitude;
     if (geoFence)geoFence.radius = radius;
     if (geoFence)geoFence.description = description;
-    if (geoFence)geoFence.isCheckedIn = isCheckedIn;
     if (geoFence)geoFence.lastChange = lastChange;
 
     await geoFence.save();

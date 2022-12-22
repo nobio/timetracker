@@ -97,16 +97,17 @@ Content-Type: application/json
 
 ###
 
-PUT http://localhost:30000/api/geofences/636e46938983cbf1f26e522a
+PUT http://localhost:30000/api/geofences/639ac58f3afada0011688746
 Content-Type: application/json
 
 {
-  "longitude": 5,
-  "latitude": 0,
-  "radius": 99,
-  "description": "updated Test",
+  "enabled": false,
+  "radius": 1,
+  "longitude": 18.45816,
+  "latitude": -34.11995,
+  "description": "St. James (Cape Town)",
   "isCheckedIn": false,
-  "lastChange": "2020-01-01T06:00:00.000Z"
+  "lastChange": "2022-12-15T06:59:18.000Z"
 }
 
 ###
