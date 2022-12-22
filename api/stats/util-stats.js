@@ -49,7 +49,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
   while (date <= moment(lastEntry.age)) {
     // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
     const dt = moment(date);
-    const busytime = this.getBusytimeByDate(dt);
+    const busytime = await this.getBusytimeByDate(dt);
     // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`)
     if (busytime && busytime.busytime && busytime.busytime != 0) {
       new StatsDay({
@@ -64,6 +64,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
       });
     }
     date = date.add(1, 'day');
+    // console.log(date, busytime);
   }
 
   return { firstEntry, lastEntry };
