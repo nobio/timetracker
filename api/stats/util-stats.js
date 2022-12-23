@@ -9,10 +9,14 @@ const moment = require('moment');
 
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
+let isRunning = false;
 /**
  * Orchestrate the calculation of statistics
  */
 exports.calcStats = async () => {
+  console.log(`---------------------- calcStats isRunning: ${isRunning} -----------------------------`);
+  if (isRunning) return;
+  isRunning = true;
   try {
     g_util.sendMessage('RECALCULATE', 'delete stats');
     await StatsDay.deleteMany();
@@ -28,10 +32,14 @@ exports.calcStats = async () => {
     const result = await this.calculateStatistics(firstEntry, lastEntry);
     g_util.sendMessage('RECALCULATE', '...calculation done');
 
+    isRunning = false;
     return result;
   } catch (error) {
     console.log(error);
+    isRunning = false;
     throw error;
+  } finally {
+    isRunning = false;
   }
 };
 
