@@ -57,6 +57,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
+  console.log(`${notificationKey} (${addedCtnt})`);
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
