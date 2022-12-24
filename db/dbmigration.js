@@ -142,7 +142,7 @@ const app = async () => {
 };
 
 console.log(`backup from ${MONGO_URL_SOURCE} to ${MONGO_URL_TARGET}`);
-readline.question('Continue? (y) - to abort any other key ', (cont) => {
+readline.question('Continue? (hit <y> or <enter> to continue or any other key to abort ', (cont) => {
   if (cont === '' || cont === 'y' || cont === 'Y') app();
   else process.exit(0);
 
