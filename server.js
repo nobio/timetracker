@@ -9,7 +9,6 @@ const limiter = rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
   max: process.env.RATE_LIMIT_RQEUESTS,
 });
-
 const express = require('express');
 
 const http = require('http');
@@ -22,6 +21,8 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
+const api = require('@opentelemetry/api');
+const { init } = require('./api/tracing');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -29,6 +30,9 @@ const api_stats = require('./api/stats');
 const api_admin = require('./api/admin');
 const api_entries = require('./api/entries');
 const api_schedule = require('./api/schedule');
+
+const tracer = init('timetracker', 'development');
+exports.tracer = tracer;
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -70,6 +74,7 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
+
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------

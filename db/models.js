@@ -1,6 +1,8 @@
 /* eslint-disable object-curly-newline */
 const mongoose = require('mongoose');
 
+mongoose.set('strictQuery', false);
+
 // --------------------------------------------------
 // ----------------- TimeEntry ----------------------
 // --------------------------------------------------
