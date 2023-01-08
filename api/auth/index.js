@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const { SpanStatusCode } = require('@opentelemetry/api');
+const { Tracer } = require('../tracing/Tracer');
 const util = require('./util-auth');
 const g_util = require('../global_util');
 
@@ -11,12 +13,17 @@ const g_util = require('../global_util');
  * @param {*} res Response object
  */
 exports.getAllUsers = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.getAllUsers');
+
   try {
     const result = await util.getAllUsers();
     res.status(200).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     res.status(500).json({ message: err });
+  } finally {
+    span.end();
   }
 };
 
@@ -29,13 +36,19 @@ exports.getAllUsers = async (req, res) => {
  * @param {*} res Response object
  */
 exports.getUser = async (req, res) => {
-  console.log(req.params.url);
+  // console.log(req.params.url);
+  const span = Tracer.getTracer().startSpan('auth.getUser');
+
+  if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
   try {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     res.status(500).json({ message: err });
+  } finally {
+    span.end();
   }
 };
 
@@ -48,13 +61,20 @@ exports.getUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.deleteUser = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.deleteUser');
+
+  if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
+
   try {
     const result = await util.deleteUser(req.params.id);
     g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     res.status(500).json({ message: err });
+  } finally {
+    span.end();
   }
 };
 
@@ -67,13 +87,19 @@ exports.deleteUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.createUser = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.createUser');
+  if (span.isRecording()) { span.setAttribute('user', req.body.username); }
+
   try {
     const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
     g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     res.status(500).json({ message: err });
+  } finally {
+    span.end();
   }
 };
 
@@ -86,14 +112,23 @@ exports.createUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.updateUser = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.updateUser');
+  if (span.isRecording()) {
+    span.setAttribute('userId', req.params.id);
+    span.setAttribute('userId', req.params.name);
+  }
+
   try {
     const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
     g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
     else res.status(500).json({ message: err.message });
+  } finally {
+    span.end();
   }
 };
 
@@ -103,14 +138,21 @@ exports.updateUser = async (req, res) => {
  * @param {*} res
  */
 exports.updateUsersPassword = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.updateUsersPassword');
+  if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
+
   try {
     const result = await util.updateUsersPassword(req.params.id, req.body.password);
     g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
+
     if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
     else res.status(500).json({ message: err.message });
+  } finally {
+    span.end();
   }
 };
 
@@ -124,9 +166,13 @@ exports.updateUsersPassword = async (req, res) => {
  */
 exports.login = async (req, res) => {
   // console.log(req)
+  const span = Tracer.getTracer().startSpan('auth.login');
+  if (span.isRecording()) { span.setAttribute('userName', req.body.username); }
+
   g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const { password } = req.body;
   if (password === null) {
+    span.setStatus({ code: 401 });
     res.status(401).send();
     return;
   }
@@ -135,11 +181,16 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
+    console.error(err);
+    span.recordException(err);
     if (err.status) {
       res.status(err.status).json({ message: err.message });
     } else {
       res.status(401).json({ message: err.message });
     }
+    span.setStatus({ code: 400, message: String(err.message) });
+  } finally {
+    span.end();
   }
 };
 
@@ -151,11 +202,17 @@ exports.login = async (req, res) => {
  * @param {*} res
  */
 exports.logout = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.logout');
+  if (span.isRecording()) { span.setAttribute('userName', req.body.token); }
+
   try {
     await util.logout(req.body.token);
     res.status(200).send();
   } catch (err) {
+    span.recordException(err);
     res.status(400).json({ message: err.message });
+  } finally {
+    span.end();
   }
 };
 
@@ -167,6 +224,9 @@ exports.logout = async (req, res) => {
  * @param {*} res
  */
 exports.refreshToken = async (req, res) => {
+  const span = Tracer.getTracer().startSpan('auth.refreshToken');
+  if (span.isRecording()) { span.setAttribute('refreshToken', req.body.token); }
+
   const refreshToken = req.body.token;
   if (refreshToken === null) {
     res.status(400).send('Unauthorized refresh token');
@@ -178,11 +238,20 @@ exports.refreshToken = async (req, res) => {
     res.status(200).send(token);
   } catch (err) {
     // console.error(err);
+    span.recordException(err);
     res.status(400).send({ message: err.message });
+  } finally {
+    span.end();
   }
 };
 
 exports.authorize = async (req, res, next) => {
+  const span = Tracer.getTracer().startSpan('auth.refreshauthorizeoken');
+  if (span.isRecording()) {
+    span.setAttribute('method', req.method);
+    span.setAttribute('url', req.url);
+  }
+
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
@@ -196,17 +265,20 @@ exports.authorize = async (req, res, next) => {
     || (req.url.startsWith('/api/log'))
   )) {
     // just continue...
-    console.log(`authorization disabled for ${req.url}`);
+    // console.log(`authorization disabled for ${req.url}`);
     res.status(200);
+    span.end();
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
     (req.method === 'POST' && req.url.startsWith('/api/geofence'))
     || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
   )) {
     // basic authorisation
+    span.end();
     return this.authorizeBasicAuth(req, res, next);
   }
   // token authorization for the rest of us
+  span.end();
   return this.authorizeToken(req, res, next);
 };
 
@@ -218,23 +290,29 @@ exports.authorize = async (req, res, next) => {
  * Clients need to create a new token using the refresh token when they got a 403 in the first place
  *
  * @param req Request object (includes the header and possibly token); user object will be added
- * @param res Respons object; only used in case of error
+ * @param res Respons object; only used in case of err
  * @param next callback to next middleware
  */
 exports.authorizeToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
+  const span = tracer.tracer.startSpan('auth.authorizeToken');
+  if (span.isRecording()) { span.setAttribute('authHeader', authHeader); }
+
   if (!token) return res.status(401).send('Unauthorized');
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      if (err.name === 'TokenExpiredError') return res.status(401).send(err.message);
+      span.recordException(err);
+      span.end();
+      if (err.name === 'TokenExpirederr') return res.status(401).send(err.message);
       return res.status(403).send(err.message);
     }
 
     req.user = user; // store user in request object
     res.status(200);
+    span.end();
     next();
   });
 };
@@ -247,18 +325,24 @@ exports.authorizeToken = async (req, res, next) => {
  * Clients need to create a new token using the refresh token when they got a 403 in the first place
  *
  * @param req Request object (includes the header and possibly token); user object will be added
- * @param res Respons object; only used in case of error
+ * @param res Respons object; only used in case of err
  * @param next callback to next middleware
  */
 exports.authorizeBasicAuth = async (req, res, next) => {
   const credentials = req.headers.authorization;
+  const span = tracer.tracer.startSpan('auth.authorizeBasicAuth');
+  if (span.isRecording()) { span.setAttribute('credentials', credentials); }
+
   try {
     await util.validateBasicAuth(credentials);
     res.status(200);
     next();
   } catch (err) {
     // console.log(err);
+    span.recordException(err);
     if (err.status) res.status(err.status).json({ message: err.message });
     else res.status(400).json({ message: err.message });
+  } finally {
+    span.end();
   }
 };

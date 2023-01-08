@@ -18,6 +18,7 @@ const { OTTracePropagator } = require('@opentelemetry/propagator-ot-trace');
 const { MongooseInstrumentation } = require('@opentelemetry/instrumentation-mongoose');
 
 const otelURL = process.env.OTEL_TRACE_URL || 'http://localhost:14268/api/traces';
+let tracer;
 
 const options = {
   tags: [],
@@ -58,8 +59,9 @@ const init = (serviceName, environment) => {
 
   console.log('tracing initialized');
 
-  const tracer = provider.getTracer(serviceName);
+  tracer = provider.getTracer(serviceName);
   return { tracer };
 };
 
 module.exports = { init };
+module.exports.tracer = tracer;

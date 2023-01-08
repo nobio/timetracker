@@ -1,6 +1,6 @@
 const { SpanStatusCode } = require('@opentelemetry/api');
 const util = require('./util-entries');
-const serverInstanz = require('../../server');
+// const serverInstanz = require('../../server');
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -8,6 +8,7 @@ const serverInstanz = require('../../server');
  * curl -X GET http://localhost:30000/api/entries/5a2100cf87f1f368d087696a
  ****************************************************************************** */
 exports.getEntryById = async (req, res) => {
+  // const span = serverInstanz.tracer.tracer.startSpan('entry.getEntryById');
   const span = serverInstanz.tracer.tracer.startSpan('entry.getEntryById');
   if (span.isRecording()) { span.setAttribute('entryId', req.params.id); }
 
@@ -247,7 +248,7 @@ exports.geofence = async (req, res) => {
 
   if (errMsg !== '') {
     // console.error(`invalid request: ${errMsg}`);
-    res.status(500).send(`Error while reading failure dates: ${errMsg}`);
+    span.setStatus({ code: 500, message: `invalid request: ${errMsg}` });
     res.status(500).send({ message: `invalid request: ${errMsg}` });
     return;
   }
