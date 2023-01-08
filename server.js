@@ -22,8 +22,6 @@ const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
 const api = require('@opentelemetry/api');
-const { Tracer } = require('./api/Tracer');
-// const { init } = require('./api/tracing');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -35,6 +33,9 @@ const api_schedule = require('./api/schedule');
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
 const app = express();
+const { Tracer } = require('./api/tracing/Tracer');
+
+Tracer.init('timetracker', 'development');
 
 morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
 
@@ -54,11 +55,6 @@ app.use(cookieParser());
 
 app.use(cors());
 app.use(api_auth.authorize);
-
-Tracer.init('timetracker', 'development');
-
-// const tracer = init('timetracker', 'development');
-// exports.tracer = tracer;
 
 /* ============================================================================= */
 const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');

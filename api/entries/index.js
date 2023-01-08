@@ -1,6 +1,6 @@
 const { SpanStatusCode } = require('@opentelemetry/api');
 const util = require('./util-entries');
-// const serverInstanz = require('../../server');
+const { Tracer } = require('../tracing/Tracer');
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -8,8 +8,7 @@ const util = require('./util-entries');
  * curl -X GET http://localhost:30000/api/entries/5a2100cf87f1f368d087696a
  ****************************************************************************** */
 exports.getEntryById = async (req, res) => {
-  // const span = serverInstanz.tracer.tracer.startSpan('entry.getEntryById');
-  const span = serverInstanz.tracer.tracer.startSpan('entry.getEntryById');
+  const span = Tracer.startSpan('auth.getAllUsers');
   if (span.isRecording()) { span.setAttribute('entryId', req.params.id); }
 
   try {
@@ -37,7 +36,7 @@ exports.getEntries = (req, res) => {
   const filterByDate = req.query.dt;
   const filterByBusy = req.query.busy;
 
-  const span = serverInstanz.tracer.tracer.startSpan('entry.getEntries');
+  const span = Tracer.startSpan('entry.getEntries');
   if (span.isRecording()) {
     span.setAttribute('filterByDate', filterByDate);
     span.setAttribute('filterByBusy', filterByBusy);
@@ -94,7 +93,7 @@ exports.createEntry = async (req, res) => {
   };
 
   /* creating OTEL Span */
-  const span = serverInstanz.tracer.tracer.startSpan('entry.createEntry');
+  const span = Tracer.startSpan('entry.createEntry');
   if (span.isRecording()) { span.setAttribute('timeEntry', timeEntry); }
 
   try {
@@ -125,7 +124,7 @@ exports.saveEntry = async (req, res) => {
   };
 
   /* creating OTEL Span */
-  const span = serverInstanz.tracer.tracer.startSpan('entry.createEntry');
+  const span = Tracer.startSpan('entry.createEntry');
   if (span.isRecording()) { span.setAttribute('timeEntry', timeEntry); }
 
   try {
@@ -146,7 +145,7 @@ exports.saveEntry = async (req, res) => {
 exports.deleteEntry = async (req, res) => {
   const { id } = req.params;
 
-  const span = serverInstanz.tracer.tracer.startSpan('entry.deleteEntry');
+  const span = Tracer.startSpan('entry.deleteEntry');
   if (span.isRecording()) { span.setAttribute('entryId', id); }
 
   try {
@@ -170,7 +169,7 @@ exports.deleteEntry = async (req, res) => {
  * curl -X POST http://localhost:30000/api/entries/error/evaluate
  */
 exports.evaluate = async (req, res) => {
-  const span = serverInstanz.tracer.tracer.startSpan('entry.evaluate');
+  const span = Tracer.startSpan('entry.evaluate');
   try {
     const reply = await util.evaluate();
     span.setStatus({ code: SpanStatusCode.OK });
@@ -185,7 +184,7 @@ exports.evaluate = async (req, res) => {
  * curl -X GET http://localhost:30000/api/entries/error/dates
  */
 exports.getErrorDates = async (req, res) => {
-  const span = serverInstanz.tracer.tracer.startSpan('entry.getErrorDates');
+  const span = Tracer.startSpan('entry.getErrorDates');
 
   try {
     const reply = await util.getErrorDates();
@@ -237,7 +236,7 @@ exports.getErrorDates = async (req, res) => {
  ****************************************************************************** */
 exports.geofence = async (req, res) => {
   // console.log(JSON.stringify(req.body));
-  const span = serverInstanz.tracer.tracer.startSpan('entry.geofence');
+  const span = Tracer.startSpan('entry.geofence');
 
   let errMsg = '';
   if (!req.body) errMsg += 'body is empty; ';

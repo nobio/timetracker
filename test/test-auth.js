@@ -101,7 +101,7 @@ describe('test utilAuth.createUser', () => {
       expect(user.name).to.eq(TESTUSER_NAME);
       expect(user.mailAddress).to.eq(TESTUSER_MAIL);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
       await util.deleteUser(userId);
     }
@@ -121,9 +121,9 @@ describe('test utilAuth.createUser', () => {
 
       await auth.createUser(req, res);
       expect(res.status).to.have.been.calledWith(201);
-    } catch (error) {
+    } catch (err) {
       console.log(error);
-      assert.fail(`should not throw error\n${error.message}`);
+      assert.fail(`should not throw error\n${err.message}`);
     }
   });
 
@@ -548,7 +548,7 @@ describe('test utilAuth.login', () => {
       await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
       await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
       await User.deleteOne({ name: TESTUSER_USERNAME });
@@ -560,7 +560,7 @@ describe('test utilAuth.login', () => {
     try {
       await util.removeTesterToken();
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -614,7 +614,7 @@ describe('test utilAuth.updateUsersPassword', () => {
         expect(err.message).to.equal('User not authenticated');
       }
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -691,7 +691,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -722,7 +722,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(403);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -738,8 +738,8 @@ describe('test index.authorize', () => {
 
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
-    } catch (error) {
-      assert.fail(`should not throw exception\n${error}`);
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err}`);
     }
   });
 
@@ -756,7 +756,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).not.to.have.been.called;
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -798,7 +798,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -812,7 +812,7 @@ describe('test index.refreshToken', () => {
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -825,7 +825,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -871,7 +871,7 @@ describe('test index.logout', () => {
       expect(res.status).to.have.been.calledWith(403); // Forbidden
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -884,7 +884,7 @@ describe('test index.logout', () => {
       await auth.logout(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -898,7 +898,7 @@ describe('test index.logout', () => {
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail(`should not throw exception\n${error.message}`);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 

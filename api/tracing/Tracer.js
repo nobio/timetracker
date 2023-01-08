@@ -8,5 +8,9 @@ class Tracer {
   static getTracer() {
     return this.tracer;
   }
+
+  static startSpan(name) {
+    return this.tracer.startSpan(name);
+  }
 }
 module.exports = { Tracer };

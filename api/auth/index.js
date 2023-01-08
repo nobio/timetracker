@@ -13,7 +13,7 @@ const g_util = require('../global_util');
  * @param {*} res Response object
  */
 exports.getAllUsers = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.getAllUsers');
+  const span = Tracer.startSpan('auth.getAllUsers');
 
   try {
     const result = await util.getAllUsers();
@@ -37,7 +37,7 @@ exports.getAllUsers = async (req, res) => {
  */
 exports.getUser = async (req, res) => {
   // console.log(req.params.url);
-  const span = Tracer.getTracer().startSpan('auth.getUser');
+  const span = Tracer.startSpan('auth.getUser');
 
   if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
   try {
@@ -61,7 +61,7 @@ exports.getUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.deleteUser = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.deleteUser');
+  const span = Tracer.startSpan('auth.deleteUser');
 
   if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
 
@@ -87,7 +87,7 @@ exports.deleteUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.createUser = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.createUser');
+  const span = Tracer.startSpan('auth.createUser');
   if (span.isRecording()) { span.setAttribute('user', req.body.username); }
 
   try {
@@ -112,7 +112,7 @@ exports.createUser = async (req, res) => {
  * @param {*} res Response object
  */
 exports.updateUser = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.updateUser');
+  const span = Tracer.startSpan('auth.updateUser');
   if (span.isRecording()) {
     span.setAttribute('userId', req.params.id);
     span.setAttribute('userId', req.params.name);
@@ -138,7 +138,7 @@ exports.updateUser = async (req, res) => {
  * @param {*} res
  */
 exports.updateUsersPassword = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.updateUsersPassword');
+  const span = Tracer.startSpan('auth.updateUsersPassword');
   if (span.isRecording()) { span.setAttribute('userId', req.params.id); }
 
   try {
@@ -166,7 +166,7 @@ exports.updateUsersPassword = async (req, res) => {
  */
 exports.login = async (req, res) => {
   // console.log(req)
-  const span = Tracer.getTracer().startSpan('auth.login');
+  const span = Tracer.startSpan('auth.login');
   if (span.isRecording()) { span.setAttribute('userName', req.body.username); }
 
   g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
@@ -202,7 +202,7 @@ exports.login = async (req, res) => {
  * @param {*} res
  */
 exports.logout = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.logout');
+  const span = Tracer.startSpan('auth.logout');
   if (span.isRecording()) { span.setAttribute('userName', req.body.token); }
 
   try {
@@ -224,7 +224,7 @@ exports.logout = async (req, res) => {
  * @param {*} res
  */
 exports.refreshToken = async (req, res) => {
-  const span = Tracer.getTracer().startSpan('auth.refreshToken');
+  const span = Tracer.startSpan('auth.refreshToken');
   if (span.isRecording()) { span.setAttribute('refreshToken', req.body.token); }
 
   const refreshToken = req.body.token;
@@ -246,7 +246,7 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.authorize = async (req, res, next) => {
-  const span = Tracer.getTracer().startSpan('auth.refreshauthorizeoken');
+  const span = Tracer.startSpan('auth.refreshauthorizeoken');
   if (span.isRecording()) {
     span.setAttribute('method', req.method);
     span.setAttribute('url', req.url);
@@ -297,7 +297,7 @@ exports.authorizeToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
-  const span = tracer.tracer.startSpan('auth.authorizeToken');
+  const span = Tracer.startSpan('auth.authorizeToken');
   if (span.isRecording()) { span.setAttribute('authHeader', authHeader); }
 
   if (!token) return res.status(401).send('Unauthorized');
@@ -306,7 +306,7 @@ exports.authorizeToken = async (req, res, next) => {
     if (err) {
       span.recordException(err);
       span.end();
-      if (err.name === 'TokenExpirederr') return res.status(401).send(err.message);
+      if (err.name === 'TokenExpiredError') return res.status(401).send(err.message);
       return res.status(403).send(err.message);
     }
 
@@ -330,7 +330,7 @@ exports.authorizeToken = async (req, res, next) => {
  */
 exports.authorizeBasicAuth = async (req, res, next) => {
   const credentials = req.headers.authorization;
-  const span = tracer.tracer.startSpan('auth.authorizeBasicAuth');
+  const span = Tracer.startSpan('auth.authorizeBasicAuth');
   if (span.isRecording()) { span.setAttribute('credentials', credentials); }
 
   try {
