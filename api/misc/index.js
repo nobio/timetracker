@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const User = mongoose.model('User');
 const packageJson = require('../../package.json');
+const { Tracer } = require('../tracing/Tracer');
 
 /**
  * exposes a ping endpoint and respones with pong
@@ -10,6 +11,7 @@ const packageJson = require('../../package.json');
  * curl -X GET http://localhost:30000/api/ping
  */
 exports.ping = (req, res) => {
+  const span = Tracer.startSpan('misc.ping');
   const ip = (req.headers['x-forwarded-for']
     || req.connection.remoteAddress
     || req.socket.remoteAddress
@@ -19,6 +21,7 @@ exports.ping = (req, res) => {
     response: 'pong',
     client_ip: ip,
   });
+  span.end();
 };
 
 /**
@@ -27,6 +30,12 @@ exports.ping = (req, res) => {
  * curl -X GET http://localhost:30000/api/version
  */
 exports.version = (req, res) => {
+  const span = Tracer.startSpan('misc.version');
+  if (span.isRecording()) {
+    span.setAttribute('version', packageJson.version);
+    span.setAttribute('last_build', packageJson.last_build);
+  }
+
   if (packageJson) {
     res.status(200).json({
       version: packageJson.version,
@@ -35,6 +44,7 @@ exports.version = (req, res) => {
   } else {
     res.status(500).send('no package.json found');
   }
+  span.end();
 };
 
 /**
@@ -56,13 +66,16 @@ exports.version = (req, res) => {
   ]
 }
  */
-exports.healtchckech = async (req, res) => {
+exports.healthcheck = async (req, res) => {
+  const span = Tracer.startSpan('misc.ping');
+
   const healthData = {
     version: packageJson.version,
     time: moment().toISOString(),
     status: 'pass',
     details: [],
   };
+  if (span.isRecording()) { span.setAttribute('healthData', healthData); }
 
   // ------------ 1. test slack ------------
   healthData.details.push({
@@ -112,6 +125,8 @@ exports.experiment = async (req, res) => {
  * curl -X PUT http://localhost:30000/api/log
  */
 exports.log = async (req, res) => {
+  const span = Tracer.startSpan('misc.ping');
+
   const resp = {};
 
   resp.url = req.url;
@@ -124,4 +139,5 @@ exports.log = async (req, res) => {
   console.log(JSON.stringify(resp));
 
   res.status(200).json(resp);
+  span.end();
 };

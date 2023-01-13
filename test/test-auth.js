@@ -36,10 +36,6 @@ process.env.REFRESH_TOKEN_SECRET = 'TEST_REFRESH_TOKEN_SECRET';
 process.env.ACCESS_TOKEN_EXPIRE = '5m';
 process.env.REFRESH_TOKEN_EXPIRE = '7d';
 
-const { Tracer } = require('../api/tracing/Tracer');
-
-Tracer.init('test-auth', 'unit test');
-
 /**
  * =============================================================
  * getAllUsers
