@@ -246,7 +246,7 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.authorize = async (req, res, next) => {
-  const span = Tracer.startSpan('auth.refreshauthorizeoken');
+  const span = Tracer.startSpan('auth.authorize');
   if (span.isRecording()) {
     span.setAttribute('method', req.method);
     span.setAttribute('url', req.url);

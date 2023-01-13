@@ -3,14 +3,15 @@
  */
 require('dotenv').config();
 require('./db');
+
 const rateLimit = require('express-rate-limit');
 
 const limiter = rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
   max: process.env.RATE_LIMIT_RQEUESTS,
 });
-const express = require('express');
 
+const express = require('express');
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -22,6 +23,7 @@ const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
 const api = require('@opentelemetry/api');
+const { Tracer } = require('./api/tracing/Tracer');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -32,10 +34,8 @@ const api_schedule = require('./api/schedule');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
-const app = express();
-const { Tracer } = require('./api/tracing/Tracer');
-
 Tracer.init('timetracker', 'development');
+const app = express();
 
 morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
 

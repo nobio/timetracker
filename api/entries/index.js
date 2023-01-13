@@ -32,11 +32,11 @@ exports.getEntryById = async (req, res) => {
  * curl -X GET http://localhost:30000/api/entries?dt=1393455600000
  * curl -X GET http://localhost:30000/api/entries?busy=1393455600000
  ****************************************************************************** */
-exports.getEntries = (req, res) => {
+exports.getEntries = async (req, res) => {
   const filterByDate = req.query.dt;
   const filterByBusy = req.query.busy;
 
-  const span = Tracer.getTracer().startSpan('entry.getEntries');
+  const span = Tracer.startSpan('entry.getEntries');
 
   if (span.isRecording()) {
     span.setAttribute('filterByDate', filterByDate);
@@ -46,20 +46,20 @@ exports.getEntries = (req, res) => {
   try {
     if (filterByDate && filterByBusy) {
       // console.log('filter by date and busy');
-      res.status(500).send('date and busy filter set; can only handle one of them');
+      await res.status(500).send('date and busy filter set; can only handle one of them');
     } else if (filterByDate) {
       // console.log(`filter by date: ${filterByDate}`);
-      util.getAllByDate(filterByDate)
+      await util.getAllByDate(filterByDate)
         .then((timeentries) => res.status(200).send(timeentries))
         .catch((err) => res.status(500).send(err));
     } else if (filterByBusy) {
       // console.log(`filter by busy: ${filterByBusy}`);
-      util.getAllByDate(filterByBusy)
+      await util.getAllByDate(filterByBusy)
         .then(util.calculateBusyTime)
         .then((busytime) => res.status(200).send(busytime))
         .catch((err) => res.status(500).send(err.message));
     } else {
-      util.getAll()
+      await util.getAll()
         .then((timeentry) => res.status(200).send(timeentry))
         .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
     }
