@@ -13,4 +13,5 @@ class Tracer {
     return this.tracer.startSpan(name);
   }
 }
+
 module.exports = { Tracer };

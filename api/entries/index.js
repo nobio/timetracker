@@ -36,7 +36,8 @@ exports.getEntries = (req, res) => {
   const filterByDate = req.query.dt;
   const filterByBusy = req.query.busy;
 
-  const span = Tracer.startSpan('entry.getEntries');
+  const span = Tracer.getTracer().startSpan('entry.getEntries');
+
   if (span.isRecording()) {
     span.setAttribute('filterByDate', filterByDate);
     span.setAttribute('filterByBusy', filterByBusy);
