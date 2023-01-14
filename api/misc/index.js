@@ -67,7 +67,7 @@ exports.version = (req, res) => {
 }
  */
 exports.healthcheck = async (req, res) => {
-  const span = Tracer.startSpan('misc.ping');
+  const span = Tracer.startSpan('misc.healthcheck');
 
   const healthData = {
     version: packageJson.version,
@@ -75,7 +75,6 @@ exports.healthcheck = async (req, res) => {
     status: 'pass',
     details: [],
   };
-  if (span.isRecording()) { span.setAttribute('healthData', healthData); }
 
   // ------------ 1. test slack ------------
   healthData.details.push({
@@ -101,6 +100,8 @@ exports.healthcheck = async (req, res) => {
   }
 
   res.status(200).json(healthData);
+  if (span.isRecording()) { span.setAttribute('healthData', healthData); }
+  span.end();
 };
 
 /*
