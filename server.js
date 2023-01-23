@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 require('dotenv').config();
-require('./db');
 
 const rateLimit = require('express-rate-limit');
 
@@ -23,7 +22,9 @@ const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
 const api = require('@opentelemetry/api');
+const db = require('./db');
 const { Tracer } = require('./api/tracing/Tracer');
+const gUtil = require('./api/global_util');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -189,7 +190,7 @@ app.use((err, req, res, next) => {
   // res.end(res.sentry + "\n");
 });
 /* ================= start the web service on http ================= */
-http.createServer(app).listen(app.get('port'), app.get('host'), () => {
+const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
@@ -213,6 +214,29 @@ if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up"
 }
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
+gUtil.sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
   .then((msg) => console.log(msg))
   .catch((err) => console.log(err));
+
+/* shutdown */
+const gracefulShutdown = async () => {
+  console.log('Closing server and ending process...');
+  await gUtil.sendMessage('SERVER_SHUTDOWN');
+
+  webSocketFacade.shutdown();
+  console.log('websocket closed');
+
+  await httpServer.close();
+  console.log('http server stopped');
+
+  await httpsServer.close();
+  console.log('https server stopped');
+
+  await db.closeConnection();
+  console.log('database disconnected');
+
+  process.exit();
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
