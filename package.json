@@ -36,6 +36,8 @@
         "@opentelemetry/exporter-collector": "^0.25.0",
         "@opentelemetry/exporter-jaeger": "^1.8.0",
         "@opentelemetry/exporter-trace-otlp-http": "^0.34.0",
+        "@opentelemetry/exporter-zipkin": "^1.9.0",
+        "@opentelemetry/instrumentation": "^0.35.0",
         "@opentelemetry/instrumentation-express": "^0.32.0",
         "@opentelemetry/instrumentation-mongoose": "^0.32.0",
         "@opentelemetry/instrumentation-router": "^0.32.0",

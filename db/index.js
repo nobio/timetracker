@@ -53,13 +53,11 @@ mongoose.model('GeoFence', models.GeoFence);
 mongoose.model('User', models.User);
 mongoose.model('Token', models.Token);
 
-exports.closeConnection = () => {
-  mongoose.connection.close(
-    () => {
-      console.log('mongodb is closed.');
-    },
-    (err) => {
-      console.error(`error while closing connection mongodb:${err}`);
-    },
-  );
+exports.closeConnection = async () => {
+  try {
+    await mongoose.connection.close();
+    console.log('mongodb is closed.');
+  } catch (error) {
+    console.error(`error while closing connection mongodb:${error}`);
+  }
 };

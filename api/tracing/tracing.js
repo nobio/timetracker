@@ -4,15 +4,16 @@ const {
   SimpleSpanProcessor,
   BatchSpanProcessor,
 } = require('@opentelemetry/tracing');
-const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
+// const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const opentelemetry = require('@opentelemetry/sdk-node');
+const openTelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+// const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { OTTracePropagator } = require('@opentelemetry/propagator-ot-trace');
 const { MongooseInstrumentation } = require('@opentelemetry/instrumentation-mongoose');
@@ -20,15 +21,21 @@ const { MongooseInstrumentation } = require('@opentelemetry/instrumentation-mong
 const otelURL = process.env.OTEL_TRACE_URL || 'http://localhost:14268/api/traces';
 let tracer;
 
-const options = {
+const jaegerOptions = {
   tags: [],
   endpoint: otelURL,
 };
-console.log(options);
+/*
+const zipkinOptions = {
+  url: 'http://192.168.178.23:9411/api/v2/spans',
+  // optional - collection of custom headers to be sent with each request, empty by default
+  headers: {},
+};
+*/
 
 const instrumentations = [
-  new ExpressInstrumentation(),
   new HttpInstrumentation(),
+  new ExpressInstrumentation(),
   new MongooseInstrumentation(),
   new NodeTracerProvider(),
 ];
@@ -37,7 +44,8 @@ const init = (serviceName, environment) => {
   // User Collector Or Jaeger Exporter
   // const exporter = new CollectorTraceExporter(options)
 
-  const exporter = new JaegerExporter(options);
+  const exporter = new JaegerExporter(jaegerOptions);
+  //  const exporter = new ZipkinExporter(zipkinOptions);
 
   const provider = new NodeTracerProvider({
     resource: new Resource({

@@ -226,47 +226,44 @@ const appendMetadata = (tracks) => {
  curl -X POST  -H "Content-Type: application/json"  -d '{"lat": "49.51429653451733", "lon": "10.87531216443598", "acc": 10, "alt": 320, "tid": "A8", "tst": 1694722307}' http://localhost:30000/api/geotrack
  */
 exports.geoFence = async (geoTrack) => {
-  try {
-    const geoFences = await GeoFence.find();
-    // console.log(JSON.stringify(geoFences));
-    // eslint-disable-next-line no-restricted-syntax
-    for (const gf of geoFences) {
-      let direction;
-      const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
-      console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
+  const geoFences = await GeoFence.find();
+  // console.log(JSON.stringify(geoFences));
+  // eslint-disable-next-line no-restricted-syntax
+  let bSaved = false;
+  for (const gf of geoFences) {
+    let direction;
+    const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
+    console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
 
-      if (dist <= gf.radius && !gf.isCheckedIn) {
-        console.log('Treffer - einchecken!!!');
-        direction = 'enter';
-      } else if (dist > gf.radius && gf.isCheckedIn) {
-        console.log('Treffer - auschecken!!!!');
-        direction = 'go';
-      }
+    if (dist <= gf.radius && !gf.isCheckedIn) {
+      console.log('Treffer - einchecken!!!');
+      direction = 'enter';
+    } else if (dist > gf.radius && gf.isCheckedIn) {
+      console.log('Treffer - auschecken!!!!');
+      direction = 'go';
+    }
 
-      // if no direction was found then do not create a new time entry
-      if (direction && gf.enabled) {
-        const timeEntry = {
-          direction,
-          longitude: geoTrack.longitude,
-          latitude: geoTrack.latitude,
-          datetime: geoTrack.date,
-        };
-        try {
-          await utilEntry.create(timeEntry);
-        } catch (error) {
-          console.error(error.message);
-        }
-      }
+    // if no direction was found then do not create a new time entry
+    if (direction && gf.enabled && !bSaved) {
+      const timeEntry = {
+        direction,
+        longitude: geoTrack.longitude,
+        latitude: geoTrack.latitude,
+        datetime: geoTrack.date,
+      };
       try {
-        gf.isCheckedIn = (direction === 'enter');
-        gf.lastChange = geoTrack.date;
-        await gf.save();
+        await utilEntry.create(timeEntry);
+        bSaved = true;
       } catch (error) {
         console.error(error.message);
       }
     }
-  } catch (error) {
-    console.error(error);
-    throw (error);
+    try {
+      gf.isCheckedIn = (direction === 'enter');
+      gf.lastChange = geoTrack.date;
+      await gf.save();
+    } catch (error) {
+      console.error(error.message);
+    }
   }
 };

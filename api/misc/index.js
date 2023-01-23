@@ -52,6 +52,9 @@ exports.version = (req, res) => {
  *
  * @param {*} req
  * @param {*} res
+ *
+ * curl -X GET http://localhost:30000/api/health
+ *
  {
   "status": "pass",
   "version": "11.2.3",

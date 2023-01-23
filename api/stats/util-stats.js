@@ -1,11 +1,11 @@
 require('../../db');
+const moment = require('moment');
 const mongoose = require('mongoose');
 const g_util = require('../global_util');
 
 const utilEntry = require('../entries/util-entries');
 
 const StatsDay = mongoose.model('StatsDay');
-const moment = require('moment');
 const { Tracer } = require('../tracing/Tracer');
 
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
@@ -18,8 +18,9 @@ exports.calcStats = async () => {
   console.log(`---------------------- calcStats isRunning: ${isRunning} -----------------------------`);
   if (isRunning) return;
   isRunning = true;
-  let span;
+  let span; let spanRoot;
   try {
+    spanRoot = Tracer.startSpan('stats.util.calcStats');
     g_util.sendMessage('RECALCULATE', 'delete stats');
     span = Tracer.startSpan('stats.util.calcStats.deleteMany');
     await StatsDay.deleteMany();
@@ -45,10 +46,12 @@ exports.calcStats = async () => {
   } catch (error) {
     console.log(error);
     isRunning = false;
+    spanRoot.recordException(error);
     throw error;
   } finally {
     isRunning = false;
     span.end();
+    spanRoot.end();
   }
 };
 
