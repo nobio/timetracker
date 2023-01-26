@@ -871,20 +871,21 @@ describe('test index.logout', () => {
     }
   });
 
-  it('test for NOK (400): call logout but without token', async () => {
+  it('test for NOK 200 (no longer 400 since bugfix #101): call logout but without token', async () => {
     const req = mockRequest({ headers: [], body: { token: null } });
     const res = mockResponse();
     const next = sinon.spy();
 
     try {
       await auth.logout(req, res, next);
-      expect(res.status).to.have.been.calledWith(400);
+      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
+      expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
-  it('test for NOK (400): call logout with invalid token', async () => {
+  it('test for NOK 200 ((no longer 400 since bugfix #101)): call logout with invalid token', async () => {
     const req = mockRequest({ headers: [], params: { token: 'xxx.yyy.zzz' } });
     const res = mockResponse();
     const next = sinon.spy();
@@ -892,7 +893,8 @@ describe('test index.logout', () => {
     try {
       await auth.logout(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
-      expect(res.status).to.have.been.calledWith(400);
+      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
+      expect(res.status).to.have.been.calledWith(200); 
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }

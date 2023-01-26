@@ -210,7 +210,9 @@ exports.logout = async (req, res) => {
     res.status(200).send();
   } catch (err) {
     span.recordException(err);
-    res.status(400).json({ message: err.message });
+    // commented for bugfix #101
+    // res.status(400).json({ message: err.message });
+    res.status(200).json({ message: err.message });
   } finally {
     span.end();
   }
