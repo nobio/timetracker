@@ -2,6 +2,7 @@ const util = require('./util-admin');
 const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
 const utilGeofence = require('./util-geofences');
+const { Tracer } = require('../tracing/Tracer');
 
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
@@ -9,9 +10,12 @@ const utilGeofence = require('./util-geofences');
  * curl -X POST http://localhost:30000/api/entries/dump
  */
 exports.dumpModels = (req, res) => {
+  const span = Tracer.startSpan('admin.dumpModels');
+
   util.dumpModels()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -20,10 +24,13 @@ exports.dumpModels = (req, res) => {
  * curl -k -X POST https://localhost:30443/api/entries/restore
  */
 exports.restoreFromFile = (req, res) => {
+  const span = Tracer.startSpan('admin.restoreFromFile');
+
   util.restoreDataFromFile()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
-},
+    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
+    .finally(() => span.end());
+};
 
 /**
    * function to backup data in an extra backup table
@@ -31,9 +38,12 @@ exports.restoreFromFile = (req, res) => {
    * curl -X POST http://localhost:30000/api/entries/backup
    */
 exports.backupTimeEntries = (req, res) => {
+  const span = Tracer.startSpan('admin.backupTimeEntries');
+
   util.backupTimeEntries()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
+    .catch((err) => res.status(500).send(`Error while backup data: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -42,9 +52,12 @@ exports.backupTimeEntries = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles
  */
 exports.getAllToggles = (req, res) => {
+  const span = Tracer.startSpan('admin.getAllToggles');
+
   utilToggles.getAllToggles()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading all toggles: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading all toggles: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -53,11 +66,13 @@ exports.getAllToggles = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/5c347688567bd711d5d2c056
  */
 exports.getToggleById = (req, res) => {
+  const span = Tracer.startSpan('admin.getToggleById');
   const { id } = req.params;
 
   utilToggles.getToggle(id)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -67,10 +82,13 @@ exports.getToggleById = (req, res) => {
  */
 exports.getToggleByName = (req, res) => {
   const { name } = req.params;
+  const span = Tracer.startSpan('admin.getToggleByName');
+  if (span.isRecording()) { span.setAttribute('name', name); }
 
   utilToggles.getToggleByName(name)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading one toggle: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -79,9 +97,12 @@ exports.getToggleByName = (req, res) => {
  * curl -X GET http://localhost:30000/api/toggles/status
  */
 exports.getToggleStatus = (req, res) => {
+  const span = Tracer.startSpan('admin.getToggleStatus');
+
   utilToggles.getToggleStatus()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading toggle status: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading toggle status: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -95,10 +116,17 @@ exports.saveToggle = (req, res) => {
   const { id } = req.params;
   const { toggle } = req.body;
   const { notification } = req.body;
+  const span = Tracer.startSpan('admin.saveToggle');
+  if (span.isRecording()) {
+    span.setAttribute('id', id);
+    span.setAttribute('toggle', toggle);
+    span.setAttribute('notification', notification);
+  }
 
   utilToggles.updateToggle(id, toggle, notification)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while saving toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while saving toggle: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -110,10 +138,17 @@ exports.createToggle = (req, res) => {
   const { name } = req.body;
   const { toggle } = req.body;
   const { notification } = req.body;
+  const span = Tracer.startSpan('admin.createToggle');
+  if (span.isRecording()) {
+    span.setAttribute('name', name);
+    span.setAttribute('toggle', toggle);
+    span.setAttribute('notification', notification);
+  }
 
   utilToggles.createToggle(name, toggle, notification)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while creating new toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while creating new toggle: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -123,6 +158,7 @@ exports.createToggle = (req, res) => {
  */
 exports.deleteToggle = (req, res) => {
   const { id } = req.params;
+  const span = Tracer.startSpan('admin.deleteToggle');
 
   utilToggles.deleteToggle(id)
     .then((toggle) => {
@@ -132,7 +168,8 @@ exports.deleteToggle = (req, res) => {
         res.status(200).send(toggle);
       }
     })
-    .catch((err) => res.status(500).send(`Error while deleting existing toggle: ${err}`));
+    .catch((err) => res.status(500).send(`Error while deleting existing toggle: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -148,9 +185,12 @@ app.delete('/api/properties/:key', api_admin.deleteProperty);
  * curl -X GET http://localhost:30000/api/properties
  */
 exports.getProperties = (req, res) => {
+  const span = Tracer.startSpan('admin.getProperties');
+
   utilProps.getProperties()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading all properties: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading all properties: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -160,6 +200,8 @@ exports.getProperties = (req, res) => {
  */
 exports.getProperty = (req, res) => {
   const { key } = req.params;
+  const span = Tracer.startSpan('admin.getProperties');
+  if (span.isRecording()) { span.setAttribute('key', key); }
 
   utilProps.getProperty(key)
     .then((response) => {
@@ -169,7 +211,8 @@ exports.getProperty = (req, res) => {
         res.status(404).send();
       }
     })
-    .catch((err) => res.status(500).send(`Error while reading one property: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading one property: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -180,10 +223,16 @@ exports.getProperty = (req, res) => {
 exports.setProperty = (req, res) => {
   const { key } = req.params;
   const { value } = req.query;
+  const span = Tracer.startSpan('admin.setProperty');
+  if (span.isRecording()) {
+    span.setAttribute('key', key);
+    span.setAttribute('value', value);
+  }
 
   utilProps.setProperty(key, value)
     .then((response) => res.status(201).send())
-    .catch((err) => res.status(500).send(`Error while reading a property: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading a property: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -193,6 +242,8 @@ exports.setProperty = (req, res) => {
  */
 exports.deleteProperty = (req, res) => {
   const { key } = req.params;
+  const span = Tracer.startSpan('admin.deleteProperty');
+  if (span.isRecording()) { span.setAttribute('key', key); }
 
   utilProps.deleteProperty(key)
     .then((response) => {
@@ -201,7 +252,8 @@ exports.deleteProperty = (req, res) => {
       } else {
         res.status(404).send();
       }
-    }).catch((err) => res.status(500).send(`Error while deleting a property: ${err}`));
+    }).catch((err) => res.status(500).send(`Error while deleting a property: ${err}`))
+    .finally(() => span.end());
 };
 
 /** ********************************
@@ -213,19 +265,27 @@ app.delete('/api/gefences/:id', api_admin.deleteGeofence);
  */
 
 exports.getGeofences = (req, res) => {
+  const span = Tracer.startSpan('admin.getGeofences');
+
   utilGeofence.getGeofences()
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading all geofences: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while reading all geofences: ${err.message}`))
+    .finally(() => span.end());
 };
 
 exports.getGeofence = (req, res) => {
   const { id } = req.params;
+  const span = Tracer.startSpan('admin.getGeofence');
+  if (span.isRecording()) { span.setAttribute('id', id); }
+
   utilGeofence.getGeofence(id)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while reading a geofence: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while reading a geofence: ${err.message}`))
+    .finally(() => span.end());
 };
 
 exports.createGeofence = (req, res) => {
+  const span = Tracer.startSpan('admin.createGeofence');
   const {
     enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
   } = req.body;
@@ -240,7 +300,8 @@ exports.createGeofence = (req, res) => {
     lastChange,
   )
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while creating a new geofence: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while creating a new geofence: ${err.message}`))
+    .finally(() => span.end());
 };
 
 exports.saveGeofence = (req, res) => {
@@ -248,16 +309,22 @@ exports.saveGeofence = (req, res) => {
   const {
     enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
   } = req.body;
+  const span = Tracer.startSpan('admin.saveGeofence');
+  if (span.isRecording()) { span.setAttribute('id', id); }
 
   utilGeofence.setGeofence(id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`));
+    .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`))
+    .finally(() => span.end());
 };
 
 exports.deleteGeofence = (req, res) => {
   const { id } = req.params;
+  const span = Tracer.startSpan('admin.deleteGeofence');
+  if (span.isRecording()) { span.setAttribute('id', id); }
 
   utilGeofence.deleteGeofence(id)
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while deleting a geofence: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while deleting a geofence: ${err.message}`))
+    .finally(() => span.end());
 };

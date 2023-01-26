@@ -2,6 +2,7 @@ const admin = require('../admin/util-admin');
 const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
+const { Tracer } = require('../tracing/Tracer');
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -9,9 +10,11 @@ const auth = require('../auth/util-auth');
  * curl -X PUT http://localhost:30000/api/schedule?jobclass=CALC_STATS
  ****************************************************************************** */
 exports.schedule = (req, res) => {
+  const span = Tracer.startSpan('schedule.schedule');
   const jobClass = req.query.jobclass;
   if (!jobClass) { res.status(400).send('no jobclass provided'); return; }
   console.log(`job class found: [${jobClass}]`);
+  if (span.isRecording()) { span.setAttribute('jobClass', jobClass); }
 
   switch (jobClass) {
     case 'CALC_STATS':
@@ -42,4 +45,5 @@ exports.schedule = (req, res) => {
       res.status(400).send('invalid jobclass provided');
       console.log('go fuck yourself');
   }
+  span.end();
 };

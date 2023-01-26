@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 process.env.SLACK_URL = '';
-if(process.env.MONGODB_PROTOCOL
+if (process.env.MONGODB_PROTOCOL
   && process.env.MONGODB_USER
    && process.env.MONGODB_PASSWORD
    && process.env.MONGODB_URI) {
@@ -9,3 +9,7 @@ if(process.env.MONGODB_PROTOCOL
 } else {
   process.env.MONGODB_URL = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 }
+
+const { Tracer } = require('../api/tracing/Tracer');
+
+Tracer.init('unit-test', 'unit test');

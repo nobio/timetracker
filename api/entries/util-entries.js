@@ -109,7 +109,7 @@ exports.create = async (timeEntry) => {
   // ============== 2nd check: is the new entry really a new entry or does it already exist? ==============
   try {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
-    // console.log(entriesByDate);
+    console.log(entriesByDate);
     entriesByDate.forEach((entry) => {
       if (entry.entry_date.toISOString() === timeEntry.datetime
         && entry.direction === timeEntry.direction) {
@@ -132,6 +132,7 @@ exports.create = async (timeEntry) => {
     }).save()
       .then((tEntry) => {
         // in case the external URL is given, use it to render a deep link
+        // eslint-disable-next-line max-len
         const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
         g_util.sendMessage('CREATE_ENTRY', msg);
         return tEntry;

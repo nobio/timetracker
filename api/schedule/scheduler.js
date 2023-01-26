@@ -3,6 +3,7 @@ const admin = require('../admin/util-admin');
 const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
+const { Tracer } = require('../tracing/Tracer');
 
 /**
  * start scheduler to run tasks
@@ -12,37 +13,43 @@ exports.scheduleTasks = function () {
   console.log('job scheduler: calcStats (every hour at ??:00)');
   scheduler.scheduleJob({ minute: 0 }, () => { // every hour at ??:00
     console.log('scheduled task "calcStats" started');
-    stats.calcStats().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.calcStats');
+    stats.calcStats().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   console.log('job scheduler: dumpModels (every day at 12:05)');
   scheduler.scheduleJob({ hour: 12, minute: 5 }, () => { // every day at 12:05
     console.log('scheduled task "dumpModels" started');
-    admin.dumpModels().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.dumpModels');
+    admin.dumpModels().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   console.log('job scheduler: backupTimeEntry (every hour at 10 past (??:10)');
   scheduler.scheduleJob({ minute: 10 }, () => {
     console.log('scheduled task "backupTimeEntry" started');
-    admin.backupTimeEntries().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.backupTimeEntry');
+    admin.backupTimeEntries().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   console.log('job scheduler: data evaluate (every hour at ??:12)');
   scheduler.scheduleJob({ minute: 12 }, () => {
     console.log('scheduled task "evaluate" started');
-    entries.evaluate().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.evaluate');
+    entries.evaluate().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   console.log('job scheduler: remove tokens of user \'Tester\' (every day at 21:59)');
   scheduler.scheduleJob({ hour: 21, minute: 50 }, () => { // every hour at ??:13
     console.log('scheduled task "removeTesterToken" started');
-    auth.removeTesterToken().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.removeTesterToken');
+    auth.removeTesterToken().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   console.log('job scheduler: remove expired Tokens (every day at 21:59)');
   scheduler.scheduleJob({ hour: 21, minute: 15 }, () => { // every hour at ??:13
     console.log('scheduled task "removeExpiredTokens" started');
-    auth.removeExpiredToken().catch((err) => console.error(err));
+    const span = Tracer.startSpan('scheduleTasks.removeExpiredTokens');
+    auth.removeExpiredToken().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   /*

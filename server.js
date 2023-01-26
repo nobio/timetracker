@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 require('dotenv').config();
-require('./db');
+
 const rateLimit = require('express-rate-limit');
 
 const limiter = rateLimit({
@@ -11,7 +11,6 @@ const limiter = rateLimit({
 });
 
 const express = require('express');
-
 const http = require('http');
 const https = require('https');
 const path = require('path');
@@ -22,6 +21,10 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
+const api = require('@opentelemetry/api');
+const db = require('./db');
+const { Tracer } = require('./api/tracing/Tracer');
+const gUtil = require('./api/global_util');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -32,6 +35,7 @@ const api_schedule = require('./api/schedule');
 
 require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
 
+Tracer.init('timetracker', 'development');
 const app = express();
 
 morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
@@ -70,6 +74,7 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
+
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------
@@ -141,7 +146,7 @@ app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
 app.get('/api/experiment', api_misc.experiment);
-app.get('/api/health', api_misc.healtchckech);
+app.get('/api/health', api_misc.healthcheck);
 // log the request on different methods
 app.get('/api/log', api_misc.log);
 app.post('/api/log', api_misc.log);
@@ -185,7 +190,7 @@ app.use((err, req, res, next) => {
   // res.end(res.sentry + "\n");
 });
 /* ================= start the web service on http ================= */
-http.createServer(app).listen(app.get('port'), app.get('host'), () => {
+const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'), () => {
   console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
@@ -209,6 +214,29 @@ if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up"
 }
 
 /* send message that server has been started */
-require('./api/global_util').sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
+gUtil.sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
   .then((msg) => console.log(msg))
   .catch((err) => console.log(err));
+
+/* shutdown */
+const gracefulShutdown = async () => {
+  console.log('Closing server and ending process...');
+  await gUtil.sendMessage('SERVER_SHUTDOWN');
+
+  webSocketFacade.shutdown();
+  console.log('websocket closed');
+
+  await httpServer.close();
+  console.log('http server stopped');
+
+  await httpsServer.close();
+  console.log('https server stopped');
+
+  await db.closeConnection();
+  console.log('database disconnected');
+
+  process.exit();
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);

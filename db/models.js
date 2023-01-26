@@ -1,6 +1,8 @@
 /* eslint-disable object-curly-newline */
 const mongoose = require('mongoose');
 
+mongoose.set('strictQuery', false);
+
 // --------------------------------------------------
 // ----------------- TimeEntry ----------------------
 // --------------------------------------------------
@@ -97,12 +99,12 @@ module.exports.Token = Token;
 // -------------- GeoFence --------------------------
 // --------------------------------------------------
 const GeoFence = new mongoose.Schema({
-  enabled: { type: Boolean, required: true },
+  enabled: { type: Boolean, required: true, index: false },
   longitude: { type: Number, required: true, index: false },
   latitude: { type: Number, required: true, index: false },
   radius: { type: Number, required: true, default: 50, index: false },
-  description: { type: String, required: false },
+  description: { type: String, required: true },
   isCheckedIn: { type: Boolean, required: true },
-  lastChange: { type: Date, required: false, default: Date.now },
+  lastChange: { type: Date, required: false, default: Date.now, index: false },
 });
 module.exports.GeoFence = GeoFence;

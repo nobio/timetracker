@@ -2,6 +2,7 @@ const util = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');
 const utilBreaktime = require('./util-breaktime');
+const { Tracer } = require('../tracing/Tracer');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -9,9 +10,12 @@ const utilBreaktime = require('./util-breaktime');
  * curl -X PUT http://localhost:30000/api/stats
  */
 exports.calcStats = (req, res) => {
+  const span = Tracer.startSpan('stats.calcStats');
+
   util.calcStats()
     .then((timeentry) => res.status(200).send(timeentry))
-    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -21,14 +25,23 @@ exports.calcStats = (req, res) => {
  *  curl -X GET http://localhost:30000/api/stats/1391295600000/month?fill=true
  */
 exports.getStats = (req, res) => {
+  const span = Tracer.startSpan('stats.getStats');
+
   const dtStart = req.params.date;
   const { timeUnit } = req.params;
   const { accumulate } = req.query;
   const { fill } = req.query;
 
+  if (span.isRecording()) {
+    span.setAttribute('timeUnit', timeUnit);
+    span.setAttribute('accumulate', accumulate);
+    span.setAttribute('fill', fill);
+  }
+
   util.getStats(timeUnit, dtStart, accumulate, fill)
     .then((timeentries) => res.status(200).send(timeentries))
-    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
+    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -38,9 +51,12 @@ exports.getStats = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/stats
  */
 exports.deleteAllStatsDays = (req, res) => {
+  const span = Tracer.startSpan('stats.deleteAllStatsDays');
+
   util.deleteAllStatsDays()
     .then((result) => res.status(200).send(result))
-    .catch((err) => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`));
+    .catch((err) => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -50,7 +66,10 @@ exports.deleteAllStatsDays = (req, res) => {
  * curl -X GET http://localhost:30000/api/statistics/aggregate?timeUnit=weekday
  */
 exports.getStatsByTimeBox = (req, res) => {
+  const span = Tracer.startSpan('stats.getStatsByTimeBox');
+
   const { timeUnit } = req.query;
+  if (span.isRecording()) { span.setAttribute('timeUnit', timeUnit); }
 
   utilTimebox.getStatsByTimeBox(timeUnit)
     .then((timeboxedStatistics) => {
@@ -75,7 +94,8 @@ exports.getStatsByTimeBox = (req, res) => {
         chart_data,
       });
     })
-    .catch((err) => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while reading Time Boxed Entries: ${err.message}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -87,12 +107,20 @@ exports.getStatsByTimeBox = (req, res) => {
  * @param {*} res
  */
 exports.histogram = (req, res) => {
+  const span = Tracer.startSpan('stats.histogram');
+
   const { interval } = req.params;
   const { direction } = req.query;
 
+  if (span.isRecording()) {
+    span.setAttribute('interval', interval);
+    span.setAttribute('direction', direction);
+  }
+
   utilHistogram.getHistogramByTimeUnit(interval, direction)
     .then((data) => res.status(200).send(data))
-    .catch((err) => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`));
+    .catch((err) => res.status(500).send(`Error while reading histogram of Time Entries for given interval (${interval}): ${err.message}`))
+    .finally(() => span.end());
 };
 
 /**
@@ -104,8 +132,15 @@ exports.histogram = (req, res) => {
  * @param {*} res
  */
 exports.breaktime = (req, res) => {
+  const span = Tracer.startSpan('stats.histogram');
+
   const interval = parseInt(req.params.interval);
   const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
+
+  if (span.isRecording()) {
+    span.setAttribute('interval', interval);
+    span.setAttribute('realCalc', realCalc);
+  }
 
   if (!interval || interval === '0') {
     res.status(500).send('invalid interval; must be numeric and > 0');
@@ -114,4 +149,5 @@ exports.breaktime = (req, res) => {
       .then((data) => res.status(200).send(data))
       .catch((err) => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
   }
+  span.end();
 };

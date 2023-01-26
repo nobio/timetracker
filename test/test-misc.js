@@ -51,7 +51,7 @@ describe('test misc functions', () => {
     let response;
 
     try {
-      await misc.healtchckech(req, res, next);
+      await misc.healthcheck(req, res, next);
       response = res.json.getCalls()[0].lastArg;
       // console.log(res.json.getCalls()[0].lastArg)
     } catch (err) {
