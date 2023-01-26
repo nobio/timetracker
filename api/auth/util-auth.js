@@ -209,8 +209,8 @@ exports.logout = async (token) => {
     await Token.deleteMany({ user: user.username }); // delete all refresh tokens with the same username
   } catch (err) {
     console.error(`error when logout: ${err.message} \n${err}`);
-     // commented for bugfix #101
-     // throw createError(400, err.message);
+    // commented for bugfix #101
+    // throw createError(400, err.message);
   }
 };
 
