@@ -113,3 +113,7 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:30000/api/geofences/636e47d627cadff11e22fbf6
+
+###
+
+post http://localhost:30000/api/entries/dump
