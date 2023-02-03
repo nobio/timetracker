@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
 require('../../db');
@@ -8,7 +9,6 @@ const zlib = require('zlib');
 const moment = require('moment');
 const mongoose = require('mongoose');
 const gUtil = require('../global_util');
-const minioUtil = require('./util-minio');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
@@ -57,7 +57,6 @@ const dumpModel = async (model) => {
         reject(err);
       } else {
         fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
-        minioUtil.dumpModel(model.modelName, dumpFile);
         resolve({
           size: entries.length,
           filename: dumpFile,
@@ -85,6 +84,8 @@ const recentFile = (dir, type) => {
  * @param {*} dbType
  */
 const restoreFile = async (dbType) => {
+  await minioUtil.downloadFile(String(dbType).toLowerCase());
+
   const f = recentFile(DUMP_DIR, dbType);
   const Model = mongoose.model(dbType);
 
@@ -107,41 +108,22 @@ const restoreFile = async (dbType) => {
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
-exports.dumpModels = async () => {
+exports.dumpModels = async (models) => {
   const res = [];
-  let result;
-
-  result = await dumpModel(mongoose.model('User'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('StatsDay'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('Toggle'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('Properties'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('GeoFence'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('FailureDay'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('TimeEntry'));
-  res.push(result);
-  result = await dumpModel(mongoose.model('GeoTracking'));
-  res.push(result);
-
+  for (const model of models) {
+    res.push(await dumpModel(mongoose.model(model)));
+  }
   return res;
 };
 
-exports.restoreDataFromFile = async () => {
-  if (!fs.existsSync(DUMP_DIR)) return 'dup directory does not exist - restore not possible';
-  const res = [];
+exports.restoreDataFromFile = async (models) => {
+  if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
 
-  res.push(restoreFile('User'));
-  res.push(restoreFile('StatsDay'));
-  res.push(restoreFile('Toggle'));
-  res.push(restoreFile('Properties'));
-  res.push(restoreFile('FailureDay'));
-  res.push(restoreFile('TimeEntry'));
-  res.push(restoreFile('GeoTracking'));
+  const res = [];
+  for (const model of models) {
+    res.push(await restoreFile(model));
+  }
+
   return res;
 };
 
