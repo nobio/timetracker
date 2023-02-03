@@ -1,6 +1,10 @@
+/* eslint-disable no-loop-func */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-syntax */
 const Minio = require('minio');
+const fs = require('fs');
+const mongoose = require('mongoose');
+const zlib = require('zlib');
 
 const connectMinIOServer = () => new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT,
@@ -11,9 +15,8 @@ const connectMinIOServer = () => new Minio.Client({
   autoDeleteObjects: true,
 });
 
-const dumpModel = async (bucketName) => {
+const dumpModel = async (bucketName, fileName) => {
   const bucket = bucketName.toLowerCase();
-  const fileName = `${bucketName}.json.gz`;
   // Instantiate the minio client with the endpoint
   // and access keys as shown below.
   const minioClient = connectMinIOServer();
@@ -35,19 +38,42 @@ const dumpModel = async (bucketName) => {
     };
 
     // Using fPutObject API upload your file to the bucket europetrip.
-    const objInfo = await minioClient.fPutObject(bucket, fileName, fileName, metaData);
+    const objInfo = await minioClient.fPutObject(bucket, `${bucketName}.json.gz`, fileName, metaData);
     console.log(`${bucketName} uploaded successfully ${JSON.stringify(objInfo)}`);
-    return;
+    return `${bucketName} uploaded successfully`;
   } catch (error) {
     console.error(error);
   }
 };
 
 exports.dumpModels = async (models) => {
-  const res = [];
+  const promises = [];
+  // TODO: delete ./tmp, create ./tmp, create *json.gz files, upload, delete ./tmp
+  // 1. delete ./tmp
+  fs.rmSync('./tmp', { recursive: true, force: true });
+  // 2. create ./tmp
+  fs.mkdirSync('./tmp');
+  // 3. create files
   for (const model of models) {
-    res.push(await dumpModel(model));
+    const dumpFile = `./tmp/${model}.json.gz`;
+    const m = mongoose.model(model);
+    const data = await m.find();
+    // 4. create file
+    zlib.gzip(JSON.stringify(data), (err, buffer) => {
+      if (err) {
+        console.log(err);
+      } else {
+        fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
+        // 5. upload to S3 storage
+        promises.push(dumpModel(model, dumpFile));
+      }
+    });
   }
+
+  const res = await Promise.all(promises);
+  // 6. delete ./tmp
+  // fs.rmSync('./tmp', { recursive: true, force: true });
+
   return res;
 };
 
