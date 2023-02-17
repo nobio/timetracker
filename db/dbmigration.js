@@ -16,11 +16,13 @@ const models = require('./models');
 // const MONGO_URL_QNAP = 'mongodb://qnap-nas:27017/timetracker';
 const MONGO_URL_QNAP = 'mongodb://192.168.178.23:27017/timetracker';
 const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
-// const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
+const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
+const MONGO_URL_STRATO = 'mongodb://h3001733.stratoserver.net:27017/timetracker';
 
 const MONGO_URL_SOURCE = MONGO_URL_QNAP;
 // const MONGO_URL_TARGET = MONGO_URL_K8S;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
+// const MONGO_URL_TARGET = MONGO_URL_STRATO;
 
 console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 

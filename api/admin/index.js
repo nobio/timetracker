@@ -5,8 +5,6 @@ const utilGeofence = require('./util-geofences');
 const utilMinio = require('./util-minio');
 const { Tracer } = require('../tracing/Tracer');
 
-const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
-
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
  *
@@ -17,13 +15,13 @@ exports.dumpModels = (req, res) => {
 
   if (process.env.MINIO_ACTIVE === 'true') {
     // dump to S3-Storage
-    utilMinio.dumpModels(MODELS)
+    utilMinio.dumpModels()
       .then((response) => res.status(200).send(response))
       .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
       .finally(() => span.end());
   } else {
     // dump to file system
-    util.dumpModels(MODELS)
+    util.dumpModels()
       .then((response) => res.status(200).send(response))
       .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
       .finally(() => span.end());
@@ -35,13 +33,22 @@ exports.dumpModels = (req, res) => {
  *
  * curl -k -X POST https://localhost:30443/api/entries/restore
  */
-exports.restoreFromFile = (req, res) => {
+exports.restore = (req, res) => {
   const span = Tracer.startSpan('admin.restoreFromFile');
 
-  util.restoreDataFromFile(MODELS)
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
-    .finally(() => span.end());
+  if (process.env.MINIO_ACTIVE === 'true') {
+    // dump to S3-Storage
+    utilMinio.restoreFromS3()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
+      .finally(() => span.end());
+  } else {
+    // dump to file system
+    util.restoreDataFromFile()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
+      .finally(() => span.end());
+  }
 };
 
 /**

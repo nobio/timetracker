@@ -1,9 +1,8 @@
+/* eslint-disable no-undef */
 require('./init');
-const mongoose = require('mongoose');
 const fs = require('fs');
 
 const chai = require('chai');
-const { resolve } = require('path');
 const util = require('../api/admin/util-admin');
 // const chaiAsPromised = require('chai-as-promised');
 // chai.use(chaiAsPromised);
@@ -28,6 +27,7 @@ describe('test util.dumpModels', () => {
     try {
       // const result = await util.dumpModel(mongoose.model('Toggle'));
       const result = await util.dumpModels();
+
       // console.log(result)
       expect(result).to.be.an('array');
       expect(result.length).to.gt(0);

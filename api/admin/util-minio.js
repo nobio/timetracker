@@ -1,10 +1,11 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-syntax */
 const Minio = require('minio');
-const fs = require('fs');
 const mongoose = require('mongoose');
-const zlib = require('zlib');
+
+const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
 
 const connectMinIOServer = () => new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT,
@@ -15,8 +16,14 @@ const connectMinIOServer = () => new Minio.Client({
   autoDeleteObjects: true,
 });
 
-const dumpModel = async (bucketName, fileName) => {
-  const bucket = bucketName.toLowerCase();
+/**
+ * Uploads a JSON Object to a S3 bucket
+ * @param {*} bucket Name of the bucket the object is supposed to be uploaded
+ * @param {*} objectName Name of the actual object that is tp be uploaded
+ * @param {*} object The (JSON) Object to be uploaded
+ * @returns Status Message
+ */
+const upload = async (bucket, objectName, object) => {
   // Instantiate the minio client with the endpoint
   // and access keys as shown below.
   const minioClient = connectMinIOServer();
@@ -27,8 +34,8 @@ const dumpModel = async (bucketName, fileName) => {
 
     // create bucket if not exists
     if (!bucketExists) {
-      await minioClient.makeBucket(bucket, 'us-east-1');
-      console.log('Bucket created successfully in "us-east-1".');
+      await minioClient.makeBucket(bucket, 'eu-west-1');
+      console.log(`Bucket ${bucket} created successfully in "us-east-1".`);
     }
     await minioClient.setBucketVersioning(bucket, { Status: 'Enabled' });
 
@@ -37,71 +44,71 @@ const dumpModel = async (bucketName, fileName) => {
       'X-Date': new Date().toISOString(),
     };
 
-    // Using fPutObject API upload your file to the bucket europetrip.
-    const objInfo = await minioClient.fPutObject(bucket, `${bucketName}.json.gz`, fileName, metaData);
-    console.log(`${bucketName} uploaded successfully ${JSON.stringify(objInfo)}`);
-    return `${bucketName} uploaded successfully`;
+    // Using putObject API upload your file to the bucket europetrip.
+    const ojbBuffer = Buffer.from(JSON.stringify(object));
+    await minioClient.removeObject(bucket, objectName);
+    const objInfo = await minioClient.putObject(bucket, objectName, ojbBuffer, metaData);
+    console.log(`${objectName} uploaded successfully to ${bucket}: ${JSON.stringify(objInfo)}`);
+
+    return `${objectName} uploaded successfully`;
   } catch (error) {
     console.error(error);
   }
 };
 
-exports.dumpModels = async (models) => {
-  const promises = [];
-  // TODO: delete ./tmp, create ./tmp, create *json.gz files, upload, delete ./tmp
-  // 1. delete ./tmp
-  fs.rmSync('./tmp', { recursive: true, force: true });
-  // 2. create ./tmp
-  fs.mkdirSync('./tmp');
-  // 3. create files
-  for (const model of models) {
-    const dumpFile = `./tmp/${model}.json.gz`;
-    const m = mongoose.model(model);
-    const data = await m.find();
-    // 4. create file
-    zlib.gzip(JSON.stringify(data), (err, buffer) => {
-      if (err) {
-        console.log(err);
-      } else {
-        fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
-        // 5. upload to S3 storage
-        promises.push(dumpModel(model, dumpFile));
-      }
-    });
+const downloadObject = async (bucket, objectName) => {
+  const minioClient = connectMinIOServer();
+
+  try {
+    const objStream = await minioClient.getObject(bucket, objectName);
+
+    const chunks = [];
+    for await (const chunk of objStream) {
+      chunks.push(chunk);
+    }
+
+    const responseBuffer = Buffer.concat(chunks);
+    const dataArray = JSON.parse(responseBuffer.toString('utf-8'));
+    return dataArray;
+  } catch (error) {
+    console.log(error);
+    return error.message;
   }
+};
 
-  const res = await Promise.all(promises);
-  // 6. delete ./tmp
-  // fs.rmSync('./tmp', { recursive: true, force: true });
+const restore = async (objectName, objectArray) => {
+  console.log(`restoring model ${objectName}`);
 
+  if (objectArray.length === 0) return;
+
+  try {
+    const Model = mongoose.model(objectName);
+    await Model.deleteMany({});
+    await Model.collection.insertMany(objectArray);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.dumpModels = async () => {
+  const res = [];
+
+  for (const modelType of MODELS) {
+    const Model = mongoose.model(modelType);
+    const entries = await Model.find();
+    res.push(await upload('test-bucket', modelType, entries));
+  }
   return res;
 };
 
-exports.downloadFile = async (bucket) => {
-  const objectsList = [];
-  // require('dotenv').config();
-  const minioClient = connectMinIOServer();
+exports.restoreFromS3 = async () => {
+  const res = [];
+  for (const modelType of MODELS) {
+    const objJsonArray = await downloadObject('test-bucket', modelType);
+    await restore(modelType, objJsonArray);
 
-  const objectsStream = await minioClient.listObjects(bucket, '', true);
-  return new Promise((resolve, reject) => {
-    objectsStream.on('error', (error) => {
-      console.log(error);
-      reject(error);
-    });
+    res.push(`${modelType} sucessfully restored`);
+  }
 
-    objectsStream.on('data', (obj) => {
-      console.log(obj.name, obj.lastModified, obj.size, obj.etag);
-      objectsList.push(obj);
-    });
-
-    objectsStream.on('end', (e) => {
-      console.log('Total number of objects: ', objectsList.length);
-      if (objectsList.length === 0) {
-        return;
-      }
-      objectsList.sort((objA, objB) => objB.lastModified - objA.lastModified);
-      const obj = objectsList[0]; // first element
-      minioClient.fGetObject(bucket, obj.name, `/Users/nobio/Projects/timetracker/dump/${obj.name}`);
-    });
-  });
+  return res;
 };

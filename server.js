@@ -109,7 +109,7 @@ app.delete('/api/geofences/:id', api_admin.deleteGeofence);
 // .......................................................................
 app.post('/api/entries/dump', api_admin.dumpModels);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
-app.post('/api/entries/restore', api_admin.restoreFromFile);
+app.post('/api/entries/restore', api_admin.restore);
 
 // .......................................................................
 // toggles

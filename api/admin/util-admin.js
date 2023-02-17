@@ -14,6 +14,7 @@ const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 
 const DUMP_DIR = './dump';
+const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
 
 /* ====================================================================================== */
 /* ======================================== H E L P E R ================================= */
@@ -53,9 +54,8 @@ const dumpModel = async (model) => {
 
   return new Promise((resolve, reject) => {
     zlib.gzip(JSON.stringify(entries), (err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
+      if (err) reject(err);
+      else {
         fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
         resolve({
           size: entries.length,
@@ -84,13 +84,18 @@ const recentFile = (dir, type) => {
  * @param {*} dbType
  */
 const restoreFile = async (dbType) => {
-  await minioUtil.downloadFile(String(dbType).toLowerCase());
-
   const f = recentFile(DUMP_DIR, dbType);
   const Model = mongoose.model(dbType);
-
-  const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
+  const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
+  const data = await new Promise((resolve, reject) => {
+    zlib.gunzip(buffer, (err, buf) => {
+      if (err) reject(err);
+      else resolve(JSON.parse(buf.toString('utf-8')));
+    });
+  });
+  // const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
   // eslint-disable-next-line no-restricted-syntax
+  await Model.deleteMany({});
   for (const item of data) {
     try {
       new Model(item).save();
@@ -108,19 +113,19 @@ const restoreFile = async (dbType) => {
 /**
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
-exports.dumpModels = async (models) => {
+exports.dumpModels = async () => {
   const res = [];
-  for (const model of models) {
+  for (const model of MODELS) {
     res.push(await dumpModel(mongoose.model(model)));
   }
   return res;
 };
 
-exports.restoreDataFromFile = async (models) => {
+exports.restoreDataFromFile = async () => {
   if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
 
   const res = [];
-  for (const model of models) {
+  for (const model of MODELS) {
     res.push(await restoreFile(model));
   }
 
@@ -128,20 +133,31 @@ exports.restoreDataFromFile = async (models) => {
 };
 
 exports.backupTimeEntries = async () => {
+  console.log('------------------- BACKUP DATA TO BACKUP TABLE ---------------------');
   await TimeEntryBackup.deleteMany({});
   const timeEntries = await TimeEntry.find();
   console.log(`${timeEntries.length} time entries found to be backed up`);
 
+  const promises = [];
   for (const timeentry of timeEntries) {
-    new TimeEntryBackup({
-      _id: timeentry._id,
-      entry_date: timeentry.entry_date,
-      direction: timeentry.direction,
-      last_changed: timeentry.last_changed,
-      longitude: timeentry.longitude,
-      latitude: timeentry.latitude,
-    }).save();
+    promises.push(
+      new TimeEntryBackup({
+        _id: timeentry._id,
+        entry_date: timeentry.entry_date,
+        direction: timeentry.direction,
+        last_changed: timeentry.last_changed,
+        longitude: timeentry.longitude,
+        latitude: timeentry.latitude,
+      }).save(),
+    );
   }
-  gUtil.sendMessage('BACKUP_DB');
-  return { backup_count: timeEntries.length };
+
+  try {
+    const values = await Promise.all(promises);
+    console.log(values.length);
+    gUtil.sendMessage('BACKUP_DB');
+    return { backup_count: timeEntries.length };
+  } catch (error) {
+    console.error(error);
+  }
 };
