@@ -2,6 +2,7 @@ const util = require('./util-admin');
 const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
 const utilGeofence = require('./util-geofences');
+const utilMinio = require('./util-minio');
 const { Tracer } = require('../tracing/Tracer');
 
 /**
@@ -12,10 +13,19 @@ const { Tracer } = require('../tracing/Tracer');
 exports.dumpModels = (req, res) => {
   const span = Tracer.startSpan('admin.dumpModels');
 
-  util.dumpModels()
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
-    .finally(() => span.end());
+  if (process.env.MINIO_ACTIVE === 'true') {
+    // dump to S3-Storage
+    utilMinio.dumpModels()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
+      .finally(() => span.end());
+  } else {
+    // dump to file system
+    util.dumpModels()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
+      .finally(() => span.end());
+  }
 };
 
 /**
@@ -23,13 +33,22 @@ exports.dumpModels = (req, res) => {
  *
  * curl -k -X POST https://localhost:30443/api/entries/restore
  */
-exports.restoreFromFile = (req, res) => {
+exports.restore = (req, res) => {
   const span = Tracer.startSpan('admin.restoreFromFile');
 
-  util.restoreDataFromFile()
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
-    .finally(() => span.end());
+  if (process.env.MINIO_ACTIVE === 'true') {
+    // dump to S3-Storage
+    utilMinio.restoreFromS3()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
+      .finally(() => span.end());
+  } else {
+    // dump to file system
+    util.restoreDataFromFile()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
+      .finally(() => span.end());
+  }
 };
 
 /**
