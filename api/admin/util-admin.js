@@ -16,6 +16,9 @@ const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 const DUMP_DIR = './dump';
 const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
 
+let isBackupRunning = false;
+let isDumpRunning = false;
+
 /* ====================================================================================== */
 /* ======================================== H E L P E R ================================= */
 /* ====================================================================================== */
@@ -114,6 +117,10 @@ const restoreFile = async (dbType) => {
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
 exports.dumpModels = async () => {
+  console.log(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) ---------------------`);
+  if (isDumpRunning) return;
+  isDumpRunning = true;
+
   const res = [];
   for (const model of MODELS) {
     res.push(await dumpModel(mongoose.model(model)));
@@ -129,11 +136,15 @@ exports.restoreDataFromFile = async () => {
     res.push(await restoreFile(model));
   }
 
+  isBackupRunning = false;
   return res;
 };
 
 exports.backupTimeEntries = async () => {
-  console.log('------------------- BACKUP DATA TO BACKUP TABLE ---------------------');
+  console.log(`------------------- BACKUP DATA TO BACKUP TABLE (${isBackupRunning}) ---------------------`);
+  if (isBackupRunning) return;
+  isBackupRunning = true;
+
   await TimeEntryBackup.deleteMany({});
   const timeEntries = await TimeEntry.find();
   console.log(`${timeEntries.length} time entries found to be backed up`);
@@ -159,5 +170,7 @@ exports.backupTimeEntries = async () => {
     return { backup_count: timeEntries.length };
   } catch (error) {
     console.error(error);
+  } finally {
+    isBackupRunning = false;
   }
 };

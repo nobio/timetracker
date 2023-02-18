@@ -10,14 +10,15 @@ const { Tracer } = require('../tracing/Tracer');
 
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
-let isRunning = false;
+let isCalcRunning = false;
+
 /**
  * Orchestrate the calculation of statistics
  */
 exports.calcStats = async () => {
-  console.log(`---------------------- calcStats isRunning: ${isRunning} -----------------------------`);
-  if (isRunning) return;
-  isRunning = true;
+  console.log(`---------------------- calcStats isRunning: ${isCalcRunning} -----------------------------`);
+  if (isCalcRunning) return;
+  isCalcRunning = true;
   let span; let spanRoot;
   try {
     spanRoot = Tracer.startSpan('stats.util.calcStats');
@@ -41,15 +42,15 @@ exports.calcStats = async () => {
     span.end();
     g_util.sendMessage('RECALCULATE', '...calculation done');
 
-    isRunning = false;
+    isCalcRunning = false;
     return result;
   } catch (error) {
     console.log(error);
-    isRunning = false;
+    isCalcRunning = false;
     spanRoot.recordException(error);
     throw error;
   } finally {
-    isRunning = false;
+    isCalcRunning = false;
     span.end();
     spanRoot.end();
   }
