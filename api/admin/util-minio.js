@@ -6,6 +6,7 @@ const Minio = require('minio');
 const mongoose = require('mongoose');
 
 const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
+let isDumpRunning = false;
 
 const connectMinIOServer = () => new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT,
@@ -91,6 +92,10 @@ const restore = async (objectName, objectArray) => {
 };
 
 exports.dumpModels = async () => {
+  console.log(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) ---------------------`);
+  if (isDumpRunning) return;
+  isDumpRunning = true;
+
   const res = [];
 
   for (const modelType of MODELS) {
