@@ -38,8 +38,12 @@ exports.getStats = (req, res) => {
     span.setAttribute('fill', fill);
   }
 
+  console.log(`**1** ${timeUnit}; ${dtStart}`);
   util.getStats(timeUnit, dtStart, accumulate, fill)
-    .then((timeentries) => res.status(200).send(timeentries))
+    .then((timeentries) => {
+      console.log(`**99** ${JSON.stringify(timeentries.chart_data.main)}`);
+      res.status(200).send(timeentries);
+    })
     .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`))
     .finally(() => span.end());
 };

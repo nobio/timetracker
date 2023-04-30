@@ -147,6 +147,7 @@ exports.getStats = (timeUnit, dtStart, accumulate, fill) => {
   return new Promise((resolve, reject) => {
     this.getStatsByRange(dtStart, dtEnd, accumulate, fill).then((calculatedBusyTime) => {
       // console.log(`getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
+      console.log(`**2** getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
         yScale: 'linear',
@@ -202,12 +203,14 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         let i = 0;
         for (let m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
           // console.log(m.format('YYYY-MM-DD'));
+          console.log(`**3** ${m}`);
+          console.log(`**4** ${m.format('YYYY-MM-DD')}`);
           innerData[i] = {
-            x: moment(m).format('YYYY-MM-DD'),
+            x: m.format('YYYY-MM-DD'),
             y: null,
           };
           innerComp[i] = {
-            x: moment(m).format('YYYY-MM-DD'),
+            x: m.format('YYYY-MM-DD'),
             y: 0.0,
           };
           i++;
