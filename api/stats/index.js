@@ -39,7 +39,9 @@ exports.getStats = (req, res) => {
   }
 
   util.getStats(timeUnit, dtStart, accumulate, fill)
-    .then((timeentries) => res.status(200).send(timeentries))
+    .then((timeentries) => {
+      res.status(200).send(timeentries);
+    })
     .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`))
     .finally(() => span.end());
 };

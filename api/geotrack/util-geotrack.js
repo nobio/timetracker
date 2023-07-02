@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-console */
 const moment = require('moment');

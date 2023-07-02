@@ -1,5 +1,6 @@
 require('../../db');
-const moment = require('moment');
+// const moment = require('moment');
+const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const g_util = require('../global_util');
 
@@ -85,7 +86,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
       });
     }
     date = date.add(1, 'day');
-    // console.log(date, busytime);
+    // date, busytime);
   }
 
   return { firstEntry, lastEntry };
@@ -106,14 +107,15 @@ exports.getBusytimeByDate = async (dt) => {
 
     return { busytime: calculated.busytime };
   } catch (error) {
-
+    console.err(error);
+    return { busytime: -1 };
   }
 };
 
 /**
  * clears the MongoDB collection for statistics
  */
-exports.deleteAllStatsDays = () => new Promise((resolve, reject) => {
+exports.deleteAllStatsDays = () => new Promise((resolve) => {
   let size;
   StatsDay.find((err, statsdays) => {
     size = statsdays.length;
@@ -126,10 +128,10 @@ exports.deleteAllStatsDays = () => new Promise((resolve, reject) => {
   });
 });
 
-exports.getStats = (timeUnit, dtStart, accumulate, fill) => {
-  // console.log("timeUnit=" + timeUnit + ", dtStart=" + dtStart+ ", accumulate=" + accumulate);
+exports.getStats = (timeUnit, startDate, accumulate, fill) => {
+  const dtStart = moment.unix(startDate / 1000).tz('Europe/Berlin');
+  console.log(`timeUnit=${timeUnit}, dtStart=${dtStart}, startDate=${startDate}, accumulate=${accumulate}`);
 
-  var dtStart = moment.unix(dtStart / 1000);
   let dtEnd;
 
   if (timeUnit === 'year') {
@@ -203,11 +205,11 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         for (let m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
           // console.log(m.format('YYYY-MM-DD'));
           innerData[i] = {
-            x: moment(m).format('YYYY-MM-DD'),
+            x: m.format('YYYY-MM-DD'),
             y: null,
           };
           innerComp[i] = {
-            x: moment(m).format('YYYY-MM-DD'),
+            x: m.format('YYYY-MM-DD'),
             y: 0.0,
           };
           i++;
