@@ -1,5 +1,6 @@
 require('../../db');
-const moment = require('moment');
+// const moment = require('moment');
+const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const g_util = require('../global_util');
 
@@ -126,10 +127,10 @@ exports.deleteAllStatsDays = () => new Promise((resolve, reject) => {
   });
 });
 
-exports.getStats = (timeUnit, dtStart, accumulate, fill) => {
-  // console.log("timeUnit=" + timeUnit + ", dtStart=" + dtStart+ ", accumulate=" + accumulate);
+exports.getStats = (timeUnit, startDate, accumulate, fill) => {
+  const dtStart = moment.unix(startDate / 1000).tz('Europe/Berlin');
+  console.log(`timeUnit=${timeUnit}, dtStart=${dtStart}, startDate=${startDate}, accumulate=${accumulate}`);
 
-  var dtStart = moment.unix(dtStart / 1000);
   let dtEnd;
 
   if (timeUnit === 'year') {
