@@ -202,7 +202,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       // init arrays innerComp, innerData
       if (fill === 'true') {
         let i = 0;
-        for (let m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
+        for (let m = dtStart; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
           console.log(`** 4 ** ${m} -> ${m.format('YYYY-MM-DD')}`);
           innerData[i] = {
             x: m.format('YYYY-MM-DD'),
@@ -229,7 +229,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       let sumActual = 0;
       let sumNominal = 0;
       stats.forEach((stat) => {
-        const statDateYMD = moment(stat.date).format('YYYY-MM-DD');
+        const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
         // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
         console.log(`** 3 ** ${stat.date} - ${moment(stat.date).format('YYYY-MM-DD')} - ${moment(stat.date).tz('Europe/Berlin')} - ${moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD')}`);
         // actual_working_time += stat.actual_working_time;
