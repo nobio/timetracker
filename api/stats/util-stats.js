@@ -251,7 +251,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         }
       });
 
-      // console.log(JSON.stringify(innerData));
+      console.log(JSON.stringify(innerData));
       // console.log(JSON.stringify(innerComp))
 
       resolve({
