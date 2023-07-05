@@ -231,7 +231,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       stats.forEach((stat) => {
         const statDateYMD = moment(stat.date).format('YYYY-MM-DD');
         // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
-        console.log(`** 3 ** ${stat.date} - ${moment(stat.date).format('YYYY-MM-DD')} - ${moment(stat.date).tz('Europe/Berlin')}`);
+        console.log(`** 3 ** ${stat.date} - ${moment(stat.date).format('YYYY-MM-DD')} - ${moment(stat.date).tz('Europe/Berlin')} - ${moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD')}`);
         // actual_working_time += stat.actual_working_time;
         let obj;
         planned_working_time += stat.planned_working_time;
