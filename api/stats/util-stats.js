@@ -130,7 +130,7 @@ exports.deleteAllStatsDays = () => new Promise((resolve) => {
 
 exports.getStats = (timeUnit, startDate, accumulate, fill) => {
   const dtStart = moment.unix(startDate / 1000).tz('Europe/Berlin');
-  console.log(`timeUnit=${timeUnit}, dtStart=${dtStart}, startDate=${startDate}, accumulate=${accumulate}`);
+  console.log(`** 1 ** timeUnit=${timeUnit}, dtStart=${dtStart}, startDate=${startDate}, accumulate=${accumulate}`);
 
   let dtEnd;
 
@@ -183,7 +183,7 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
  * @param {*} accumulate
  */
 exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((resolve, reject) => {
-  // console.log(">>> searching data for date between " + moment(dtStart).format('YYYY-MM-DD') + " and " + moment(dtEnd).format('YYYY-MM-DD'));
+  console.log(`** 2 ** searching data for date between ${dtStart}-${dtEnd} => ${moment(dtStart).format('YYYY-MM-DD')} and ${moment(dtEnd).format('YYYY-MM-DD')}`);
   // console.log(">>> searching data for date between " + dtStart + " and " + dtEnd);
   StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd } })
     .sort({ date: 1 })
@@ -203,7 +203,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       if (fill === 'true') {
         let i = 0;
         for (let m = moment(dtStart); m.isBefore(dtEnd); m.add(1, 'days')) {
-          // console.log(m.format('YYYY-MM-DD'));
+          console.log(`** 4 ** ${m} -> ${m.format('YYYY-MM-DD')}`);
           innerData[i] = {
             x: m.format('YYYY-MM-DD'),
             y: null,
@@ -230,14 +230,12 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       let sumNominal = 0;
       stats.forEach((stat) => {
         const statDateYMD = moment(stat.date).format('YYYY-MM-DD');
-        // console.log(" >>>>   " + moment(stat.date).format('YYYY-MM-DD') + " " + stat.actual_working_time + " " + stat.planned_working_time + " -> " + stat._id);
+        console.log(`** 3 ** ${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
         // actual_working_time += stat.actual_working_time;
         let obj;
         planned_working_time += stat.planned_working_time;
         if (accumulate === 'true') {
-          (sumActual += Math.round(
-            (stat.actual_working_time / 60 / 60 / 1000) * 100,
-          ) / 100), // rounding 2 digits after comma
+          (sumActual += Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
           (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
           obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
           obj.y = sumActual;
@@ -251,7 +249,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         }
       });
 
-      console.log(JSON.stringify(innerData));
+      console.log(`** 10 ** ${JSON.stringify(innerData)}`);
       // console.log(JSON.stringify(innerComp))
 
       resolve({
