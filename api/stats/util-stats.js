@@ -130,7 +130,6 @@ exports.deleteAllStatsDays = () => new Promise((resolve) => {
 
 exports.getStats = (timeUnit, startDate, accumulate, fill) => {
   const dtStart = moment.unix(startDate / 1000).tz('Europe/Berlin');
-  console.log(`** 1 ** timeUnit=${timeUnit}, dtStart=${dtStart}, startDate=${startDate}, accumulate=${accumulate}`);
 
   let dtEnd;
 
@@ -183,8 +182,8 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
  * @param {*} accumulate
  */
 exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((resolve, reject) => {
-  console.log(`** 2 ** searching data for date between ${dtStart}-${dtEnd} => ${moment(dtStart).format('YYYY-MM-DD')} and ${moment(dtEnd).format('YYYY-MM-DD')}`);
-  // console.log(">>> searching data for date between " + dtStart + " and " + dtEnd);
+  // console.log(`  >>> searching data for date between ${dtStart}-${dtEnd} => ${moment(dtStart).format('YYYY-MM-DD')} and ${moment(dtEnd).format('YYYY-MM-DD')}`);
+  // console.log("  >>> searching data for date between " + dtStart + " and " + dtEnd);
   StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd } })
     .sort({ date: 1 })
     .exec((err, stats) => {
@@ -203,7 +202,7 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       if (fill === 'true') {
         let i = 0;
         for (let m = dtStart; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-          console.log(`** 4 ** ${m} -> ${m.format('YYYY-MM-DD')}`);
+          // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')}`);
           innerData[i] = {
             x: m.format('YYYY-MM-DD'),
             y: null,
@@ -231,8 +230,6 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
       stats.forEach((stat) => {
         const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
         // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
-        console.log(`** 3 ** ${stat.date} - ${moment(stat.date).format('YYYY-MM-DD')} - ${moment(stat.date).tz('Europe/Berlin')} - ${moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD')}`);
-        // actual_working_time += stat.actual_working_time;
         let obj;
         planned_working_time += stat.planned_working_time;
         if (accumulate === 'true') {
@@ -250,7 +247,6 @@ exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((res
         }
       });
 
-      console.log(`** 10 ** ${JSON.stringify(innerData)}`);
       // console.log(JSON.stringify(innerComp))
 
       resolve({
