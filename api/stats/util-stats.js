@@ -72,7 +72,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
     // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
     const dt = moment(date);
     const busytime = await this.getBusytimeByDate(dt);
-    console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
+    // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
     if (busytime && busytime.busytime && busytime.busytime != 0) {
       new StatsDay({
         date: dt,
