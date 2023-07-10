@@ -894,7 +894,7 @@ describe('test index.logout', () => {
       await auth.logout(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
       // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
-      expect(res.status).to.have.been.calledWith(200); 
+      expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
