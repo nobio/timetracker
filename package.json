@@ -43,7 +43,7 @@
         "@opentelemetry/instrumentation-router": "^0.32.0",
         "@opentelemetry/propagator-ot-trace": "^0.26.2",
         "@opentelemetry/resources": "^1.8.0",
-        "@opentelemetry/sdk-node": "^0.34.0",
+        "@opentelemetry/sdk-node": "^0.41.0",
         "@opentelemetry/sdk-trace-base": "^1.8.0",
         "@opentelemetry/sdk-trace-node": "^1.8.0",
         "@opentelemetry/semantic-conventions": "^1.8.0",
