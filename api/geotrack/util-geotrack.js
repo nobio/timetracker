@@ -232,39 +232,43 @@ exports.geoFence = async (geoTrack) => {
   // eslint-disable-next-line no-restricted-syntax
   let bSaved = false;
   for (const gf of geoFences) {
-    let direction;
-    const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
-    console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
+    if (gf.enabled) { // only do something when this geofence is enabled
+      let direction;
+      const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
+      console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
 
-    if (dist <= gf.radius && !gf.isCheckedIn) {
-      console.log('Treffer - einchecken!!!');
-      direction = 'enter';
-    } else if (dist > gf.radius && gf.isCheckedIn) {
-      console.log('Treffer - auschecken!!!!');
-      direction = 'go';
-    }
-
-    // if no direction was found then do not create a new time entry
-    if (direction && gf.enabled && !bSaved) {
-      const timeEntry = {
-        direction,
-        longitude: geoTrack.longitude,
-        latitude: geoTrack.latitude,
-        datetime: geoTrack.date,
-      };
-      try {
-        await utilEntry.create(timeEntry);
-        bSaved = true;
-      } catch (error) {
-        console.error(error.message);
+      if (dist <= gf.radius && !gf.isCheckedIn) {
+        console.log('Treffer - einchecken!!!');
+        direction = 'enter';
+      } else if (dist > gf.radius && gf.isCheckedIn) {
+        console.log('Treffer - auschecken!!!!');
+        direction = 'go';
+      } else {
+        console.log('kein Handlungsbedarf');
       }
-    }
-    try {
-      gf.isCheckedIn = (direction === 'enter');
-      gf.lastChange = geoTrack.date;
-      await gf.save();
-    } catch (error) {
-      console.error(error.message);
+
+      // if no direction was found then do not create a new time entry
+      if (direction && !bSaved) {
+        const timeEntry = {
+          direction,
+          longitude: geoTrack.longitude,
+          latitude: geoTrack.latitude,
+          datetime: geoTrack.date,
+        };
+        try {
+          await utilEntry.create(timeEntry);
+          bSaved = true;
+        } catch (error) {
+          console.error(`trying to create a new time entry but not successful: ${error.message}`);
+        }
+      }
+      try {
+        gf.isCheckedIn = (direction === 'enter');
+        gf.lastChange = geoTrack.date;
+        await gf.save();
+      } catch (error) {
+        console.error(`trying to save this geofence (${gf.description}): ${error.message}`);
+      }
     }
   }
 };
