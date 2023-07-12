@@ -10,6 +10,20 @@ function add(a, b) {
   return a + b;
 }
 
+function calculateOneDae(data) {
+  const tmpData = data.reduce(({ count, sum }, workingTime) => ({
+    count: count + 1,
+    sum: sum + workingTime,
+  }), { count: 0, sum: 0 });
+
+  // calculate the average working time for this week day
+  tmpData.average = tmpData.sum / tmpData.count;
+
+  // map to an array with quadratic distances from average
+  const distances = data.map((x) => ((x - tmpData.average) ** 2));
+  tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count);
+  return tmpData;
+}
 /**
  * Examples:
  * data: {
@@ -20,27 +34,18 @@ function add(a, b) {
     }
     weekDay: 'Mo'
  */
-function renderOneData(data, weekDay) {
+function renderOneData(data, date) {
   // calculate duration (=sum over all workingTimes) and count
-  const tmpData = data.rawData.reduce(({ count, sum }, workingTime) => ({
-    count: count + 1,
-    sum: sum + workingTime,
-  }), { count: 0, sum: 0 });
-
-  // calculate the average working time for this week day
-  tmpData.avg = tmpData.sum / tmpData.count;
-
-  // map to an array with quadratic distances from average
-  const distances = data.rawData.map((x) => ((x - tmpData.avg) ** 2));
-  tmpData.deviation = Math.sqrt(distances.reduce((v, d) => v + d) / tmpData.count);
+  const tmpData = calculateOneDae(data);
 
   // console.log(JSON.stringify(tmpData));
 
   return {
-    x: weekDay,
-    y: Math.round(tmpData.avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-    n: tmpData.count,
-    dev: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    x: date,
+    y: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    n: tmpData.length,
+    average: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    deviation: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
   };
 }
 
@@ -135,20 +140,14 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
     // console.log(actualTimeUnit)
 
     if (lastTimeUnit !== actualTimeUnit || lastHash === stat._id) {
-      const sum = timeUnitStats.reduce(add, 0); // reduce function
-      // const sum = timeUnitStats.reduce((total, value) => total + value);
-      const avg = sum / timeUnitStats.length;
-      // var variance = timeUnitStats.reduce(varianz, 0);
-      // console.log(moment(stat.date).format('YYYY-MM-DD') + " / " + moment(avg).format('hh:mm:ss') + "(" + Math.round(avg / 60 / 60 / 1000 * 100) / 100 + ")" + " / " + moment(sum).format('YYYY-MM-DD') + " / " + lastTimeUnit + " / " + moment(lastTimeUnit).format('YYYY-MM-DD'));
-      // special treatment for time unit 'year':
-      //   The constructor does not take '2014' it needs to get '2014-01-01';
-      if (timeUnitFormatString === 'gggg') {
-        lastTimeUnit += '-01-01';
-      }
+      tmpData = calculateOneDae(timeUnitStats);
 
       data[idx] = {
         x: lastTimeUnit,
-        y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+        y: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+        n: tmpData.length,
+        average: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+        deviation: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
       };
 
       // reset to next week
@@ -221,11 +220,11 @@ function getStatsByTimeBoxTimeWeekDay(stats) {
   });
 
   // calculate statistics of last week
-  data[0] = renderOneData(time_data.Mo, 'Mo');
-  data[1] = renderOneData(time_data.Tu, 'Di');
-  data[2] = renderOneData(time_data.We, 'Mi');
-  data[3] = renderOneData(time_data.Th, 'Do');
-  data[4] = renderOneData(time_data.Fr, 'Fr');
+  data[0] = renderOneData(time_data.Mo.rawData, 'Mo');
+  data[1] = renderOneData(time_data.Tu.rawData, 'Di');
+  data[2] = renderOneData(time_data.We.rawData, 'Mi');
+  data[3] = renderOneData(time_data.Th.rawData, 'Do');
+  data[4] = renderOneData(time_data.Fr.rawData, 'Fr');
   // data[5] = renderOneData(time_data.Sa, 'Sa');
   // data[6] = renderOneData(time_data.Su, 'Su');
 
