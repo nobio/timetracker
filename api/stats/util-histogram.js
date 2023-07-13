@@ -1,7 +1,4 @@
-const moment = require('moment');
-const mongoose = require('mongoose');
-
-const StatsDay = mongoose.model('StatsDay');
+const moment = require('moment-timezone');
 const utilEntry = require('../entries/util-entries');
 
 /**
@@ -61,6 +58,7 @@ function calculateHistogram(timeEntries, interval, direction, data) {
  * @param {*} entryDate
  */
 function getTimeInMinutes(entryDate) {
-  const t = moment(entryDate);
+  const t = moment.tz(entryDate, 'Europe/Berlin');
+  // moment.tz(stat.date, 'Europe/Berlin');
   return t.hours() * 60 + t.minutes();
 }
