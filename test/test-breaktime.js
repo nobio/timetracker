@@ -156,13 +156,12 @@ describe('test util-breaktime - Promise', () => {
     } catch (error) {
       assert.fail('should not throw exception');
     }
-
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(121);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('breakTime');
     expect(result[44].breakTime).to.equal(0); // minute 45
-    expect(result[50].breakTime).to.equal(1); // minute 50
+    expect(result[51].breakTime).to.equal(1); // minute 50
   });
   it('calculateHistogram one day, interval 1, rale data', async () => {
     let result;
@@ -178,7 +177,7 @@ describe('test util-breaktime - Promise', () => {
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('breakTime');
     expect(result[44].breakTime).to.equal(0); // minute 45
-    expect(result[50].breakTime).to.equal(1); // minute 50
+    expect(result[51].breakTime).to.equal(1); // minute 50
   });
   it('calculateHistogram two days, interval 1, all data', async () => {
     let result;
@@ -195,7 +194,7 @@ describe('test util-breaktime - Promise', () => {
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('breakTime');
     expect(result[59].breakTime).to.equal(1); // minute 45
-    expect(result[50].breakTime).to.equal(1); // minute 50
+    expect(result[51].breakTime).to.equal(1); // minute 50
     expect(result[60].breakTime).to.equal(0);
   });
   it('calculateHistogram two days, interval 1, real data', async () => {
@@ -213,7 +212,7 @@ describe('test util-breaktime - Promise', () => {
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('breakTime');
     expect(result[44].breakTime).to.equal(0); // minute 45
-    expect(result[50].breakTime).to.equal(1); // minute 50
+    expect(result[51].breakTime).to.equal(1); // minute 50
   });
 
   it('calculateHistogram two days, interval 20, real data', async () => {
