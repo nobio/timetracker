@@ -99,7 +99,7 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
   // ok, could have been done also in a classic way using the iterator and loops...
   // "index" is the break time in minutes
 
-  const idx = parseInt((preparedBreakTimes[0] - 1) / interval);
+  const idx = parseInt((preparedBreakTimes[0]) / interval);
   breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
 
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
