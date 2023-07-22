@@ -2,13 +2,11 @@ require('./init');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const { response } = require('express');
-const { assert } = require('chai');
 const g_util = require('../api/global_util');
 const utilEntries = require('../api/entries/util-entries');
 
 chai.use(chaiAsPromised);
-const { expect } = chai;
+const { expect, assert } = chai;
 chai.should();
 
 describe('test global_util.sendMessage()', () => {

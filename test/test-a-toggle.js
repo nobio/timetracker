@@ -1,11 +1,9 @@
 require('./init');
-const fs = require('fs');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);
-const { expect } = chai;
-const { assert } = chai;
+const { expect, assert } = chai;
 
 const util = require('../api/admin/util-toggles');
 

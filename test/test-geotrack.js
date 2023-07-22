@@ -3,14 +3,10 @@ require('../db');
 const mongoose = require('mongoose');
 const moment = require('moment');
 
-const GeoTracking = mongoose.model('GeoTracking');
-
 const chai = require('chai');
 chai.use(require('chai-datetime'));
 const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
-const sinon = require('sinon');
-const { stub, match } = require('sinon');
 const sinonChai = require('sinon-chai');
 const util = require('../api/geotrack/util-geotrack');
 const geo = require('../api/geotrack');
@@ -18,9 +14,7 @@ const geo = require('../api/geotrack');
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const { expect } = chai;
-const { assert } = chai;
-const { should } = chai;
+const { expect, assert } = chai;
 
 /**
  * =============================================================

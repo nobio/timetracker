@@ -6,8 +6,7 @@ const chai = require('chai');
 const util = require('../api/admin/util-admin');
 // const chaiAsPromised = require('chai-as-promised');
 // chai.use(chaiAsPromised);
-const { expect } = chai;
-const { assert } = chai;
+const { expect, assert } = chai;
 
 require('moment-timezone');
 

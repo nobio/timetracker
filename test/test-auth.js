@@ -16,9 +16,7 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 chai.use(require('chai-integer'));
 
-const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
+const { expect, assert } = chai;
 
 const util = require('../api/auth/util-auth');
 const auth = require('../api/auth');

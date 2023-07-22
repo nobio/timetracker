@@ -7,8 +7,7 @@ const utilBreaktime = require('../api/stats/util-breaktime');
 const g_util = require('../api/global_util');
 
 chai.use(chaiAsPromised);
-const { expect } = chai;
-const { assert } = chai;
+const { expect, assert } = chai;
 
 const TIME_ENTRIES_01 = [
   { direction: 'enter', entry_date: '2014-02-20T07:00:00.00Z' },

@@ -1,6 +1,5 @@
 require('./init');
 const moment = require('moment');
-const { assert } = require('chai');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 

@@ -3,7 +3,6 @@ require('../db');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
-const StatsDay = mongoose.model('StatsDay');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const moment = require('moment');
