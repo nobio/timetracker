@@ -21,7 +21,9 @@ exports.createGeoTrack = async (req, res) => {
     console.error('data encrypted');
     res.status(202).send('data encrypted');
     return;
-  } if (!geoTrack) {
+  }
+
+  if (!geoTrack) {
     console.error('missing data (longitude, latitude, accuracy, source)');
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;

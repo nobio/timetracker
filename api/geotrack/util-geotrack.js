@@ -244,7 +244,7 @@ exports.geoFence = async (geoTrack) => {
         console.log('Treffer - auschecken!!!!');
         direction = 'go';
       } else {
-        console.log('kein Handlungsbedarf');
+        console.log('kein Handlungsbedarf da Entfernung größer als Radius ist');
       }
 
       // if no direction was found then do not create a new time entry
@@ -256,7 +256,7 @@ exports.geoFence = async (geoTrack) => {
           datetime: geoTrack.date,
         };
         try {
-          await utilEntry.create(timeEntry);
+          utilEntry.create(timeEntry);
           bSaved = true;
         } catch (error) {
           console.error(`trying to create a new time entry but not successful: ${error.message}`);
@@ -265,7 +265,7 @@ exports.geoFence = async (geoTrack) => {
       try {
         gf.isCheckedIn = (direction === 'enter');
         gf.lastChange = geoTrack.date;
-        await gf.save();
+        gf.save();
       } catch (error) {
         console.error(`trying to save this geofence (${gf.description}): ${error.message}`);
       }
