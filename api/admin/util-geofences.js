@@ -85,7 +85,20 @@ exports.deleteGeofence = async (id) => {
 
   try {
     await GeoFence.findOneAndRemove({ _id: id });
-    return;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+exports.resetGeofenceCheckins = async () => {
+  try {
+    const geofences = await GeoFence.find();
+    geofences.forEach((geofence) => {
+      if (geofence.isCheckedIn) {
+        geofence.isCheckedIn = false;
+        geofence.save();
+      }
+    });
   } catch (error) {
     throw new Error(error.message);
   }

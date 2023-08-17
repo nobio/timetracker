@@ -3,6 +3,7 @@ const admin = require('../admin/util-admin');
 const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
+const geofence = require('../admin/util-geofences');
 const { Tracer } = require('../tracing/Tracer');
 
 /**
@@ -45,11 +46,18 @@ exports.scheduleTasks = function () {
     auth.removeTesterToken().catch((err) => console.error(err)).finally(() => span.end());
   });
 
-  console.log('job scheduler: remove expired Tokens (every day at 21:59)');
+  console.log('job scheduler: remove expired Tokens (every day at 21:15)');
   scheduler.scheduleJob({ hour: 21, minute: 15 }, () => { // every hour at ??:13
     console.log('scheduled task "removeExpiredTokens" started');
     const span = Tracer.startSpan('scheduleTasks.removeExpiredTokens');
     auth.removeExpiredToken().catch((err) => console.error(err)).finally(() => span.end());
+  });
+
+  console.log('job scheduler: reset geofence cehckins (every day at 21:20)');
+  scheduler.scheduleJob({ hour: 21, minute: 20 }, () => { // every hour at 21:20
+    console.log('scheduled task "resetGeofenceCheckins" started');
+    const span = Tracer.startSpan('scheduleTasks.resetGeofenceCheckins');
+    geofence.resetGeofenceCheckins().catch((err) => console.error(err)).finally(() => span.end());
   });
 
   /*

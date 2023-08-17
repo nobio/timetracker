@@ -2,6 +2,7 @@ const admin = require('../admin/util-admin');
 const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
+const geofence = require('../admin/util-geofences');
 const { Tracer } = require('../tracing/Tracer');
 
 /** ******************************************************************************
@@ -39,6 +40,10 @@ exports.schedule = (req, res) => {
 
     case 'REMOVE_EXIRED_TOKEN':
       auth.removeExpiredToken().then(res.status(200).send('remove expired tokens ok')).catch((err) => console.error(err));
+      break;
+
+    case 'RESET_GEOFENCE_CHEKINS':
+      geofence.resetGeofenceCheckins().then(res.status(200).send('reset of geofence checkins ok')).catch((err) => console.error(err));
       break;
 
     default:
