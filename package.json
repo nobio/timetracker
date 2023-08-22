@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "16.2.0",
-    "last_build": "2023-08-17T08:26:10.909Z",
+    "version": "16.2.1",
+    "last_build": "2023-08-22T13:35:49.555Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -43,7 +43,7 @@
         "@opentelemetry/instrumentation-router": "^0.32.0",
         "@opentelemetry/propagator-ot-trace": "^0.26.2",
         "@opentelemetry/resources": "^1.8.0",
-        "@opentelemetry/sdk-node": "^0.34.0",
+        "@opentelemetry/sdk-node": "^0.41.2",
         "@opentelemetry/sdk-trace-base": "^1.8.0",
         "@opentelemetry/sdk-trace-node": "^1.8.0",
         "@opentelemetry/semantic-conventions": "^1.8.0",
