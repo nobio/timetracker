@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: nobio/timetracker-ui:master
+          image: nobio/timetracker-ui:master.k8s
           imagePullPolicy: Always
           ports:
             - name: http
