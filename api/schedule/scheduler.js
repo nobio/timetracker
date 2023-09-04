@@ -53,7 +53,7 @@ exports.scheduleTasks = function () {
     auth.removeExpiredToken().catch((err) => console.error(err)).finally(() => span.end());
   });
 
-  console.log('job scheduler: reset geofence cehckins (every day at 21:20)');
+  console.log('job scheduler: reset geofence checkins (every day at 21:20)');
   scheduler.scheduleJob({ hour: 21, minute: 20 }, () => { // every hour at 21:20
     console.log('scheduled task "resetGeofenceCheckins" started');
     const span = Tracer.startSpan('scheduleTasks.resetGeofenceCheckins');
