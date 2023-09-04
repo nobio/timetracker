@@ -1276,6 +1276,7 @@ paths:
               - EVALUATE
               - REMOVE_TESTER_TOKEN
               - REMOVE_EXIRED_TOKEN
+              - RESET_GEOFENCE_CHEKINS
       responses:
         "200":
           description: job successfully triggered; please mind that it runs in the background and there is no error code in case it fails
