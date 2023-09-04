@@ -78,9 +78,3 @@ exports.scheduleTasks = function () {
     schedule.scheduleJob('0 17 ? * 0,4-6', function(){
     */
 };
-
-exports.getEntryById = (req, res) => {
-  util.findById(req.params.id)
-    .then((timeentry) => res.status(200).send(timeentry))
-    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
-};
