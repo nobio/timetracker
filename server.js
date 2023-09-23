@@ -191,7 +191,7 @@ app.use((err, req, res, next) => {
 });
 /* ================= start the web service on http ================= */
 const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`\nserver listening on http://${app.get('host')}:${app.get('port')}`);
+  console.log(`server listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 /* ================= start the web service on https ================= */
@@ -200,7 +200,7 @@ const ssl_options = {
   cert: fs.readFileSync('keys/cert.pem'),
 };
 const httpsServer = https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
-  console.log(`\nssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
+  console.log(`ssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 /* init and start Websocket Server */
@@ -214,9 +214,7 @@ if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up"
 }
 
 /* send message that server has been started */
-gUtil.sendMessage('SERVER_STARTED', ` on http://${app.get('host')}:${app.get('port')}`)
-  .then((msg) => console.log(msg))
-  .catch((err) => console.log(err));
+gUtil.sendMessage('SERVER_STARTED', `on http://${app.get('host')}:${app.get('port')}`);
 
 /* shutdown */
 const gracefulShutdown = async () => {

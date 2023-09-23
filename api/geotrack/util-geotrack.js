@@ -5,6 +5,7 @@ const moment = require('moment');
 const mongoose = require('mongoose');
 const ws = require('../ws');
 const utilEntry = require('../entries/util-entries');
+const globalUtil = require('../global_util');
 
 const GeoTracking = mongoose.model('GeoTracking');
 const GeoFence = mongoose.model('GeoFence');
@@ -75,6 +76,12 @@ exports.createGeoTrack = async (geoTrack) => {
   if (!geoTrack) return;
 
   try { await this.geoFence(geoTrack); } catch (error) { console.error(error.message); }
+  try {
+    globalUtil.sendMessage('GEOFENCE_DEBUG', `LON: ${geoTrack.longitude}, LAT: ${geoTrack.latitude}, ACCURACY: ${geoTrack.accuracy}`);
+  } catch (error) {
+    console.error('ignoring error during debugging');
+  }
+
   try {
     ws.sendGeoLocation(geoTrack);
     return await geoTrack.save();
