@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const moment = require('moment');
 const util = require('./util-geotrack');
+
 const { Tracer } = require('../tracing/Tracer');
 
 /**
@@ -30,7 +31,7 @@ exports.createGeoTrack = async (req, res) => {
   }
 
   await util.createGeoTrack(geoTrack)
-    .then((tracks) => res.status(200).send(tracks))
+    .then((track) => res.status(200).send(track))
     .catch((err) => { span.recordException(err); res.status(err.status).json({ message: err.message }); })
     .finally(() => span.end());
 };

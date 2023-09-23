@@ -59,7 +59,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  * use Slack's 'incoming Webhooks' to publish messages
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
-  const span = Tracer.startSpan(`SLACk send message: ${notificationKey} - ${addedContent}`);
+  const span = Tracer.startSpan(`SLACK send message: ${notificationKey} - ${addedContent}`);
 
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
   console.log(`${notificationKey} (${addedCtnt})`);
