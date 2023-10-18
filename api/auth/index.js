@@ -272,7 +272,7 @@ exports.authorize = async (req, res, next) => {
     span.end();
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
-    (req.method === 'POST' && req.url.startsWith('/api/geofence'))
+    (req.method === 'POST' && req.url === '/api/geofence') // .startsWith is not sufficiant since there is an endpoint /api/geofences
     || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
   )) {
     // basic authorisation

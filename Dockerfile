@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --only=production --omit=dev
+RUN npm install --omit=dev
 
 # Bundle app source
 COPY . .
