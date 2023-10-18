@@ -253,7 +253,7 @@ exports.authorize = async (req, res, next) => {
     span.setAttribute('method', req.method);
     span.setAttribute('url', req.url);
   }
-
+  console.log(req.url);
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
@@ -272,7 +272,7 @@ exports.authorize = async (req, res, next) => {
     span.end();
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
-    (req.method === 'POST' && req.url === '/api/geofence') // .startsWith is not sufficiant since there is an endpoint /api/geofences
+    (req.method === 'POST' && (req.url === '/api/geofence' || req.url === '/api/geofence/')) // .startsWith is not sufficiant since there is an endpoint /api/geofences
     || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
   )) {
     // basic authorisation

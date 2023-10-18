@@ -753,6 +753,38 @@ describe('test index.authorize', () => {
       assert.fail(`should not throw exception\n${err.message}`);
     }
   });
+  it('test for OK (401): call Baisc auth service with header incl. invalid basic authentication and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
+    req.url = '/api/geofence'; // removed tailing slash from url
+    req.method = 'POST';
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorize(req, res, next);
+
+      expect(res.status).to.have.been.calledWith(401);
+      expect(next).not.to.have.been.called;
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err.message}`);
+    }
+  });
+  it('test for OK (401): call Baisc auth service with header incl. invalid basic authentication  and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
+    req.url = '/api/geofences'; // removed tailing slash from url
+    req.method = 'POST';
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorize(req, res, next);
+
+      expect(res.status).to.have.been.calledWith(403);
+      expect(next).not.to.have.been.called;
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err.message}`);
+    }
+  });
 
   after(async () => {
     await User.deleteOne({ name: TESTUSER_USERNAME });
