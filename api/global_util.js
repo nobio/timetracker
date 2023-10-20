@@ -19,8 +19,7 @@ exports.getBreakTimeSeconds = (date) => {
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
 
-  // if date is AOK
-  if (dateMoment.isAfter('2021-08-31')) {
+  if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-09-30')) { // AOK enty date and exit date
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
   }
@@ -30,7 +29,7 @@ exports.getBreakTimeMilliSeconds = (date) => this.getBreakTimeSeconds(date) * 10
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
   // console.log(busytime, pause, date, entriesPerDay)
   let bookedTime;
-  if (moment(date, 'X').isAfter('2021-08-31')) {
+  if (moment(date, 'X').isAfter('2021-08-31') && moment(date, 'X').isBefore('2023-09-30')) {
     // AOK Bayern
     if (entriesPerDay > 2) {
       bookedTime = busytime + AOK_WEGEZEIT_SECONDS; // 'Wegegeld'
