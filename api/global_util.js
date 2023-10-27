@@ -3,8 +3,8 @@ const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-const DEFAULT_BREAK_TIME_SECONDS = 60 * 60; // 30 min Pause
-const AOK_BREAK_TIME_SECONDS = 30 * 60; // 60 min Pause
+const DEFAULT_BREAK_TIME_SECONDS = 60 * 45; // 45 min Pause
+const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 
@@ -15,14 +15,14 @@ const { Tracer } = require('./tracing/Tracer');
  * the numbers of entries per day
  */
 exports.getBreakTimeSeconds = (date) => {
-  console.log('-------------------------------------------------------');
-  console.log(date)
-  console.log('-------------------------------------------------------');
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
-
-  if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-09-30')) { // AOK enty date and exit date
+  
+  //console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021: ${dateMoment.isAfter('2021-08-31')}`);
+  //console.log(`date ${dateMoment.format('DD.MM.YYYY')} is before 31.08.2021: ${dateMoment.isBefore('2023-10-01')}`);
+  
+  if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) { // AOK enty date and exit date
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
   }
