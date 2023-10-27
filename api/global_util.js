@@ -15,6 +15,9 @@ const { Tracer } = require('./tracing/Tracer');
  * the numbers of entries per day
  */
 exports.getBreakTimeSeconds = (date) => {
+  console.log('-------------------------------------------------------');
+  console.log(date)
+  console.log('-------------------------------------------------------');
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
