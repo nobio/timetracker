@@ -1,13 +1,16 @@
 require('./init');
 const moment = require('moment');
 
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
 const chaiAsPromised = require('chai-as-promised');
 const utilBreaktime = require('../api/stats/util-breaktime');
-const g_util = require('../api/global_util');
+const globalUtil = require('../api/global_util');
 
-chai.use(chaiAsPromised);
-const { expect, assert } = chai;
+const { describe, it } = Mocha;
+const { expect, assert } = Chai;
+
+Chai.use(chaiAsPromised);
 
 const TIME_ENTRIES_01 = [
   { direction: 'enter', entry_date: '2014-02-20T07:00:00.00Z' },
@@ -117,7 +120,7 @@ describe('test util-breaktime - Promise', () => {
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
     expect(result[0]).to.equal(50);
-    expect(result[1]).to.equal(60); // old break time
+    expect(result[1]).to.equal(45); // old break time
   });
   it('prepareBreakTimes two days AOK - all data', async () => {
     let result;
@@ -192,7 +195,7 @@ describe('test util-breaktime - Promise', () => {
     expect(result).to.have.lengthOf(121);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('breakTime');
-    expect(result[59].breakTime).to.equal(1); // minute 45
+    expect(result[44].breakTime).to.equal(1); // minute 45
     expect(result[51].breakTime).to.equal(1); // minute 50
     expect(result[60].breakTime).to.equal(0);
   });
@@ -243,46 +246,116 @@ describe('test g_util.getBreakTime...', () => {
   const TIME_DURING_AOK = moment('2022-02-01').unix();
 
   it('getBreakTimeSeconds before AOK', async () => {
-    const result = await g_util.getBreakTimeSeconds(TIME_BEFORE_AOK);
-    expect(result).to.equal(60 * 60); // default time before AOK
+    const result = await globalUtil.getBreakTimeSeconds(TIME_BEFORE_AOK);
+    expect(result).to.equal(45 * 60); // default time before AOK
   });
   it('getBreakTimeSeconds during AOK', async () => {
-    const result = await g_util.getBreakTimeSeconds(TIME_DURING_AOK);
+    const result = await globalUtil.getBreakTimeSeconds(TIME_DURING_AOK);
     expect(result).to.equal(30 * 60); // time during AOK
   });
   it('getBreakTimeSeconds with invalid date (-> default)', async () => {
-    const result = await g_util.getBreakTimeSeconds();
-    expect(result).to.equal(60 * 60); // default
+    const result = await globalUtil.getBreakTimeSeconds();
+    expect(result).to.equal(45 * 60); // default
   });
+  it('test getBreakTimeSeconds(date) with date in the past before AOK (1970-01-01)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('1970-01-01'));
+    expect(timestamp).to.equal(2700);
+  });
+
+  it('test getBreakTimeSeconds(date) a day before starting at AOK (2021-08-31)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2021-08-31'));
+    expect(timestamp).to.equal(2700);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after starting at AOK (2021-09-01)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2021-09-01'));
+    expect(timestamp).to.equal(1800);
+  });
+
+  it('test getBreakTimeSeconds(date) somwhere in the midst of AOK engagement (2022-03-16)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2022-03-16'));
+    expect(timestamp).to.equal(1800);
+  });
+
+  it('test getBreakTimeSeconds(date) at last day of AOK engagement (2023-09-30)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-09-30'));
+    expect(timestamp).to.equal(1800);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after AOK engagement (2023-10-01)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'));
+    expect(timestamp).to.equal(2700);
+  });
+
+  it('test getBreakTimeSeconds(date) somewhere in the future (2024-01-01)', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2024-01-01'));
+    expect(timestamp).to.equal(2700);
+  });
+
   it('getBreakTimeMilliSeconds before AOK', async () => {
-    const result = await g_util.getBreakTimeMilliSeconds(TIME_BEFORE_AOK);
-    expect(result).to.equal(60 * 60 * 1000); // default time before AOK
+    const result = await globalUtil.getBreakTimeMilliSeconds(TIME_BEFORE_AOK);
+    expect(result).to.equal(45 * 60 * 1000); // default time before AOK
   });
   it('getBreakTimeMilliSeconds during AOK', async () => {
-    const result = await g_util.getBreakTimeMilliSeconds(TIME_DURING_AOK);
+    const result = await globalUtil.getBreakTimeMilliSeconds(TIME_DURING_AOK);
     expect(result).to.equal(30 * 60 * 1000); // time during AOK
   });
   it('getBreakTimeMilliSeconds with invalid date (-> default)', async () => {
-    const result = await g_util.getBreakTimeMilliSeconds();
-    expect(result).to.equal(60 * 60 * 1000); // default
+    const result = await globalUtil.getBreakTimeMilliSeconds();
+    expect(result).to.equal(45 * 60 * 1000); // default
+  });
+
+  it('test getBreakTimeMilliSeconds(date) with date in the past before AOK (1970-01-01)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('1970-01-01'));
+    expect(timestamp).to.equal(2700000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) a day before starting at AOK (2021-08-31)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2021-08-31'));
+    expect(timestamp).to.equal(2700000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) a day after starting at AOK (2021-09-01)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2021-09-01'));
+    expect(timestamp).to.equal(1800000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) somwhere in the midst of AOK engagement (2022-03-16)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2022-03-16'));
+    expect(timestamp).to.equal(1800000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) at last day of AOK engagement (2023-09-30)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2023-09-30'));
+    expect(timestamp).to.equal(1800000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) a day after AOK engagement (2023-10-01)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2023-10-01'));
+    expect(timestamp).to.equal(2700000);
+  });
+
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01)', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'));
+    expect(timestamp).to.equal(2700000);
   });
 });
 
 describe('test g_util.getBookedTimeMilliSeconds...', () => {
   it('getBookedTimeMilliSeconds before AOK with 2 entries', async () => {
-    const result = await g_util.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 2);
+    const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 2);
     expect(result).to.equal(100000 - 5000); // default time before AOK
   });
   it('getBookedTimeMilliSeconds before AOK with 4 entries', async () => {
-    const result = await g_util.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 4);
+    const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 4);
     expect(result).to.equal(100000 - 5000); // default time before AOK
   });
   it('getBookedTimeMilliSeconds after AOK with 2 entries', async () => {
-    const result = await g_util.getBookedTimeMilliSeconds(100000, 5000, moment('2022-02-01').unix(), 2);
+    const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2022-02-01').unix(), 2);
     expect(result).to.equal(100000 - 5000 + 504 * 60); // default time before AOK
   });
   it('getBookedTimeMilliSeconds after AOK with 4 entries', async () => {
-    const result = await g_util.getBookedTimeMilliSeconds(100000, 5000, moment('2022-02-01').unix(), 4);
+    const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2022-02-01').unix(), 4);
     expect(result).to.equal(100000 + 504 * 60); // default time before AOK
   });
 });
