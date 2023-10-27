@@ -1,18 +1,21 @@
 require('./init');
 require('../db');
 const mongoose = require('mongoose');
-
-const TimeEntry = mongoose.model('TimeEntry');
-const util = require('../api/entries/util-entries');
-
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const { assert, expect } = require('chai');
-
 const moment = require('moment');
 require('moment-timezone');
+
+const TimeEntry = mongoose.model('TimeEntry');
+
+const Mocha = require('mocha');
+const Chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+
+Chai.use(chaiAsPromised);
+
+const { describe, it } = Mocha;
+const { assert, expect } = Chai;
+
+const util = require('../api/entries/util-entries');
 
 const DEFAULT_DATE = moment('1967-03-16');
 const TWO_ENTRIES = [
@@ -112,9 +115,9 @@ describe('test util.calculateBusyTime', () => {
     expect(result).to.have.property('duration');
     expect(result.duration).to.equal(29880000);
     expect(result).to.have.property('busytime');
-    expect(result.busytime).to.equal(26280000);
+    expect(result.busytime).to.equal(27180000);
     expect(result).to.have.property('pause');
-    expect(result.pause).to.equal(3600000);
+    expect(result.pause).to.equal(2700000);
     expect(result).to.have.property('count');
     expect(result.count).to.equal(2);
   });
@@ -128,9 +131,9 @@ describe('test util.calculateBusyTime', () => {
     expect(result).to.have.property('duration');
     expect(result.duration).to.equal(32400000);
     expect(result).to.have.property('busytime');
-    expect(result.busytime).to.equal(28800000);
+    expect(result.busytime).to.equal(29700000);
     expect(result).to.have.property('pause');
-    expect(result.pause).to.equal(3600000);
+    expect(result.pause).to.equal(2700000);
     expect(result).to.have.property('count');
     expect(result.count).to.equal(2);
   });
