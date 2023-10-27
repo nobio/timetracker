@@ -85,3 +85,9 @@ describe('test global_util.getBreakTimeMilliSeconds', () => {
     expect(timestamp).to.equal(2700000);
   });
 });
+
+describe('test global_util.getBookedTimeMilliSeconds', () => {
+  it('test getBookedTimeMilliSeconds(date)', () => {
+
+  });
+});
