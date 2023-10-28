@@ -331,7 +331,9 @@ exports.saveGeofence = (req, res) => {
   const span = Tracer.startSpan('admin.saveGeofence');
   if (span.isRecording()) { span.setAttribute('id', id); }
 
-  utilGeofence.setGeofence(id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange)
+  utilGeofence.setGeofence({
+    id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  })
     .then((response) => res.status(200).send(response))
     .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`))
     .finally(() => span.end());

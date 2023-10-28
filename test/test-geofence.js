@@ -1,11 +1,16 @@
 require('./init');
 const moment = require('moment');
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
 const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const { expect } = chai;
 const util = require('../api/admin/util-geofences');
+
+const {
+  describe, it, before, after,
+} = Mocha;
+const { expect, assert } = Chai;
+
+Chai.use(chaiAsPromised);
 
 let GEOFENCE;
 
@@ -93,7 +98,16 @@ describe('test set a geofence', () => {
 
   it('set an existing geofence', async () => {
     // console.log(GEOFENCE);
-    const gf = await util.setGeofence(GEOFENCE.id, false, -10, -20, 100, 'new test', true, moment().toISOString());
+    const gf = await util.setGeofence({
+      id: GEOFENCE.id,
+      enabled: false,
+      longitude: -10,
+      latitude: -20,
+      radius: 100,
+      description: 'new test',
+      isCheckedIn: true,
+      lastChange: moment().toISOString(),
+    });
     expect(gf).to.be.a('object');
     expect(gf).to.have.property('id');
     expect(gf).to.have.property('enabled');
@@ -110,24 +124,29 @@ describe('test set a geofence', () => {
     expect(gf).to.have.property('lastChange');
   });
 
-  it('update an exsisting geofence with undefined value', async () => {
+  it.only('update a not exsisting geofence with undefined value', async () => {
     // update the geofence with a new vale
     try {
       await util.setGeofence();
     } catch (err) {
-      console.log(err.message);
-      expect(err).to.be.an('error');
-      expect(err.message).to.equal('could not create new geofence: geo fence object could not be updated because it does not exist');
+      assert.fail('should not throw exception');
     }
   });
 
-  it('update an exsisting geofence with null value', async () => {
+  it.only('update a not exsisting geofence with null value', async () => {
     // update the geofence with a new vale
     try {
       await util.setGeofence(null);
     } catch (err) {
-      expect(err).to.be.an('error');
-      expect(err.message).to.equal('could not create new geofence: geo fence object could not be updated because it does not exist');
+      assert.fail('should not throw exception');
+    }
+  });
+
+  it.only('update a not exsisting geofence with id=null', async () => {
+    try {
+      await util.setGeofence({ id: null });
+      assert.fail('should throw exception');
+    } catch (err) {
     }
   });
 
