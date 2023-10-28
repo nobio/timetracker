@@ -1,6 +1,9 @@
+/* eslint-disable max-len */
+/* eslint-disable no-underscore-dangle */
 require('../../db');
 
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const GeoFence = mongoose.model('GeoFence');
 
@@ -56,26 +59,24 @@ exports.createGeofence = async (enabled, longitude, latitude, radius, descriptio
   }
 };
 
-exports.setGeofence = async (id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange) => {
-  try {
-    const geoFence = await GeoFence.findOne({ _id: id });
-    if (geoFence == null) {
-      throw new Error('geo fence object could not be updated because it does not exist');
-    }
-    geoFence.enabled = enabled;
-    geoFence.isCheckedIn = isCheckedIn;
+exports.setGeofence = async (geofence) => {
+  if (geofence === null || !geofence) return null;
+  if (geofence.id === null) throw new Error('could not create new geofence: geo fence object could not be updated because it does not exist');
 
-    if (longitude) geoFence.longitude = longitude;
-    if (geoFence)geoFence.latitude = latitude;
-    if (geoFence)geoFence.radius = radius;
-    if (geoFence)geoFence.description = description;
-    if (geoFence)geoFence.lastChange = lastChange;
+  try {
+    const geoFence = await GeoFence.findOne(mongoose.Types.ObjectId(geofence.id));
+    geoFence.enabled = geofence.enabled;
+    geoFence.isCheckedIn = geofence.isCheckedIn;
+    geoFence.lastChange = moment().toISOString(); // always set lastChange to now
+    if (geofence.longitude) geoFence.longitude = geofence.longitude;
+    if (geofence.latitude) geoFence.latitude = geofence.latitude;
+    if (geofence.radius) geoFence.radius = geofence.radius;
+    if (geofence.description) geoFence.description = geofence.description;
 
     await geoFence.save();
-
     return castGeofence(geoFence);
   } catch (error) {
-    console.error(error.message);
+    // console.error(error.message);
     throw new Error(`could not create new geofence: ${error.message}`);
   }
 };
