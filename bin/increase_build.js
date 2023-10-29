@@ -39,7 +39,11 @@ if (!arg || arg == '' || arg == 'b') {
   modified = true;
 }
 
-if (modified) { // only write file if version has changed
+if (!modified) { // only write file if version has changed
+  console.log('nothing to do, please check your parameters');
+  console.log('Usage: node bin/build.js [<ma|mi|b>]');
+  process.exit(1);
+} else {
   package_json.version = `${major_version}.${minor_version}.${build_version}`;
   package_json.last_build = new Date();
   package_lock_json.version = `${major_version}.${minor_version}.${build_version}`;
