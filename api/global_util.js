@@ -18,10 +18,10 @@ exports.getBreakTimeSeconds = (date) => {
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
-  
-  //console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021: ${dateMoment.isAfter('2021-08-31')}`);
-  //console.log(`date ${dateMoment.format('DD.MM.YYYY')} is before 31.08.2021: ${dateMoment.isBefore('2023-10-01')}`);
-  
+
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021: ${dateMoment.isAfter('2021-08-31')}`);
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is before 31.08.2021: ${dateMoment.isBefore('2023-10-01')}`);
+
   if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) { // AOK enty date and exit date
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;

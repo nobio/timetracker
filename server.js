@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Module dependencies.
  */
@@ -24,7 +25,7 @@ const cors = require('cors');
 const api = require('@opentelemetry/api');
 const db = require('./db');
 const { Tracer } = require('./api/tracing/Tracer');
-const gUtil = require('./api/global_util');
+const globalUtil = require('./api/global_util');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
 const api_misc = require('./api/misc');
@@ -196,9 +197,11 @@ const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'
 
 /* ================= start the web service on https ================= */
 const ssl_options = {
-  key: fs.readFileSync('keys/key.pem'),
-  cert: fs.readFileSync('keys/cert.pem'),
+  key: Buffer.from(process.env.SSL_PRIVATE_KEY_BASE64, 'base64').toString('ascii'),
+  cert: Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('ascii'),
 };
+
+// write output to console
 const httpsServer = https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
   console.log(`ssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
@@ -214,12 +217,12 @@ if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up"
 }
 
 /* send message that server has been started */
-gUtil.sendMessage('SERVER_STARTED', `on http://${app.get('host')}:${app.get('port')}`);
+globalUtil.sendMessage('SERVER_STARTED', `on http://${app.get('host')}:${app.get('port')}`);
 
 /* shutdown */
 const gracefulShutdown = async () => {
   console.log('Closing server and ending process...');
-  await gUtil.sendMessage('SERVER_SHUTDOWN');
+  await globalUtil.sendMessage('SERVER_SHUTDOWN');
 
   webSocketFacade.shutdown();
   console.log('websocket closed');
@@ -235,6 +238,5 @@ const gracefulShutdown = async () => {
 
   process.exit();
 };
-
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
