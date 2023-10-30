@@ -142,6 +142,6 @@ exports.log = async (req, res) => {
 
   console.log(JSON.stringify(resp));
 
-  res.status(200).json(resp);
+  res.status(201).json(resp);
   span.end();
 };

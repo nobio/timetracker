@@ -100,7 +100,7 @@ exports.createEntry = async (req, res) => {
   try {
     const createdTimeentry = await util.create(timeEntry);
     span.setStatus({ code: SpanStatusCode.OK });
-    res.status(200).send(createdTimeentry);
+    res.status(201).send(createdTimeentry);
   } catch (error) {
     span.recordException(error);
     res.status(500).send(`Error while creating a new Time Entry: ${error.message}`);

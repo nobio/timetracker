@@ -124,7 +124,7 @@ describe('test set a geofence', () => {
     expect(gf).to.have.property('lastChange');
   });
 
-  it.only('update a not exsisting geofence with undefined value', async () => {
+  it('update a not exsisting geofence with undefined value', async () => {
     // update the geofence with a new vale
     try {
       await util.setGeofence();
@@ -133,7 +133,7 @@ describe('test set a geofence', () => {
     }
   });
 
-  it.only('update a not exsisting geofence with null value', async () => {
+  it('update a not exsisting geofence with null value', async () => {
     // update the geofence with a new vale
     try {
       await util.setGeofence(null);
@@ -142,7 +142,7 @@ describe('test set a geofence', () => {
     }
   });
 
-  it.only('update a not exsisting geofence with id=null', async () => {
+  it('update a not exsisting geofence with id=null', async () => {
     try {
       await util.setGeofence({ id: null });
       assert.fail('should throw exception');

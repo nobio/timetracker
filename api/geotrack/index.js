@@ -20,7 +20,7 @@ exports.createGeoTrack = async (req, res) => {
 
   if (geoTrack === null) {
     console.error('data encrypted');
-    res.status(202).send('data encrypted');
+    res.status(201).send('data encrypted');
     return;
   }
 

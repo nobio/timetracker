@@ -290,7 +290,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(202);
+      expect(res.status).to.have.been.calledWith(201);
     } catch (error) {
       throw error;
     }

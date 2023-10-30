@@ -16,7 +16,7 @@ exports.dumpModels = (req, res) => {
   if (process.env.MINIO_ACTIVE === 'true') {
     // dump to S3-Storage
     utilMinio.dumpModels()
-      .then((response) => res.status(200).send(response))
+      .then((response) => res.status(201).send(response))
       .catch((err) => res.status(500).send(`Error while dumping data: ${err}`))
       .finally(() => span.end());
   } else {
@@ -39,13 +39,13 @@ exports.restore = (req, res) => {
   if (process.env.MINIO_ACTIVE === 'true') {
     // dump to S3-Storage
     utilMinio.restoreFromS3()
-      .then((response) => res.status(200).send(response))
+      .then((response) => res.status(201).send(response))
       .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
       .finally(() => span.end());
   } else {
     // dump to file system
     util.restoreDataFromFile()
-      .then((response) => res.status(200).send(response))
+      .then((response) => res.status(201).send(response))
       .catch((err) => res.status(500).send(`Error while restoring data: ${err}`))
       .finally(() => span.end());
   }
@@ -60,7 +60,7 @@ exports.backupTimeEntries = (req, res) => {
   const span = Tracer.startSpan('admin.backupTimeEntries');
 
   util.backupTimeEntries()
-    .then((response) => res.status(200).send(response))
+    .then((response) => res.status(201).send(response))
     .catch((err) => res.status(500).send(`Error while backup data: ${err}`))
     .finally(() => span.end());
 };
@@ -165,7 +165,7 @@ exports.createToggle = (req, res) => {
   }
 
   utilToggles.createToggle(name, toggle, notification)
-    .then((response) => res.status(200).send(response))
+    .then((response) => res.status(201).send(response))
     .catch((err) => res.status(500).send(`Error while creating new toggle: ${err}`))
     .finally(() => span.end());
 };
@@ -318,7 +318,7 @@ exports.createGeofence = (req, res) => {
     isCheckedIn,
     lastChange,
   )
-    .then((response) => res.status(200).send(response))
+    .then((response) => res.status(201).send(response))
     .catch((err) => res.status(500).send(`Error while creating a new geofence: ${err.message}`))
     .finally(() => span.end());
 };
