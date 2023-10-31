@@ -10,12 +10,15 @@ const { Tracer } = require('../tracing/Tracer');
  *
  * curl -X GET http://localhost:30000/api/ping
  */
-exports.ping = (req, res) => {
+exports.ping = async (req, res) => {
   const span = Tracer.startSpan('misc.ping');
-  const ip = (req.headers['x-forwarded-for']
-    || req.connection.remoteAddress
-    || req.socket.remoteAddress
-    || req.connection.socket.remoteAddress).split(',')[0];
+  const ip = (
+    req.headers['cf-connecting-ip']
+        || req.headers['x-real-ip']
+        || req.headers['x-forwarded-for']
+        || (req.connection ? req.connection.remoteAddress : false)
+        || ''
+  ).split(',')[0].trim();
 
   res.status(200).json({
     response: 'pong',

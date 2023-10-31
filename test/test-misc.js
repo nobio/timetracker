@@ -2,17 +2,18 @@
 require('./init');
 require('../db');
 
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
+
+const { expect, assert } = Chai;
+const { describe, it } = Mocha;
 const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
-const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
-chai.use(chaiAsPromised);
-chai.use(sinonChai);
-chai.use(require('chai-integer'));
-
-const { expect, assert } = chai;
+Chai.use(chaiAsPromised);
+Chai.use(sinonChai);
+Chai.use(require('chai-integer'));
 
 const misc = require('../api/misc');
 
@@ -22,18 +23,42 @@ const misc = require('../api/misc');
  * =============================================================
  */
 describe('test misc functions', () => {
+  it('test ping with header x-forwareded-for', async () => {
+    const req = mockRequest({ headers: { 'x-forwarded-for': '1.2.3.4' }, body: {} });
+    const res = mockResponse();
+
+    await misc.ping(req, res);
+    const response = res.json.getCalls()[0].lastArg;
+
+    expect(res.status).to.have.been.calledWith(200);
+    expect(response).to.have.property('response');
+    expect(response.response).to.equal('pong');
+    expect(response).to.have.property('client_ip');
+    expect(response.client_ip).to.equal('1.2.3.4');
+  });
+  it('test ping with header x-real-ip', async () => {
+    const req = mockRequest({ headers: { 'x-real-ip': '1.2.3.4' }, body: {} });
+    const res = mockResponse();
+
+    await misc.ping(req, res);
+    const response = res.json.getCalls()[0].lastArg;
+
+    expect(res.status).to.have.been.calledWith(200);
+    expect(response).to.have.property('response');
+    expect(response.response).to.equal('pong');
+    expect(response).to.have.property('client_ip');
+    expect(response.client_ip).to.equal('1.2.3.4');
+  });
+
   it('test version', async () => {
     const req = mockRequest({ headers: [], body: {} });
     const res = mockResponse();
-    const next = sinon.spy();
     let response;
 
     try {
-      await misc.version(req, res, next);
+      await misc.version(req, res);
       response = res.json.getCalls()[0].lastArg;
-      // console.log(res.json.getCalls()[0].lastArg)
     } catch (err) {
-      // console.log(err)
       assert.fail(`should not throw exception\n${err.message}`);
     }
 
@@ -45,15 +70,12 @@ describe('test misc functions', () => {
   it('test healthcheck', async () => {
     const req = mockRequest({ headers: [], body: {} });
     const res = mockResponse();
-    const next = sinon.spy();
     let response;
 
     try {
-      await misc.healthcheck(req, res, next);
+      await misc.healthcheck(req, res);
       response = res.json.getCalls()[0].lastArg;
-      // console.log(res.json.getCalls()[0].lastArg)
     } catch (err) {
-      // console.log(err)
       assert.fail(`should not throw exception\n${err.message}`);
     }
 
