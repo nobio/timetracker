@@ -22,7 +22,6 @@ const fs = require('fs');
 const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
-const api = require('@opentelemetry/api');
 const db = require('./db');
 const { Tracer } = require('./api/tracing/Tracer');
 const globalUtil = require('./api/global_util');
@@ -34,22 +33,18 @@ const api_admin = require('./api/admin');
 const api_entries = require('./api/entries');
 const api_schedule = require('./api/schedule');
 
-require('log-timestamp')(() => `[${moment().format('ddd, D MMM YYYY hh:mm:ss Z')}] - %s`);
+require('log-timestamp')(() => `[${moment().format('ddd, DD MMM YYYY hh:mm:ss Z')}] - %s`);
 
 Tracer.init('timetracker', 'development');
 const app = express();
 
-morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
+// morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
 
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
-// app.use(express.static(path.join(__dirname, 'public')));
-// app.use(express.static(path.join(__dirname, 'www')));
-// app.use(serveStatic('www', { 'index': ['index.html'] }));
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
-// app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
 app.use(express.json());
 app.use(cookieParser());
 // apply rate limiter to all requests

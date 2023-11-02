@@ -1,8 +1,8 @@
+/* eslint-disable max-len */
 const jwt = require('jsonwebtoken');
-const { SpanStatusCode } = require('@opentelemetry/api');
 const { Tracer } = require('../tracing/Tracer');
 const util = require('./util-auth');
-const g_util = require('../global_util');
+const globalUtil = require('../global_util');
 
 /**
  * reads all users from database
@@ -67,7 +67,7 @@ exports.deleteUser = async (req, res) => {
 
   try {
     const result = await util.deleteUser(req.params.id);
-    g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
+    globalUtil.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
     // console.error(err);
@@ -92,7 +92,7 @@ exports.createUser = async (req, res) => {
 
   try {
     const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
-    g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
+    globalUtil.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
@@ -120,7 +120,7 @@ exports.updateUser = async (req, res) => {
 
   try {
     const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
-    g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
+    globalUtil.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
@@ -143,7 +143,7 @@ exports.updateUsersPassword = async (req, res) => {
 
   try {
     const result = await util.updateUsersPassword(req.params.id, req.body.password);
-    g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
+    globalUtil.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
@@ -169,7 +169,7 @@ exports.login = async (req, res) => {
   const span = Tracer.startSpan('auth.login');
   if (span.isRecording()) { span.setAttribute('userName', req.body.username); }
 
-  g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
+  globalUtil.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const { password } = req.body;
   if (password === null) {
     span.setStatus({ code: 401 });
@@ -253,7 +253,8 @@ exports.authorize = async (req, res, next) => {
     span.setAttribute('method', req.method);
     span.setAttribute('url', req.url);
   }
-  console.log(req.url);
+
+  // console.log(req.url);
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
