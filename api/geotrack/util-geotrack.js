@@ -237,7 +237,7 @@ exports.geoFence = async (geoTrack) => {
   const geoFences = await GeoFence.find();
   // console.log(JSON.stringify(geoFences));
   // eslint-disable-next-line no-restricted-syntax
-  let bSaved = false;
+  let isSaved = false;
   for (const gf of geoFences) {
     if (gf.enabled) { // only do something when this geofence is enabled
       let direction;
@@ -255,7 +255,7 @@ exports.geoFence = async (geoTrack) => {
       }
 
       // if no direction was found then do not create a new time entry
-      if (direction && !bSaved) {
+      if (direction && !isSaved) {
         const timeEntry = {
           direction,
           longitude: geoTrack.longitude,
@@ -264,7 +264,7 @@ exports.geoFence = async (geoTrack) => {
         };
         try {
           utilEntry.create(timeEntry);
-          bSaved = true;
+          isSaved = true;
         } catch (error) {
           console.error(`trying to create a new time entry but not successful: ${error.message}`);
         }
