@@ -324,7 +324,7 @@ describe('test util.calculateStatistics', () => {
   });
 });
 
-describe.only('test calculation of extra hours', () => {
+describe('test calculation of extra hours', () => {
   let db;
   before(() => {
     db = require('../db');
