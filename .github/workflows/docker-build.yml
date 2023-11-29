@@ -45,7 +45,7 @@ jobs:
           cache: "npm"
 
       - name: Install
-        run: npm ci
+        run: npm install
 
       - name: Build App
         run: npm run build --if-present
