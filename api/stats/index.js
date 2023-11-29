@@ -1,7 +1,8 @@
-const util = require('./util-stats');
+const utilStats = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');
 const utilBreaktime = require('./util-breaktime');
+const utilExtraHours = require('./util-extrahours');
 const { Tracer } = require('../tracing/Tracer');
 
 /**
@@ -12,7 +13,7 @@ const { Tracer } = require('../tracing/Tracer');
 exports.calcStats = (req, res) => {
   const span = Tracer.startSpan('stats.calcStats');
 
-  util.calcStats()
+  utilStats.calcStats()
     .then((timeentry) => res.status(200).send(timeentry))
     .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`))
     .finally(() => span.end());
@@ -29,8 +30,7 @@ exports.getStats = (req, res) => {
 
   const dtStart = req.params.date;
   const { timeUnit } = req.params;
-  const { accumulate } = req.query;
-  const { fill } = req.query;
+  const { accumulate, fill } = req.query;
 
   if (span.isRecording()) {
     span.setAttribute('timeUnit', timeUnit);
@@ -38,7 +38,7 @@ exports.getStats = (req, res) => {
     span.setAttribute('fill', fill);
   }
 
-  util.getStats(timeUnit, dtStart, accumulate, fill)
+  utilStats.getStats(timeUnit, dtStart, accumulate, fill)
     .then((timeentries) => {
       res.status(200).send(timeentries);
     })
@@ -55,7 +55,7 @@ exports.getStats = (req, res) => {
 exports.deleteAllStatsDays = (req, res) => {
   const span = Tracer.startSpan('stats.deleteAllStatsDays');
 
-  util.deleteAllStatsDays()
+  utilStats.deleteAllStatsDays()
     .then((result) => res.status(200).send(result))
     .catch((err) => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`))
     .finally(() => span.end());
@@ -137,7 +137,7 @@ exports.histogram = (req, res) => {
 exports.breaktime = (req, res) => {
   const span = Tracer.startSpan('stats.histogram');
 
-  const interval = parseInt(req.params.interval);
+  const interval = parseInt(req.params.interval, 10);
   const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
 
   if (span.isRecording()) {
@@ -152,5 +152,30 @@ exports.breaktime = (req, res) => {
       .then((data) => res.status(200).send(data))
       .catch((err) => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
   }
+  span.end();
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/statistics/extrahours?accumulate=false
+ * curl -X GET http://localhost:30000/api/statistics/extrahours?accumulate=true
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+exports.extraHours = (req, res) => {
+  const span = Tracer.startSpan('stats.extrahours');
+
+  const acc = (req.query.accumulate === 'true');
+  const { timeUnit } = req.query;
+
+  if (span.isRecording()) {
+    span.setAttribute('accumulate', acc);
+    span.setAttribute('timeUnit', timeUnit);
+  }
+
+  utilExtraHours.getExtraHours(acc, timeUnit)
+    .then((data) => res.status(200).send(data))
+    .catch((err) => res.status(403).send(`Error while reading extra hoursbreak with parameter acc (${acc}): ${err.message}`));
+
   span.end();
 };

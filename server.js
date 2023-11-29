@@ -135,6 +135,7 @@ app.delete('/api/stats', api_stats.deleteAllStatsDays);
 app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
 app.get('/api/statistics/histogram/:interval', api_stats.histogram);
 app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
+app.get('/api/statistics/extrahours', api_stats.extraHours);
 
 // .......................................................................
 // maintain
