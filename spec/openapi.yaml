@@ -7,6 +7,7 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 6.0.0
 servers:
+  - url: "http://localhost:30443/api"
   - url: "https://localhost:30443/api"
   - url: "https://nobio.myhome-server.de/api"
   - url: "https://timetracker-ui.web.app/api"
@@ -1238,6 +1239,53 @@ paths:
                     breaktime:
                       type: number
                       example: 689
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
+  "/statistics/extrahours":
+    get:
+      tags:
+        - Statistics
+      summary: calculate extra hours starting with Oct/2023
+      description: >-
+        Returns the extra hours per day either as value or accumulated over time
+      parameters:
+        - name: accumulate
+          in: query
+          description: indicates if statistics are to be accumulated or just presented
+          required: true
+          schema:
+            type: boolean
+            default: false
+        - name: timeUnit
+          in: query
+          description: time unit
+          required: true
+          schema:
+            type: string
+            default: day
+            enum:
+              - year
+              - month
+              - week
+              - day
+      responses:
+        "200":
+          description: Extra hours according to the given parameters
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 999999
+                items:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    extra_hour:
+                      type: number
+                      example: 1.2
         "403":
           $ref: "#/components/responses/UnauthorizedError"
   /version:
