@@ -1,20 +1,26 @@
+/* eslint-disable global-require */
 require('./init');
 require('../db');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
+
+const { expect, assert } = Chai;
 const chaiAsPromised = require('chai-as-promised');
+
+Chai.use(chaiAsPromised);
+
+const {
+  describe, it, before, after,
+} = Mocha;
 const moment = require('moment');
-const { assert } = require('chai');
 const util = require('../api/stats/util-stats');
 const utilTimeEntry = require('../api/entries/util-entries');
 const utilTimebox = require('../api/stats/util-statstimebox');
 const utilHistogram = require('../api/stats/util-histogram');
-
-chai.use(chaiAsPromised);
-
-const { expect } = chai;
+const utilExtraHours = require('../api/stats/util-extrahours');
 
 require('moment-timezone');
 
@@ -311,6 +317,40 @@ describe('test util.calculateStatistics', () => {
     expect(result).to.have.property('lastEntry');
     expect(result.lastEntry).to.have.property('_id');
     expect(result.lastEntry).to.have.property('age');
+  });
+
+  after(() => {
+    // db.closeConnection()
+  });
+});
+
+describe.only('test calculation of extra hours', () => {
+  let db;
+  before(() => {
+    db = require('../db');
+  });
+
+  it('extra hours by day, no fill', async () => {
+    const result = await utilExtraHours.getExtraHours(false, 'day');
+
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result[0]).to.have.property('date');
+    expect(result[0]).to.have.property('extra_hour');
+    expect(result[0]).to.have.property('hour');
+
+    expect(result[6].date).to.be.equal('2023-10-11');
+    expect(result[6].extra_hour).to.be.equal(2);
+    expect(result[6].hour).to.be.equal(8);
+  });
+
+  it('extra hours by day, fill - hours increase in value', async () => {
+    const result = await utilExtraHours.getExtraHours(true, 'day');
+
+    let lastHour = 0;
+    result.forEach((item) => {
+      expect(item.hour).to.be.greaterThan(lastHour);
+      lastHour = item.hour;
+    });
   });
 
   after(() => {
