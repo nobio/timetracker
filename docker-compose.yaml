@@ -1,0 +1,137 @@
+version: "3"
+services:
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # timetracker-ui - the frontend
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  timetracker-ui:
+    container_name: timetracker-ui
+    restart: always
+    # build: .
+    image: nobio/timetracker-ui:master.prod
+    ports:
+      - "8083:80"
+    depends_on:
+      - timetracker
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # timetracker - the api and backend
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  timetracker:
+    container_name: timetracker
+    restart: always
+    image: nobio/timetracker:master
+    env_file:
+      - .env
+    volumes:
+      # in-host:in-container
+      - ./dump:/usr/src/app/dump
+    ports:
+      - "30030:30000"
+      - "30043:30443"
+    links:
+      - mongo
+    depends_on:
+      - mongo
+      - minio
+      - jaeger
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # This is why I still use mongodb 4.4 - I have to. At least in this qnap server :-(
+  #
+  # WARNING: MongoDB 5.0+ requires a CPU with AVX support, and your current system does not appear to have that!
+  #    |   see https://jira.mongodb.org/browse/SERVER-54407
+  #    |   see also https://www.mongodb.com/community/forums/t/mongodb-5-0-cpu-intel-g4650-compatibility/116610/2
+  #    |   see also https://github.com/docker-library/mongo/issues/485#issuecomment-891991814
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  mongo:
+    container_name: mongo
+    restart: always
+    image: mongo:4.4
+    volumes:
+      # in-host:in-container
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # mongo-admin: frontend for mongodb
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  mongo-admin:
+    container_name: mongo-admin
+    image: nobio/mongo-admin:latest
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - "30031:3001"
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Jaeger
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.45
+    env_file:
+      - .env
+    ports:
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 14269:14269
+      - 14250:14250
+      - 9411:9411
+      - 4317:4317
+      - 4318:4318
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # minio: S3 compatible storage
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
+    env_file:
+      - .env
+    command: server --console-address ":9001" /data
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # mongo-gui: possible alternative to monog-admin frontend (supports only one database)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  #mongo-gui:
+  #  container_name: "mongo-gui"
+  #  image: ugleiton/mongo-gui
+  #  restart: always
+  #  ports:
+  #    - "4321:4321"
+  #  environment:
+  #    - MONGO_URL=mongodb://192.168.178.23:27017
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# network definition
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+networks:
+  network-nobio:
+    driver: bridge
+    name: nobio-network
+
+volumes:
+  minio_storage: {}
