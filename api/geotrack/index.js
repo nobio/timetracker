@@ -2,8 +2,6 @@
 const moment = require('moment');
 const util = require('./util-geotrack');
 
-const { Tracer } = require('../tracing/Tracer');
-
 /**
  * Stores Geo Locations (i.e. latitude and longitude) coming from a mobile device
  * to geo track
@@ -15,7 +13,6 @@ const { Tracer } = require('../tracing/Tracer');
  * curl -X POST -H "Content-Type: application/json" -d '{"_type":"encrypted","data":"O5O4V7PF0o90tfmGg04TnGDJ73sA9iIxHpEvQ3J3qwHs3Vqh77lH1/Kh5PxMnZLDZzLn7AWtz+87GZ5+q04PzmqVJcoCud1qg5tEVAQOrlxRS8XZKhc3tLUJm6B2t5Cjb3Ro51+y1MX2lLe+1KMhhpWjZkSvQNf4trFfoOpN5w38rlrBB4VCFJeLFKJzICEFkE0kTwYyJpeHUKJ/wmed20fPT3RXWd6ozYhxa7NrUl+aa15gB7f0BemdhoVJ6EZJHeo9zsRevqEfF0wOiQnul4PujceCL41JFE2iuAtDRyN0yns="}' http://localhost:30000/api/geotrack
  */
 exports.createGeoTrack = async (req, res) => {
-  const span = Tracer.startSpan('geotrack.createGeoTrack');
   const geoTrack = util.parseGeoTrackingObject(req.body);
 
   if (geoTrack === null) {
@@ -32,8 +29,7 @@ exports.createGeoTrack = async (req, res) => {
 
   await util.createGeoTrack(geoTrack)
     .then((track) => res.status(200).send(track))
-    .catch((err) => { span.recordException(err); res.status(err.status).json({ message: err.message }); })
-    .finally(() => span.end());
+    .catch((err) => { res.status(err.status).json({ message: err.message }); });
 };
 
 /**
@@ -43,14 +39,12 @@ exports.createGeoTrack = async (req, res) => {
  * curl -X GET "http://localhost:30000/api/geotrack?dateStart=2020-03-09&dateEnd=2020-03-10" -H "accept: application/json"
  */
 exports.getGeoTracking = (req, res) => {
-  const span = Tracer.startSpan('geotrack.getGeoTracking');
   const dtStart = moment(req.query.dateStart);
   const dtEnd = moment(req.query.dateEnd);
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then((tracks) => res.status(200).send(tracks))
-    .catch((err) => { span.recordException(err); res.status(err.status).json({ message: err.message }); })
-    .finally(() => span.end());
+    .catch((err) => { res.status(err.status).json({ message: err.message }); });
 };
 
 /**
@@ -59,13 +53,11 @@ exports.getGeoTracking = (req, res) => {
  * @param {*} res response object
  */
 exports.getGeoTrackingMetadata = (req, res) => {
-  const span = Tracer.startSpan('geotrack.getGeoTrackingMetadata');
   const dtStart = moment(req.query.dateStart);
   const dtEnd = moment(req.query.dateEnd);
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then(util.getGeoTrackingMetadata)
     .then((metaData) => res.status(200).send(metaData))
-    .catch((err) => { span.recordException(err); res.status(err.status ? err.status : 500).json({ message: err.message }); })
-    .finally(() => span.end());
+    .catch((err) => { res.status(err.status ? err.status : 500).json({ message: err.message }); });
 };

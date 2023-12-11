@@ -23,7 +23,6 @@ const swaggerUi = require('swagger-ui-express');
 const jsyaml = require('js-yaml');
 const cors = require('cors');
 const db = require('./db');
-const { Tracer } = require('./api/tracing/Tracer');
 const globalUtil = require('./api/global_util');
 const api_geotrack = require('./api/geotrack');
 const api_auth = require('./api/auth');
@@ -35,7 +34,6 @@ const api_schedule = require('./api/schedule');
 
 require('log-timestamp')(() => `[${moment().format('ddd, DD MMM YYYY hh:mm:ss Z')}] - %s`);
 
-Tracer.init('timetracker', 'development');
 const app = express();
 
 // morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));

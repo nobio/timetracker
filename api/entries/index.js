@@ -1,6 +1,4 @@
-const { SpanStatusCode } = require('@opentelemetry/api');
 const util = require('./util-entries');
-const { Tracer } = require('../tracing/Tracer');
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -8,18 +6,11 @@ const { Tracer } = require('../tracing/Tracer');
  * curl -X GET http://localhost:30000/api/entries/5a2100cf87f1f368d087696a
  ****************************************************************************** */
 exports.getEntryById = async (req, res) => {
-  const span = Tracer.startSpan('auth.getAllUsers');
-  if (span.isRecording()) { span.setAttribute('entryId', req.params.id); }
-
   try {
     const timeEntry = await util.findById(req.params.id);
-    span.setStatus({ code: SpanStatusCode.OK });
     res.status(200).send(timeEntry);
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(error.message);
-  } finally {
-    span.end();
   }
 };
 
@@ -35,13 +26,6 @@ exports.getEntryById = async (req, res) => {
 exports.getEntries = async (req, res) => {
   const filterByDate = req.query.dt;
   const filterByBusy = req.query.busy;
-
-  const span = Tracer.startSpan('entry.getEntries');
-
-  if (span.isRecording()) {
-    span.setAttribute('filterByDate', filterByDate);
-    span.setAttribute('filterByBusy', filterByBusy);
-  }
 
   try {
     if (filterByDate && filterByBusy) {
@@ -64,10 +48,7 @@ exports.getEntries = async (req, res) => {
         .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
     }
   } catch (error) {
-    span.recordException(error);
-    span.setStatus({ code: 500, message: String(error) });
-  } finally {
-    span.end();
+    console.error(error);
   }
 };
 
@@ -93,18 +74,12 @@ exports.createEntry = async (req, res) => {
     latitude: req.body.latitude,
   };
 
-  /* creating OTEL Span */
-  const span = Tracer.startSpan('entry.createEntry');
-  if (span.isRecording()) { span.setAttribute('timeEntry', timeEntry); }
-
   try {
     const createdTimeentry = await util.create(timeEntry);
-    span.setStatus({ code: SpanStatusCode.OK });
     res.status(201).send(createdTimeentry);
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(`Error while creating a new Time Entry: ${error.message}`);
-  } finally { span.end(); }
+  }
 };
 
 /** ******************************************************************************
@@ -124,18 +99,12 @@ exports.saveEntry = async (req, res) => {
     latitude: req.body.latitude,
   };
 
-  /* creating OTEL Span */
-  const span = Tracer.startSpan('entry.createEntry');
-  if (span.isRecording()) { span.setAttribute('timeEntry', timeEntry); }
-
   try {
     const savedTimeentry = await util.update(timeEntry);
-    span.setStatus({ code: SpanStatusCode.OK });
     res.status(200).send(savedTimeentry);
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(`Error while saving Time Entry: ${id} ${error.message}`);
-  } finally { span.end(); }
+  }
 };
 
 /** ******************************************************************************
@@ -145,24 +114,15 @@ exports.saveEntry = async (req, res) => {
  ****************************************************************************** */
 exports.deleteEntry = async (req, res) => {
   const { id } = req.params;
-
-  const span = Tracer.startSpan('entry.deleteEntry');
-  if (span.isRecording()) { span.setAttribute('entryId', id); }
-
   try {
     const timeEntry = await util.deleteById(id);
     if (timeEntry === undefined || timeEntry === null) {
-      span.setStatus({ code: SpanStatusCode.ERROR, message: `Could not delete Time Entry with (id: ${id})` });
       res.status(404).send(`Could not delete Time Entry with (id: ${id})`);
     } else {
-      span.setStatus({ code: SpanStatusCode.OK });
       res.status(200).send(timeEntry);
     }
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(`Error while reading Time Entry: ${req.params.id} - ${error.message}`);
-  } finally {
-    span.end();
   }
 };
 
@@ -170,30 +130,24 @@ exports.deleteEntry = async (req, res) => {
  * curl -X POST http://localhost:30000/api/entries/error/evaluate
  */
 exports.evaluate = async (req, res) => {
-  const span = Tracer.startSpan('entry.evaluate');
   try {
     const reply = await util.evaluate();
-    span.setStatus({ code: SpanStatusCode.OK });
     res.status(200).send(reply);
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(`Error while validating Time Entries: ${error}`);
-  } finally { span.end(); }
+  }
 };
 
 /**
  * curl -X GET http://localhost:30000/api/entries/error/dates
  */
 exports.getErrorDates = async (req, res) => {
-  const span = Tracer.startSpan('entry.getErrorDates');
-
   try {
     const reply = await util.getErrorDates();
     res.status(200).send(reply);
   } catch (error) {
-    span.recordException(error);
     res.status(500).send(`Error while reading failure dates: ${error}`);
-  } finally { span.end(); }
+  }
 };
 
 /*
@@ -237,7 +191,6 @@ exports.getErrorDates = async (req, res) => {
  ****************************************************************************** */
 exports.geofence = async (req, res) => {
   // console.log(JSON.stringify(req.body));
-  const span = Tracer.startSpan('entry.geofence');
 
   let errMsg = '';
   if (!req.body) errMsg += 'body is empty; ';
@@ -248,7 +201,6 @@ exports.geofence = async (req, res) => {
 
   if (errMsg !== '') {
     // console.error(`invalid request: ${errMsg}`);
-    span.setStatus({ code: 500, message: `invalid request: ${errMsg}` });
     res.status(500).send({ message: `invalid request: ${errMsg}` });
     return;
   }
@@ -265,11 +217,9 @@ exports.geofence = async (req, res) => {
       const te = await util.create(timeEntry);
       res.status(200).send(te);
     } catch (error) {
-      span.recordException(error);
       res.status(500).send(`Error while createing a new Time Entry: ${err.message}`);
     }
   } else {
-    span.setStatus({ code: 500, message: `no geofence entry made; id must be 'Work' but is '${req.body.id}')` });
     res.status(500).send({
       message: `no geofence entry made; id must be 'Work' but is '${req.body.id}')`,
     });
