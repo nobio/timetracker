@@ -87,7 +87,10 @@ const getExtraHoursByTimeUnitAcc = async (stats, timeUnit) => {
   // see above [4]
   const extraHours = [];
   const dailyExtraHours = await getExtraHoursByDay(stats, true);
-  let lastEndOfTimeUnit = moment(dailyExtraHours[0].date).endOf(timeUnit);
+  let lastEndOfTimeUnit = moment();
+  if (dailyExtraHours.length > 0) {
+    lastEndOfTimeUnit = moment(dailyExtraHours[0].date).endOf(timeUnit);
+  }
 
   // iterate all accumulated days and pick the one at the and of our time unit
   dailyExtraHours.forEach((extraHour, idx) => {
