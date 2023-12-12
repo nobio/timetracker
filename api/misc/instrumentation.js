@@ -30,7 +30,8 @@ const sdk = new opentelemetry.NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
-console.log(new OTLPTraceExporter());
-console.log(new OTLPMetricExporter());
-console.log(`instrumented using otel server in ${process.env.OTEL_TRACE_URL}`);
+console.log(`OTEL instrumentation using trace server ${process.env.OTEL_TRACE_URL}`);
+console.log(`OTEL instrumentation using metric server ${process.env.OTEL_METRICS_URL}`);
+console.log(`OTEL_SERVICE_NAME is ${process.env.OTEL_SERVICE_NAME}`);
+
 sdk.start();
