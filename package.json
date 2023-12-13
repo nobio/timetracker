@@ -8,7 +8,7 @@
         "start": "OTEL_SERVICE_NAME='timetracker' node --require ./api/misc/instrumentation.js server",
         "test": "nyc --reporter=html --reporter=text ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "test:dev": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
-        "start:dev": "node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
+        "start:dev": "OTEL_SERVICE_NAME='timetracker' node_modules/nodemon/bin/nodemon.js  --require ./api/misc/instrumentation.js server",
         "serve-noauth": "AUTHORIZATION=false node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
