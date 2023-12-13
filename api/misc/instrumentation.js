@@ -2,7 +2,7 @@ require('dotenv').config();
 
 console.log(`OTEL instrumentation using trace server  ${process.env.OTEL_TRACE_URL}`);
 console.log(`OTEL instrumentation using metric server ${process.env.OTEL_METRICS_URL}`);
-console.log(`OTEL service nam is '${process.env.OTEL_SERVICE_NAME}'`);
+console.log(`OTEL service name is '${process.env.OTEL_SERVICE_NAME}'`);
 
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
