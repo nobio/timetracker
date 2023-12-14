@@ -3,7 +3,6 @@
  * Module dependencies.
  */
 require('dotenv').config();
-require('./api/misc/instrumentation'); // loading OTEL instrumentation
 
 const rateLimit = require('express-rate-limit');
 
