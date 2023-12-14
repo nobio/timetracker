@@ -5,38 +5,18 @@ console.log(`OTEL instrumentation using metric server ${process.env.OTEL_METRICS
 console.log(`OTEL service name is '${process.env.OTEL_SERVICE_NAME}'`);
 
 const opentelemetry = require('@opentelemetry/sdk-node');
-const { Resource } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-const {
-  BasicTracerProvider,
-  ConsoleSpanExporter,
-  SimpleSpanProcessor,
-} = require('@opentelemetry/tracing');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
 const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 
-const exporter = new OTLPTraceExporter({
-  // optional - default url is http://localhost:4318/v1/traces
-  url: process.env.OTEL_TRACE_URL,
-  // optional - collection of custom headers to be sent with each request, empty by default
-  headers: {},
-});
-const provider = new BasicTracerProvider({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME,
-  }),
-});
-// export spans to console (useful for debugging)
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-// export spans to opentelemetry collector
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-
-provider.register();
-
 const sdk = new opentelemetry.NodeSDK({
-  traceExporter: exporter,
+  traceExporter: new OTLPTraceExporter({
+    // optional - default url is http://localhost:4318/v1/traces
+    url: process.env.OTEL_TRACE_URL,
+    // optional - collection of custom headers to be sent with each request, empty by default
+    headers: {},
+  }),
   metricReader: new PeriodicExportingMetricReader({
     exporter: new OTLPMetricExporter({
       // url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
