@@ -7,7 +7,6 @@ const g_util = require('../global_util');
 const utilEntry = require('../entries/util-entries');
 
 const StatsDay = mongoose.model('StatsDay');
-const { Tracer } = require('../tracing/Tracer');
 
 const DEFAULT_WORKING_TIME = 7.8 * 60 * 60 * 1000; // 7.8 hours in milli seconds
 
@@ -20,27 +19,19 @@ exports.calcStats = async () => {
   console.log(`---------------------- calcStats isRunning: ${isCalcRunning} -----------------------------`);
   if (isCalcRunning) return;
   isCalcRunning = true;
-  let span; let spanRoot;
   try {
-    spanRoot = Tracer.startSpan('stats.util.calcStats');
     g_util.sendMessage('RECALCULATE', 'delete stats');
-    span = Tracer.startSpan('stats.util.calcStats.deleteMany');
     await StatsDay.deleteMany();
-    span.end();
 
     g_util.sendMessage('RECALCULATE', 'delete doublets');
-    span = Tracer.startSpan('stats.util.calcStats.deleteMany');
     await utilEntry.removeDoublets();
-    span.end();
 
     const firstEntry = await utilEntry.getFirstTimeEntry();
     const lastEntry = await utilEntry.getLastTimeEntry();
     g_util.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
 
     g_util.sendMessage('RECALCULATE', 'start calculating...');
-    span = Tracer.startSpan('stats.util.calcStats.deleteMany');
     const result = await this.calculateStatistics(firstEntry, lastEntry);
-    span.end();
     g_util.sendMessage('RECALCULATE', '...calculation done');
 
     isCalcRunning = false;
@@ -48,12 +39,9 @@ exports.calcStats = async () => {
   } catch (error) {
     console.log(error);
     isCalcRunning = false;
-    spanRoot.recordException(error);
     throw error;
   } finally {
     isCalcRunning = false;
-    span.end();
-    spanRoot.end();
   }
 };
 
