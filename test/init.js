@@ -9,7 +9,3 @@ if (process.env.MONGODB_PROTOCOL
 } else {
   process.env.MONGODB_URL = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 }
-
-const { Tracer } = require('../api/tracing/Tracer');
-
-Tracer.init('unit-test', 'unit test');

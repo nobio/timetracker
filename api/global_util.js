@@ -8,8 +8,6 @@ const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 
-const { Tracer } = require('./tracing/Tracer');
-
 /**
  * calculates the break time dependeing on the date (needed to use the right employer) and
  * the numbers of entries per day
@@ -61,8 +59,6 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  * use Slack's 'incoming Webhooks' to publish messages
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
-  const span = Tracer.startSpan(`SLACK send message: ${notificationKey} - ${addedContent}`);
-
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
   console.log(`${notificationKey} (${addedCtnt})`);
   try {
@@ -70,13 +66,10 @@ exports.sendMessage = async (notificationKey, addedContent) => {
     if (toggle != null && toggle.toggle === true) {
       // console.log(`toggle '${notificationKey}' switched on`);
       const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedCtnt}`;
-      span.end();
       return this.sendTextMessage(msg);
     }
     return (`toggle ${notificationKey} switched off`);
   } catch (error) {
-    span.recordException(error);
-    span.end();
     return error.message;
   }
 };
