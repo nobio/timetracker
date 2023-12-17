@@ -1,12 +1,11 @@
 #!/usr/local/bin/node
 /* eslint-disable no-console */
-
+const commander = require('commander');
 const mongoose = require('mongoose');
 const readline = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-
 const models = require('./models');
 
 // mongoose.set('useUnifiedTopology', true);
@@ -142,11 +141,23 @@ const app = async () => {
     process.exit(-1);
   }
 };
+console.log(`backup from '${MONGO_URL_SOURCE}' to '${MONGO_URL_TARGET}'`);
 
-console.log(`backup from ${MONGO_URL_SOURCE} to ${MONGO_URL_TARGET}`);
-readline.question('Continue? (hit <y> or <enter> to continue or any other key to abort ', (cont) => {
-  if (cont === '' || cont === 'y' || cont === 'Y') app();
-  else process.exit(0);
+commander
+  .version('2.0.0')
+  .usage('[npm run backup] or [node db/dbmigration] [OPTIONS]')
+  .option('-f, --force', 'run without asking')
+  .parse(process.argv);
 
-  readline.close();
-});
+const options = commander.opts();
+
+if (options.force) {
+  app();
+} else {
+  readline.question('Continue? (hit <y> or <enter> to continue or any other key to abort > ', (cont) => {
+    if (cont === '' || cont === 'y' || cont === 'Y') app();
+    else process.exit(0);
+
+    readline.close();
+  });
+}

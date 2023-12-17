@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "16.8.1",
-    "last_build": "2023-11-29T15:42:15.298Z",
+    "version": "16.8.2",
+    "last_build": "2023-12-17T10:23:06.113Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -13,7 +13,7 @@
         "lint-fix": "eslint --fix",
         "lint": "eslint",
         "build": "node bin/increase_build",
-        "backup": "node db/dbmigration -d"
+        "backup": "node db/dbmigration"
     },
     "devDependencies": {
         "chai": "^4.3.6",
@@ -40,6 +40,7 @@
         "axios": "^1.4.0",
         "bcrypt": "^5.1.1",
         "body-parser": "^1.20.2",
+        "commander": "^11.1.0",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "debug": "^4.3.4",
