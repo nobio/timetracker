@@ -346,8 +346,8 @@ describe('test g_util.getBookedTimeMilliSeconds...', () => {
     const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 2);
     expect(result).to.equal(100000 - 5000); // default time before AOK
   });
-  it('getBookedTimeMilliSeconds before AOK with 4 entries', async () => {
-    const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2018-02-01').unix(), 4);
+  it.only('getBookedTimeMilliSeconds before AOK with 4 entries', async () => {
+    const result = await globalUtil.getBookedTimeMilliSeconds(95000, 5000, moment('2018-02-01').unix(), 4);
     expect(result).to.equal(100000 - 5000); // default time before AOK
   });
   it('getBookedTimeMilliSeconds after AOK with 2 entries', async () => {

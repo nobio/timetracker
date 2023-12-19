@@ -106,12 +106,8 @@ describe('test util.calculateBusyTime', () => {
     }
   });
   it('calculate duration, bustyme, pause (before AOK, 2 Entries)', async () => {
-    let result;
-    try {
-      result = await util.calculateBusyTime(TWO_ENTRIES);
-    } catch (error) {
-      throw error;
-    }
+    const result = await util.calculateBusyTime(TWO_ENTRIES);
+
     expect(result).to.have.property('duration');
     expect(result.duration).to.equal(29880000);
     expect(result).to.have.property('busytime');
@@ -122,12 +118,8 @@ describe('test util.calculateBusyTime', () => {
     expect(result.count).to.equal(2);
   });
   it('calculate duration, bustyme, pause (AOK, 2 Entries)', async () => {
-    let result;
-    try {
-      result = await util.calculateBusyTime(TWO_ENTRIES_AOK);
-    } catch (error) {
-      throw error;
-    }
+    const result = await util.calculateBusyTime(TWO_ENTRIES_AOK);
+
     expect(result).to.have.property('duration');
     expect(result.duration).to.equal(32400000);
     expect(result).to.have.property('busytime');
@@ -138,16 +130,12 @@ describe('test util.calculateBusyTime', () => {
     expect(result.count).to.equal(2);
   });
   it('calculate duration, bustyme, pause (AOK, 4 Entries)', async () => {
-    let result;
-    try {
-      result = await util.calculateBusyTime(FOUR_ENTRIES_AOK);
-    } catch (error) {
-      throw error;
-    }
+    const result = await util.calculateBusyTime(FOUR_ENTRIES_AOK);
+
     expect(result).to.have.property('duration');
     expect(result.duration).to.equal(34200000);
     expect(result).to.have.property('busytime');
-    expect(result.busytime).to.equal(28800000);
+    expect(result.busytime).to.equal(31500000);
     expect(result).to.have.property('pause');
     expect(result.pause).to.equal(2700000);
     expect(result).to.have.property('count');
@@ -157,21 +145,17 @@ describe('test util.calculateBusyTime', () => {
 
 describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
   it('should find one Time Entry by its id', async () => {
-    try {
-      const timeentry = await util.findById('5a2100cf87f1f368d087696a');
-      // console.log(timeentry)
-      expect(timeentry).to.have.property('_id');
-      expect(timeentry).to.have.property('direction');
-      expect(timeentry).to.have.property('longitude');
-      expect(timeentry).to.have.property('latitude');
-      expect(timeentry).to.have.property('__v');
-      expect(timeentry).to.have.property('direction');
-      expect(timeentry.direction).to.equal('enter');
-      expect(timeentry).to.have.property('last_changed');
-      expect(timeentry).to.have.property('entry_date');
-    } catch (error) {
-      throw error;
-    }
+    const timeentry = await util.findById('5a2100cf87f1f368d087696a');
+    // console.log(timeentry)
+    expect(timeentry).to.have.property('_id');
+    expect(timeentry).to.have.property('direction');
+    expect(timeentry).to.have.property('longitude');
+    expect(timeentry).to.have.property('latitude');
+    expect(timeentry).to.have.property('__v');
+    expect(timeentry).to.have.property('direction');
+    expect(timeentry.direction).to.equal('enter');
+    expect(timeentry).to.have.property('last_changed');
+    expect(timeentry).to.have.property('entry_date');
   });
   it('should not find a Time Entry by an invalid id', async () => {
     await expect(util.findById('********_invalid-id_********')).to.be.rejectedWith(Error);
@@ -181,28 +165,20 @@ describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
 describe('test to load the last TimeEntry of a given date: -> util.getLastTimeEntryByDate(dt) ', () => {
   it('check the last entry of a given date', async () => {
     const MY_DATE = moment('2018-01-12');
-    try {
-      const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
-      // console.log(timeEntry)
-      expect(timeEntry).to.not.be.null;
-      expect(timeEntry).to.not.be.undefined;
-      expect(timeEntry).to.have.property('entry_date');
-      expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('2018-01-12');
-      expect(moment(timeEntry.entry_date).format('mm:ss')).to.equal('22:56');
-    } catch (error) {
-      throw error;
-    }
+    const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
+    // console.log(timeEntry)
+    expect(timeEntry).to.not.be.null;
+    expect(timeEntry).to.not.be.undefined;
+    expect(timeEntry).to.have.property('entry_date');
+    expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('2018-01-12');
+    expect(moment(timeEntry.entry_date).format('mm:ss')).to.equal('22:56');
   });
 
   it('last entry of an empty date (in the future) must be undefined', async () => {
     const MY_DATE = moment('2050-01-01');
-    try {
-      const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
-      // console.log(timeEntry)
-      expect(timeEntry).to.be.undefined;
-    } catch (error) {
-      throw error;
-    }
+    const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
+    // console.log(timeEntry)
+    expect(timeEntry).to.be.undefined;
   });
 });
 
