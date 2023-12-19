@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "16.8.2",
-    "last_build": "2023-12-17T10:23:06.113Z",
+    "version": "16.8.3",
+    "last_build": "2023-12-19T07:06:33.321Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -13,16 +13,16 @@
         "lint-fix": "eslint --fix",
         "lint": "eslint",
         "build": "node bin/increase_build",
-        "backup": "node db/dbmigration"
+        "backup": "node db/dbmigration -f"
     },
     "devDependencies": {
         "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
         "chai-datetime": "^1.8.0",
         "chai-integer": "^0.1.0",
-        "eslint": "^8.18.0",
+        "eslint": "^8.56.0",
         "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-plugin-import": "^2.26.0",
+        "eslint-plugin-import": "^2.29.1",
         "mocha": "^10.2.0",
         "mock-req-res": "^1.2.1",
         "nodemon": "^3.0.1",

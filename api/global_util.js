@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 const Axios = require('axios');
 const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
@@ -39,8 +40,10 @@ exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
     }
     bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
   } else {
-    // vor AOK Bayern
-    bookedTime = busytime - pause;
+    // vor/nach AOK Bayern
+    if (entriesPerDay > 2) bookedTime = busytime; // more then 2 (i.e. 4, 6, etc.) entries, the pause has already been taken into account
+    else if (busytime < pause) bookedTime = busytime; // pause > bookedTime: we are at the very morning shortly after checking in
+    else bookedTime = busytime - pause; // remains: n==2 and bookedTime longer than calculated pause
   }
   return bookedTime;
 };
