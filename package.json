@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "16.8.4",
-    "last_build": "2023-12-19T07:21:51.830Z",
+    "version": "16.8.5",
+    "last_build": "2023-12-28T11:19:51.741Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -62,7 +62,7 @@
         "ws": "^8.13.0"
     },
     "engines": {
-        "node": "^20"
+        "node": "^21"
     },
     "repository": {
         "type": "git",
