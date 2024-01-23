@@ -55,14 +55,13 @@ app.use(api_auth.authorize);
 const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
 const swaggerDoc = jsyaml.load(spec);
 
-/*
 app.use((req, res, next) => {
   console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
   console.log(`▶ params:${JSON.stringify(req.params)}`);
   console.log(`▶ body:${JSON.stringify(req.body)}`);
   next();
 });
-*/
+
 /*
 app.configure('production', function() {
   app.use(express.errorHandler());
