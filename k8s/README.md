@@ -15,13 +15,14 @@ curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/miniku
 sudo mv minikube /usr/local/bin
 
 sudo minikube start --driver=docker --force
+```
 
-# install dashboard and create user an secret
-cd Projects
-git clone https://github.com/irsols-devops/kubernetes-dashboard.git
-sudo kubectl apply -f ./kubernetes-dashboard/
+## Dashboard installieren
+```
+# Installation
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+# Zugriffstoken erzeugen
 sudo kubectl -n kubernetes-dashboard create token admin-user
-
 # start proxy (Terminal bleibt offen, Proxy muss laufen; ggf. in Background schicken)
 sudo kubectl proxy
 ```
