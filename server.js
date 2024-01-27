@@ -55,13 +55,14 @@ app.use(api_auth.authorize);
 const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
 const swaggerDoc = jsyaml.load(spec);
 
+/*
 app.use((req, res, next) => {
-  console.log(`▶ headers: ${JSON.stringify(req.headers)}`);
+  console.log(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
   console.log(`▶ params:${JSON.stringify(req.params)}`);
   console.log(`▶ body:${JSON.stringify(req.body)}`);
   next();
 });
-
+*/
 /*
 app.configure('production', function() {
   app.use(express.errorHandler());
@@ -167,6 +168,9 @@ app.post('/api/auth/token', api_auth.refreshToken);
 // .......................................................................
 app.put('/api/schedule', api_schedule.schedule);
 
+// .......................................................................
+// Check Slack url
+// .......................................................................
 if (process.env.SLACK_URL) {
   console.log('using Slack to notify');
 } else {
