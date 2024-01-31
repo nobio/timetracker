@@ -110,7 +110,8 @@ spec:
               value: "20"
           volumeMounts:
             - name: api-storage
-              mountPath: "/data/api"
+              # path in pod
+              mountPath: "/usr/src/app/dump"
       volumes:
         - name: api-storage
           persistentVolumeClaim:
@@ -151,7 +152,8 @@ spec:
   capacity:
     storage: 1Gi
   hostPath:
-    path: /data/api
+    # path on host
+    path: /data/api/dump
 ---
 # -----------------------------------------------------------
 # Volume Claim
