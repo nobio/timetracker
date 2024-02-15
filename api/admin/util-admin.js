@@ -40,6 +40,9 @@ const deleteOldDumpfiles = async () => {
     }
   }
 };
+exports.testWrapperDeleteOldDumpfiles = async () => {
+  return deleteOldDumpfiles();
+}
 
 /**
  * dumps one model
@@ -68,6 +71,9 @@ const dumpModel = async (model) => {
     });
   });
 };
+exports.testWrapperDumpModel = async (model) => {
+  return dumpModel(model);
+}
 
 /**
  * returns the latest file of a typ within a directory
@@ -88,6 +94,8 @@ const recentFile = (dir, type) => {
  */
 const restoreFile = async (dbType) => {
   const f = recentFile(DUMP_DIR, dbType);
+  if(!f) return;
+
   const Model = mongoose.model(dbType);
   const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
   const data = await new Promise((resolve, reject) => {
@@ -101,12 +109,13 @@ const restoreFile = async (dbType) => {
   await Model.deleteMany({});
   for (const item of data) {
     try {
-      new Model(item).save();
+      await new Model(item).save();
       console.log(`model ${Model.modelName} ${item._id} saved`);
     } catch (error) {
       console.error(error.message);
     }
   }
+  return dbType;
 };
 
 /* ====================================================================================== */
