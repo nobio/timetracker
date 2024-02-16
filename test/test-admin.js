@@ -61,7 +61,7 @@ describe('test util.dumpModels', () => {
 
     // read files from dump directory
     const dirContent = fs.readdirSync(DUMP_DIR);
-    console.log(dirContent)
+    // console.log(dirContent)
 
     // first file date should be today - 32 because today - 31 are deleted
     const lastDateFileShouldExist = moment().subtract(31, 'days').format('YYYY-MM-DD');
