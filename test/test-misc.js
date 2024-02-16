@@ -106,4 +106,17 @@ describe('test misc functions', () => {
     expect(response.details[1]).to.have.property('metricValue');
     expect(response.details[1].metricValue).to.equal(true);
   });
+  it('test log', async () => {
+    const req = mockRequest({ headers: { 'x-forwarded-for': '1.2.3.4' }, body: { 'key': 'value' }, url: '/api/log', method: 'POST' });
+    const res = mockResponse();
+
+    await misc.log(req, res);
+    const response = res.json.getCalls()[0].lastArg;
+
+    expect(res.status).to.have.been.calledWith(201);
+    expect(response).to.have.property('url'); expect(response.url).to.equal('/api/log');
+    expect(response).to.have.property('method'); expect(response.method).to.equal('POST');
+    expect(response).to.have.property('headers'); expect(response.headers['x-forwarded-for']).to.equal('1.2.3.4');
+    expect(response).to.have.property('body'); expect(response.body['key']).to.equal('value');
+  });
 });

@@ -33,8 +33,8 @@ const deleteOldDumpfiles = async () => {
 
     for (const fileName of fileNames) {
       const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');;
-      const diffDays = Math.round(moment().diff(fileDate) / 86400000);
-      console.log(fileDate, diffDays)
+      const diffDays = Math.floor(moment().diff(fileDate) / 86400000);
+      // console.log(moment(), fileDate, diffDays)
       if (diffDays > 31) {
         fs.rmSync(`${DUMP_DIR}/${fileName}`);
       }
