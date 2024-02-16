@@ -102,12 +102,7 @@ exports.healthcheck = async (req, res) => {
  * curl -X GET http://localhost:30000/api/experiment
  */
 exports.experiment = async (req, res) => {
-  const admin = require('../admin/util-admin');
-  let result;
-
-  result = await admin.dumpModels();
-  console.log(result);
-  res.status(200).json(result);
+  res.status(200).send('nothing to see here');
 };
 
 /**
@@ -122,12 +117,11 @@ exports.log = async (req, res) => {
 
   resp.url = req.url;
   resp.method = req.method;
-  //  resp.headers = JSON.stringify(req.headers);
-  //  resp.body = JSON.stringify(req.body);
+
   if (Object.keys(req.headers).length) resp.headers = req.headers;
   if (Object.keys(req.body).length) resp.body = req.body;
 
-  console.log(JSON.stringify(resp));
+  console.debug(JSON.stringify(resp, null, 2));
 
   res.status(201).json(resp);
 };
