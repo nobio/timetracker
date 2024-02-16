@@ -255,7 +255,7 @@ describe('test utilAuth.updateUser', () => {
   });
 
   after(async () => {
-    await util.deleteUser(userId);
+    if (userId) await util.deleteUser(userId);
   });
 
   it('update an existing user', async () => {
@@ -273,6 +273,37 @@ describe('test utilAuth.updateUser', () => {
       expect(user.mailAddress).to.be.equal('donald.duck@aol.com');
     } catch (err) {
       assert.fail(`should not throw exception\n${error.message}`);
+    } finally {
+      await util.deleteUser(userId);
+    }
+  });
+
+  it('update an existing user (req/res)', async () => {
+    try {
+      await User.deleteOne({ username: TESTUSER_USERNAME });
+      await User.deleteOne({ username: 'alberto' });
+      userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
+console.log('UserId = ' + userId)
+      const res = mockResponse();
+      const req = mockRequest({
+        headers: [],
+        body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
+        params: { 'id': userId },
+      });
+
+      await auth.updateUser(req, res);
+      expect(res.status).to.have.been.calledWith(201);
+
+      const user = await util.getUser(userId);
+      expect(user.username).to.be.equal('alberto');
+      expect(user.name).to.be.equal('ALBERTO EINSTEINO');
+      expect(user.mailAddress).to.be.equal('alberto-einsteino@berkly.edu');
+
+    } catch (error) {
+      console.error(error.message)
+      assert.fail(`should not throw error\n${error.message}`);
+    } finally {
+      await util.deleteUser(userId)
     }
   });
   it('update an existing user - id null', async () => {
@@ -286,6 +317,17 @@ describe('test utilAuth.updateUser', () => {
     } catch (err) {
       expect(err).to.be.a('error');
     }
+  });
+  it('update an existing user - id null (req/res)', async () => {
+    const res = mockResponse();
+    const req = mockRequest({
+      headers: [],
+      body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
+      //params: { 'id': userId },
+    });
+
+    await auth.updateUser(req, res);
+    expect(res.status).to.have.been.calledWith(404);
   });
   it('update an existing user - username null', async () => {
     try {
@@ -337,6 +379,8 @@ describe('test utilAuth.updateUser', () => {
       assert.fail(`should not throw exception\n${error.message}`);
     }
   });
+
+
 });
 
 /**
@@ -416,6 +460,20 @@ describe('test utilAuth.login', () => {
       expect(refreshToken).to.be.a('string');
     } catch (err) {
       assert.fail(`should not throw exception\n${error.message}`);
+    } finally {
+      await Token.deleteOne({ token: refreshToken });
+    }
+  });
+  it('login with valid principal and credenital (req/res)', async () => {
+    let refreshToken = '';
+    try {
+      const res = mockResponse();
+      const req = mockRequest({
+        body: { 'username': TESTUSER_USERNAME, 'password': TESTUSER_PASSWORD },
+      });
+      const result = await auth.login(req, res);
+      expect(res.status).to.have.been.calledWith(200);
+
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -572,7 +630,7 @@ describe('test utilAuth.updateUsersPassword', () => {
   let refreshToken;
   let userId;
   let db;
-  before(async () => {
+  beforeEach(async () => {
     db = require('../db');
     await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
@@ -581,7 +639,7 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password for existing user', async () => {
-    const NEW_PASSWORD = '___SECRETPSSWORD___';
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       let result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
       expect(result).to.be.a('object');
@@ -615,7 +673,7 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password for not existing user', async () => {
-    const NEW_PASSWORD = '___SECRETPSSWORD___';
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword('asdkahsd87ggakjhfbjkshdbuszvf', NEW_PASSWORD);
@@ -629,7 +687,7 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password but do not provide user id', async () => {
-    const NEW_PASSWORD = '___SECRETPSSWORD___';
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword(null, NEW_PASSWORD);
@@ -643,7 +701,7 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password but do not provide password', async () => {
-    const NEW_PASSWORD = '___SECRETPSSWORD___';
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword(userId, null);
@@ -656,7 +714,43 @@ describe('test utilAuth.updateUsersPassword', () => {
     }
   });
 
-  after(async () => {
+  it('set new password (req/res)', async () => {
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
+    let result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+    expect(result).to.be.a('object');
+    expect(result).to.have.property('accessToken');
+    expect(result).to.have.property('refreshToken');
+
+    // update password
+    const res = mockResponse();
+    const req = mockRequest({
+      body: { 'password': NEW_PASSWORD },
+      params: { 'id': userId },
+    });
+
+    await auth.updateUsersPassword(req, res);
+    expect(res.status).to.have.been.calledWith(201);
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
+
+    // try to login with new password
+    result = await util.login(TESTUSER_USERNAME, NEW_PASSWORD);
+    expect(result).to.be.a('object');
+    expect(result).to.have.property('accessToken');
+    expect(result).to.have.property('refreshToken');
+
+    // try to login with old password
+    try {
+      result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.status).to.equal(401);
+      expect(err.message).to.equal('User not authenticated');
+    }
+
+  });
+
+  afterEach(async () => {
     await User.deleteOne({ name: TESTUSER_USERNAME });
   });
 });

@@ -93,7 +93,7 @@ exports.createUser = async (username, password, name, mailAddress) => {
  * @param {*} mailAddress mail address of user (optional)
  */
 exports.updateUser = async (id, username, name, mailAddress) => {
-  if (!id) throw Error('User must be provided');
+  if (!id) throw Error('User does not exists');
 
   const user = await User.findById(id);
   if (!user) throw Error('User does not exists');

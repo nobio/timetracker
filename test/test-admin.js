@@ -48,34 +48,30 @@ describe('test util.dumpModels', () => {
 
   it('testing deletion of files older 31 days', async () => {
     const DAYS_IN_PAST = 31 + 10;
-    try {
-      // create the dump directory and files with names indicating dates from today tol DAYS_IN_PAST
-      fs.mkdirSync(DUMP_DIR);
-      for (let n = 1; n < DAYS_IN_PAST; n++) {
-        const d = moment().subtract(n, 'days').format('YYYY-MM-DD_HHmmss');
-        const dumpFile = `./dump/deleteme_${d}.json.gz`;
-        fs.writeFileSync(dumpFile, Buffer.from('please delete me if you find me', 'utf-8'));
-      }
-
-      // delete files older today - 31 days
-      await util.testWrapperDeleteOldDumpfiles();
-
-      // read files from dump directory
-      const dirContent = fs.readdirSync(DUMP_DIR);
-
-      // first file date should be today - 32 because today - 31 are deleted
-      const lastDateFileShouldExist = moment().subtract(32, 'days').format('YYYY-MM-DD');
-
-      // get first (=oldest) file name
-      const firstFileName = dirContent[0];
-
-      // oldest file date (like '2024-01-14') should be included in first filename like 'deleteme_2024-01-14_075838.json.gz'
-      expect(firstFileName).to.include(lastDateFileShouldExist);
-      expect(dirContent.length).to.equal(32);
-    } catch (error) {
-      console.log(error);
-      assert.fail('should not throw exception');
+    // create the dump directory and files with names indicating dates from today tol DAYS_IN_PAST
+    fs.mkdirSync(DUMP_DIR);
+    for (let n = 1; n < DAYS_IN_PAST; n++) {
+      const d = moment().subtract(n, 'days').format('YYYY-MM-DD_HHmmss');
+      const dumpFile = `./dump/deleteme_${d}.json.gz`;
+      fs.writeFileSync(dumpFile, Buffer.from('please delete me if you find me', 'utf-8'));
     }
+
+    // delete files older today - 31 days
+    await util.testWrapperDeleteOldDumpfiles();
+
+    // read files from dump directory
+    const dirContent = fs.readdirSync(DUMP_DIR);
+    console.log(dirContent)
+
+    // first file date should be today - 32 because today - 31 are deleted
+    const lastDateFileShouldExist = moment().subtract(31, 'days').format('YYYY-MM-DD');
+
+    // get first (=oldest) file name
+    const firstFileName = dirContent[0];
+
+    // oldest file date (like '2024-01-14') should be included in first filename like 'deleteme_2024-01-14_075838.json.gz'
+    expect(firstFileName).to.include(lastDateFileShouldExist);
+    expect(dirContent.length).to.equal(31);
   });
 });
 

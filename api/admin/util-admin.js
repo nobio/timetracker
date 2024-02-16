@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const gUtil = require('../global_util');
 
@@ -32,8 +32,9 @@ const deleteOldDumpfiles = async () => {
     const fileNames = await fs.readdirSync(DUMP_DIR);
 
     for (const fileName of fileNames) {
-      const fileDate = moment(fileName.split('.')[0].split('_')[1]);
-      const diffDays = Math.round(moment().diff(fileDate) / 86400000) - 1;
+      const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');;
+      const diffDays = Math.round(moment().diff(fileDate) / 86400000);
+      console.log(fileDate, diffDays)
       if (diffDays > 31) {
         fs.rmSync(`${DUMP_DIR}/${fileName}`);
       }
