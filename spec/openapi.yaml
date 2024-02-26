@@ -13,6 +13,7 @@ servers:
   - url: "https://timetracker-ui.web.app/api"
 security:
   - bearerAuth: []
+  - keyAuth: []
 tags:
   - name: Time Tracker
     description: description goes here
@@ -1997,6 +1998,11 @@ components:
     basicAuth:
       type: http
       scheme: basic
+    keyAuth:
+      type: apiKey
+      in: header
+      name: api-key
+      description: All requests must include the `api-key` header containing your account ID.
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid; try to refresh your token
