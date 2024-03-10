@@ -1,6 +1,8 @@
 const util = require('./util-admin');
 const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
+const utilGeofence = require('./util-geofences');
+const utilMinio = require('./util-minio');
 
 /**
  * function to dump the mongodb to the local file system in order to be restored if needed
@@ -8,9 +10,17 @@ const utilProps = require('./util-properties');
  * curl -X POST http://localhost:30000/api/entries/dump
  */
 exports.dumpModels = (req, res) => {
-  util.dumpModels()
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+  if (process.env.MINIO_ACTIVE === 'true') {
+    // dump to S3-Storage
+    utilMinio.dumpModels()
+      .then((response) => res.status(201).send(response))
+      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+  } else {
+    // dump to file system
+    util.dumpModels()
+      .then((response) => res.status(200).send(response))
+      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+  }
 };
 
 /**
@@ -18,22 +28,30 @@ exports.dumpModels = (req, res) => {
  *
  * curl -k -X POST https://localhost:30443/api/entries/restore
  */
-exports.restoreFromFile = (req, res) => {
-  util.restoreDataFromFile()
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
-},
+exports.restore = (req, res) => {
+  if (process.env.MINIO_ACTIVE === 'true') {
+    // dump to S3-Storage
+    utilMinio.restoreFromS3()
+      .then((response) => res.status(201).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
+  } else {
+    // dump to file system
+    util.restoreDataFromFile()
+      .then((response) => res.status(201).send(response))
+      .catch((err) => res.status(500).send(`Error while restoring data: ${err}`));
+  }
+};
 
-  /**
+/**
    * function to backup data in an extra backup table
    *
    * curl -X POST http://localhost:30000/api/entries/backup
    */
-  exports.backupTimeEntries = (req, res) => {
-    util.backupTimeEntries()
-      .then((response) => res.status(200).send(response))
-      .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
-  };
+exports.backupTimeEntries = (req, res) => {
+  util.backupTimeEntries()
+    .then((response) => res.status(201).send(response))
+    .catch((err) => res.status(500).send(`Error while backup data: ${err}`));
+};
 
 /**
  * read the list of all toggles
@@ -94,7 +112,6 @@ exports.saveToggle = (req, res) => {
   const { id } = req.params;
   const { toggle } = req.body;
   const { notification } = req.body;
-
   utilToggles.updateToggle(id, toggle, notification)
     .then((response) => res.status(200).send(response))
     .catch((err) => res.status(500).send(`Error while saving toggle: ${err}`));
@@ -111,7 +128,7 @@ exports.createToggle = (req, res) => {
   const { notification } = req.body;
 
   utilToggles.createToggle(name, toggle, notification)
-    .then((response) => res.status(200).send(response))
+    .then((response) => res.status(201).send(response))
     .catch((err) => res.status(500).send(`Error while creating new toggle: ${err}`));
 };
 
@@ -201,4 +218,65 @@ exports.deleteProperty = (req, res) => {
         res.status(404).send();
       }
     }).catch((err) => res.status(500).send(`Error while deleting a property: ${err}`));
+};
+
+/** ********************************
+app.get('/api/gefences', api_admin.getGeofences);
+app.get('/api/gefences/:id', api_admin.getGeofence);
+app.post('/api/gefences', api_admin.createGeofence);
+app.put('/api/gefences/:id', api_admin.saveGeofence);
+app.delete('/api/gefences/:id', api_admin.deleteGeofence);
+ */
+
+exports.getGeofences = (req, res) => {
+  utilGeofence.getGeofences()
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading all geofences: ${err.message}`));
+};
+
+exports.getGeofence = (req, res) => {
+  const { id } = req.params;
+
+  utilGeofence.getGeofence(id)
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while reading a geofence: ${err.message}`));
+};
+
+exports.createGeofence = (req, res) => {
+  const {
+    enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  } = req.body;
+
+  utilGeofence.createGeofence(
+    enabled,
+    longitude,
+    latitude,
+    radius,
+    description,
+    isCheckedIn,
+    lastChange,
+  )
+    .then((response) => res.status(201).send(response))
+    .catch((err) => res.status(500).send(`Error while creating a new geofence: ${err.message}`));
+};
+
+exports.saveGeofence = (req, res) => {
+  const { id } = req.params;
+  const {
+    enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  } = req.body;
+
+  utilGeofence.setGeofence({
+    id, enabled, longitude, latitude, radius, description, isCheckedIn, lastChange,
+  })
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(404).send(`Error while updating existing geofence: ${err.message}`));
+};
+
+exports.deleteGeofence = (req, res) => {
+  const { id } = req.params;
+
+  utilGeofence.deleteGeofence(id)
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(500).send(`Error while deleting a geofence: ${err.message}`));
 };

@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 const jwt = require('jsonwebtoken');
 const util = require('./util-auth');
-const g_util = require('../global_util');
+const globalUtil = require('../global_util');
 
 /**
  * reads all users from database
@@ -29,7 +30,7 @@ exports.getAllUsers = async (req, res) => {
  * @param {*} res Response object
  */
 exports.getUser = async (req, res) => {
-  console.log(req.params.url)
+  // console.log(req.params.url);
   try {
     const result = await util.getUser(req.params.id);
     res.status(200).json(result);
@@ -50,7 +51,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const result = await util.deleteUser(req.params.id);
-    g_util.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
+    globalUtil.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     res.status(202).json(result);
   } catch (err) {
     // console.error(err);
@@ -69,7 +70,7 @@ exports.deleteUser = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
-    g_util.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
+    globalUtil.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
@@ -88,7 +89,7 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
-    g_util.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
+    globalUtil.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
@@ -105,10 +106,11 @@ exports.updateUser = async (req, res) => {
 exports.updateUsersPassword = async (req, res) => {
   try {
     const result = await util.updateUsersPassword(req.params.id, req.body.password);
-    g_util.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
+    globalUtil.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
     res.status(201).json(result);
   } catch (err) {
     // console.error(err);
+
     if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
     else res.status(500).json({ message: err.message });
   }
@@ -124,9 +126,9 @@ exports.updateUsersPassword = async (req, res) => {
  */
 exports.login = async (req, res) => {
   // console.log(req)
-  g_util.sendMessage('LOGIN', `try to login user ${req.body.username}`);
+  globalUtil.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const { password } = req.body;
-  if (password == null) {
+  if (password === null) {
     res.status(401).send();
     return;
   }
@@ -135,6 +137,7 @@ exports.login = async (req, res) => {
     const tokens = await util.login(req.body.username, password);
     res.status(200).json(tokens);
   } catch (err) {
+    console.error(err);
     if (err.status) {
       res.status(err.status).json({ message: err.message });
     } else {
@@ -155,7 +158,9 @@ exports.logout = async (req, res) => {
     await util.logout(req.body.token);
     res.status(200).send();
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    // commented for bugfix #101
+    // res.status(400).json({ message: err.message });
+    res.status(200).json({ message: err.message });
   }
 };
 
@@ -168,7 +173,7 @@ exports.logout = async (req, res) => {
  */
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.token;
-  if (refreshToken == null) {
+  if (refreshToken === null) {
     res.status(400).send('Unauthorized refresh token');
     return;
   }
@@ -183,6 +188,7 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.authorize = async (req, res, next) => {
+  // console.log(req.url);
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
@@ -190,15 +196,17 @@ exports.authorize = async (req, res, next) => {
     (req.method === 'POST' && req.url.startsWith('/api/auth/login'))
     || (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
     || (req.method === 'POST' && req.url.startsWith('/api/auth/token'))
+    || (req.method === 'GET' && req.url.startsWith('/api/health'))
     || (req.method === 'GET' && req.url.startsWith('/api-docs'))
     || (req.method === 'GET' && req.url.startsWith('/ws'))
+    || (req.url.startsWith('/api/log'))
   )) {
     // just continue...
-    console.log(`authorization disabled for ${req.url}`);
+    // console.log(`authorization disabled for ${req.url}`);
     res.status(200);
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
-    (req.method === 'POST' && req.url.startsWith('/api/geofence'))
+    (req.method === 'POST' && (req.url === '/api/geofence' || req.url === '/api/geofence/')) // .startsWith is not sufficiant since there is an endpoint /api/geofences
     || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
   )) {
     // basic authorisation
@@ -216,23 +224,24 @@ exports.authorize = async (req, res, next) => {
  * Clients need to create a new token using the refresh token when they got a 403 in the first place
  *
  * @param req Request object (includes the header and possibly token); user object will be added
- * @param res Respons object; only used in case of error
+ * @param res Respons object; only used in case of err
  * @param next callback to next middleware
  */
 exports.authorizeToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.status(401).send('Unauthorized');
+  if (!token) return res.status(401).send('Unauthorized');
 
   await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
-      if (err.name == 'TokenExpiredError') return res.status(401).send(err.message);
+      if (err.name === 'TokenExpiredError') return res.status(401).send(err.message);
       return res.status(403).send(err.message);
     }
 
     req.user = user; // store user in request object
     res.status(200);
+
     next();
   });
 };
@@ -245,7 +254,7 @@ exports.authorizeToken = async (req, res, next) => {
  * Clients need to create a new token using the refresh token when they got a 403 in the first place
  *
  * @param req Request object (includes the header and possibly token); user object will be added
- * @param res Respons object; only used in case of error
+ * @param res Respons object; only used in case of err
  * @param next callback to next middleware
  */
 exports.authorizeBasicAuth = async (req, res, next) => {

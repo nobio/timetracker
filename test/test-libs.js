@@ -1,7 +1,8 @@
 require('./init');
-const util = require('../api/entries/util-entries');
 const chai = require('chai');
-const expect = chai.expect;
+const util = require('../api/entries/util-entries');
+
+const { expect } = chai;
 
 describe('isEmpty ', () => {
   let testv;
@@ -40,4 +41,3 @@ describe('test stripdownToDateBerlin method', () => {
   it('should parse timestamp 0', () => expect(util.stripdownToDateBerlin(0).format('YYYY-MM-DD HH:mm:ss')).to.equal('1970-01-01 00:00:00'));
   it('should parse negative timestamp to timestamp 0', () => expect(util.stripdownToDateBerlin(-999).format('YYYY-MM-DD HH:mm:ss')).to.equal('1970-01-01 00:00:00'));
 });
-

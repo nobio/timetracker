@@ -1,24 +1,27 @@
+/* eslint-disable global-require */
 require('./init');
 require('../db');
 const mongoose = require('mongoose');
 
 const TimeEntry = mongoose.model('TimeEntry');
-const StatsDay = mongoose.model('StatsDay');
+const Chai = require('chai');
+const Mocha = require('mocha');
+
+const { expect, assert } = Chai;
+const chaiAsPromised = require('chai-as-promised');
+
+Chai.use(chaiAsPromised);
+
+const {
+  describe, it, before, after,
+} = Mocha;
+const moment = require('moment');
 const util = require('../api/stats/util-stats');
 const utilTimeEntry = require('../api/entries/util-entries');
 const utilTimebox = require('../api/stats/util-statstimebox');
 const utilHistogram = require('../api/stats/util-histogram');
+const utilExtraHours = require('../api/stats/util-extrahours');
 
-const chai = require('chai');
-
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-
-const expect = chai.expect;
-
-const moment = require('moment');
-const { assert } = require('chai');
 require('moment-timezone');
 
 const DEFAULT_DATE = moment('1967-03-16');
@@ -42,6 +45,7 @@ describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry', () => {
 describe('utilTimeEntry util.removeDoublets', () => {
   it('test for doubletts (should be no in)', async () => {
     const result = await utilTimeEntry.removeDoublets();
+
     expect(result).to.have.property('removed');
     expect(result.removed).to.equal(0);
   });
@@ -69,7 +73,7 @@ describe('test util.getStats and getStatsByRange', () => {
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd);
-    //console.log(result)
+    // console.log(result)
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -240,21 +244,21 @@ describe('test utilHistogram.getHistogramByTimeUnit', () => {
     }
   });
   it('utilHistogram with interval 60 with go', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'go') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'go'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('histValue');
   });
   it('utilHistogram with interval 60 with enter', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'enter') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'enter'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
     expect(result[0]).to.have.property('histValue');
   });
   it('utilHistogram with interval 60 with invalid direction', async () => {
-    const result = await utilHistogram.getHistogramByTimeUnit(60, 'XXXX') // numbers of minutes in one day
+    const result = await utilHistogram.getHistogramByTimeUnit(60, 'XXXX'); // numbers of minutes in one day
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result).to.be.an('array').with.lengthOf(24);
     expect(result[0]).to.have.property('time');
@@ -290,20 +294,19 @@ describe('test utilTimebox.getStatsByTimeBox', () => {
       await utilTimebox.getStatsByTimeBox('XXXX');
       assert.fail('should not reach this point but throw error instead');
     } catch (error) {
-      expect(error.message).to.be.equal("time unit 'XXXX' is invalid");
+      expect(error.message).to.be.equal('time unit \'XXXX\' is invalid');
     }
-
   });
 });
-describe("test util.calculateStatistics", () => {
-  var db;
-  before(function () {
-    db = require("../db");
+describe('test util.calculateStatistics', () => {
+  let db;
+  before(() => {
+    db = require('../db');
   });
 
   it('calcStats', async () => {
-    const firstEntry = { _id: 0, age: moment('2016-01-01T06:30:00.000Z') };
-    const lastEntry = { _id: 0, age: moment('2016-01-15T06:30:00.000Z') };
+    const firstEntry = { _id: 0, age: moment('2019-03-01T06:30:00.000Z') };
+    const lastEntry = { _id: 0, age: moment('2019-03-31T06:30:00.000Z') };
 
     const result = await util.calculateStatistics(firstEntry, lastEntry);
 
@@ -316,8 +319,42 @@ describe("test util.calculateStatistics", () => {
     expect(result.lastEntry).to.have.property('age');
   });
 
-  after(function () {
-    //db.closeConnection()
+  after(() => {
+    // db.closeConnection()
+  });
+});
+
+describe('test calculation of extra hours', () => {
+  let db;
+  before(() => {
+    db = require('../db');
+  });
+
+  it('extra hours by day, no fill', async () => {
+    const result = await utilExtraHours.getExtraHours(false, 'day');
+
+    expect(result).to.be.an('array').with.length.greaterThan(0);
+    expect(result[0]).to.have.property('date');
+    expect(result[0]).to.have.property('extra_hour');
+    expect(result[0]).to.have.property('hour');
+
+    expect(result[6].date).to.be.equal('2023-10-11');
+    expect(result[6].extra_hour).to.be.equal(2);
+    expect(result[6].hour).to.be.equal(8);
+  });
+
+  it('extra hours by day, fill - hours increase in value', async () => {
+    const result = await utilExtraHours.getExtraHours(true, 'day');
+
+    let lastHour = 0;
+    result.forEach((item) => {
+      expect(item.hour).to.be.greaterThan(lastHour);
+      lastHour = item.hour;
+    });
+  });
+
+  after(() => {
+    // db.closeConnection()
   });
 });
 
@@ -348,20 +385,16 @@ describe("test util.deleteAllStatsDays", () => {
 /**
  * create a new TimeEntry regardless other entries. No checks will be performed
  */
-function createTimeEntry(timeEntry) {
+async function createTimeEntry(timeEntry) {
   // console.log('entered save ' + id)
-  return new Promise((resolve, reject) => {
-    new TimeEntry({
-      entry_date: timeEntry.datetime,
-      direction: timeEntry.direction,
-      longitude: timeEntry.longitude,
-      latitude: timeEntry.latitude,
-      signature: 'HARD_CODED',
-    })
-      .save()
-      .then(timeEntry => resolve(timeEntry))
-      .catch(err => reject(err));
-  });
+  // console.log(timeEntry);
+  await new TimeEntry({
+    entry_date: timeEntry.datetime,
+    direction: timeEntry.direction,
+    longitude: timeEntry.longitude,
+    latitude: timeEntry.latitude,
+    signature: 'HARD_CODED',
+  }).save();
 }
 
 /**

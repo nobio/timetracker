@@ -5,7 +5,7 @@ node_js:
   - "14.17.1"
 
 services:
-  - docker 
+  - docker
 
 env:
   global:
@@ -16,31 +16,31 @@ before_script:
   - VERSION=`cat VERSION`
   - echo $VERSION
 
-  - if [ $TRAVIS_BRANCH == "master" ]; then
-        export TAG=latest;
+  - if [ $TRAVIS_BRANCH === "master" ]; then
+    export TAG=latest;
     else
-        export TAG=_$TRAVIS_BRANCH-DEV;
+    export TAG=_$TRAVIS_BRANCH-DEV;
     fi;
 
   - echo $TAG
-  
+
 script:
   - npm test
 
 after_success:
-  - docker --version  # document the version travis is using
+  - docker --version # document the version travis is using
   - docker build -t $IMAGE_NAME:$TAG .
 
   - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" # hidden in travis-ci.org settings of timetracker project
   #- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin  # hidden in travis-ci.org settings of timetracker project
   #- docker images
-  
-  - if [ $TRAVIS_BRANCH == "master" ]; then
-        docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
-        docker push $IMAGE_NAME:$VERSION;
-        docker push $IMAGE_NAME:latest;
+
+  - if [ $TRAVIS_BRANCH === "master" ]; then
+    docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:$VERSION;
+    docker push $IMAGE_NAME:$VERSION;
+    docker push $IMAGE_NAME:latest;
     else
-      docker push $IMAGE_NAME:$TAG;
+    docker push $IMAGE_NAME:$TAG;
     fi;
-  
+
   # - docker push $IMAGE_NAME

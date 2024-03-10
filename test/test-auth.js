@@ -16,9 +16,7 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 chai.use(require('chai-integer'));
 
-const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
+const { expect, assert } = chai;
 
 const util = require('../api/auth/util-auth');
 const auth = require('../api/auth');
@@ -28,13 +26,13 @@ const TESTUSER_PASSWORD = 'Test12345';
 const TESTUSER_NAME = 'TEST_USER_DELETE_ME';
 const TESTUSER_MAIL = 'TEST_USER_DELETE_ME@fake.com';
 
-process.env.AUTHORIZATION = 'on'
+process.env.AUTHORIZATION = 'on';
 
-process.env.ACCESS_TOKEN_SECRET = 'TEST_ACCESS_TOKEN_SECRET'
-process.env.REFRESH_TOKEN_SECRET = 'TEST_REFRESH_TOKEN_SECRET'
+process.env.ACCESS_TOKEN_SECRET = 'TEST_ACCESS_TOKEN_SECRET';
+process.env.REFRESH_TOKEN_SECRET = 'TEST_REFRESH_TOKEN_SECRET';
 
-process.env.ACCESS_TOKEN_EXPIRE = '5m'
-process.env.REFRESH_TOKEN_EXPIRE = '7d'
+process.env.ACCESS_TOKEN_EXPIRE = '5m';
+process.env.REFRESH_TOKEN_EXPIRE = '7d';
 
 /**
  * =============================================================
@@ -67,7 +65,7 @@ describe('test utilAuth.getAllUsers', () => {
       await auth.getAllUsers(req, res);
       expect(res.status).to.have.been.calledWith(200);
     } catch (error) {
-      assert.fail('should not throw error\n' + error.message);
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });
@@ -97,7 +95,7 @@ describe('test utilAuth.createUser', () => {
       expect(user.name).to.eq(TESTUSER_NAME);
       expect(user.mailAddress).to.eq(TESTUSER_MAIL);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
       await util.deleteUser(userId);
     }
@@ -110,23 +108,22 @@ describe('test utilAuth.createUser', () => {
     try {
       req.body = {
         username: TESTUSER_USERNAME,
-        name: TESTUSER_NAME, 
-        mailAddress: "albert@einstein.edu", 
-        password: TESTUSER_PASSWORD
-      }
+        name: TESTUSER_NAME,
+        mailAddress: 'albert@einstein.edu',
+        password: TESTUSER_PASSWORD,
+      };
 
       await auth.createUser(req, res);
       expect(res.status).to.have.been.calledWith(201);
-    } catch (error) {
-      console.log(error)
-      assert.fail("should not throw error\n" + error.message);       
+    } catch (err) {
+      console.log(error);
+      assert.fail(`should not throw error\n${err.message}`);
     }
   });
 
-
   it('try to create user twice', async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500)); // sleep a little while...
+      await new Promise((resolve) => setTimeout(resolve, 500)); // sleep a little while...
       const result = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       assert.fail(); // should not reach this...
     } catch (err) {
@@ -234,16 +231,15 @@ describe('test utilAuth.createUser', () => {
       const userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       req.method = 'GET';
       req.url = `/api/users/${userId}`;
-      req.params = {id: userId};
+      req.params = { id: userId };
 
       await auth.getUser(req, res);
       expect(res.status).to.have.been.calledWith(200);
     } catch (error) {
-      console.log(error)
-      assert.fail("should not throw error\n" + error.message);       
+      console.log(error);
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
-
 });
 
 /**
@@ -259,7 +255,7 @@ describe('test utilAuth.updateUser', () => {
   });
 
   after(async () => {
-    await util.deleteUser(userId);
+    if (userId) await util.deleteUser(userId);
   });
 
   it('update an existing user', async () => {
@@ -276,7 +272,38 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal('Donald Duck');
       expect(user.mailAddress).to.be.equal('donald.duck@aol.com');
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${error.message}`);
+    } finally {
+      await util.deleteUser(userId);
+    }
+  });
+
+  it('update an existing user (req/res)', async () => {
+    try {
+      await User.deleteOne({ username: TESTUSER_USERNAME });
+      await User.deleteOne({ username: 'alberto' });
+      userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
+console.log('UserId = ' + userId)
+      const res = mockResponse();
+      const req = mockRequest({
+        headers: [],
+        body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
+        params: { 'id': userId },
+      });
+
+      await auth.updateUser(req, res);
+      expect(res.status).to.have.been.calledWith(201);
+
+      const user = await util.getUser(userId);
+      expect(user.username).to.be.equal('alberto');
+      expect(user.name).to.be.equal('ALBERTO EINSTEINO');
+      expect(user.mailAddress).to.be.equal('alberto-einsteino@berkly.edu');
+
+    } catch (error) {
+      console.error(error.message)
+      assert.fail(`should not throw error\n${error.message}`);
+    } finally {
+      await util.deleteUser(userId)
     }
   });
   it('update an existing user - id null', async () => {
@@ -286,10 +313,21 @@ describe('test utilAuth.updateUser', () => {
       userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
 
       const id = await util.updateUser(null, 'dduck', 'Donald Duck', 'donald.duck@aol.com');
-      assert.fail('should throw an exception but does not\n' + error.message);
+      assert.fail(`should throw an exception but does not\n${error.message}`);
     } catch (err) {
       expect(err).to.be.a('error');
     }
+  });
+  it('update an existing user - id null (req/res)', async () => {
+    const res = mockResponse();
+    const req = mockRequest({
+      headers: [],
+      body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
+      //params: { 'id': userId },
+    });
+
+    await auth.updateUser(req, res);
+    expect(res.status).to.have.been.calledWith(404);
   });
   it('update an existing user - username null', async () => {
     try {
@@ -304,7 +342,7 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal('Donald Duck');
       expect(user.mailAddress).to.be.equal('donald.duck@aol.com');
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${error.message}`);
     }
   });
   it('update an existing user - name null', async () => {
@@ -320,8 +358,8 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal(TESTUSER_NAME);
       expect(user.mailAddress).to.be.equal('donald.duck@aol.com');
     } catch (err) {
-      console.log(err)
-      assert.fail('should not throw exception\n' + error.message);
+      console.log(err);
+      assert.fail(`should not throw exception\n${error.message}`);
     }
   });
   it('update an existing user - mailadress null', async () => {
@@ -337,10 +375,12 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal('Donald Duck');
       expect(user.mailAddress).to.be.equal(TESTUSER_MAIL);
     } catch (err) {
-      console.log(err)
-      assert.fail('should not throw exception\n' + error.message);
+      console.log(err);
+      assert.fail(`should not throw exception\n${error.message}`);
     }
   });
+
+
 });
 
 /**
@@ -363,15 +403,15 @@ describe('test utilAuth.deleteUser', () => {
       const resultDelete = await util.deleteUser(resultCreate);
       expect(resultCreate).to.be.an.integer;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${error.message}`);
     }
   });
   it('delete a non-existing user', async () => {
     try {
-      await util.deleteUser("1234567");
+      await util.deleteUser('1234567');
     } catch (err) {
-      expect(err).to.be.a("string");
-      expect(err).to.equal("cannot delete user 1234567");
+      expect(err).to.be.a('string');
+      expect(err).to.equal('cannot delete user 1234567');
     }
   });
   it('delete user using index.js', async () => {
@@ -381,13 +421,13 @@ describe('test utilAuth.deleteUser', () => {
     try {
       const userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
       req.method = 'GET';
-      req.params = {id: userId};
+      req.params = { id: userId };
 
       await auth.deleteUser(req, res);
       expect(res.status).to.have.been.calledWith(202);
     } catch (error) {
-      console.log(error)
-      assert.fail("should not throw error\n" + error.message);       
+      console.log(error);
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });
@@ -404,7 +444,7 @@ describe('test utilAuth.login', () => {
     await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
     await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('login with valid principal and credenital', async () => {
@@ -419,7 +459,21 @@ describe('test utilAuth.login', () => {
       refreshToken = result.refreshToken;
       expect(refreshToken).to.be.a('string');
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${error.message}`);
+    } finally {
+      await Token.deleteOne({ token: refreshToken });
+    }
+  });
+  it('login with valid principal and credenital (req/res)', async () => {
+    let refreshToken = '';
+    try {
+      const res = mockResponse();
+      const req = mockRequest({
+        body: { 'username': TESTUSER_USERNAME, 'password': TESTUSER_PASSWORD },
+      });
+      const result = await auth.login(req, res);
+      expect(res.status).to.have.been.calledWith(200);
+
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -462,7 +516,7 @@ describe('test utilAuth.login', () => {
 
   it('login with invalid principal and invalid credenital', async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const result = await util.login('YYYYYYYYYYYYYYYYYYYY', 'XXXXX');
       assert.fail(); // should not reach this...
     } catch (err) {
@@ -487,9 +541,8 @@ describe('test utilAuth.login', () => {
       expect(refreshToken).to.be.a('string');
 
       await util.removeExpiredToken();
-      
     } catch (err) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -498,7 +551,7 @@ describe('test utilAuth.login', () => {
   it('test expire time: set expiretime to 2s, login, use accessToken, wait, fail using access token, get new token, use new access token', async () => {
     process.env.AUTHORIZATION = 'on';
     process.env.ACCESS_TOKEN_EXPIRE = '1s'; // 1000ms
-    process.env.IGNORE_AUTH_PROTOCOL = 'http'
+    process.env.IGNORE_AUTH_PROTOCOL = 'http';
 
     let refreshToken;
     let accessToken;
@@ -526,7 +579,7 @@ describe('test utilAuth.login', () => {
       expect(res.status).to.have.been.calledWith(200);
 
       // *** let the access token expire
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // *** authorization should fail now
       req = mockRequest({ headers: { authorization: `Bearer ${accessToken}` } });
@@ -547,9 +600,9 @@ describe('test utilAuth.login', () => {
       await auth.authorize(req, res, next);
       expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
-      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+      await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
       await User.deleteOne({ name: TESTUSER_USERNAME });
       await Token.deleteOne({ token: refreshToken });
     }
@@ -557,9 +610,9 @@ describe('test utilAuth.login', () => {
 
   it('remove Tester Tokens', async () => {
     try {
-      await util.removeTesterToken();      
+      await util.removeTesterToken();
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -577,16 +630,16 @@ describe('test utilAuth.updateUsersPassword', () => {
   let refreshToken;
   let userId;
   let db;
-  before(async () => {
+  beforeEach(async () => {
     db = require('../db');
     await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
     userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('set new password for existing user', async () => {
-    const NEW_PASSWORD = "___SECRETPSSWORD___";
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       let result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
       expect(result).to.be.a('object');
@@ -595,7 +648,7 @@ describe('test utilAuth.updateUsersPassword', () => {
 
       // update password
       await util.updateUsersPassword(userId, NEW_PASSWORD);
-      await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+      await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
 
       // try to login with new password
       result = await util.login(TESTUSER_USERNAME, NEW_PASSWORD);
@@ -612,20 +665,19 @@ describe('test utilAuth.updateUsersPassword', () => {
         expect(err.status).to.equal(401);
         expect(err.message).to.equal('User not authenticated');
       }
-
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
   });
 
   it('set new password for not existing user', async () => {
-    const NEW_PASSWORD = "___SECRETPSSWORD___";
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword('asdkahsd87ggakjhfbjkshdbuszvf', NEW_PASSWORD);
-      assert.fail(); // should not reach 
+      assert.fail(); // should not reach
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('User does not exists');
@@ -635,11 +687,11 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password but do not provide user id', async () => {
-    const NEW_PASSWORD = "___SECRETPSSWORD___";
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword(null, NEW_PASSWORD);
-      assert.fail(); // should not reach 
+      assert.fail(); // should not reach
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('User must be provided');
@@ -649,11 +701,11 @@ describe('test utilAuth.updateUsersPassword', () => {
   });
 
   it('set new password but do not provide password', async () => {
-    const NEW_PASSWORD = "___SECRETPSSWORD___";
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
     try {
       // update password
       await util.updateUsersPassword(userId, null);
-      assert.fail(); // should not reach 
+      assert.fail(); // should not reach
     } catch (err) {
       expect(err).to.be.an('error');
       expect(err.message).to.equal('Password must be provided');
@@ -662,11 +714,46 @@ describe('test utilAuth.updateUsersPassword', () => {
     }
   });
 
-  after(async () => {
+  it('set new password (req/res)', async () => {
+    const NEW_PASSWORD = '___SECRET-PASSWORD___';
+    let result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+    expect(result).to.be.a('object');
+    expect(result).to.have.property('accessToken');
+    expect(result).to.have.property('refreshToken');
+
+    // update password
+    const res = mockResponse();
+    const req = mockRequest({
+      body: { 'password': NEW_PASSWORD },
+      params: { 'id': userId },
+    });
+
+    await auth.updateUsersPassword(req, res);
+    expect(res.status).to.have.been.calledWith(201);
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
+
+    // try to login with new password
+    result = await util.login(TESTUSER_USERNAME, NEW_PASSWORD);
+    expect(result).to.be.a('object');
+    expect(result).to.have.property('accessToken');
+    expect(result).to.have.property('refreshToken');
+
+    // try to login with old password
+    try {
+      result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
+      assert.fail(); // should not reach this...
+    } catch (err) {
+      expect(err).to.be.an('error');
+      expect(err.status).to.equal(401);
+      expect(err.message).to.equal('User not authenticated');
+    }
+
+  });
+
+  afterEach(async () => {
     await User.deleteOne({ name: TESTUSER_USERNAME });
   });
 });
-
 
 /**
  * =============================================================
@@ -679,7 +766,7 @@ describe('test index.authorize', () => {
     await User.deleteOne({ username: TESTUSER_USERNAME });
     // *** create a user with password
     await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('test for OK (200): call authorizeToken service with empty header and auth switch off', async () => {
@@ -692,7 +779,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -707,7 +794,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -723,7 +810,7 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(403);
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -739,8 +826,8 @@ describe('test index.authorize', () => {
 
       expect(res.status).to.have.been.calledWith(200);
       expect(next).to.have.been.called;
-    } catch (error) {
-      assert.fail('should not throw exception\n' + error);
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err}`);
     }
   });
 
@@ -757,14 +844,45 @@ describe('test index.authorize', () => {
       expect(res.status).to.have.been.calledWith(401);
       expect(next).not.to.have.been.called;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
+    }
+  });
+  it('test for OK (401): call Baisc auth service with header incl. invalid basic authentication and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
+    req.url = '/api/geofence'; // removed tailing slash from url
+    req.method = 'POST';
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorize(req, res, next);
+
+      expect(res.status).to.have.been.calledWith(401);
+      expect(next).not.to.have.been.called;
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err.message}`);
+    }
+  });
+  it('test for OK (401): call Baisc auth service with header incl. invalid basic authentication  and auth switch on', async () => {
+    process.env.AUTHORIZATION = 'on';
+    const req = mockRequest({ headers: { authorization: 'Basic asdssdfgsdfjsdfzg=' } });
+    req.url = '/api/geofences'; // removed tailing slash from url
+    req.method = 'POST';
+    const res = mockResponse();
+    const next = sinon.spy();
+    try {
+      await auth.authorize(req, res, next);
+
+      expect(res.status).to.have.been.calledWith(403);
+      expect(next).not.to.have.been.called;
+    } catch (err) {
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
   after(async () => {
     await User.deleteOne({ name: TESTUSER_USERNAME });
   });
-
 });
 
 /**
@@ -780,7 +898,7 @@ describe('test index.refreshToken', () => {
     // *** create a user with password
     await User.deleteOne({ username: TESTUSER_USERNAME });
     await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
 
     // *** then login to get the access- and refresh token
     const result = await util.login(TESTUSER_USERNAME, TESTUSER_PASSWORD);
@@ -800,7 +918,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -814,7 +932,7 @@ describe('test index.refreshToken', () => {
       // console.log(res.json.getCalls()[0].lastArg)
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -827,7 +945,7 @@ describe('test index.refreshToken', () => {
       await auth.refreshToken(req, res, next);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -848,7 +966,7 @@ describe('test index.logout', () => {
     // *** create a user with password
     await User.deleteOne({ username: TESTUSER_USERNAME });
     await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-    await new Promise(resolve => setTimeout(resolve, 100)); // sleep a little while...
+    await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
   });
 
   it('test for OK (200): call logout', async () => {
@@ -873,24 +991,25 @@ describe('test index.logout', () => {
       expect(res.status).to.have.been.calledWith(403); // Forbidden
       expect(next).to.not.have.been.called;
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
-  it('test for NOK (400): call logout but without token', async () => {
+  it('test for NOK 200 (no longer 400 since bugfix #101): call logout but without token', async () => {
     const req = mockRequest({ headers: [], body: { token: null } });
     const res = mockResponse();
     const next = sinon.spy();
 
     try {
       await auth.logout(req, res, next);
-      expect(res.status).to.have.been.calledWith(400);
+      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
+      expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
-  it('test for NOK (400): call logout with invalid token', async () => {
+  it('test for NOK 200 ((no longer 400 since bugfix #101)): call logout with invalid token', async () => {
     const req = mockRequest({ headers: [], params: { token: 'xxx.yyy.zzz' } });
     const res = mockResponse();
     const next = sinon.spy();
@@ -898,9 +1017,10 @@ describe('test index.logout', () => {
     try {
       await auth.logout(req, res, next);
       // console.log(res.json.getCalls()[0].lastArg)
-      expect(res.status).to.have.been.calledWith(400);
+      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
+      expect(res.status).to.have.been.calledWith(200);
     } catch (err) {
-      assert.fail('should not throw exception\n' + error.message);
+      assert.fail(`should not throw exception\n${err.message}`);
     }
   });
 
@@ -909,4 +1029,3 @@ describe('test index.logout', () => {
     await Token.deleteMany({ user: TESTUSER_USERNAME });
   });
 });
-

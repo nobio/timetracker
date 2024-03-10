@@ -8,7 +8,9 @@
  */
 
 const fs = require('fs');
+const { exec } = require('child_process');
 const package_json = require('../package.json');
+const package_lock_json = require('../package-lock.json');
 
 const arg = process.argv.slice(2);
 if (arg == '--help') {
@@ -37,9 +39,14 @@ if (!arg || arg == '' || arg == 'b') {
   modified = true;
 }
 
-if (modified) { // only write file if version has changed
+if (!modified) { // only write file if version has changed
+  console.log('nothing to do, please check your parameters');
+  console.log('Usage: node bin/build.js [<ma|mi|b>]');
+  process.exit(1);
+} else {
   package_json.version = `${major_version}.${minor_version}.${build_version}`;
   package_json.last_build = new Date();
+  package_lock_json.version = `${major_version}.${minor_version}.${build_version}`;
 
   console.log(`new version ${package_json.version} last_build ${package_json.last_build}`);
 
@@ -48,5 +55,17 @@ if (modified) { // only write file if version has changed
     JSON.stringify(package_json, null, 4),
     'UTF8',
   );
+  fs.writeFileSync(
+    './package-lock.json',
+    JSON.stringify(package_lock_json, null, 4),
+    'UTF8',
+  );
   fs.writeFileSync('./VERSION', `${major_version}.${minor_version}.${build_version}`);
+
+  // tag the branch
+  exec(`git tag ${major_version}.${minor_version}.${build_version}`, (err) => {
+    if (err) {
+      console.error(`exec error: ${err}`);
+    }
+  });
 }

@@ -34,7 +34,7 @@ exports.createToggle = (name, toggle, notification) => new Promise((resolve, rej
     toggle,
     notification,
   }).save()
-    .then((toggle) => resolve(toggle))
+    .then((tg) => resolve(tg))
     .catch((err) => reject(err));
 });
 

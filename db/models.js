@@ -1,4 +1,7 @@
+/* eslint-disable object-curly-newline */
 const mongoose = require('mongoose');
+
+mongoose.set('strictQuery', false);
 
 // --------------------------------------------------
 // ----------------- TimeEntry ----------------------
@@ -34,9 +37,9 @@ module.exports.StatsDay = StatsDay;
 // -------------- Notification Toggles --------------
 // --------------------------------------------------
 const Toggle = new mongoose.Schema({
-  name: { type: String, required: true, index: true, unique: true, },
-  toggle: { type: Boolean, required: true, default: false, index: false, },
-  notification: { type: String, required: true, default: 'generic message', index: false, unique: false, },
+  name: { type: String, required: true, index: true, unique: true },
+  toggle: { type: Boolean, required: true, default: false, index: false },
+  notification: { type: String, required: true, default: 'generic message', index: false, unique: false },
 });
 module.exports.Toggle = Toggle;
 
@@ -44,8 +47,8 @@ module.exports.Toggle = Toggle;
 // ----------------- Properties ---------------------
 // --------------------------------------------------
 const Properties = new mongoose.Schema({
-  key: { type: String, required: true, index: true, unique: true, },
-  value: { type: String, required: true, index: false, unique: false, },
+  key: { type: String, required: true, index: true, unique: true },
+  value: { type: String, required: true, index: false, unique: false },
 });
 module.exports.Properties = Properties;
 
@@ -54,8 +57,8 @@ module.exports.Properties = Properties;
 // --------------------------------------------------
 const failureTypes = 'INCOMPLETE,WRONG_ORDER'.split(',');
 const FailureDay = new mongoose.Schema({
-  date: { type: Date, required: true, index: false, unique: false, },
-  failure_type: { type: String, enum: failureTypes, required: true, index: false, unique: false, },
+  date: { type: Date, required: true, index: false, unique: false },
+  failure_type: { type: String, enum: failureTypes, required: true, index: false, unique: false },
 });
 module.exports.FailureDay = FailureDay;
 
@@ -68,26 +71,40 @@ const GeoTracking = new mongoose.Schema({
   accuracy: { type: Number, required: false },
   source: { type: String, required: true },
   altitude: { type: String, required: false },
-  date: { type: Date, required: true, index: true, unique: true, default: Date.now, },
+  date: { type: Date, required: true, index: true, unique: true, default: Date.now },
 });
 module.exports.GeoTracking = GeoTracking;
 
 // --------------------------------------------------
-// -------------- Users -------------- --------------
+// -------------- Users -----------------------------
 // --------------------------------------------------
 const User = new mongoose.Schema({
-  username: { type: String, required: true, index: true, unique: true, },
-  password: { type: String, required: true, default: false, index: false, },
-  name: { type: String, required: true, index: false, unique: false, },
-  mailaddress: { type: String, required: true, default: false, index: false, },
+  username: { type: String, required: true, index: true, unique: true },
+  password: { type: String, required: true, default: false, index: false },
+  name: { type: String, required: true, index: false, unique: false },
+  mailaddress: { type: String, required: true, default: false, index: false },
 });
 module.exports.User = User;
 
 // --------------------------------------------------
-// -------------- Token -------------- --------------
+// -------------- Token -----------------------------
 // --------------------------------------------------
 const Token = new mongoose.Schema({
-  token: { type: String, required: true, index: true, unique: true, },
-  user: { type: String, required: false, index: true, unique: false, default: 'ANONYMOUS', },
+  token: { type: String, required: true, index: true, unique: true },
+  user: { type: String, required: false, index: true, unique: false, default: 'ANONYMOUS' },
 });
 module.exports.Token = Token;
+
+// --------------------------------------------------
+// -------------- GeoFence --------------------------
+// --------------------------------------------------
+const GeoFence = new mongoose.Schema({
+  enabled: { type: Boolean, required: true, index: false },
+  longitude: { type: Number, required: true, index: false },
+  latitude: { type: Number, required: true, index: false },
+  radius: { type: Number, required: true, default: 50, index: false },
+  description: { type: String, required: true },
+  isCheckedIn: { type: Boolean, required: true },
+  lastChange: { type: Date, required: false, default: Date.now, index: false },
+});
+module.exports.GeoFence = GeoFence;

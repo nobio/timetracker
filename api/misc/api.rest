@@ -1,0 +1,11 @@
+POST http://localhost:30000/api/log
+Content-Type: application/json
+
+{
+    "name": "Tester",
+    "password": "test12345"
+}
+
+###
+
+GET http://localhost:30000/api/ping

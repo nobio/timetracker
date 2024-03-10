@@ -18,8 +18,18 @@ POST http://localhost:30000/api/auth/login
 Content-Type: application/json
 
 {
-    "username": "Tester",
-    "password": "test12345"
+    "username": "nobio",
+    "password": "schernoo"
+}
+
+###
+
+POST https://79.219.195.193/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "nobio",
+    "password": "schernoo"
 }
 
 ###

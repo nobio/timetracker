@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: evaluate
+  namespace: timetracker
+spec:
+  # every hour at ??:12
+  schedule: "12 * * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: evaluate
+              #image: busybox:1.28
+              image: yauritux/busybox-curl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+                - curl -X PUT http://api-service:30000/api/schedule?jobclass=EVALUATE
+          restartPolicy: Never

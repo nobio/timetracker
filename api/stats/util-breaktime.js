@@ -61,13 +61,13 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve, rej
       breakTime = 0;
     }
     if (!realCalc && timeItem.length === 2) {
-      breakTime = g_util.DEFAULT_BREAK_TIME_SECONDS;
+      breakTime = g_util.getBreakTimeSeconds(timeItem[0]);
     }
 
     if (breakTime === -1) {
       breakTime = timeItem.reduce((acc, timeEntry, idx) => {
         // console.log('idx=' + idx + ' timeEntry=' + timeEntry + ' acc=' + acc);
-        if ((idx % 2) == 0 && idx > 0) {
+        if ((idx % 2) === 0 && idx > 0) {
           acc += timeEntry - timeItem[idx - 1];
         }
         return acc; // always return commulator
@@ -99,12 +99,12 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
   // ok, could have been done also in a classic way using the iterator and loops...
   // "index" is the break time in minutes
 
-  const idx = parseInt((preparedBreakTimes[0] - 1) / interval);
+  const idx = parseInt((preparedBreakTimes[0] + 1) / interval);
   breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
 
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
     const idx = parseInt((breakTimeMin - 1) / interval);
-    if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin == 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
+    if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin === 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
       // console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
       breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
     }

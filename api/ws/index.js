@@ -1,8 +1,8 @@
 const moment = require('moment');
 const WebSocketServer = require('ws');
+let wss;
 
 class WebSocketFacade {
-
   constructor(server) {
     WebSocketFacade.websockets = [];
 
@@ -14,8 +14,8 @@ class WebSocketFacade {
   }
 
   init(server) {
-    console.log('\nweb socket server exposing path  /ws');
-    const wss = new WebSocketServer.Server({ server, clientTracking: true, path: '/ws' });
+    console.log('web socket server exposing path  /ws');
+    wss = new WebSocketServer.Server({ server, clientTracking: true, path: '/ws' });
 
     wss.on("connection", (ws, req) => {
 
@@ -84,6 +84,9 @@ class WebSocketFacade {
     console.log(`numbers of web sockets after remove: ${WebSocketFacade.websockets.length}`);
   }
 
+  shutdown() {
+    wss.close();
+  }
 }
 
 //module.exports = WebSocketFacade;

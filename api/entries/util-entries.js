@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-restricted-syntax */
 /**
  *
  * Methods of this file must never be used from server.js directly rather than from api layer
@@ -6,8 +8,8 @@
 require('../../db');
 const moment = require('moment');
 const mongoose = require('mongoose');
-const g_util = require('../global_util');
-const auth_util = require('../auth/util-auth');
+const globalUtil = require('../global_util');
+const utilGeofence = require('../admin/util-geofences');
 
 const TimeEntry = mongoose.model('TimeEntry');
 const FailureDay = mongoose.model('FailureDay');
@@ -99,7 +101,7 @@ exports.create = async (timeEntry) => {
   const lastTimeEntry = await this.getLastTimeEntryByDate(timeEntry.datetime);
   // console.log(JSON.stringify(timeEntry));
   if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
-    if (timeEntry.direction != 'enter') {
+    if (timeEntry.direction !== 'enter') {
       throw new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`);
     }
   } else if (lastTimeEntry.direction === timeEntry.direction) { // entry already exists -> direction must be opposite
@@ -111,8 +113,8 @@ exports.create = async (timeEntry) => {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
     // console.log(entriesByDate);
     entriesByDate.forEach((entry) => {
-      if (entry.entry_date.toISOString() == timeEntry.datetime
-        && entry.direction == timeEntry.direction) {
+      if (entry.entry_date.toISOString() === timeEntry.datetime
+        && entry.direction === timeEntry.direction) {
         console.error('entry already exists; use update to modify');
         throw new Error('entry already exists; use update to modify');
       }
@@ -122,27 +124,47 @@ exports.create = async (timeEntry) => {
     throw error;
   }
 
-  return new Promise((resolve, reject) => {
+  // ============== Save the new TimeEntry ==============
+  try {
     // all checks successfully done, lets create the TimeEntry!
-    new TimeEntry({
+    const tEntry = await new TimeEntry({
       entry_date: timeEntry.datetime,
       direction: timeEntry.direction,
       longitude: timeEntry.longitude,
       latitude: timeEntry.latitude,
-    }).save()
-      .then((tEntry) => {
-        // in case the external URL is given, use it to render a deep link
-        const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
-        g_util.sendMessage('CREATE_ENTRY', msg);
-        return tEntry;
-      })
-      .then((tEntry) => resolve(tEntry))
-      .catch((err) => {
-        g_util.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`);
-        reject(err);
-      });
-  })
-    .catch((err) => reject(err));
+    }).save();
+    // in case the external URL is given, use it to render a deep link
+    // eslint-disable-next-line max-len
+    const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
+    globalUtil.sendMessage('CREATE_ENTRY', msg);
+    setGeofenceCheckStatus(timeEntry.direction); // Activate/Deactivate checkin status
+
+    return tEntry;
+  } catch (err) {
+    // asynchonously send the message
+    globalUtil.sendMessage('CREATE_ENTRY', `could not create new entry: ${err.message}`);
+    return err;
+  }
+};
+
+/**
+ * activate/deactivate checkin status of all active geofences
+ * direction = "enter" -> set 'isCheckedIn" of all active geofences to 'true'
+ * direction = "gi" -> set 'isCheckedIn" of all active geofences to 'false'
+ */
+const setGeofenceCheckStatus = async (direction) => {
+  try {
+    const geofences = await utilGeofence.getGeofences();
+    for (const geofence of geofences) {
+      if (geofence.enabled) {
+        geofence.isCheckedIn = (direction === 'enter');
+        // eslint-disable-next-line no-await-in-loop
+        await utilGeofence.setGeofence(geofence);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 /**
@@ -194,7 +216,7 @@ exports.deleteById = (id) =>
   new Promise((resolve, reject) => {
     TimeEntry.findByIdAndRemove(id)
       .then((timeentry) => resolve(timeentry))
-      .then(g_util.sendMessage('DELETE_ENTRY', id))
+      .then(globalUtil.sendMessage('DELETE_ENTRY', id))
       .catch((err) => reject(err));
   });
 
@@ -270,20 +292,20 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
 
       const end = timeentries[n].entry_date;
       const start = timeentries[n - 1].entry_date;
-      busytime += (end - start);
+      busytime += moment(end).diff(moment(start));
 
       if (n > 2) {
-        pause += (start - timeentries[n - 2].entry_date);
+        pause += moment(start).diff(moment(timeentries[n - 2].entry_date));
       }
     }
 
-    // when there have been only 2 entries we reduce the busytime by 45 minutes (default pause)
     if (timeentries.length === 2) {
-      busytime -= g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
-      pause = g_util.DEFAULT_BREAK_TIME_MILLISECONDS;
+      pause = globalUtil.getBreakTimeMilliSeconds(timeentries[0].entry_date);
     }
 
-    const duration = timeentries[timeentries.length - 1].entry_date - timeentries[0].entry_date;
+    // calculate break time depending on the dates in timeentries (all entries for this given day)
+    busytime = globalUtil.getBookedTimeMilliSeconds(busytime, pause, timeentries[0].entry_date, timeentries.length);
+    const duration = moment(timeentries[timeentries.length - 1].entry_date).diff(moment(timeentries[0].entry_date));
 
     resolve({
       duration,
@@ -361,7 +383,7 @@ exports.getFirstTimeEntry = () => new Promise((resolve, reject) => {
     .then((timeentries) => {
       resolve(timeentries[0]);
     })
-    .catch((err) => reject(new Error(`${'Unable to read first Time Entry: ' + ' ('}${err.message})`)));
+    .catch((err) => reject(new Error(`${'Unable to read first Time Entry: ('}${err.message})`)));
 });
 
 exports.getLastTimeEntry = () => new Promise((resolve, reject) => {
@@ -383,12 +405,13 @@ exports.removeDoublets = async () => {
   let lastTimeentry;
   let count = 0;
 
+  /*
   try {
     const timeEntries = await TimeEntry.find().sort({ entry_date: 1 });
     timeEntries.forEach((timeentry) => {
       if (lastTimeentry !== undefined) {
         if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
-          && timeentry.direction == lastTimeentry.direction) {
+          && timeentry.direction === lastTimeentry.direction) {
           timeentry.remove();
           count++;
           // console.log(`removing timeentry ${timeentry}`);
@@ -401,10 +424,26 @@ exports.removeDoublets = async () => {
     });
 
     return { removed: count };
-
   } catch (error) {
     throw error;
   }
+  */
+  const timeEntries = await TimeEntry.find().sort({ entry_date: 1 });
+  for await (const timeentry of timeEntries) {
+    if (lastTimeentry !== undefined) {
+      if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
+          && timeentry.direction === lastTimeentry.direction) {
+        timeentry.remove();
+        count++;
+        // console.log(`removing timeentry ${timeentry}`);
+      } else {
+        lastTimeentry = timeentry;
+      }
+    } else {
+      lastTimeentry = timeentry;
+    }
+  }
+  return { removed: count };
 };
 
 exports.sleep = (delay) => {
@@ -421,14 +460,13 @@ exports.evaluate = async () => {
     const lastTimeEntry = await this.getLastTimeEntry();
     await FailureDay.deleteMany({});
     const result = await this.storeValidationErrors(firstTimeEntry, lastTimeEntry);
-    g_util.sendMessage('EVALUATE_DATA');
+    globalUtil.sendMessage('EVALUATE_DATA');
 
     return result;
-
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
   // console.log(JSON.stringify(firstEntry), lastEntry);

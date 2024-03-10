@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-time-entries
+  namespace: timetracker
+spec:
+  # every hour at 10 past (??:10)'
+  schedule: "10 * * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup-time-entries
+              image: yauritux/busybox-curl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+                - curl -X PUT http://api-service:30000/api/schedule?jobclass=BACKUP_TIME_ENTRIES
+          restartPolicy: Never

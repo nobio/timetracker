@@ -1,7 +1,8 @@
-const util = require('./util-stats');
+const utilStats = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');
 const utilBreaktime = require('./util-breaktime');
+const utilExtraHours = require('./util-extrahours');
 
 /**
  * calculates the statistics for today +/- one month and stores them in database
@@ -9,7 +10,7 @@ const utilBreaktime = require('./util-breaktime');
  * curl -X PUT http://localhost:30000/api/stats
  */
 exports.calcStats = (req, res) => {
-  util.calcStats()
+  utilStats.calcStats()
     .then((timeentry) => res.status(200).send(timeentry))
     .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`));
 };
@@ -23,11 +24,12 @@ exports.calcStats = (req, res) => {
 exports.getStats = (req, res) => {
   const dtStart = req.params.date;
   const { timeUnit } = req.params;
-  const { accumulate } = req.query;
-  const { fill } = req.query;
+  const { accumulate, fill } = req.query;
 
-  util.getStats(timeUnit, dtStart, accumulate, fill)
-    .then((timeentries) => res.status(200).send(timeentries))
+  utilStats.getStats(timeUnit, dtStart, accumulate, fill)
+    .then((timeentries) => {
+      res.status(200).send(timeentries);
+    })
     .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err}`));
 };
 
@@ -38,7 +40,7 @@ exports.getStats = (req, res) => {
  * curl -X DELETE http://localhost:30000/api/stats
  */
 exports.deleteAllStatsDays = (req, res) => {
-  util.deleteAllStatsDays()
+  utilStats.deleteAllStatsDays()
     .then((result) => res.status(200).send(result))
     .catch((err) => res.status(500).send(`Error while deleting Time Entries: ${req.params.id} ${err}`));
 };
@@ -68,6 +70,7 @@ exports.getStatsByTimeBox = (req, res) => {
         }],
       };
 
+      console.log(JSON.stringify(timeboxedStatistics));
       res.send({
         actual_working_time: timeboxedStatistics.actual_working_time,
         planned_working_time: timeboxedStatistics.planned_working_time,
@@ -104,14 +107,30 @@ exports.histogram = (req, res) => {
  * @param {*} res
  */
 exports.breaktime = (req, res) => {
-  const interval = parseInt(req.params.interval);
+  const interval = parseInt(req.params.interval, 10);
   const realCalc = (!req.query.real || req.query.real === '' ? false : req.query.real.toLowerCase() === 'true');
 
-  if (!interval || interval == '0') {
+  if (!interval || interval === '0') {
     res.status(500).send('invalid interval; must be numeric and > 0');
   } else {
     utilBreaktime.getBreakTime(interval, realCalc)
       .then((data) => res.status(200).send(data))
       .catch((err) => res.status(500).send(`Error while reading break time data with parameter realCalc (${realCalc}): ${err.message}`));
   }
+};
+
+/**
+ * curl -X GET http://localhost:30000/api/statistics/extrahours?accumulate=false
+ * curl -X GET http://localhost:30000/api/statistics/extrahours?accumulate=true
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+exports.extraHours = (req, res) => {
+  const acc = (req.query.accumulate === 'true');
+  const { timeUnit } = req.query;
+
+  utilExtraHours.getExtraHours(acc, timeUnit)
+    .then((data) => res.status(200).send(data))
+    .catch((err) => res.status(403).send(`Error while reading extra hoursbreak with parameter acc (${acc}): ${err.message}`));
 };

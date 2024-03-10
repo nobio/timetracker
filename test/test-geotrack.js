@@ -3,25 +3,18 @@ require('../db');
 const mongoose = require('mongoose');
 const moment = require('moment');
 
-const GeoTracking = mongoose.model('GeoTracking');
-
-const geo = require('../api/geotrack');
-const util = require('../api/geotrack/util-geotrack');
-
 const chai = require('chai');
 chai.use(require('chai-datetime'));
 const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
-const sinon = require('sinon');
-const { stub, match } = require('sinon')
 const sinonChai = require('sinon-chai');
+const util = require('../api/geotrack/util-geotrack');
+const geo = require('../api/geotrack');
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const expect = chai.expect;
-const assert = chai.assert;
-const should = chai.should;
+const { expect, assert } = chai;
 
 /**
  * =============================================================
@@ -29,64 +22,53 @@ const should = chai.should;
  * =============================================================
  */
 describe('test distance calculation', () => {
-
   it('distance near by', async () => {
-
-    let dist = util.distance([{
+    const dist = util.distance([{
       latitude: 49.5141556930523,
-      longitude: 10.875497217473503
+      longitude: 10.875497217473503,
     }, {
       latitude: 49.514286993311146,
-      longitude: 10.87513135572651
+      longitude: 10.87513135572651,
     }, {
       latitude: 49.51389,
-      longitude: 10.87485
+      longitude: 10.87485,
     }]);
     expect(dist).to.equal(79);
-
   });
 
   it('distance to Livinstone', async () => {
-
     dist = util.distance([{
       latitude: 49.5141556930523,
-      longitude: 10.875497217473503
+      longitude: 10.875497217473503,
     }, {
       latitude: -17.84870850232013,
-      longitude: 25.855451736188684
+      longitude: 25.855451736188684,
     }]);
     expect(dist).to.equal(7634714);
-
   });
 
   it('distance north to south pole', async () => {
-
     dist = util.distance([{
       latitude: 90,
-      longitude: 0
+      longitude: 0,
     }, {
       latitude: -90,
-      longitude: 0
+      longitude: 0,
     }]);
     expect(dist).to.equal(20015087);
-
   });
 
   it('distance with empty track', async () => {
-
     dist = util.distance([]);
     expect(dist).to.equal(0);
-
   });
 
   it('distance with one entry track', async () => {
-
     dist = util.distance([{
       latitude: 90,
-      longitude: 0
+      longitude: 0,
     }]);
     expect(dist).to.equal(0);
-
   });
 });
 
@@ -96,10 +78,8 @@ describe('test distance calculation', () => {
  * =============================================================
  */
 describe('test accuracy calculation', () => {
-
   it('perfect accuracy', async () => {
-
-    let acc = util.meanAccuracy([{
+    const acc = util.meanAccuracy([{
       accuracy: 0,
     }, {
       accuracy: 0,
@@ -108,12 +88,10 @@ describe('test accuracy calculation', () => {
     }]);
     expect(acc.mean).to.equal(0);
     expect(acc.stdt).to.equal(0);
-
   });
 
   it('medium accuracy', async () => {
-
-    let acc = util.meanAccuracy([{
+    const acc = util.meanAccuracy([{
       accuracy: 10,
     }, {
       accuracy: 20,
@@ -122,43 +100,36 @@ describe('test accuracy calculation', () => {
     }]);
     expect(acc.mean).to.equal(20);
     expect(acc.stdt).to.equal(8.16496580927726);
-
   });
 
   it('accuracy with 0 entries', async () => {
-
-    let acc = util.meanAccuracy([]);
+    const acc = util.meanAccuracy([]);
     expect(acc.mean).to.equal(0);
     expect(acc.stdt).to.equal(0);
-
   });
 
   it('accuracy with 1 entry', async () => {
-
-    let acc = util.meanAccuracy([{
+    const acc = util.meanAccuracy([{
       accuracy: 10,
     }]);
     expect(acc.mean).to.equal(10);
     expect(acc.stdt).to.equal(0);
-
   });
 
   it('accuracy with many many random accuracy entries', async () => {
     const track = [];
     for (let n = 0; n < 100000; n++) {
       track.push({
-        accuracy: Math.random() * 50
-      })
+        accuracy: Math.random() * 50,
+      });
     }
-    let acc = util.meanAccuracy(track);
+    const acc = util.meanAccuracy(track);
     // mean value should by around 25
-    expect(acc.mean).to.be.approximately(25, 1)
+    expect(acc.mean).to.be.approximately(25, 1);
 
     // stdt value should by around 14 (+/- 1)
-    expect(acc.stdt).to.be.approximately(14, 1)
-
+    expect(acc.stdt).to.be.approximately(14, 1);
   });
-
 });
 
 /**
@@ -167,7 +138,6 @@ describe('test accuracy calculation', () => {
  * =============================================================
  */
 describe('test parsing of GeoTrack objects', () => {
-
   it('parse invalid GeoTrack object', async () => {
     const req = mockRequest({ headers: [], body: {} });
     const geoObj = util.parseGeoTrackingObject(req);
@@ -208,7 +178,6 @@ describe('test parsing of GeoTrack objects', () => {
 
     expect(geoObj).to.have.property('source');
     expect(geoObj.source).to.equal('OWNTRACK');
-
   });
 
   it('parse HASSIO GeoTrack object', async () => {
@@ -235,7 +204,6 @@ describe('test parsing of GeoTrack objects', () => {
 
     expect(geoObj).to.have.property('source');
     expect(geoObj.source).to.equal('HASSIO');
-
   });
 
   it('parse encrypted GeoTrack object', async () => {
@@ -246,7 +214,6 @@ describe('test parsing of GeoTrack objects', () => {
     const geoObj = util.parseGeoTrackingObject(body);
     expect(geoObj).to.be.null;
   });
-
 });
 
 /**
@@ -255,12 +222,12 @@ describe('test parsing of GeoTrack objects', () => {
  * =============================================================
  */
 describe('test creating of GeoTrack', () => {
-
   it('create GeoTrack', async () => {
     const timestamp = 1630000000 + Math.round((Math.random() * 10000000));
     const res = mockResponse();
     const req = mockRequest({
-      headers: [], body: {
+      headers: [],
+      body: {
         lon: 10.875663,
         acc: 32,
         vel: 0,
@@ -269,12 +236,12 @@ describe('test creating of GeoTrack', () => {
         alt: 309,
         vel: 1,
         tid: 'OWNTRACK',
-      }
+      },
     });
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(200); //duplicate
+      expect(res.status).to.have.been.calledWith(200); // duplicate
     } catch (error) {
       throw error;
     }
@@ -283,7 +250,8 @@ describe('test creating of GeoTrack', () => {
   it('create GeoTrack', async () => {
     const res = mockResponse();
     const req = mockRequest({
-      headers: [], body: {
+      headers: [],
+      body: {
         lon: 10.875663,
         acc: 32,
         vel: 0,
@@ -292,13 +260,13 @@ describe('test creating of GeoTrack', () => {
         alt: 309,
         vel: 1,
         tid: 'OWNTRACK',
-      }
+      },
     });
 
     try {
       await geo.createGeoTrack(req, res);
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(202); //duplicate
+      expect(res.status).to.have.been.calledWith(202); // duplicate
     } catch (error) {
       throw error;
     }
@@ -322,7 +290,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(202);
+      expect(res.status).to.have.been.calledWith(201);
     } catch (error) {
       throw error;
     }
@@ -334,14 +302,12 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(400); //duplicate
+      expect(res.status).to.have.been.calledWith(400); // duplicate
     } catch (error) {
       throw error;
     }
   });
-
 });
-
 
 /**
  * =============================================================
@@ -349,8 +315,7 @@ describe('test creating of GeoTrack', () => {
  * =============================================================
  */
 describe('test get GeoTracks', () => {
-
-  it('load geo tracks', async () => {
+  it('load geo tracks (1)', async () => {
     const track = await util.getGeoTrackingDataByTime(moment('2021-09-01'), moment('2021-09-02'));
     const dist = util.distance(track);
     const acc = util.meanAccuracy(track);
@@ -361,7 +326,7 @@ describe('test get GeoTracks', () => {
     expect(acc.stdt).to.be.approximately(607, 1);
   });
 
-  it('load geo tracks', async () => {
+  it('load geo tracks (2)', async () => {
     const res = mockResponse();
     const req = mockRequest({ headers: [], body: {} });
     req.query = { dateStart: '2021-09-01', dateEnd: '2021-09-02' };
@@ -369,7 +334,7 @@ describe('test get GeoTracks', () => {
     try {
       await geo.getGeoTracking(req, res);
     } catch (error) {
-      assert.fail("should not throw error");
+      assert.fail('should not throw error');
     }
   });
 
@@ -381,8 +346,7 @@ describe('test get GeoTracks', () => {
     try {
       await geo.getGeoTrackingMetadata(req, res);
     } catch (error) {
-      assert.fail("should not throw error");
+      assert.fail('should not throw error');
     }
   });
-
 });

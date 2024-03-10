@@ -1,23 +1,22 @@
 require('./init');
-const fs = require('fs');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
 chai.use(chaiAsPromised);
-const expect = chai.expect;
-const assert = chai.assert;
+const { expect, assert } = chai;
 
 const util = require('../api/admin/util-toggles');
 
 describe('test util.getAllToggles', () => {
   it('load all toggles', async () => {
     try {
-      const result = await util.getAllToggles()
+      const result = await util.getAllToggles();
       expect(result).to.be.an('array');
       expect(result[0]).not.to.be.empty;
       expect(result[0]).to.have.property('toggle');
       expect(result[0]).to.have.property('name');
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 });
@@ -25,41 +24,41 @@ describe('test util.getAllToggles', () => {
 describe('test util.getToggle', () => {
   it('load one toggle', async () => {
     try {
-      const result = await util.getAllToggles()
+      const result = await util.getAllToggles();
       const toggle = await util.getToggle(result[0].id);
       expect(toggle).to.have.property('toggle');
       expect(toggle).to.have.property('name');
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 
   it('load one not existing toggle; should fail', async () => {
-    expect(util.getToggle('12345')).to.be.rejectedWith(Error)
+    expect(util.getToggle('12345')).to.be.rejectedWith(Error);
   });
 
   it('test to load notification toggle by existing name', async () => {
     try {
-      const result = await util.getToggleByName('CREATE_ENTRY')
+      const result = await util.getToggleByName('CREATE_ENTRY');
       expect(result.name).to.equal('CREATE_ENTRY');
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
   it('test to load notification toggle by a not existing name', async () => {
     try {
-      const result = await util.getToggleByName('xxx')
+      const result = await util.getToggleByName('xxx');
       expect(result).to.be.null;
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
   it('test to load notification toggle without any name (null)', async () => {
     try {
-      const result = await util.getToggleByName()
+      const result = await util.getToggleByName();
       expect(result).to.be.null;
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 });
@@ -78,7 +77,7 @@ describe('test util.updateToggle', () => {
       expect(result.toggle).to.equal(true);
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
   it('update existing toggle but only notification text', async () => {
@@ -92,7 +91,7 @@ describe('test util.updateToggle', () => {
       expect(result).not.to.be.null;
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 
@@ -100,10 +99,9 @@ describe('test util.updateToggle', () => {
     try {
       const toggle = await util.updateToggle('41224d776a326fb40f000001', true);
       expect(toggle).to.be.null;
-    } catch (error) { assert.fail('should not throw exception') }
+    } catch (error) { assert.fail('should not throw exception'); }
   });
 });
-
 
 describe('test util.deleteToggle', () => {
   const toggleName = getToggleTestName();
@@ -114,14 +112,13 @@ describe('test util.deleteToggle', () => {
       const result = await util.getToggle(deletedToggle._id);
       expect(result).to.be.null;
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
 
   it('try to delete a not existing toggle', async () => {
     expect(await util.deleteToggle('41224d776a326fb40f000001')).to.be.null;
   });
-
 
   describe('test util.getToggleStatus', () => {
     it('check Slack status without SLACK_URL', async () => {
@@ -132,8 +129,8 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('NOTIFICATION_SLACK');
         expect(result.NOTIFICATION_SLACK).to.equal(false);
       } catch (error) {
-        console.log(error)
-        assert.fail('should not throw exception')
+        console.log(error);
+        assert.fail('should not throw exception');
       }
     });
     it('check Slack status with SLACK_URL', async () => {
@@ -143,8 +140,8 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('NOTIFICATION_SLACK');
         expect(result.NOTIFICATION_SLACK).to.equal(true);
       } catch (error) {
-        console.log(error)
-        assert.fail('should not throw exception')
+        console.log(error);
+        assert.fail('should not throw exception');
       }
     });
   });
@@ -162,7 +159,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('generic message');
       } catch (error) {
-        assert.fail('should not throw exception')
+        assert.fail('should not throw exception');
       }
     });
 
@@ -170,7 +167,7 @@ describe('test util.deleteToggle', () => {
       const toggleName = getToggleTestName();
 
       try {
-        const result = await util.createToggle(toggleName, true)
+        const result = await util.createToggle(toggleName, true);
         expect(result).to.have.property('toggle');
         expect(result.toggle).to.equal(true); // Default value is "false"
         expect(result).to.have.property('name');
@@ -178,16 +175,15 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('generic message');
       } catch (error) {
-        assert.fail('should not throw exception')
+        assert.fail('should not throw exception');
       }
-
     });
 
     it('creating a new toggle with name, notification text that does not exist with given toggle value', async () => {
       const toggleName = getToggleTestName();
 
       try {
-        const result = await util.createToggle(toggleName, true, 'DELETE_ME')
+        const result = await util.createToggle(toggleName, true, 'DELETE_ME');
         expect(result).to.have.property('toggle');
         expect(result.toggle).to.equal(true); // Default value is "false"
         expect(result).to.have.property('name');
@@ -195,25 +191,23 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('DELETE_ME');
       } catch (error) {
-        assert.fail('should not throw exception')
+        assert.fail('should not throw exception');
       }
     });
 
-    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle()).to.be.rejectedWith(Error) });
-    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle('')).to.be.rejectedWith(Error) });
-    it('creating a new toggle without name but toggle; should fail', async () => { await expect(util.createToggle('', true)).to.be.rejectedWith(Error) });
+    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle()).to.be.rejectedWith(Error); });
+    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle('')).to.be.rejectedWith(Error); });
+    it('creating a new toggle without name but toggle; should fail', async () => { await expect(util.createToggle('', true)).to.be.rejectedWith(Error); });
   });
-
 
   after(async () => {
     try {
-      const result = await util.deleteTestToggles()
+      const result = await util.deleteTestToggles();
       console.log(JSON.stringify(result));
     } catch (error) {
-      assert.fail('should not throw exception')
+      assert.fail('should not throw exception');
     }
   });
-
 });
 
 function getToggleTestName() {
