@@ -135,7 +135,7 @@ exports.create = async (timeEntry) => {
     }).save();
     // in case the external URL is given, use it to render a deep link
     // eslint-disable-next-line max-len
-    const msg = ((process.env.EXTERNAL_DOMAIN) ? `http://${process.env.EXTERNAL_DOMAIN}/?dl=entryId:${tEntry._id}` : JSON.stringify(timeEntry));
+    const msg = ((process.env.EXTERNAL_DOMAIN) ? `(<${process.env.EXTERNAL_DOMAIN}/#/members/entries/entries/${tEntry._id}|Link>)` : JSON.stringify(timeEntry));
     globalUtil.sendMessage('CREATE_ENTRY', msg);
     setGeofenceCheckStatus(timeEntry.direction); // Activate/Deactivate checkin status
 
@@ -432,7 +432,7 @@ exports.removeDoublets = async () => {
   for await (const timeentry of timeEntries) {
     if (lastTimeentry !== undefined) {
       if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
-          && timeentry.direction === lastTimeentry.direction) {
+        && timeentry.direction === lastTimeentry.direction) {
         timeentry.remove();
         count++;
         // console.log(`removing timeentry ${timeentry}`);
