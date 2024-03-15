@@ -179,31 +179,31 @@ const setGeofenceCheckStatus = async (direction) => {
  * @returns new TimeEntry object
  */
 // exports.update = (timeEntry, id, direction, datetime, longitude, latitude) => {
-exports.update = (timeEntry) => {
+exports.update = async (timeEntry) => {
   if (!timeEntry) {
     throw new Error('to update a record, the passed object must not be undefined');
   }
 
-  return new Promise((resolve, reject) => {
-    TimeEntry.findById(timeEntry.id)
-      .then((te) => {
-        if (te === null) {
-          resolve(null);
-          return;
-        }
-        te.direction = (timeEntry.direction === undefined) ? te.direction : timeEntry.direction;
-        te.longitude = (timeEntry.longitude === undefined) ? te.longitude : timeEntry.longitude;
-        te.latitude = (timeEntry.latitude === undefined) ? te.latitude : timeEntry.latitude;
-        te.datetime = (timeEntry.datetime === undefined) ? te.datetime : timeEntry.datetime;
-        te.entry_date = (timeEntry.entry_date === undefined) ? te.entry_date : timeEntry.entry_date;
-        te.last_changed = new Date();
-        // console.log(te)
-        return te;
-      })
-      .then((te) => te.save())
-      .then((te) => resolve(te))
-      .catch((err) => reject(err));
-  });
+  let tEntry;
+  try {
+    tEntry = await TimeEntry.findById(timeEntry.id);
+    if (tEntry === null) {
+      return;
+    }
+    tEntry.direction = (timeEntry.direction === undefined) ? tEntry.direction : timeEntry.direction;
+    tEntry.longitude = (timeEntry.longitude === undefined) ? tEntry.longitude : timeEntry.longitude;
+    tEntry.latitude = (timeEntry.latitude === undefined) ? tEntry.latitude : timeEntry.latitude;
+    tEntry.datetime = (timeEntry.datetime === undefined) ? tEntry.datetime : timeEntry.datetime;
+    tEntry.entry_date = (timeEntry.entry_date === undefined) ? tEntry.entry_date : timeEntry.entry_date;
+    tEntry.last_changed = new Date();
+
+    tEntry.save();
+    // eslint-disable-next-line max-len
+    const msg = ((process.env.EXTERNAL_DOMAIN) ? `(<${process.env.EXTERNAL_DOMAIN}/#/members/entries/entries/${tEntry._id}|Link>)` : JSON.stringify(timeEntry));
+    globalUtil.sendMessage('UPDATE_ENTRY', msg);
+  } catch (error) {
+    console.log(`unable to update entry ${tEntry._id}\n${error}`);
+  }
 };
 
 /**
