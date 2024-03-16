@@ -204,6 +204,7 @@ exports.update = async (timeEntry) => {
   } catch (error) {
     console.log(`unable to update entry ${tEntry._id}\n${error}`);
   }
+  return tEntry;
 };
 
 /**
