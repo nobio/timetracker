@@ -63,7 +63,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
-  console.log(`${notificationKey} (${addedCtnt})`);
+  //console.log(`${notificationKey} (${addedCtnt})`);
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
@@ -71,7 +71,7 @@ exports.sendMessage = async (notificationKey, addedContent) => {
       const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedCtnt}`;
       return this.sendTextMessage(msg);
     }
-    return (`toggle ${notificationKey} switched off`);
+    return this.sendTextMessage(`${notificationKey}: ${addedContent}`);
   } catch (error) {
     return error.message;
   }

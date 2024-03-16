@@ -323,8 +323,9 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16');
       expect(timeEntry).to.have.property('longitude');
 
+
       // 3. find TimeEntry by id
-      timeEntry = await util.findById(timeEntry.id);
+      timeEntry = await util.findById(timeEntry._id);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
       expect(timeEntry._id).to.not.be.undefined;

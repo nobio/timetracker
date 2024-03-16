@@ -29,8 +29,9 @@ describe('test global_util.sendMessage()', () => {
       const result = await g_util.sendMessage('UNKNOWN_KEY', 'XXXXXXX');
       expect(result).to.not.be.undefined;
       expect(result).to.be.string;
-      expect(result).to.equal('toggle UNKNOWN_KEY switched off');
+      expect(result).to.contain('could not send message <\'UNKNOWN_KEY: XXXXXXX\'>');
     } catch (error) {
+      console.log(error);
       assert.fail('should not throw exception');
     }
   });
