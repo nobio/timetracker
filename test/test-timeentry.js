@@ -294,10 +294,11 @@ describe('test delete one TimeEntry by its id:  -> util.deleteById() ', () => {
 describe('test to modify one TimeEntry:  -> util.update() ', () => {
   it('modify successfully a new TimeEntry', async () => {
     try {
-      // 1. create a TimeEntry with direction enter
+      // 1. create a TimeEntry with direction "enter"
       let timeEntry = await create({ direction: 'enter', datetime: DEFAULT_DATE });
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
+      expect(timeEntry).to.have.property('id');
       expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
@@ -313,6 +314,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       timeEntry = await util.update(timeEntry);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
+      expect(timeEntry).to.have.property('id');
       expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
@@ -323,11 +325,12 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       expect(moment(timeEntry.entry_date).format('YYYY-MM-DD')).to.equal('1967-03-16');
       expect(timeEntry).to.have.property('longitude');
 
-
       // 3. find TimeEntry by id
-      timeEntry = await util.findById(timeEntry._id);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      timeEntry = await util.findById(timeEntry.id);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
+      expect(timeEntry).to.have.property('id');
       expect(timeEntry._id).to.not.be.undefined;
       expect(timeEntry._id).to.not.be.a('string');
       expect(timeEntry).to.have.property('__v');
