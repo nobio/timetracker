@@ -227,6 +227,8 @@ exports.removeExpiredToken = async () => {
       if (parseInt(token.exp), now - token.exp > 0) {
         console.log(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
         jwt.remove();
+      } else {
+        console.log(`refresh token NOT yet expired and will not be deleted now: (${JSON.stringify(token)})`);
       }
     });
   } catch (err) {
@@ -237,6 +239,7 @@ exports.removeExpiredToken = async () => {
 
 exports.removeTesterToken = async () => {
   await Token.deleteMany({ user: 'Tester' });
+  await Token.deleteMany({ user: 'tester' });
 };
 
 exports.validateBasicAuth = async (authorization) => {
