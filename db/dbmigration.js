@@ -44,6 +44,9 @@ const TOGGLE_SOURCE = connectionSource.model('Toggle', models.Toggle);
 const TOGGLE_TARGET = connectionTarget.model('Toggle', models.Toggle);
 const PROPS_SOURCE = connectionSource.model('Properties', models.Properties);
 const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
+const TOKEN_SOURCE = connectionSource.model('Token', models.Token);
+const TOKEN_TARGET = connectionTarget.model('Token', models.Token);
+
 
 console.log('--------------------------------------------------------------- \n');
 console.log('Backing up mongodb');
@@ -108,6 +111,11 @@ const app = async () => {
     await deleteAllTarget(TOGGLE_TARGET);
     await storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET);
     console.timeEnd('toggles'); process.stdout.write('\n');
+
+    console.time('token');
+    await deleteAllTarget(TOKEN_TARGET);
+    await storeDataToTarget(await getDataFromSource(TOKEN_SOURCE), TOKEN_TARGET);
+    console.timeEnd('token'); process.stdout.write('\n');
 
     console.time('properties');
     await deleteAllTarget(PROPS_TARGET);
