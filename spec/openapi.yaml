@@ -7,7 +7,7 @@ info:
     url: "https://opensource.org/licenses/MIT"
   version: 6.0.0
 servers:
-  - url: "http://localhost:30443/api"
+  - url: "http://localhost:30000/api"
   - url: "https://localhost:30443/api"
   - url: "https://nobio.myhome-server.de/api"
   - url: "https://timetracker-ui.web.app/api"
