@@ -140,7 +140,7 @@ app.get('/api/statistics/extrahours', api_stats.extraHours);
 // .......................................................................
 app.get('/api/ping', api_misc.ping);
 app.get('/api/version', api_misc.version);
-app.get('/api/experiment', api_misc.experiment);
+app.all('/api/experiment', api_misc.experiment);
 app.get('/api/health', api_misc.healthcheck);
 // log the request on different methods
 app.get('/api/log', api_misc.log);

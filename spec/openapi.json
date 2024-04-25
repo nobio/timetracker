@@ -1,0 +1,4480 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Timetracker API",
+    "description": "OpenaAPI SPEC oF my fancy timetracker app",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "version": "6.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:30000/api"
+    },
+    {
+      "url": "https://localhost:30443/api"
+    },
+    {
+      "url": "https://nobio.myhome-server.de/api"
+    },
+    {
+      "url": "https://timetracker-ui.web.app/api"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "keyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Time Tracker",
+      "description": "description goes here"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "Login of a user",
+        "description": "A user (username, password) will be authenticated; a jwt access token (5min expiry) and a refresh token will be returned.",
+        "requestBody": {
+          "description": "The User object to be authenticated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "tester",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "pattern": "^[\\w-.]",
+                    "example": "psiodjkÜsö93JKK=w8dj",
+                    "maxLength": 20
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "access and refresh tokens are created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "description": "the accees JWT to be used to access",
+                      "example": "eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8\","
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "description": "refresh JWT",
+                      "example": "eyIjshJ9.eyJOOksW1lIjdasdihg0Mn0.kgR2dNsda2d8\","
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized; usually when no password was provided or when user is not registered or when password was incorrect",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "error message",
+                      "example": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "User"
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "logout and destroy tokens; does not need bearer token",
+        "requestBody": {
+          "description": "long living refresh token will be invalidated (short living access token might still live until expiry)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "token"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "JWT",
+                    "pattern": "^[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*$",
+                    "maxLength": 256,
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Invalidates the refresh token of a user"
+          }
+        }
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "tags": [
+          "Authentication & Authorization"
+        ],
+        "summary": "Refresh the access token using the refresh token",
+        "requestBody": {
+          "description": "long living refresh token will be invalidated (short living access token might still live until expiry)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "token"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "JWT",
+                    "pattern": "^[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*$",
+                    "maxLength": 256,
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "new access token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "accessToken": {
+                      "type": "string",
+                      "description": "new accees JWT to be used to access",
+                      "example": "eyJhbJ9.eyJuYW1lIjoibm4OTg0Mn0.kgR2dN1VsZ_1Vd8\","
+                    },
+                    "user": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "user name linked to this token",
+                          "example": "user@university.edu"
+                        },
+                        "iat": {
+                          "type": "number",
+                          "description": "generation timetamp",
+                          "example": 1618390174
+                        },
+                        "exp": {
+                          "type": "number",
+                          "description": "expire timetamp",
+                          "example": 1618390174
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "refresh token is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "error message",
+                      "example": "Unauthorized (invalid refresh token)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entries": {
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Read all time entries",
+        "description": "Reads all time entries;\nread entries by date getAllByDate -> List of Time Entry of the given day;\nRead busy time getBusyTime -> Busy Time of the given day (in ms)\n",
+        "parameters": [
+          {
+            "name": "busy",
+            "in": "query",
+            "description": "Zeitstempel",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          },
+          {
+            "name": "dt",
+            "in": "query",
+            "description": "Zeitstempel",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All (or filtered) time entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "required": [
+                      "direction",
+                      "entry_date"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "entry_date": {
+                        "type": "string",
+                        "description": "The date this time entry represents",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "last_changed": {
+                        "type": "string",
+                        "description": "Date of last change on this time entry",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                        "example": "enter",
+                        "enum": [
+                          "enter",
+                          "go"
+                        ]
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "description": "the longitude geo coordinate",
+                        "example": 10.875482
+                      },
+                      "latitude": {
+                        "type": "number",
+                        "description": "the latitude geo coordinate",
+                        "example": 49.514135
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Create new time entry",
+        "description": "Create new time entry in system",
+        "requestBody": {
+          "description": "Time entry that we want to create",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "direction",
+                  "entry_date"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "entry_date": {
+                    "type": "string",
+                    "description": "The date this time entry represents",
+                    "example": "2000-01-01T10:15:02.151Z",
+                    "format": "date-time"
+                  },
+                  "last_changed": {
+                    "type": "string",
+                    "description": "Date of last change on this time entry",
+                    "example": "2000-01-01T10:15:02.151Z",
+                    "format": "date-time"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                    "example": "enter",
+                    "enum": [
+                      "enter",
+                      "go"
+                    ]
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "New entry is created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "direction",
+                    "entry_date"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "entry_date": {
+                      "type": "string",
+                      "description": "The date this time entry represents",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "last_changed": {
+                      "type": "string",
+                      "description": "Date of last change on this time entry",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                      "example": "enter",
+                      "enum": [
+                        "enter",
+                        "go"
+                      ]
+                    },
+                    "longitude": {
+                      "type": "number",
+                      "description": "the longitude geo coordinate",
+                      "example": 10.875482
+                    },
+                    "latitude": {
+                      "type": "number",
+                      "description": "the latitude geo coordinate",
+                      "example": 49.514135
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "timeentry"
+      }
+    },
+    "/entries/{id}": {
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Get time entry with given ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of time entry that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "TimeEntry is found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "required": [
+                      "direction",
+                      "entry_date"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "entry_date": {
+                        "type": "string",
+                        "description": "The date this time entry represents",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "last_changed": {
+                        "type": "string",
+                        "description": "Date of last change on this time entry",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                        "example": "enter",
+                        "enum": [
+                          "enter",
+                          "go"
+                        ]
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "description": "the longitude geo coordinate",
+                        "example": 10.875482
+                      },
+                      "latitude": {
+                        "type": "number",
+                        "description": "the latitude geo coordinate",
+                        "example": 49.514135
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Update toggle with give ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of time entry that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[\\w-.]",
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "TimeEntry with new values of properties",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "direction",
+                  "entry_date"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "entry_date": {
+                    "type": "string",
+                    "description": "The date this time entry represents",
+                    "example": "2000-01-01T10:15:02.151Z",
+                    "format": "date-time"
+                  },
+                  "last_changed": {
+                    "type": "string",
+                    "description": "Date of last change on this time entry",
+                    "example": "2000-01-01T10:15:02.151Z",
+                    "format": "date-time"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                    "example": "enter",
+                    "enum": [
+                      "enter",
+                      "go"
+                    ]
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Toggle is updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "direction",
+                    "entry_date"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "entry_date": {
+                      "type": "string",
+                      "description": "The date this time entry represents",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "last_changed": {
+                      "type": "string",
+                      "description": "Date of last change on this time entry",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                      "example": "enter",
+                      "enum": [
+                        "enter",
+                        "go"
+                      ]
+                    },
+                    "longitude": {
+                      "type": "number",
+                      "description": "the longitude geo coordinate",
+                      "example": 10.875482
+                    },
+                    "latitude": {
+                      "type": "number",
+                      "description": "the latitude geo coordinate",
+                      "example": 49.514135
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "TimeEntry"
+      },
+      "delete": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Delete time entry with given ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of time entry that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Time Entry is deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "required": [
+                      "direction",
+                      "entry_date"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "entry_date": {
+                        "type": "string",
+                        "description": "The date this time entry represents",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "last_changed": {
+                        "type": "string",
+                        "description": "Date of last change on this time entry",
+                        "example": "2000-01-01T10:15:02.151Z",
+                        "format": "date-time"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+                        "example": "enter",
+                        "enum": [
+                          "enter",
+                          "go"
+                        ]
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "description": "the longitude geo coordinate",
+                        "example": 10.875482
+                      },
+                      "latitude": {
+                        "type": "number",
+                        "description": "the latitude geo coordinate",
+                        "example": 49.514135
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/entries/dump": {
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Backup data to file system",
+        "description": "dump the mongodb to the local file system in order to be restored if needed",
+        "responses": {
+          "200": {
+            "description": "data dumped to file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/entries/restore": {
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Restore data",
+        "description": "Restore data from file which has been dumped by dump method",
+        "responses": {
+          "200": {
+            "description": "data sucessfully restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/entries/backup": {
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Backup data to database",
+        "description": "backup data in an extra backup table",
+        "responses": {
+          "200": {
+            "description": "data saved to database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "something went wrong...",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/entries/error/evaluate": {
+      "post": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Evaluate time entries",
+        "description": "Evaluate time entries on their consistency (completeness, order, etc.). As a result, the failure data will be put to an own document in mongodb. This data could be inquired by using the endpoint /api/entries/error/dates",
+        "responses": {
+          "200": {
+            "description": "data saved to database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "something went wrong...",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/entries/error/dates": {
+      "get": {
+        "tags": [
+          "TimeEntries"
+        ],
+        "summary": "Inquire the error time entries",
+        "description": "Read all dates with error type that was written to database by endpoint /api/entries/error/evaluate",
+        "responses": {
+          "200": {
+            "description": "data saved to database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "error-date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2000-01-01T10:15:02.151Z"
+                      },
+                      "error-type": {
+                        "type": "string",
+                        "maxLength": 30,
+                        "description": "Type of the error - INCOMPLETE means that entries are missing and WRONG_ORDER means that the order of go and enter is not correctly booked",
+                        "example": "INCOMPLETE or WRONG_ORDER"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "something went wrong...",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/geotrack": {
+      "get": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "Reads all geo tracking data for a given date",
+        "description": "Reads all geo tracking data for a given date",
+        "parameters": [
+          {
+            "name": "dateStart",
+            "in": "query",
+            "description": "start date of the time range; format YYYY-MM-DD like 2020-03-09",
+            "example": "2022-03-16T00:00:00.000Z",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dateEnd",
+            "in": "query",
+            "description": "end date of the time range; format YYYY-MM-DD like 2020-03-10",
+            "example": "2022-03-17T00:00:00.000Z",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delivered a valid result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "longitude": {
+                        "type": "number",
+                        "description": "the longitude geo coordinate",
+                        "example": 10.875482
+                      },
+                      "latitude": {
+                        "type": "number",
+                        "description": "the latitude geo coordinate",
+                        "example": 49.514135
+                      },
+                      "accuracy": {
+                        "type": "number",
+                        "description": "the accuracy of the position measurement in meter (radius)",
+                        "example": 60
+                      },
+                      "velocity": {
+                        "type": "number",
+                        "description": "the velocity in [m/s] between two points (this related to the last one in time)",
+                        "example": 22.3
+                      },
+                      "timediff": {
+                        "type": "number",
+                        "description": "The time in [s] passed between two points (this related to the last one in time)",
+                        "example": 11620
+                      },
+                      "dist": {
+                        "type": "number",
+                        "description": "The distance in [m] passed between two points (this related to the last one in time)",
+                        "example": 320
+                      },
+                      "source": {
+                        "type": "string",
+                        "description": "identifier of the sender of this request",
+                        "example": "HASSIO"
+                      },
+                      "altitude": {
+                        "type": "number",
+                        "description": "altitude of the position",
+                        "example": 320
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "date of this entry in ISO format",
+                        "example": "2020-07-15T10:45:23.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "Create new time entry from a geo tracking device like Hassio Mobil App or OwnTrack",
+        "description": "Create new time entry from a geo tracking device like Hassio Mobil App or OwnTrack; the request body takes differen formats; internally they will be transformed to a internal general format before storing to database",
+        "requestBody": {
+          "description": "Time entry that we want to create using Geofencing",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "longitude": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  },
+                  "accuracy": {
+                    "type": "number",
+                    "description": "the accuracy of the position measurement in meter (radius)",
+                    "example": 60
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "identifier of the sender of this request",
+                    "example": "HASSIO"
+                  },
+                  "lon": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "lat": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  },
+                  "acc": {
+                    "type": "number",
+                    "description": "the accuracy of the position measurement in meter (radius)",
+                    "example": 60
+                  },
+                  "altitude": {
+                    "type": "number",
+                    "description": "altitude of the position",
+                    "example": 320
+                  },
+                  "tst": {
+                    "type": "number",
+                    "description": "unix timestamp of this event",
+                    "example": 1594913160
+                  },
+                  "desc": {
+                    "type": "string",
+                    "description": "description (?)"
+                  },
+                  "tid": {
+                    "type": "string",
+                    "description": "some source identifier; sometimes its desc, sometimes its tid"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "New entry is created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "longitude": {
+                      "type": "number",
+                      "description": "the longitude geo coordinate",
+                      "example": 10.875482
+                    },
+                    "latitude": {
+                      "type": "number",
+                      "description": "the latitude geo coordinate",
+                      "example": 49.514135
+                    },
+                    "accuracy": {
+                      "type": "number",
+                      "description": "the accuracy of the position measurement in meter (radius)",
+                      "example": 60
+                    },
+                    "velocity": {
+                      "type": "number",
+                      "description": "the velocity in [m/s] between two points (this related to the last one in time)",
+                      "example": 22.3
+                    },
+                    "timediff": {
+                      "type": "number",
+                      "description": "The time in [s] passed between two points (this related to the last one in time)",
+                      "example": 11620
+                    },
+                    "dist": {
+                      "type": "number",
+                      "description": "The distance in [m] passed between two points (this related to the last one in time)",
+                      "example": 320
+                    },
+                    "source": {
+                      "type": "string",
+                      "description": "identifier of the sender of this request",
+                      "example": "HASSIO"
+                    },
+                    "altitude": {
+                      "type": "number",
+                      "description": "altitude of the position",
+                      "example": 320
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "date of this entry in ISO format",
+                      "example": "2020-07-15T10:45:23.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "duplicate entry or encrypted data; does not change database and will be ignored",
+            "content": {}
+          },
+          "400": {
+            "description": "some data is missing",
+            "content": {}
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "geo_timeentry"
+      }
+    },
+    "/geotrack/metadata": {
+      "get": {
+        "tags": [
+          "Geo Tracking"
+        ],
+        "summary": "meta data about the track for the given time span",
+        "description": "Returns som meta data about the track for the given time span",
+        "parameters": [
+          {
+            "name": "dateStart",
+            "in": "query",
+            "description": "start date of the time range; format YYYY-MM-DD like 2020-03-09",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "dateEnd",
+            "in": "query",
+            "description": "end date of the time range; format YYYY-MM-DD like 2020-03-10",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "delivered a valid result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "size": {
+                      "type": "number",
+                      "description": "number of geo track entries for the given time span",
+                      "example": 210
+                    },
+                    "totalDistance": {
+                      "type": "number",
+                      "description": "distance in meter of the given time span",
+                      "example": 21232
+                    },
+                    "accuracy": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "mean": {
+                          "type": "number",
+                          "description": "mean of accuracies in meters of all geo locations",
+                          "example": 114.232
+                        },
+                        "variance": {
+                          "type": "number",
+                          "description": "variance of accuracies in meters of all geo locations",
+                          "example": 11.031
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/toggles": {
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Get all toggles in system",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "required": [
+                      "name",
+                      "notification",
+                      "toggle"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "example": "__TEST__",
+                        "maxLength": 128,
+                        "pattern": "^[\\w-.]"
+                      },
+                      "toggle": {
+                        "type": "string",
+                        "example": "false",
+                        "maxLength": 128,
+                        "pattern": "^[\\w-.]"
+                      },
+                      "notification": {
+                        "type": "string",
+                        "example": "some text",
+                        "maxLength": 128,
+                        "pattern": "^[\\w-.]"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Create new toggle in system",
+        "description": "Create new toggle in system",
+        "requestBody": {
+          "description": "Toggle that we want to create",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "name",
+                  "notification",
+                  "toggle"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "__TEST__",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  },
+                  "toggle": {
+                    "type": "string",
+                    "example": "false",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  },
+                  "notification": {
+                    "type": "string",
+                    "example": "some text",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "New toggle is created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "name",
+                    "notification",
+                    "toggle"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "__TEST__",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "toggle": {
+                      "type": "string",
+                      "example": "false",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "notification": {
+                      "type": "string",
+                      "example": "some text",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "toggle"
+      }
+    },
+    "/toggles/{id}": {
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Get toggle with given ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of toggle that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toggle is found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "name",
+                    "notification",
+                    "toggle"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "__TEST__",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "toggle": {
+                      "type": "string",
+                      "example": "false",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "notification": {
+                      "type": "string",
+                      "example": "some text",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Update toggle with give ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of toggle that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Toggle with new values of properties",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "name",
+                  "notification",
+                  "toggle"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "__TEST__",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  },
+                  "toggle": {
+                    "type": "string",
+                    "example": "false",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  },
+                  "notification": {
+                    "type": "string",
+                    "example": "some text",
+                    "maxLength": 128,
+                    "pattern": "^[\\w-.]"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Toggle is updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "name",
+                    "notification",
+                    "toggle"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "__TEST__",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "toggle": {
+                      "type": "string",
+                      "example": "false",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "notification": {
+                      "type": "string",
+                      "example": "some text",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "toggle"
+      },
+      "delete": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Delete toggle with given ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of toggle that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Toggle is deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "name",
+                    "notification",
+                    "toggle"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "__TEST__",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "toggle": {
+                      "type": "string",
+                      "example": "false",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "notification": {
+                      "type": "string",
+                      "example": "some text",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/toggles/name/{name}": {
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "read one toggle by its name",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of a toggle that we want to find",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All toggles status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "name",
+                    "notification",
+                    "toggle"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "__TEST__",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "toggle": {
+                      "type": "string",
+                      "example": "false",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    },
+                    "notification": {
+                      "type": "string",
+                      "example": "some text",
+                      "maxLength": 128,
+                      "pattern": "^[\\w-.]"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/toggles/status": {
+      "get": {
+        "tags": [
+          "Toggles"
+        ],
+        "summary": "Toggle status (currently onl)",
+        "responses": {
+          "200": {
+            "description": "All toggles status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "NOTIFICATION_SLACK": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Read a all persisted properties",
+        "responses": {
+          "200": {
+            "description": "Read a property by it's key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 1000,
+                  "items": {
+                    "required": [
+                      "key",
+                      "value"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[\\w-.]",
+                        "maxLength": 30,
+                        "example": "de.nobio.timetracker.KEY_01"
+                      },
+                      "value": {
+                        "type": "string",
+                        "pattern": "^[\\w-.]",
+                        "maxLength": 100,
+                        "example": "this is a value"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "unable to read key-value pairs from database"
+          }
+        }
+      }
+    },
+    "/properties/{key}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Read one persisted propertie's value",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key of key-value pair",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Read a property by it's key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 1000,
+                  "items": {
+                    "required": [
+                      "key",
+                      "value"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[\\w-.]",
+                        "maxLength": 30,
+                        "example": "de.nobio.timetracker.KEY_01"
+                      },
+                      "value": {
+                        "type": "string",
+                        "pattern": "^[\\w-.]",
+                        "maxLength": 100,
+                        "example": "this is a value"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "Property for given key was not found"
+          },
+          "500": {
+            "description": "unable to read key-value pair from database"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Create or update a property (key-value pair)",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key of key-value pair",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "description": "Value of key-value pair",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "no body, please check http status code"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "unable to store key-value pair"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Delete a persisted property",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "Key of key-value pair",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successfully deleted key-value pair"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "Property for given key was not found"
+          },
+          "500": {
+            "description": "unable to delete key-value pair"
+          }
+        }
+      }
+    },
+    "/geofences": {
+      "get": {
+        "tags": [
+          "Geofences"
+        ],
+        "summary": "Read a all geofences",
+        "responses": {
+          "200": {
+            "description": "Read a geofence by it's key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "required": [
+                      "id",
+                      "enabled",
+                      "longitude",
+                      "latitude",
+                      "radius",
+                      "description",
+                      "isCheckedIn",
+                      "lastChange"
+                    ],
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "identifier of this geofence",
+                        "example": "6367e7c3a94ff60017d7c1ce"
+                      },
+                      "enabled": {
+                        "type": "boolean",
+                        "description": "flag that indicates if the geo fence should trigger or not",
+                        "example": true
+                      },
+                      "radius": {
+                        "type": "number",
+                        "description": "radius of the geofence within it matches",
+                        "example": 150
+                      },
+                      "longitude": {
+                        "type": "number",
+                        "description": "the longitude geo coordinate",
+                        "example": 10.875482
+                      },
+                      "latitude": {
+                        "type": "number",
+                        "description": "the latitude geo coordinate",
+                        "example": 49.514135
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "A (unique) description of this geofence; name it after the location",
+                        "example": "Home"
+                      },
+                      "isCheckedIn": {
+                        "type": "boolean",
+                        "description": "flag that indicates if one is chacked in at this geofence",
+                        "example": false
+                      },
+                      "lastChange": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "date of last checkin or checkout",
+                        "example": "2020-07-15T10:45:23.000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "unable to read geofences from database"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Geofences"
+        ],
+        "summary": "Creates a new geofence",
+        "requestBody": {
+          "description": "Geofence with new values of properties",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "id",
+                  "enabled",
+                  "longitude",
+                  "latitude",
+                  "radius",
+                  "description",
+                  "isCheckedIn",
+                  "lastChange"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "identifier of this geofence",
+                    "example": "6367e7c3a94ff60017d7c1ce"
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "flag that indicates if the geo fence should trigger or not",
+                    "example": true
+                  },
+                  "radius": {
+                    "type": "number",
+                    "description": "radius of the geofence within it matches",
+                    "example": 150
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A (unique) description of this geofence; name it after the location",
+                    "example": "Home"
+                  },
+                  "isCheckedIn": {
+                    "type": "boolean",
+                    "description": "flag that indicates if one is chacked in at this geofence",
+                    "example": false
+                  },
+                  "lastChange": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "date of last checkin or checkout",
+                    "example": "2020-07-15T10:45:23.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "successfully created a new geofence"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "unable to store key-value pair"
+          }
+        }
+      }
+    },
+    "/geofences/{id}": {
+      "get": {
+        "tags": [
+          "Geofences"
+        ],
+        "summary": "Read one geofences by it's id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of a geofence object",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Read a geofence by it's key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "id",
+                    "enabled",
+                    "longitude",
+                    "latitude",
+                    "radius",
+                    "description",
+                    "isCheckedIn",
+                    "lastChange"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "identifier of this geofence",
+                      "example": "6367e7c3a94ff60017d7c1ce"
+                    },
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "flag that indicates if the geo fence should trigger or not",
+                      "example": true
+                    },
+                    "radius": {
+                      "type": "number",
+                      "description": "radius of the geofence within it matches",
+                      "example": 150
+                    },
+                    "longitude": {
+                      "type": "number",
+                      "description": "the longitude geo coordinate",
+                      "example": 10.875482
+                    },
+                    "latitude": {
+                      "type": "number",
+                      "description": "the latitude geo coordinate",
+                      "example": 49.514135
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A (unique) description of this geofence; name it after the location",
+                      "example": "Home"
+                    },
+                    "isCheckedIn": {
+                      "type": "boolean",
+                      "description": "flag that indicates if one is chacked in at this geofence",
+                      "example": false
+                    },
+                    "lastChange": {
+                      "type": "string",
+                      "format": "date",
+                      "description": "date of last checkin or checkout",
+                      "example": "2020-07-15T10:45:23.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "Property for given key was not found"
+          },
+          "500": {
+            "description": "unable to read key-value pair from database"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Geofences"
+        ],
+        "summary": "Update a geofence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of geofence",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Geofence with new values of properties",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "id",
+                  "enabled",
+                  "longitude",
+                  "latitude",
+                  "radius",
+                  "description",
+                  "isCheckedIn",
+                  "lastChange"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "identifier of this geofence",
+                    "example": "6367e7c3a94ff60017d7c1ce"
+                  },
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "flag that indicates if the geo fence should trigger or not",
+                    "example": true
+                  },
+                  "radius": {
+                    "type": "number",
+                    "description": "radius of the geofence within it matches",
+                    "example": 150
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "description": "the longitude geo coordinate",
+                    "example": 10.875482
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "description": "the latitude geo coordinate",
+                    "example": 49.514135
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A (unique) description of this geofence; name it after the location",
+                    "example": "Home"
+                  },
+                  "isCheckedIn": {
+                    "type": "boolean",
+                    "description": "flag that indicates if one is chacked in at this geofence",
+                    "example": false
+                  },
+                  "lastChange": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "date of last checkin or checkout",
+                    "example": "2020-07-15T10:45:23.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "204": {
+            "description": "no body, please check http status code"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "500": {
+            "description": "unable to store key-value pair"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Geofences"
+        ],
+        "summary": "Delete a geofence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of a geofence",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successfully deleted geofence"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "Property for given key was not found"
+          },
+          "500": {
+            "description": "unable to delete geofence"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Read all users",
+        "description": "Reads all time users from database;",
+        "responses": {
+          "200": {
+            "description": "All (or filtered) time entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "asdjas0sd-sdasdi-asdasd"
+                      },
+                      "username": {
+                        "type": "string",
+                        "example": "tester"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Tester"
+                      },
+                      "mailAddress": {
+                        "type": "string",
+                        "example": "albert@einstein.edu"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create a new user",
+        "description": "Create a new user with password. PWD will be stored encrypted",
+        "requestBody": {
+          "description": "The User object to be created",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 60,
+                    "example": "Tester"
+                  },
+                  "password": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "format": "password",
+                    "example": "jshHfu3ek=fDÖ",
+                    "maxLength": 20
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 60,
+                    "example": "Tester"
+                  },
+                  "mailAddress": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 100,
+                    "example": "albert@einstein.edu"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "New user is created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "username",
+                    "name",
+                    "mailAddress"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 60,
+                      "example": "tester"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "Tester"
+                    },
+                    "mailAddress": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "albert@einstein.edu"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        },
+        "x-codegen-request-body-name": "User"
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Loads an existing user by it's it",
+        "description": "Loads an existing user by it's it",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "unique reference to user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A user from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "asdjas0sd-sdasdi-asdasd"
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "tester"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Tester"
+                    },
+                    "mailAddress": {
+                      "type": "string",
+                      "example": "albert@einstein.edu"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Updates an existing user",
+        "description": "Updates an existing user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "unique reference to user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The User object to be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": [
+                  "username",
+                  "name",
+                  "mailAddress"
+                ],
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 60,
+                    "example": "tester"
+                  },
+                  "name": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 100,
+                    "example": "Tester"
+                  },
+                  "mailAddress": {
+                    "type": "string",
+                    "pattern": "^[\\w-.]",
+                    "maxLength": 100,
+                    "example": "albert@einstein.edu"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "description": "User sucessfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "username",
+                    "name",
+                    "mailAddress"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 60,
+                      "example": "tester"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "Tester"
+                    },
+                    "mailAddress": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "albert@einstein.edu"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "User (id) does not exist"
+          }
+        },
+        "x-codegen-request-body-name": "User"
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delets an existing user incl. credentials",
+        "description": "Deletes a new user with credentials",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "unique reference to user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "User was deleted; also returned if user did not exist"
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/users/{id}/password": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Updates the password of an existing user",
+        "description": "Updates the password of an existing user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "unique reference to user",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The password to be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "minimum": 5,
+                    "pattern": "^[\\w-.]",
+                    "example": "k9wPüä=kdHs2",
+                    "maxLength": 20
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User sucessfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "username",
+                    "name",
+                    "mailAddress"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 60,
+                      "example": "tester"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "Tester"
+                    },
+                    "mailAddress": {
+                      "type": "string",
+                      "pattern": "^[\\w-.]",
+                      "maxLength": 100,
+                      "example": "albert@einstein.edu"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          },
+          "404": {
+            "description": "User (id) does not exist"
+          }
+        },
+        "x-codegen-request-body-name": "User"
+      }
+    },
+    "/stats": {
+      "put": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate and fill database table with statistics",
+        "description": "calculates the statistics for today +/- one month and stores them in database;",
+        "responses": {
+          "200": {
+            "description": "Statistics have successfully been calculated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "firstEntry": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "_id": {
+                          "type": "number",
+                          "example": 0
+                        },
+                        "age": {
+                          "type": "string",
+                          "pattern": "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$",
+                          "example": "2014-01-13T06:30:00.000Z"
+                        }
+                      }
+                    },
+                    "lastEntry": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "_id": {
+                          "type": "number",
+                          "example": 0
+                        },
+                        "age": {
+                          "type": "string",
+                          "pattern": "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$",
+                          "example": "2019-01-10T21:13:29.233Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Deletes all entries from statistics table",
+        "responses": {
+          "200": {
+            "description": "Statistics data have successfully been deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9999999,
+                      "format": "int32",
+                      "example": 953
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/stats/{date}/{timeUnit}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate statistics (evtl. accumulated)",
+        "description": "Returns the aggregated statistics for a given time day",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "timestamp representing a date",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "default": 1391295600000
+            }
+          },
+          {
+            "name": "timeUnit",
+            "in": "path",
+            "description": "time unit",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "day",
+              "enum": [
+                "year",
+                "month",
+                "week",
+                "day"
+              ]
+            }
+          },
+          {
+            "name": "accumulate",
+            "in": "query",
+            "description": "indicates if statistics are to be accumulated or just presented",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "fill",
+            "in": "query",
+            "description": "indicates if the data should be filled with all days of this time range; if no measured value is available, the value is 0",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "statistics for the given date",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "chart_data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "yScale": {
+                          "type": "string",
+                          "enum": [
+                            "linear"
+                          ]
+                        },
+                        "xScale": {
+                          "type": "string",
+                          "enum": [
+                            "ordinal",
+                            "time"
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bar",
+                            "line-dottet"
+                          ]
+                        },
+                        "main": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "data": {
+                              "type": "array",
+                              "maxItems": 999999,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "comp": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "line"
+                              ]
+                            },
+                            "data": {
+                              "type": "array",
+                              "maxItems": 999999,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/statistics/aggregate": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate aggregated statistics",
+        "description": "calculates statistics aggregated to the geven timeUnit",
+        "parameters": [
+          {
+            "name": "timeUnit",
+            "in": "query",
+            "description": "time unit",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "day",
+              "enum": [
+                "year",
+                "month",
+                "week",
+                "day"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "calculated aggregated statistics for this given timeUnit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "chart_data": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "yScale": {
+                          "type": "string",
+                          "enum": [
+                            "linear"
+                          ]
+                        },
+                        "xScale": {
+                          "type": "string",
+                          "enum": [
+                            "ordinal",
+                            "time"
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "bar",
+                            "line-dottet"
+                          ]
+                        },
+                        "yMin": {
+                          "type": "number"
+                        },
+                        "main": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "data": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "properties": {
+                                "y": {
+                                  "type": "number"
+                                },
+                                "x": {
+                                  "type": "number"
+                                },
+                                "n": {
+                                  "type": "number"
+                                },
+                                "dev": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "comp": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "type": {
+                              "type": "string",
+                              "enum": [
+                                "line"
+                              ]
+                            },
+                            "data": {
+                              "type": "array",
+                              "maxItems": 999999,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/statistics/histogram/{interval}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate historgram from statistic data",
+        "description": "returns a histogram with a given interval (time) and optionally filtered by direction (enter, go or both)",
+        "parameters": [
+          {
+            "name": "interval",
+            "in": "path",
+            "description": "time interval this historgram should be created",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "default": 60
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "filter entries by their direction",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "enter",
+                "go"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "histogramm according to the given parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "1970-01-01T08:20:00.000Z"
+                      },
+                      "histValue": {
+                        "type": "number",
+                        "example": 512
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/statistics/breaktime/{interval}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate historgram of break times from statistic data",
+        "description": "returns a histogram of break times optionally filtered by \"real\" measurement of breaks or, in case of only two entries this day, calculated default breaks (45 min).",
+        "parameters": [
+          {
+            "name": "interval",
+            "in": "path",
+            "description": "time interval this historgram should be created",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "default": 60
+            }
+          },
+          {
+            "name": "real",
+            "in": "query",
+            "description": "filter entries by their direction",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "histogramm according to the given parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "time": {
+                        "type": "number",
+                        "example": 40
+                      },
+                      "breaktime": {
+                        "type": "number",
+                        "example": 689
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/statistics/extrahours": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "calculate extra hours starting with Oct/2023",
+        "description": "Returns the extra hours per day either as value or accumulated over time",
+        "parameters": [
+          {
+            "name": "accumulate",
+            "in": "query",
+            "description": "indicates if statistics are to be accumulated or just presented",
+            "required": true,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "timeUnit",
+            "in": "query",
+            "description": "time unit",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "day",
+              "enum": [
+                "year",
+                "month",
+                "week",
+                "day"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extra hours according to the given parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 999999,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "extra_hour": {
+                        "type": "number",
+                        "example": 1.2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Version of this application",
+        "description": "reveals the actual version of this application",
+        "responses": {
+          "200": {
+            "description": "version information regarding this application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "version",
+                    "last_build"
+                  ],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "description": "version of this application",
+                      "pattern": "^(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)$",
+                      "example": "11.2.3"
+                    },
+                    "last_build": {
+                      "type": "string",
+                      "description": "date/time of last build",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access token is missing or invalid; try to refresh your token"
+          }
+        }
+      }
+    },
+    "/schedule": {
+      "put": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "API to schedule jobs",
+        "description": "Exposes an API to jobs trigger by an external scheduler (like kubernetes CronJob)",
+        "parameters": [
+          {
+            "name": "jobclass",
+            "in": "query",
+            "description": "job class defines the job to be triggered",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "CALC_STATS",
+              "enum": [
+                "CALC_STATS",
+                "DUMP_MODELS",
+                "BACKUP_TIME_ENTRIES",
+                "EVALUATE",
+                "REMOVE_TESTER_TOKEN",
+                "REMOVE_EXIRED_TOKEN",
+                "RESET_GEOFENCE_CHEKINS"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "job successfully triggered; please mind that it runs in the background and there is no error code in case it fails"
+          },
+          "400": {
+            "description": "job class invalid or not provided"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Healthcheck endpoint",
+        "description": "Performs a healthcheck if this app (no auth required)",
+        "responses": {
+          "200": {
+            "description": "Healthcheck was performed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "fail",
+                        "warn"
+                      ],
+                      "description": "Status of healthcheck. “pass”: healthy “fail”: unhealthy “warn”: healthy, with some concerns",
+                      "example": "pass"
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "version of this application",
+                      "pattern": "^(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)$",
+                      "example": "11.2.3"
+                    },
+                    "time": {
+                      "type": "string",
+                      "description": "date/time of this health check",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "details": {
+                      "type": "array",
+                      "maxItems": 100,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Name of this component",
+                            "example": "database"
+                          },
+                          "componentType": {
+                            "description": "Types of component.",
+                            "type": "string",
+                            "enum": [
+                              "component",
+                              "datastore",
+                              "system"
+                            ]
+                          },
+                          "metricUnit": {
+                            "description": "Unit of the measured metric value",
+                            "type": "string",
+                            "enum": [
+                              "ms",
+                              "s",
+                              "percent",
+                              "GiB",
+                              "MiB"
+                            ]
+                          },
+                          "metricValue": {
+                            "description": "the value of the given metricUnit. Needs to be a common data type to hold all other data types; currently it consists of time and byte and percentage",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Healthcheck could not be performed successfully because this or a dependend service was not available.",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/log": {
+      "get": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Log request object",
+        "description": "Logs several values of request to console of server",
+        "responses": {
+          "200": {
+            "description": "version information regarding this application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "description": "url of this method",
+                      "example": "/api/url"
+                    },
+                    "method": {
+                      "type": "string",
+                      "description": "the method of this request",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "description": "JSON object of headers for this request",
+                      "example": {
+                        "host": "localhost:30000",
+                        "user-agent": "curl/7.71.1",
+                        "accept": "*/*",
+                        "content-length": "41",
+                        "content-type": "application/x-www-form-urlencoded"
+                      },
+                      "format": "json"
+                    },
+                    "body": {
+                      "type": "object",
+                      "description": "JSON object of body for this request; optional - only when passed",
+                      "example": {
+                        "key": "value"
+                      },
+                      "format": "json"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Log request object",
+        "description": "Logs several values of request to console of server",
+        "responses": {
+          "200": {
+            "description": "version information regarding this application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "description": "url of this method",
+                      "example": "/api/url"
+                    },
+                    "method": {
+                      "type": "string",
+                      "description": "the method of this request",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "description": "JSON object of headers for this request",
+                      "example": {
+                        "host": "localhost:30000",
+                        "user-agent": "curl/7.71.1",
+                        "accept": "*/*",
+                        "content-length": "41",
+                        "content-type": "application/x-www-form-urlencoded"
+                      },
+                      "format": "json"
+                    },
+                    "body": {
+                      "type": "object",
+                      "description": "JSON object of body for this request; optional - only when passed",
+                      "example": {
+                        "key": "value"
+                      },
+                      "format": "json"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Misc"
+        ],
+        "summary": "Log request object",
+        "description": "Logs several values of request to console of server",
+        "responses": {
+          "200": {
+            "description": "version information regarding this application",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "maxLength": 60,
+                      "description": "url of this method",
+                      "example": "/api/url"
+                    },
+                    "method": {
+                      "type": "string",
+                      "description": "the method of this request",
+                      "example": "2000-01-01T10:15:02.151Z",
+                      "format": "date-time"
+                    },
+                    "headers": {
+                      "type": "object",
+                      "description": "JSON object of headers for this request",
+                      "example": {
+                        "host": "localhost:30000",
+                        "user-agent": "curl/7.71.1",
+                        "accept": "*/*",
+                        "content-length": "41",
+                        "content-type": "application/x-www-form-urlencoded"
+                      },
+                      "format": "json"
+                    },
+                    "body": {
+                      "type": "object",
+                      "description": "JSON object of body for this request; optional - only when passed",
+                      "example": {
+                        "key": "value"
+                      },
+                      "format": "json"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TimeEntry": {
+        "required": [
+          "direction",
+          "entry_date"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry_date": {
+            "type": "string",
+            "description": "The date this time entry represents",
+            "example": "2000-01-01T10:15:02.151Z",
+            "format": "date-time"
+          },
+          "last_changed": {
+            "type": "string",
+            "description": "Date of last change on this time entry",
+            "example": "2000-01-01T10:15:02.151Z",
+            "format": "date-time"
+          },
+          "direction": {
+            "type": "string",
+            "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+            "example": "enter",
+            "enum": [
+              "enter",
+              "go"
+            ]
+          },
+          "longitude": {
+            "type": "number",
+            "description": "the longitude geo coordinate",
+            "example": 10.875482
+          },
+          "latitude": {
+            "type": "number",
+            "description": "the latitude geo coordinate",
+            "example": 49.514135
+          }
+        }
+      },
+      "Geofence": {
+        "required": [
+          "id",
+          "enabled",
+          "longitude",
+          "latitude",
+          "radius",
+          "description",
+          "isCheckedIn",
+          "lastChange"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "identifier of this geofence",
+            "example": "6367e7c3a94ff60017d7c1ce"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "flag that indicates if the geo fence should trigger or not",
+            "example": true
+          },
+          "radius": {
+            "type": "number",
+            "description": "radius of the geofence within it matches",
+            "example": 150
+          },
+          "longitude": {
+            "type": "number",
+            "description": "the longitude geo coordinate",
+            "example": 10.875482
+          },
+          "latitude": {
+            "type": "number",
+            "description": "the latitude geo coordinate",
+            "example": 49.514135
+          },
+          "description": {
+            "type": "string",
+            "description": "A (unique) description of this geofence; name it after the location",
+            "example": "Home"
+          },
+          "isCheckedIn": {
+            "type": "boolean",
+            "description": "flag that indicates if one is chacked in at this geofence",
+            "example": false
+          },
+          "lastChange": {
+            "type": "string",
+            "format": "date",
+            "description": "date of last checkin or checkout",
+            "example": "2020-07-15T10:45:23.000Z"
+          }
+        }
+      },
+      "Geofences": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "required": [
+            "id",
+            "enabled",
+            "longitude",
+            "latitude",
+            "radius",
+            "description",
+            "isCheckedIn",
+            "lastChange"
+          ],
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "identifier of this geofence",
+              "example": "6367e7c3a94ff60017d7c1ce"
+            },
+            "enabled": {
+              "type": "boolean",
+              "description": "flag that indicates if the geo fence should trigger or not",
+              "example": true
+            },
+            "radius": {
+              "type": "number",
+              "description": "radius of the geofence within it matches",
+              "example": 150
+            },
+            "longitude": {
+              "type": "number",
+              "description": "the longitude geo coordinate",
+              "example": 10.875482
+            },
+            "latitude": {
+              "type": "number",
+              "description": "the latitude geo coordinate",
+              "example": 49.514135
+            },
+            "description": {
+              "type": "string",
+              "description": "A (unique) description of this geofence; name it after the location",
+              "example": "Home"
+            },
+            "isCheckedIn": {
+              "type": "boolean",
+              "description": "flag that indicates if one is chacked in at this geofence",
+              "example": false
+            },
+            "lastChange": {
+              "type": "string",
+              "format": "date",
+              "description": "date of last checkin or checkout",
+              "example": "2020-07-15T10:45:23.000Z"
+            }
+          }
+        }
+      },
+      "Geotrack": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "longitude": {
+            "type": "number",
+            "description": "the longitude geo coordinate",
+            "example": 10.875482
+          },
+          "latitude": {
+            "type": "number",
+            "description": "the latitude geo coordinate",
+            "example": 49.514135
+          },
+          "accuracy": {
+            "type": "number",
+            "description": "the accuracy of the position measurement in meter (radius)",
+            "example": 60
+          },
+          "source": {
+            "type": "string",
+            "description": "identifier of the sender of this request",
+            "example": "HASSIO"
+          },
+          "lon": {
+            "type": "number",
+            "description": "the longitude geo coordinate",
+            "example": 10.875482
+          },
+          "lat": {
+            "type": "number",
+            "description": "the latitude geo coordinate",
+            "example": 49.514135
+          },
+          "acc": {
+            "type": "number",
+            "description": "the accuracy of the position measurement in meter (radius)",
+            "example": 60
+          },
+          "altitude": {
+            "type": "number",
+            "description": "altitude of the position",
+            "example": 320
+          },
+          "tst": {
+            "type": "number",
+            "description": "unix timestamp of this event",
+            "example": 1594913160
+          },
+          "desc": {
+            "type": "string",
+            "description": "description (?)"
+          },
+          "tid": {
+            "type": "string",
+            "description": "some source identifier; sometimes its desc, sometimes its tid"
+          }
+        }
+      },
+      "GeotrackResp": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "longitude": {
+            "type": "number",
+            "description": "the longitude geo coordinate",
+            "example": 10.875482
+          },
+          "latitude": {
+            "type": "number",
+            "description": "the latitude geo coordinate",
+            "example": 49.514135
+          },
+          "accuracy": {
+            "type": "number",
+            "description": "the accuracy of the position measurement in meter (radius)",
+            "example": 60
+          },
+          "velocity": {
+            "type": "number",
+            "description": "the velocity in [m/s] between two points (this related to the last one in time)",
+            "example": 22.3
+          },
+          "timediff": {
+            "type": "number",
+            "description": "The time in [s] passed between two points (this related to the last one in time)",
+            "example": 11620
+          },
+          "dist": {
+            "type": "number",
+            "description": "The distance in [m] passed between two points (this related to the last one in time)",
+            "example": 320
+          },
+          "source": {
+            "type": "string",
+            "description": "identifier of the sender of this request",
+            "example": "HASSIO"
+          },
+          "altitude": {
+            "type": "number",
+            "description": "altitude of the position",
+            "example": 320
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "date of this entry in ISO format",
+            "example": "2020-07-15T10:45:23.000Z"
+          }
+        }
+      },
+      "GeotrackResponses": {
+        "type": "array",
+        "maxItems": 999999,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "description": "the longitude geo coordinate",
+              "example": 10.875482
+            },
+            "latitude": {
+              "type": "number",
+              "description": "the latitude geo coordinate",
+              "example": 49.514135
+            },
+            "accuracy": {
+              "type": "number",
+              "description": "the accuracy of the position measurement in meter (radius)",
+              "example": 60
+            },
+            "velocity": {
+              "type": "number",
+              "description": "the velocity in [m/s] between two points (this related to the last one in time)",
+              "example": 22.3
+            },
+            "timediff": {
+              "type": "number",
+              "description": "The time in [s] passed between two points (this related to the last one in time)",
+              "example": 11620
+            },
+            "dist": {
+              "type": "number",
+              "description": "The distance in [m] passed between two points (this related to the last one in time)",
+              "example": 320
+            },
+            "source": {
+              "type": "string",
+              "description": "identifier of the sender of this request",
+              "example": "HASSIO"
+            },
+            "altitude": {
+              "type": "number",
+              "description": "altitude of the position",
+              "example": 320
+            },
+            "date": {
+              "type": "string",
+              "format": "date",
+              "description": "date of this entry in ISO format",
+              "example": "2020-07-15T10:45:23.000Z"
+            }
+          }
+        }
+      },
+      "GeotrackMetaDataResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "size": {
+            "type": "number",
+            "description": "number of geo track entries for the given time span",
+            "example": 210
+          },
+          "totalDistance": {
+            "type": "number",
+            "description": "distance in meter of the given time span",
+            "example": 21232
+          },
+          "accuracy": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "mean": {
+                "type": "number",
+                "description": "mean of accuracies in meters of all geo locations",
+                "example": 114.232
+              },
+              "variance": {
+                "type": "number",
+                "description": "variance of accuracies in meters of all geo locations",
+                "example": 11.031
+              }
+            }
+          }
+        }
+      },
+      "TimeEntries": {
+        "type": "array",
+        "maxItems": 999999,
+        "items": {
+          "required": [
+            "direction",
+            "entry_date"
+          ],
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "entry_date": {
+              "type": "string",
+              "description": "The date this time entry represents",
+              "example": "2000-01-01T10:15:02.151Z",
+              "format": "date-time"
+            },
+            "last_changed": {
+              "type": "string",
+              "description": "Date of last change on this time entry",
+              "example": "2000-01-01T10:15:02.151Z",
+              "format": "date-time"
+            },
+            "direction": {
+              "type": "string",
+              "description": "direction of this time entry; representing, if the time entry means a coming or going event:\n * `go` - leaving\n * `enter` - entering\n",
+              "example": "enter",
+              "enum": [
+                "enter",
+                "go"
+              ]
+            },
+            "longitude": {
+              "type": "number",
+              "description": "the longitude geo coordinate",
+              "example": 10.875482
+            },
+            "latitude": {
+              "type": "number",
+              "description": "the latitude geo coordinate",
+              "example": 49.514135
+            }
+          }
+        }
+      },
+      "Toggle": {
+        "required": [
+          "name",
+          "notification",
+          "toggle"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "__TEST__",
+            "maxLength": 128,
+            "pattern": "^[\\w-.]"
+          },
+          "toggle": {
+            "type": "string",
+            "example": "false",
+            "maxLength": 128,
+            "pattern": "^[\\w-.]"
+          },
+          "notification": {
+            "type": "string",
+            "example": "some text",
+            "maxLength": 128,
+            "pattern": "^[\\w-.]"
+          }
+        }
+      },
+      "Toggles": {
+        "type": "array",
+        "maxItems": 999999,
+        "items": {
+          "required": [
+            "name",
+            "notification",
+            "toggle"
+          ],
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "__TEST__",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            },
+            "toggle": {
+              "type": "string",
+              "example": "false",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            },
+            "notification": {
+              "type": "string",
+              "example": "some text",
+              "maxLength": 128,
+              "pattern": "^[\\w-.]"
+            }
+          }
+        }
+      },
+      "Property": {
+        "required": [
+          "key",
+          "value"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 30,
+            "example": "de.nobio.timetracker.KEY_01"
+          },
+          "value": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 100,
+            "example": "this is a value"
+          }
+        }
+      },
+      "Properties": {
+        "type": "array",
+        "maxItems": 1000,
+        "items": {
+          "required": [
+            "key",
+            "value"
+          ],
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[\\w-.]",
+              "maxLength": 30,
+              "example": "de.nobio.timetracker.KEY_01"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^[\\w-.]",
+              "maxLength": 100,
+              "example": "this is a value"
+            }
+          }
+        }
+      },
+      "StatsEntryResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "firstEntry": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "_id": {
+                "type": "number",
+                "example": 0
+              },
+              "age": {
+                "type": "string",
+                "pattern": "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$",
+                "example": "2014-01-13T06:30:00.000Z"
+              }
+            }
+          },
+          "lastEntry": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "_id": {
+                "type": "number",
+                "example": 0
+              },
+              "age": {
+                "type": "string",
+                "pattern": "^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$",
+                "example": "2019-01-10T21:13:29.233Z"
+              }
+            }
+          }
+        }
+      },
+      "AggregatedStats": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "chart_data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "yScale": {
+                "type": "string",
+                "enum": [
+                  "linear"
+                ]
+              },
+              "xScale": {
+                "type": "string",
+                "enum": [
+                  "ordinal",
+                  "time"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bar",
+                  "line-dottet"
+                ]
+              },
+              "main": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "maxItems": 999999,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "comp": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "line"
+                    ]
+                  },
+                  "data": {
+                    "type": "array",
+                    "maxItems": 999999,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "AggregatedStatistics": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "chart_data": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "yScale": {
+                "type": "string",
+                "enum": [
+                  "linear"
+                ]
+              },
+              "xScale": {
+                "type": "string",
+                "enum": [
+                  "ordinal",
+                  "time"
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bar",
+                  "line-dottet"
+                ]
+              },
+              "yMin": {
+                "type": "number"
+              },
+              "main": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "y": {
+                        "type": "number"
+                      },
+                      "x": {
+                        "type": "number"
+                      },
+                      "n": {
+                        "type": "number"
+                      },
+                      "dev": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "comp": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "line"
+                    ]
+                  },
+                  "data": {
+                    "type": "array",
+                    "maxItems": 999999,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "UniqueUsers": {
+        "type": "array",
+        "maxItems": 999999,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "asdjas0sd-sdasdi-asdasd"
+            },
+            "username": {
+              "type": "string",
+              "example": "tester"
+            },
+            "name": {
+              "type": "string",
+              "example": "Tester"
+            },
+            "mailAddress": {
+              "type": "string",
+              "example": "albert@einstein.edu"
+            }
+          }
+        }
+      },
+      "UniqueUser": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "asdjas0sd-sdasdi-asdasd"
+          },
+          "username": {
+            "type": "string",
+            "example": "tester"
+          },
+          "name": {
+            "type": "string",
+            "example": "Tester"
+          },
+          "mailAddress": {
+            "type": "string",
+            "example": "albert@einstein.edu"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "username",
+          "name",
+          "mailAddress"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 60,
+            "example": "tester"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 100,
+            "example": "Tester"
+          },
+          "mailAddress": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 100,
+            "example": "albert@einstein.edu"
+          }
+        }
+      },
+      "FullUser": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 60,
+            "example": "Tester"
+          },
+          "password": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "format": "password",
+            "example": "jshHfu3ek=fDÖ",
+            "maxLength": 20
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 60,
+            "example": "Tester"
+          },
+          "mailAddress": {
+            "type": "string",
+            "pattern": "^[\\w-.]",
+            "maxLength": 100,
+            "example": "albert@einstein.edu"
+          }
+        }
+      },
+      "Token": {
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT",
+            "pattern": "^[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*\\.[A-Za-z0-9-_]*$",
+            "maxLength": 256,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          }
+        }
+      },
+      "VersionResp": {
+        "required": [
+          "version",
+          "last_build"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "version of this application",
+            "pattern": "^(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)$",
+            "example": "11.2.3"
+          },
+          "last_build": {
+            "type": "string",
+            "description": "date/time of last build",
+            "example": "2000-01-01T10:15:02.151Z",
+            "format": "date-time"
+          }
+        }
+      },
+      "HealthcheckResp": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "warn"
+            ],
+            "description": "Status of healthcheck. “pass”: healthy “fail”: unhealthy “warn”: healthy, with some concerns",
+            "example": "pass"
+          },
+          "version": {
+            "type": "string",
+            "description": "version of this application",
+            "pattern": "^(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)$",
+            "example": "11.2.3"
+          },
+          "time": {
+            "type": "string",
+            "description": "date/time of this health check",
+            "example": "2000-01-01T10:15:02.151Z",
+            "format": "date-time"
+          },
+          "details": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of this component",
+                  "example": "database"
+                },
+                "componentType": {
+                  "description": "Types of component.",
+                  "type": "string",
+                  "enum": [
+                    "component",
+                    "datastore",
+                    "system"
+                  ]
+                },
+                "metricUnit": {
+                  "description": "Unit of the measured metric value",
+                  "type": "string",
+                  "enum": [
+                    "ms",
+                    "s",
+                    "percent",
+                    "GiB",
+                    "MiB"
+                  ]
+                },
+                "metricValue": {
+                  "description": "the value of the given metricUnit. Needs to be a common data type to hold all other data types; currently it consists of time and byte and percentage",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LogResp": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "url of this method",
+            "example": "/api/url"
+          },
+          "method": {
+            "type": "string",
+            "description": "the method of this request",
+            "example": "2000-01-01T10:15:02.151Z",
+            "format": "date-time"
+          },
+          "headers": {
+            "type": "object",
+            "description": "JSON object of headers for this request",
+            "example": {
+              "host": "localhost:30000",
+              "user-agent": "curl/7.71.1",
+              "accept": "*/*",
+              "content-length": "41",
+              "content-type": "application/x-www-form-urlencoded"
+            },
+            "format": "json"
+          },
+          "body": {
+            "type": "object",
+            "description": "JSON object of body for this request; optional - only when passed",
+            "example": {
+              "key": "value"
+            },
+            "format": "json"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "keyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "api-key",
+        "description": "All requests must include the `api-key` header containing your account ID."
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Access token is missing or invalid; try to refresh your token"
+      }
+    }
+  }
+}

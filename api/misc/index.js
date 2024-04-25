@@ -12,10 +12,10 @@ const packageJson = require('../../package.json');
 exports.ping = async (req, res) => {
   const ip = (
     req.headers['cf-connecting-ip']
-        || req.headers['x-real-ip']
-        || req.headers['x-forwarded-for']
-        || (req.connection ? req.connection.remoteAddress : false)
-        || ''
+    || req.headers['x-real-ip']
+    || req.headers['x-forwarded-for']
+    || (req.connection ? req.connection.remoteAddress : false)
+    || ''
   ).split(',')[0].trim();
 
   res.status(200).json({
@@ -102,6 +102,11 @@ exports.healthcheck = async (req, res) => {
  * curl -X GET http://localhost:30000/api/experiment
  */
 exports.experiment = async (req, res) => {
+  console.log('================================== HEADERS ==================================');
+  console.log(req.headers);
+  console.log('=================================== BODY ==================================');
+  console.log(req.body);
+  console.log('===========================================================================');
   res.status(200).send('nothing to see here');
 };
 

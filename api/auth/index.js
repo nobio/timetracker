@@ -200,6 +200,7 @@ exports.authorize = async (req, res, next) => {
     || (req.method === 'GET' && req.url.startsWith('/api-docs'))
     || (req.method === 'GET' && req.url.startsWith('/ws'))
     || (req.url.startsWith('/api/log'))
+    || (req.url.startsWith('/api/experiment'))
   )) {
     // just continue...
     // console.log(`authorization disabled for ${req.url}`);
