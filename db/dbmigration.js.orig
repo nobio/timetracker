@@ -65,7 +65,7 @@ async function getDataFromSource(source) {
   }
 }
 
-const deleteTarget = async (target) => {
+async function deleteTarget(target) {
   try {
     console.log('connecting to target database');
     console.log(`deleting target data of ${target.modelName} in target`);
@@ -74,14 +74,14 @@ const deleteTarget = async (target) => {
   } catch (error) {
     throw new Error(error);
   }
-};
+}
 
 /**
  * Stores the data to target data srouce read from source data source
  *
  * @param {entries} entries
  */
-const storeDataToTarget = async (entries, target) => {
+async function storeDataToTarget(entries, target) {
   console.log(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
@@ -92,55 +92,84 @@ const storeDataToTarget = async (entries, target) => {
 
   mongoose.connection.close();
   return (`${entries.length} elements saved`);
+}
+
+const deleteAll = async () => {
+  Promise.allSettled([
+    deleteTarget(USER_TARGET),
+    deleteTarget(FAILURE_MODEL_TARGET),
+    deleteTarget(TOGGLE_TARGET),
+    deleteTarget(TOKEN_TARGET),
+    deleteTarget(PROPS_TARGET),
+    deleteTarget(STATSDAY_MODEL_TARGET),
+    deleteTarget(GEO_FENCE_MODEL_TARGET),
+    deleteTarget(TIME_ENTRY_MODEL_TARGET),
+    deleteTarget(GEO_TRACKING_MODEL_TARGET),
+  ]).catch(console.error);
+};
+const storeAll = async () => {
+  Promise.allSettled([
+    storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET),
+    storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET),
+    storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET),
+    storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(GEO_FENCE_MODEL_SOURCE), GEO_FENCE_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET),
+  ]).catch(console.error);
 };
 
 const app = async () => {
   try {
     console.time('backup User');
-    await deleteTarget(USER_TARGET);
+    await deleteAll();
+    await storeAll();
+    /*
+    await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
     console.timeEnd('backup User'); process.stdout.write('\n');
 
     console.time('failures');
-    await deleteTarget(FAILURE_MODEL_TARGET);
+    await deleteAllTarget(FAILURE_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET);
     console.timeEnd('failures'); process.stdout.write('\n');
 
     console.time('toggles');
-    await deleteTarget(TOGGLE_TARGET);
+    await deleteAllTarget(TOGGLE_TARGET);
     await storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET);
     console.timeEnd('toggles'); process.stdout.write('\n');
 
     console.time('token');
-    await deleteTarget(TOKEN_TARGET);
+    await deleteAllTarget(TOKEN_TARGET);
     await storeDataToTarget(await getDataFromSource(TOKEN_SOURCE), TOKEN_TARGET);
     console.timeEnd('token'); process.stdout.write('\n');
 
     console.time('properties');
-    await deleteTarget(PROPS_TARGET);
+    await deleteAllTarget(PROPS_TARGET);
     await storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET);
     console.timeEnd('properties'); process.stdout.write('\n');
 
     console.time('system status');
-    await deleteTarget(STATSDAY_MODEL_TARGET);
+    await deleteAllTarget(STATSDAY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET);
     console.timeEnd('system status'); process.stdout.write('\n');
 
     console.time('geofences');
-    await deleteTarget(GEO_FENCE_MODEL_TARGET);
+    await deleteAllTarget(GEO_FENCE_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(GEO_FENCE_MODEL_SOURCE), GEO_FENCE_MODEL_TARGET);
     console.timeEnd('geofences'); process.stdout.write('\n');
 
     console.time('time entries');
-    await deleteTarget(TIME_ENTRY_MODEL_TARGET);
+    await deleteAllTarget(TIME_ENTRY_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET);
     console.timeEnd('time entries'); process.stdout.write('\n');
 
     console.time('geo tracking');
-    await deleteTarget(GEO_TRACKING_MODEL_TARGET);
+    await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
     console.timeEnd('geo tracking'); process.stdout.write('\n');
-
+    */
     process.exit(0);
   } catch (err) {
     console.error(err);
