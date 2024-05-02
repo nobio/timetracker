@@ -16,12 +16,12 @@ const models = require('./models');
 const MONGO_URL_QNAP = 'mongodb://192.168.178.23:27017/timetracker';
 const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nobiocluster.arj0i.mongodb.net/timetrack?retryWrites=true&w=majority';
 const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
-const MONGO_URL_STRATO = 'mongodb://h3001733.stratoserver.net:27017/timetracker';
+const MONGO_URL_HETZNER = 'mongodb://88.198.110.159:27017/timetracker';
 
 const MONGO_URL_SOURCE = MONGO_URL_QNAP;
 // const MONGO_URL_TARGET = MONGO_URL_K8S;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
-// const MONGO_URL_TARGET = MONGO_URL_STRATO;
+// const MONGO_URL_TARGET = MONGO_URL_HETZNER;
 
 console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
@@ -47,7 +47,6 @@ const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 const TOKEN_SOURCE = connectionSource.model('Token', models.Token);
 const TOKEN_TARGET = connectionTarget.model('Token', models.Token);
 
-
 console.log('--------------------------------------------------------------- \n');
 console.log('Backing up mongodb');
 console.log('\n--------------------------------------------------------------- ');
@@ -66,7 +65,7 @@ async function getDataFromSource(source) {
   }
 }
 
-async function deleteAllTarget(target) {
+async function deleteTarget(target) {
   try {
     console.log('connecting to target database');
     console.log(`deleting target data of ${target.modelName} in target`);
@@ -95,9 +94,38 @@ async function storeDataToTarget(entries, target) {
   return (`${entries.length} elements saved`);
 }
 
+const deleteAll = async () => {
+  Promise.allSettled([
+    deleteTarget(USER_TARGET),
+    deleteTarget(FAILURE_MODEL_TARGET),
+    deleteTarget(TOGGLE_TARGET),
+    deleteTarget(TOKEN_TARGET),
+    deleteTarget(PROPS_TARGET),
+    deleteTarget(STATSDAY_MODEL_TARGET),
+    deleteTarget(GEO_FENCE_MODEL_TARGET),
+    deleteTarget(TIME_ENTRY_MODEL_TARGET),
+    deleteTarget(GEO_TRACKING_MODEL_TARGET),
+  ]).catch(console.error);
+};
+const storeAll = async () => {
+  Promise.allSettled([
+    storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET),
+    storeDataToTarget(await getDataFromSource(FAILURE_MODEL_SOURCE), FAILURE_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(TOGGLE_SOURCE), TOGGLE_TARGET),
+    storeDataToTarget(await getDataFromSource(PROPS_SOURCE), PROPS_TARGET),
+    storeDataToTarget(await getDataFromSource(STATSDAY_MODEL_SOURCE), STATSDAY_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(GEO_FENCE_MODEL_SOURCE), GEO_FENCE_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(TIME_ENTRY_MODEL_SOURCE), TIME_ENTRY_MODEL_TARGET),
+    storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET),
+  ]).catch(console.error);
+};
+
 const app = async () => {
   try {
     console.time('backup User');
+    await deleteAll();
+    await storeAll();
+    /*
     await deleteAllTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
     console.timeEnd('backup User'); process.stdout.write('\n');
@@ -141,7 +169,7 @@ const app = async () => {
     await deleteAllTarget(GEO_TRACKING_MODEL_TARGET);
     await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE), GEO_TRACKING_MODEL_TARGET);
     console.timeEnd('geo tracking'); process.stdout.write('\n');
-
+    */
     process.exit(0);
   } catch (err) {
     console.error(err);
