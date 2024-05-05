@@ -32,7 +32,7 @@ const deleteOldDumpfiles = async () => {
     const fileNames = await fs.readdirSync(DUMP_DIR);
 
     for (const fileName of fileNames) {
-      const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');;
+      const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');
       const diffDays = Math.floor(moment().diff(fileDate) / 86400000);
       // console.log(moment(), fileDate, diffDays)
       if (diffDays > 31) {
@@ -41,9 +41,7 @@ const deleteOldDumpfiles = async () => {
     }
   }
 };
-exports.testWrapperDeleteOldDumpfiles = async () => {
-  return deleteOldDumpfiles();
-}
+exports.testWrapperDeleteOldDumpfiles = async () => deleteOldDumpfiles();
 
 /**
  * dumps one model
@@ -72,9 +70,7 @@ const dumpModel = async (model) => {
     });
   });
 };
-exports.testWrapperDumpModel = async (model) => {
-  return dumpModel(model);
-}
+exports.testWrapperDumpModel = async (model) => dumpModel(model);
 
 /**
  * returns the latest file of a typ within a directory
@@ -95,7 +91,7 @@ const recentFile = (dir, type) => {
  */
 const restoreFile = async (dbType) => {
   const f = recentFile(DUMP_DIR, dbType);
-  if(!f) return;
+  if (!f) return;
 
   const Model = mongoose.model(dbType);
   const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
@@ -127,7 +123,7 @@ const restoreFile = async (dbType) => {
  * function dump the whole database to a file. This file is located in the "dump" folder
  */
 exports.dumpModels = async () => {
-  console.log(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) ---------------------`);
+  console.info(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) ---------------------`);
   if (isDumpRunning) return;
   isDumpRunning = true;
 
@@ -135,6 +131,7 @@ exports.dumpModels = async () => {
   for (const model of MODELS) {
     res.push(await dumpModel(mongoose.model(model)));
   }
+  isDumpRunning = false;
   return res;
 };
 
@@ -151,7 +148,7 @@ exports.restoreDataFromFile = async () => {
 };
 
 exports.backupTimeEntries = async () => {
-  console.log(`------------------- BACKUP DATA TO BACKUP TABLE (${isBackupRunning}) ---------------------`);
+  console.info(`------------------- BACKUP DATA TO BACKUP TABLE (${isBackupRunning}) ---------------------`);
   if (isBackupRunning) return;
   isBackupRunning = true;
 
