@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-restricted-syntax */
 /**
