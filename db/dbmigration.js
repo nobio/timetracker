@@ -18,10 +18,12 @@ const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nob
 const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
 const MONGO_URL_HETZNER = 'mongodb://88.198.110.159:27017/timetracker';
 
-const MONGO_URL_SOURCE = MONGO_URL_QNAP;
+// const MONGO_URL_SOURCE = MONGO_URL_QNAP;
+const MONGO_URL_SOURCE = MONGO_URL_HETZNER;
 // const MONGO_URL_TARGET = MONGO_URL_K8S;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
 // const MONGO_URL_TARGET = MONGO_URL_HETZNER;
+
 
 console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-restricted-syntax */
@@ -14,7 +16,7 @@ const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 
 const DUMP_DIR = './dump';
-const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
+const MODELS = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 let isBackupRunning = false;
 let isDumpRunning = false;
@@ -102,16 +104,11 @@ const restoreFile = async (dbType) => {
     });
   });
   // const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
-  // eslint-disable-next-line no-restricted-syntax
+  console.log(`>>>>>>> ${Model.modelName} >>>>>>>`);
   await Model.deleteMany({});
-  for (const item of data) {
-    try {
-      await new Model(item).save();
-      console.log(`model ${Model.modelName} ${item._id} saved`);
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
+  await Model.insertMany(data);
+  console.log(`<<<<<<< ${Model.modelName} <<<<<<<`);
+
   return dbType;
 };
 
