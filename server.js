@@ -1,3 +1,5 @@
+/* eslint-disable no-cond-assign */
+/* eslint-disable no-constant-condition */
 /* eslint-disable no-console */
 /**
  * Module dependencies.
@@ -175,6 +177,14 @@ if (process.env.SLACK_URL) {
   console.log('using Slack to notify');
 } else {
   console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
+}
+// .......................................................................
+// Check MinIO
+// .......................................................................
+if (process.env.MINIO_ACTIVE = 'true') {
+  console.log('using MinIO to save and read database objects');
+} else {
+  console.log('MinIO is not used. If you want to use MinIO please set process.env.MINIO_ACTIVE to true');
 }
 
 // .......................................................................
