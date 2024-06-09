@@ -1,4 +1,3 @@
-version: "3"
 services:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # timetracker-ui - the frontend
@@ -24,6 +23,7 @@ services:
     image: nobio/timetracker:master
     env_file:
       - .env
+      - .env_overwrite
     volumes:
       # in-host:in-container
       - ./dump:/usr/src/app/dump
@@ -35,7 +35,7 @@ services:
     depends_on:
       - mongo
       - minio
-      - jaeger
+      #- jaeger
     networks:
       - network-nobio
 
@@ -50,7 +50,7 @@ services:
   mongo:
     container_name: mongo
     restart: always
-    image: mongo:4.4
+    image: mongo:5.0.26
     volumes:
       # in-host:in-container
       - ./data:/data/db
@@ -70,6 +70,54 @@ services:
       - mongo
     ports:
       - "30031:3001"
+    networks:
+      - network-nobio
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # minio: S3 compatible storage
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  minio-init:
+    image: minio/mc
+    container_name: minio-init
+    restart: on-failure:3
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set ${MINIO_TARGET} http://${MINIO_HOST}:${MINIO_PORT} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc admin user add ${MINIO_TARGET} ${MINIO_TECH_USER} ${MINIO_TECH_USERPASSWD};
+      mc admin group add ${MINIO_TARGET} ${MINIO_TECH_GROUP} ${MINIO_TECH_USER};
+      mc admin policy attach ${MINIO_TARGET} readwrite --group ${MINIO_TECH_GROUP};
+      mc mb -p ${MINIO_TARGET}/${MINIO_DEFAULT_BUCKET};
+      mc version suspend ${MINIO_TARGET}/${MINIO_DEFAULT_BUCKET};
+      mc admin user svcacct add ${MINIO_TARGET} ${MINIO_TECH_USER} --access-key ${MINIO_ACCESS_KEY} --secret-key ${MINIO_SECRET_KEY} --name "Access_for_${MINIO_TECH_USER}";
+      exit 0;
+      "
+      volumes:
+        - ./minio_storage:/data
+      env_files:
+        - .env
+        - .env_overwritey
+      networks:
+        - nobio-network
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./minio_storage:/data
+    env_file:
+      - .env
+      - .env_overwrite
+    command: server --console-address ":9001" /data
     networks:
       - network-nobio
 
@@ -95,36 +143,6 @@ services:
     networks:
       - network-nobio
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # minio: S3 compatible storage
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  minio:
-    image: minio/minio
-    container_name: minio
-    restart: always
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_storage:/data
-    env_file:
-      - .env
-    command: server --console-address ":9001" /data
-    networks:
-      - network-nobio
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # mongo-gui: possible alternative to monog-admin frontend (supports only one database)
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  #mongo-gui:
-  #  container_name: "mongo-gui"
-  #  image: ugleiton/mongo-gui
-  #  restart: always
-  #  ports:
-  #    - "4321:4321"
-  #  environment:
-  #    - MONGO_URL=mongodb://192.168.178.23:27017
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # network definition
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,4 +152,5 @@ networks:
     name: nobio-network
 
 volumes:
-  minio_storage: {}
+  minio_storage:
+    external: false
