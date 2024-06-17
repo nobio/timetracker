@@ -80,9 +80,7 @@ const downloadObject = async (objectName) => {
       chunks.push(chunk);
     }
 
-    const responseBuffer = Buffer.concat(chunks);
-    const dataArray = JSON.parse(responseBuffer.toString('utf-8'));
-    return dataArray;
+    return JSON.parse(Buffer.concat(chunks).toString('utf-8'));
   } catch (error) {
     console.log(error);
     return error.message;
@@ -97,7 +95,8 @@ const restore = async (objectName, objectArray) => {
   try {
     const Model = mongoose.model(objectName);
     await Model.deleteMany({});
-    await Model.collection.insertMany(objectArray);
+    const r = await Model.collection.insertMany(objectArray);
+    console.log(r);
   } catch (error) {
     console.error(error);
   }
@@ -109,7 +108,6 @@ exports.dumpModels = async () => {
   isDumpRunning = true;
 
   const res = [];
-
   for (const modelType of MODELS) {
     const Model = mongoose.model(modelType);
     const entries = await Model.find();
@@ -130,3 +128,29 @@ exports.restoreFromS3 = async () => {
 
   return res;
 };
+
+const deleteBucketAndAllObjects = async () => new Promise((resolve, reject) => {
+  const objectsList = [];
+
+  // List all object paths in bucket my-bucketname.
+  const objectsStream = minioClient.listObjects(BUCKET_NAME, '', true);
+
+  objectsStream.on('data', (obj) => {
+    objectsList.push(obj.name);
+  });
+
+  objectsStream.on('error', (err) => {
+    console.log(err);
+    reject(err);
+  });
+
+  objectsStream.on('end', () => {
+    minioClient.removeObjects(BUCKET_NAME, objectsList, (err) => {
+      if (err) {
+        rejcet('Unable to remove Objects ', e);
+      }
+      minioClient.removeBucket(BUCKET_NAME)
+        .then(resolve('Removed the objects successfully'));
+    });
+  });
+});

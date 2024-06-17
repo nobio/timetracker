@@ -3,6 +3,7 @@ const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
 const geofence = require('../admin/util-geofences');
+const dump = require('../admin'); // the dumpModel checks the env parameter MINIO_ACTIVE and uses minio or file
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -20,7 +21,7 @@ exports.schedule = (req, res) => {
       break;
 
     case 'DUMP_MODELS':
-      admin.dumpModels().then(res.status(200).send('dump models to database ok')).catch((err) => console.error(err));
+      dump.dumpModels().then(res.status(200).send('dump models to database ok')).catch((err) => console.error(err));
       break;
 
     case 'BACKUP_TIME_ENTRIES':
