@@ -4,6 +4,7 @@ const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');
 const auth = require('../auth/util-auth');
 const geofence = require('../admin/util-geofences');
+const dumpster = require('../admin');
 
 /**
  * start scheduler to run tasks
@@ -19,7 +20,7 @@ exports.scheduleTasks = function () {
   console.log('job scheduler: dumpModels (every day at 12:05)');
   scheduler.scheduleJob({ hour: 12, minute: 5 }, () => { // every day at 12:05
     console.log('scheduled task "dumpModels" started');
-    admin.dumpModels().catch((err) => console.error(err));
+    dumpster.dumpModels().catch((err) => console.error(err));
   });
 
   console.log('job scheduler: backupTimeEntry (every hour at 10 past (??:10)');
