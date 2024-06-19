@@ -59,7 +59,7 @@
         "morgan": "^1.10.0",
         "node-schedule": "^2.1.1",
         "swagger-ui-express": "^5.0.0",
-        "ws": "^8.16.0"
+        "ws": "^8.17.1"
     },
     "engines": {
         "node": "^21"
