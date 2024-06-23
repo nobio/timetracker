@@ -9,18 +9,18 @@ const utilMinio = require('./util-minio');
  *
  * curl -X POST http://localhost:30000/api/entries/dump
  */
-exports.dumpModels = (req, res) => {
+exports.dumpModels = async (req, res) => {
+  this.dumpModelsInternally()
+    .then((response) => res.status(201).send(response))
+    .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+};
+exports.dumpModelsInternally = async () => {
   if (process.env.MINIO_ACTIVE === 'true') {
     // dump to S3-Storage
-    utilMinio.dumpModels()
-      .then((response) => res.status(201).send(response))
-      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
-  } else {
-    // dump to file system
-    util.dumpModels()
-      .then((response) => res.status(200).send(response))
-      .catch((err) => res.status(500).send(`Error while dumping data: ${err}`));
+    return utilMinio.dumpModels();
   }
+  // dump to file system
+  return util.dumpModels();
 };
 
 /**

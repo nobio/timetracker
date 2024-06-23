@@ -25,13 +25,13 @@ let minioClient = connectMinioClient();
 // Ensure the bucket exists
 minioClient.bucketExists(BUCKET_NAME)
   .then((buckExists) => {
-    if (buckExists) { console.log(`Bucket "${BUCKET_NAME}" already exists.`); } else {
+    if (buckExists) { console.log(`S3 bucket "${BUCKET_NAME}" already exists.`); } else {
       // Create the bucket if it does not exist
       minioClient.makeBucket(BUCKET_NAME, '', (error) => {
         if (error) {
-          console.log(`Error creating bucket ${BUCKET_NAME}: `, err);
+          console.log(`Error creating S3 bucket ${BUCKET_NAME}: `, err);
         }
-        console.log(`Bucket ${BUCKET_NAME} + created successfully.`);
+        console.log(`S3 Bucket ${BUCKET_NAME} + created successfully.`);
       });
     }
   })
@@ -61,7 +61,7 @@ const upload = async (objectName, object) => {
     const ojbBuffer = Buffer.from(JSON.stringify(object));
     // await minioClient.removeObject(bucket, objectName);
     const objInfo = await minioClient.putObject(BUCKET_NAME, objectName, ojbBuffer, metaData);
-    console.log(`${objectName} uploaded successfully to ${BUCKET_NAME}: ${JSON.stringify(objInfo)}`);
+    console.log(`${objectName} uploaded successfully to S3 bucket ${BUCKET_NAME}: ${JSON.stringify(objInfo)}`);
 
     return `${objectName} uploaded successfully`;
   } catch (error) {
@@ -109,11 +109,19 @@ exports.dumpModels = async () => {
 
   const res = [];
   for (const modelType of MODELS) {
-    const Model = mongoose.model(modelType);
-    const entries = await Model.find();
-    res.push(await upload(modelType, entries));
+    let result;
+    try {
+      const Model = mongoose.model(modelType);
+      const entries = await Model.find();
+      result = await upload(modelType, entries);
+      res.push(result);
+    } catch (error) {
+      res.push(`${modelType} could not be stored`);
+      console.error(error);
+    }
   }
   isDumpRunning = false;
+  console.log(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) DONE ---------------------`);
   return res;
 };
 

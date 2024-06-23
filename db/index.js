@@ -7,7 +7,7 @@ const MONGODB_OPTIONS = {
   // reconnectTries: 1000,
   // reconnectInterval: 500,
   // poolSize: 5,
-  keepAlive: true,
+  // keepAlive: true,
   // bufferMaxEntries: -1,
   // useCreateIndex: true,
   useNewUrlParser: true,

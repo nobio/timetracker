@@ -129,6 +129,7 @@ exports.dumpModels = async () => {
     res.push(await dumpModel(mongoose.model(model)));
   }
   isDumpRunning = false;
+  console.info(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) DONE ---------------------`);
   return res;
 };
 
