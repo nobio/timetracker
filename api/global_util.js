@@ -9,6 +9,7 @@ const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 // const BAADERBANK_BREAK_TIME_SECONDS = 60 * 60; // 60 min Pause
+exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 /**
  * calculates the break time dependeing on the date (needed to use the right employer) and

@@ -5,8 +5,9 @@
 /* eslint-disable no-restricted-syntax */
 const Minio = require('minio');
 const mongoose = require('mongoose');
+const gUtil = require('../global_util');
 
-const MODELS = ['User', 'StatsDay', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'TimeEntry', 'GeoTracking'];
+const { MODEL_TYPES } = gUtil;
 const BUCKET_NAME = process.env.MINIO_DEFAULT_BUCKET;
 let isDumpRunning = false;
 
@@ -108,7 +109,7 @@ exports.dumpModels = async () => {
   isDumpRunning = true;
 
   const res = [];
-  for (const modelType of MODELS) {
+  for (const modelType of MODEL_TYPES) {
     let result;
     try {
       const Model = mongoose.model(modelType);
@@ -125,9 +126,11 @@ exports.dumpModels = async () => {
   return res;
 };
 
+exports.getDumpedModelFromS3 = async (modelType) => await downloadObject(modelType);
+
 exports.restoreFromS3 = async () => {
   const res = [];
-  for (const modelType of MODELS) {
+  for (const modelType of MODEL_TYPES) {
     const objJsonArray = await downloadObject(modelType);
     await restore(modelType, objJsonArray);
 

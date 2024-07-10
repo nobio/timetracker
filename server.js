@@ -7,12 +7,7 @@
 require('dotenv').config();
 
 const rateLimit = require('express-rate-limit');
-
-const limiter = rateLimit({
-  windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
-  max: process.env.RATE_LIMIT_RQEUESTS,
-});
-
+const compression = require('compression');
 const express = require('express');
 const http = require('http');
 const https = require('https');
@@ -48,7 +43,11 @@ app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:us
 app.use(express.json());
 app.use(cookieParser());
 // apply rate limiter to all requests
-// app.use(limiter);
+
+app.use(rateLimit({
+  windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
+  max: process.env.RATE_LIMIT_RQEUESTS,
+}));
 
 app.use(cors());
 app.use(api_auth.authorize);
@@ -70,7 +69,16 @@ app.configure('production', function() {
   app.use(express.errorHandler());
 });
 */
-
+app.use(compression({
+  filter(req, res) {
+    if (req.headers['x-no-compression']) {
+      // don't compress responses with this request header
+      return false;
+    }
+    // fallback to standard filter function
+    return compression.filter(req, res);
+  },
+}));
 // -------------- SWAGGER ------------------------------------------------
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------
@@ -104,6 +112,7 @@ app.delete('/api/geofences/:id', api_admin.deleteGeofence);
 // admin
 // .......................................................................
 app.post('/api/entries/dump', api_admin.dumpModels);
+app.get('/api/entries/dump/:modelType', api_admin.getDumpedModels);
 app.post('/api/entries/backup', api_admin.backupTimeEntries);
 app.post('/api/entries/restore', api_admin.restore);
 

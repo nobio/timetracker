@@ -16,7 +16,7 @@ const TimeEntry = mongoose.model('TimeEntry');
 const TimeEntryBackup = mongoose.model('TimeEntryBackup');
 
 const DUMP_DIR = './dump';
-const MODELS = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
+const MODELS = gUtil.MODEL_TYPES;
 
 let isBackupRunning = false;
 let isDumpRunning = false;

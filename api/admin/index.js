@@ -1,3 +1,6 @@
+const gUtils = require('../global_util');
+
+const { MODEL_TYPES } = gUtils;
 const util = require('./util-admin');
 const utilToggles = require('./util-toggles');
 const utilProps = require('./util-properties');
@@ -23,6 +26,23 @@ exports.dumpModelsInternally = async () => {
   return util.dumpModels();
 };
 
+/**
+ * returns an array of JSON objects containing the latest dumped data
+ * curl -X GET http://localhost:30000/api/entries/dump
+ */
+exports.getDumpedModels = async (req, res) => {
+  const { modelType } = req.params;
+
+  let data;
+  if (MODEL_TYPES.includes(modelType)) {
+    if (process.env.MINIO_ACTIVE === 'true') {
+      data = await utilMinio.getDumpedModelFromS3(modelType);
+    } else {
+      data = await util.getDumpedModel();
+    }
+    res.status(200).send(data);
+  } else res.status(404).send(`modelType "${modelType}" not found`);
+};
 /**
  * restores data from lastest written file, exported by dumModels method
  *
