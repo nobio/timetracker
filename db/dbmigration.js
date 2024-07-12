@@ -18,12 +18,8 @@ const MONGO_URL_ATLAS = 'mongodb+srv://timetracker-user:cyfgeq-mypnu9-vozFyv@nob
 const MONGO_URL_K8S = 'mongodb://mongouser:mongopassword@192.168.64.2:30001';
 const MONGO_URL_HETZNER = 'mongodb://88.198.110.159:27017/timetracker';
 
-// const MONGO_URL_SOURCE = MONGO_URL_QNAP;
 const MONGO_URL_SOURCE = MONGO_URL_HETZNER;
-// const MONGO_URL_TARGET = MONGO_URL_K8S;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
-// const MONGO_URL_TARGET = MONGO_URL_HETZNER;
-
 
 console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
@@ -67,7 +63,7 @@ async function getDataFromSource(source) {
   }
 }
 
-const deleteTarget = async (target) => {
+async function deleteTarget(target) {
   try {
     console.log('connecting to target database');
     console.log(`deleting target data of ${target.modelName} in target`);
@@ -76,14 +72,14 @@ const deleteTarget = async (target) => {
   } catch (error) {
     throw new Error(error);
   }
-};
+}
 
 /**
  * Stores the data to target data srouce read from source data source
  *
  * @param {entries} entries
  */
-const storeDataToTarget = async (entries, target) => {
+async function storeDataToTarget(entries, target) {
   console.log(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
@@ -94,11 +90,10 @@ const storeDataToTarget = async (entries, target) => {
 
   mongoose.connection.close();
   return (`${entries.length} elements saved`);
-};
+}
 
 const app = async () => {
   try {
-    console.time('backup User');
     await deleteTarget(USER_TARGET);
     await storeDataToTarget(await getDataFromSource(USER_SOURCE), USER_TARGET);
     console.timeEnd('backup User'); process.stdout.write('\n');
