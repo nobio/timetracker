@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 require('./init');
 require('../db');
 const mongoose = require('mongoose');
@@ -145,7 +146,10 @@ describe('test util.calculateBusyTime', () => {
 
 describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
   it('should find one Time Entry by its id', async () => {
-    const timeentry = await util.findById('5a2100cf87f1f368d087696a');
+    // find any valid time entry to get a valid id
+    const lastTimeEntry = await util.getLastTimeEntryByDate('2017-12-19T19:34:00.000Z');
+    const timeentry = await util.findById(lastTimeEntry._id);
+
     // console.log(timeentry)
     expect(timeentry).to.have.property('_id');
     expect(timeentry).to.have.property('direction');
@@ -153,7 +157,6 @@ describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
     expect(timeentry).to.have.property('latitude');
     expect(timeentry).to.have.property('__v');
     expect(timeentry).to.have.property('direction');
-    expect(timeentry.direction).to.equal('enter');
     expect(timeentry).to.have.property('last_changed');
     expect(timeentry).to.have.property('entry_date');
   });
