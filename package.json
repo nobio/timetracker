@@ -13,7 +13,8 @@
         "lint-fix": "eslint --fix",
         "lint": "eslint",
         "build": "node bin/increase_build",
-        "backup": "node db/dbmigration -f"
+        "backup": "node db/dbmigration -f",
+        "backup-hetzner": "node db/dbmigrationS3 -f"
     },
     "devDependencies": {
         "chai": "^4.3.10",
