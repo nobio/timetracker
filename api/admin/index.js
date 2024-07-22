@@ -38,7 +38,7 @@ exports.getDumpedModels = async (req, res) => {
     if (process.env.MINIO_ACTIVE === 'true') {
       data = await utilMinio.getDumpedModelFromS3(modelType);
     } else {
-      data = await util.getDumpedModel();
+      data = await util.getDumpedModel(modelType);
     }
     res.status(200).send(data);
   } else res.status(404).send(`modelType "${modelType}" not found`);

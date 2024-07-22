@@ -126,7 +126,7 @@ exports.dumpModels = async () => {
   return res;
 };
 
-exports.getDumpedModelFromS3 = async (modelType) => await downloadObject(modelType);
+exports.getDumpedModel = async (modelType) => await downloadObject(modelType);
 
 exports.restoreFromS3 = async () => {
   const res = [];

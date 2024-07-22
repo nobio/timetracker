@@ -111,6 +111,25 @@ const restoreFile = async (dbType) => {
 
   return dbType;
 };
+const downloadObject = async (dbType) => {
+  try {
+    const f = recentFile(DUMP_DIR, dbType);
+    if (!f) return;
+
+    const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
+    const data = await new Promise((resolve, reject) => {
+      zlib.gunzip(buffer, (err, buf) => {
+        if (err) reject(err);
+        else resolve(JSON.parse(buf.toString('utf-8')));
+      });
+    });
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    return error.message;
+  }
+};
 
 /* ====================================================================================== */
 /* ======================================== IMPL ================================= */
@@ -179,3 +198,5 @@ exports.backupTimeEntries = async () => {
     isBackupRunning = false;
   }
 };
+
+exports.getDumpedModel = async (modelType) => await downloadObject(modelType);
