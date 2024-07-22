@@ -303,6 +303,40 @@ paths:
                 additionalProperties: false
         "403":
           $ref: "#/components/responses/UnauthorizedError"
+  /entries/dump/{modelType}:
+    get:
+      tags:
+        - TimeEntries
+      summary: Get time entrys from the set of last dumped data with given modelType
+      parameters:
+        - name: modelType
+          in: path
+          description: Model Type reflected by mongoose model
+          required: true
+          schema:
+            type: string
+            enum:
+              - User
+              - StatsDay
+              - Toggle
+              - Properties
+              - GeoFence
+              - FailureDay
+              - TimeEntry
+              - GeoTracking
+      responses:
+        "200":
+          description: TimeEntry is found
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of JSON objects representing the data of requested modelType
+                items:
+                  type: object
+                  description: JSON object representing the data of requested modelType
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
   /entries/restore:
     post:
       tags:
