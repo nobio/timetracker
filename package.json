@@ -64,7 +64,7 @@
         "ws": "^8.17.1"
     },
     "engines": {
-        "node": "^21"
+        "node": "^22"
     },
     "repository": {
         "type": "git",
