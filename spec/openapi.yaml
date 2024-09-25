@@ -432,6 +432,30 @@ paths:
         "500":
           description: something went wrong...
           content: {}
+  /entries/mark:
+    post:
+      tags:
+        - TimeEntries
+      summary: Mark the day as vacation or sick leave
+      description: Mark the day as vacation or sick leave (i.e. create two entries with this mark)
+      requestBody:
+        description: Time entry that we want to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mark-a-Day"
+        required: false
+
+      responses:
+        "200":
+          description: data sucessfully restored
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+        "403":
+          $ref: "#/components/responses/UnauthorizedError"
   #  /geofence:
   #    post:
   #      tags:
@@ -1918,6 +1942,26 @@ components:
           maxLength: 256
           example: >-
             eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    Mark-a-Day:
+      type: object
+      required:
+        - mark
+      additionalProperties: false
+      properties:
+        entry_date:
+          type: string
+          description: The date this time entry represents; if not provided "today" will be used
+          example: "2000-01-01T10:15:02.151Z"
+          format: date
+        mark:
+          type: string
+          enum:
+            - vacation
+            - sick-leave
+          description: >-
+            Marker that indicates the reason
+          example: sick-leave
+
     VersionResp:
       required:
         - version

@@ -93,7 +93,7 @@ app.put('/api/entries/:id', api_entries.saveEntry);
 app.delete('/api/entries/:id', api_entries.deleteEntry);
 app.post('/api/entries/error/evaluate', api_entries.evaluate);
 app.get('/api/entries/error/dates', api_entries.getErrorDates);
-
+app.post('/api/entries/mark', api_entries.markADay);
 // .......................................................................
 // geofencing
 // .......................................................................

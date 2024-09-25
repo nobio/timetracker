@@ -5,3 +5,18 @@ GET http://localhost:30000/api/entries/52d38dcdbe2c010000000001
 GET http://localhost:30000/api/entries?dt=1702910377179
 ###
 GET http://localhost:30000/api/entries?busy=1702910377179
+###
+POST http://localhost:30000/api/entries/mark
+Content-Type: application/json
+
+{
+    "entry_date": "2023-09-24",
+    "mark": "sick-leave"
+}
+###
+POST http://localhost:30000/api/entries/mark
+Content-Type: application/json
+
+{
+    "mark": "sick-leave"
+}

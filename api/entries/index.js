@@ -1,4 +1,5 @@
 const util = require('./util-entries');
+const moment = require('moment-timezone');
 
 /** ******************************************************************************
  * Get one Time Entry by it's id
@@ -224,4 +225,29 @@ exports.geofence = async (req, res) => {
       message: `no geofence entry made; id must be 'Work' but is '${req.body.id}')`,
     });
   }
+};
+
+/**
+ * curl -X POST -H "Content-Type: application/json" -d '{"mark":"vacation"}' http://localhost:30000/api/entries/mark
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.markADay = async (req, res) => {
+  //console.log(req.body);
+  const marks = 'vacation sick-leave'.split(' ');
+
+  if (!req.body.mark) { res.status(400).send('please provide a mark'); return; }
+  if (!marks.includes(req.body.mark)) { res.status(400).send('mark is not valid'); return; }
+  
+  const mark =  req.body.mark;
+  const entryDate = moment(req.body.entry_date).startOf('day') || moment().startOf('day');
+
+  try {
+    await util.markADay(entryDate, mark);    
+    res.status(200).send();
+  } catch (error) {
+    res.status(500).send(error.message);    
+  }
+
 };
