@@ -133,6 +133,7 @@ exports.create = async (timeEntry) => {
       direction: timeEntry.direction,
       longitude: timeEntry.longitude,
       latitude: timeEntry.latitude,
+      mark: timeEntry.mark,
     }).save();
     // in case the external URL is given, use it to render a deep link
     // eslint-disable-next-line max-len
@@ -539,3 +540,32 @@ exports.getErrorDates = () => new Promise((resolve, reject) => {
     })
     .catch((err) => reject(err));
 });
+
+/**
+ * creates two entries for the given entry dated marked with the given mark 
+ * @param {*} entryDate 
+ * @param {*} mark 
+ */
+exports.markADay = async (entryDate, mark) => {
+  // set enter to 08:00 
+  const entryDateEnter = entryDate.clone().hours(8);
+  // for the go entry, add 8 hours...
+  const entryDateGo = entryDate.clone().hours(8+8);
+  //... and then add the pause
+  entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 'seconds');
+
+  // create the enter time entry
+  await this.create({
+    datetime: entryDateEnter,
+    direction: 'enter',
+    mark,
+  });
+  
+  // create the go time entry 8 hours later
+  await this.create({
+    datetime: entryDateGo,
+    direction: 'go',
+    mark,
+  });
+};
+

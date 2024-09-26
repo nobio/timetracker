@@ -7,6 +7,8 @@ mongoose.set('strictQuery', false);
 // ----------------- TimeEntry ----------------------
 // --------------------------------------------------
 const directions = 'enter go'.split(' ');
+const marks = 'vacation sick-leave work'.split(' ');
+
 const TimeEntry = new mongoose.Schema({
   entry_date: {
     type: Date, required: true, default: Date.now, index: true,
@@ -15,6 +17,7 @@ const TimeEntry = new mongoose.Schema({
   last_changed: { type: Date, default: Date.now, required: true },
   longitude: { type: Number, required: false },
   latitude: { type: Number, required: false },
+  mark: { type: String, enum: marks, required: false, default: 'work', unique: false }
 });
 module.exports.TimeEntry = TimeEntry;
 

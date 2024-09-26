@@ -367,8 +367,55 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
     }
   });
 
-  after(() => {
-    clearAllEntries(DEFAULT_DATE);
+  after(async () => {
+    await clearAllEntries(DEFAULT_DATE);
+  });
+});
+
+describe('test util.markADay ', () => {
+  it('mark a date as vacation', async () => {
+    await clearAllEntries(DEFAULT_DATE);
+    try {
+      await util.markADay(DEFAULT_DATE, 'vacation');
+      const entries = await util.getAllByDate(DEFAULT_DATE);
+      expect(entries.length).to.equal(2);
+      expect(entries[0].mark).to.equal('vacation');
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('mark a date as sick-leave', async () => {
+    await clearAllEntries(DEFAULT_DATE);
+    try {
+      await util.markADay(DEFAULT_DATE, 'sick-leave');
+      const entries = await util.getAllByDate(DEFAULT_DATE);
+      expect(entries.length).to.equal(2);
+      expect(entries[0].mark).to.equal('sick-leave');
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('create a normal time entry and check if this is marked as `work`', async () => {
+    await clearAllEntries(DEFAULT_DATE);
+    try {
+      const timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
+      expect(timeEntry.mark).to.equal('work');
+    } catch (error) {
+      throw error;
+    }
+  });
+  it('mark a date with a non existing mark', async () => {
+    await clearAllEntries(DEFAULT_DATE);
+    try {
+      await util.markADay(DEFAULT_DATE, 'NOT-EXISTING-MARK');
+      assert('should throw an error: TimeEntry validation failed: mark: `NOT-EXISTING-MARK` is not a valid enum value for path `mark`.')
+    } catch (error) {
+      // nothing to do, we expect an error
+    }
+  });
+
+  after(async () => {
+    await clearAllEntries(DEFAULT_DATE);
   });
 });
 
@@ -402,10 +449,11 @@ describe('test util.storeValidationErrors ', () => {
     expect(util.getErrorDates()).to.eventually.be.an('array');
   });
 
-  after(() => {
+  after(async () => {
     clearAllEntries(DEFAULT_DATE);
   });
 });
+
 
 // ########################################################################################################
 // #
