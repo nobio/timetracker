@@ -555,18 +555,17 @@ exports.markADay = async (entryDate, mark) => {
   entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 'seconds');
 
   // create the enter time entry
-  let res = await this.create({
+  await this.create({
     datetime: entryDateEnter,
     direction: 'enter',
     mark,
   });
-  console.log(res);
+  
   // create the go time entry 8 hours later
-  res = await this.create({
+  await this.create({
     datetime: entryDateGo,
     direction: 'go',
     mark,
   });
-  console.log(res);
 };
 
