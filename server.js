@@ -86,99 +86,100 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // ------------------ API ------------------------------------------------
 // restful services for entries using Promises
 // -----------------------------------------------------------------------
-app.get('/api/entries', api_entries.getEntries);
-app.post('/api/entries', api_entries.createEntry);
-app.get('/api/entries/:id', api_entries.getEntryById);
-app.put('/api/entries/:id', api_entries.saveEntry);
-app.delete('/api/entries/:id', api_entries.deleteEntry);
-app.post('/api/entries/error/evaluate', api_entries.evaluate);
-app.get('/api/entries/error/dates', api_entries.getErrorDates);
-app.post('/api/entries/mark', api_entries.markADay);
+const API_PATH = process.env.API_PATH || '/api';
+
+app.get(`${API_PATH}/entries`, api_entries.getEntries);
+app.post(`${API_PATH}/entries`, api_entries.createEntry);
+app.get(`${API_PATH}/entries/:id`, api_entries.getEntryById);
+app.put(`${API_PATH}/entries/:id`, api_entries.saveEntry);
+app.delete(`${API_PATH}/entries/:id`, api_entries.deleteEntry);
+app.post(`${API_PATH}/entries/error/evaluate`, api_entries.evaluate);
+app.get(`${API_PATH}/entries/error/dates`, api_entries.getErrorDates);
+app.post(`${API_PATH}/entries/mark`, api_entries.markADay);
 // .......................................................................
 // geofencing
 // .......................................................................
 // app.post('/api/geofence', api_entries.geofence);
-app.post('/api/geotrack', api_geotrack.createGeoTrack);
-app.get('/api/geotrack', api_geotrack.getGeoTracking);
-app.get('/api/geotrack/metadata', api_geotrack.getGeoTrackingMetadata);
+app.post(`${API_PATH}/geotrack`, api_geotrack.createGeoTrack);
+app.get(`${API_PATH}/geotrack`, api_geotrack.getGeoTracking);
+app.get(`${API_PATH}/geotrack/metadata`, api_geotrack.getGeoTrackingMetadata);
 
-app.get('/api/geofences', api_admin.getGeofences);
-app.get('/api/geofences/:id', api_admin.getGeofence);
-app.post('/api/geofences', api_admin.createGeofence);
-app.put('/api/geofences/:id', api_admin.saveGeofence);
-app.delete('/api/geofences/:id', api_admin.deleteGeofence);
+app.get(`${API_PATH}/geofences`, api_admin.getGeofences);
+app.get(`${API_PATH}/geofences/:id`, api_admin.getGeofence);
+app.post(`${API_PATH}/geofences`, api_admin.createGeofence);
+app.put(`${API_PATH}/geofences/:id`, api_admin.saveGeofence);
+app.delete(`${API_PATH}/geofences/:id`, api_admin.deleteGeofence);
 
 // .......................................................................
 // admin
 // .......................................................................
-app.post('/api/entries/dump', api_admin.dumpModels);
-app.get('/api/entries/dump/:modelType', api_admin.getDumpedModels);
-app.post('/api/entries/backup', api_admin.backupTimeEntries);
-app.post('/api/entries/restore', api_admin.restore);
+app.post(`${API_PATH}/entries/dump`, api_admin.dumpModels);
+app.get(`${API_PATH}/entries/dump/:modelType`, api_admin.getDumpedModels);
+app.post(`${API_PATH}/entries/backup`, api_admin.backupTimeEntries);
+app.post(`${API_PATH}/entries/restore`, api_admin.restore);
 
 // .......................................................................
 // toggles
 // .......................................................................
-app.get('/api/toggles', api_admin.getAllToggles);
-app.get('/api/toggles/status', api_admin.getToggleStatus);
-app.get('/api/toggles/:id', api_admin.getToggleById);
-app.get('/api/toggles/name/:name', api_admin.getToggleByName);
-app.put('/api/toggles/:id', api_admin.saveToggle);
-app.post('/api/toggles', api_admin.createToggle);
-app.delete('/api/toggles/:id', api_admin.deleteToggle);
+app.get(`${API_PATH}/toggles`, api_admin.getAllToggles);
+app.get(`${API_PATH}/toggles/status`, api_admin.getToggleStatus);
+app.get(`${API_PATH}/toggles/:id`, api_admin.getToggleById);
+app.get(`${API_PATH}/toggles/name/:name`, api_admin.getToggleByName);
+app.put(`${API_PATH}/toggles/:id`, api_admin.saveToggle);
+app.post(`${API_PATH}/toggles`, api_admin.createToggle);
+app.delete(`${API_PATH}/toggles/:id`, api_admin.deleteToggle);
 
 // .......................................................................
 // properties
 // .......................................................................
-app.get('/api/properties', api_admin.getProperties);
-app.get('/api/properties/:key', api_admin.getProperty);
-app.put('/api/properties/:key', api_admin.setProperty);
-app.delete('/api/properties/:key', api_admin.deleteProperty);
+app.get(`${API_PATH}/properties`, api_admin.getProperties);
+app.get(`${API_PATH}/properties/:key`, api_admin.getProperty);
+app.put(`${API_PATH}/properties/:key`, api_admin.setProperty);
+app.delete(`${API_PATH}/properties/:key`, api_admin.deleteProperty);
 
 // .......................................................................
 // statistics
 // .......................................................................
-app.put('/api/stats', api_stats.calcStats);
-app.get('/api/stats/:date/:timeUnit', api_stats.getStats);
-app.delete('/api/stats', api_stats.deleteAllStatsDays);
-app.get('/api/statistics/aggregate', api_stats.getStatsByTimeBox);
-app.get('/api/statistics/histogram/:interval', api_stats.histogram);
-app.get('/api/statistics/breaktime/:interval', api_stats.breaktime);
-app.get('/api/statistics/extrahours', api_stats.extraHours);
+app.put(`${API_PATH}/stats`, api_stats.calcStats);
+app.get(`${API_PATH}/stats/:date/:timeUnit`, api_stats.getStats);
+app.delete(`${API_PATH}/stats`, api_stats.deleteAllStatsDays);
+app.get(`${API_PATH}/statistics/aggregate`, api_stats.getStatsByTimeBox);
+app.get(`${API_PATH}/statistics/histogram/:interval`, api_stats.histogram);
+app.get(`${API_PATH}/statistics/breaktime/:interval`, api_stats.breaktime);
+app.get(`${API_PATH}/statistics/extrahours`, api_stats.extraHours);
 
 // .......................................................................
 // maintain
 // .......................................................................
-app.get('/api/ping', api_misc.ping);
-app.get('/api/version', api_misc.version);
-app.all('/api/experiment', api_misc.experiment);
-app.get('/api/health', api_misc.healthcheck);
+app.get(`${API_PATH}/ping`, api_misc.ping);
+app.get(`${API_PATH}/version`, api_misc.version);
+app.all(`${API_PATH}/experiment`, api_misc.experiment);
+app.get(`${API_PATH}/health`, api_misc.healthcheck);
 // log the request on different methods
-app.get('/api/log', api_misc.log);
-app.post('/api/log', api_misc.log);
-app.put('/api/log', api_misc.log);
+app.get(`${API_PATH}/log`, api_misc.log);
+app.post(`${API_PATH}/log`, api_misc.log);
+app.put(`${API_PATH}/log`, api_misc.log);
 
 // .......................................................................
 // users and authentication
 // .......................................................................
-app.get('/api/users', api_auth.getAllUsers);
-app.get('/api/users/:id', api_auth.getUser);
-app.post('/api/users', api_auth.createUser);
-app.put('/api/users/:id', api_auth.updateUser);
-app.put('/api/users/:id/password', api_auth.updateUsersPassword);
-app.delete('/api/users/:id', api_auth.deleteUser);
+app.get(`${API_PATH}/users`, api_auth.getAllUsers);
+app.get(`${API_PATH}/users/:id`, api_auth.getUser);
+app.post(`${API_PATH}/users`, api_auth.createUser);
+app.put(`${API_PATH}/users/:id`, api_auth.updateUser);
+app.put(`${API_PATH}/users/:id/password`, api_auth.updateUsersPassword);
+app.delete(`${API_PATH}/users/:id`, api_auth.deleteUser);
 
-app.post('/api/auth/login', api_auth.login);
-app.post('/api/auth/logout', api_auth.logout);
-app.post('/api/auth/token', api_auth.refreshToken);
+app.post(`${API_PATH}/auth/login`, api_auth.login);
+app.post(`${API_PATH}/auth/logout`, api_auth.logout);
+app.post(`${API_PATH}/auth/token`, api_auth.refreshToken);
 
 // .......................................................................
 // export functionalities that are supposed to run regulary. If
 // timetracker does not do scheduling (see process.env.START_CRONJOBS)
 // the jobs should be triggered from outside (for example by a CronJob pod)
 // .......................................................................
-app.put('/api/schedule', api_schedule.schedule);
-
+app.put(`${API_PATH}/schedule`, api_schedule.schedule);
 // .......................................................................
 // Check Slack url
 // .......................................................................

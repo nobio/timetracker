@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ###
 
-POST https://79.219.195.193/api/auth/login
+POST http://localhost:30000/api/auth/login
 Content-Type: application/json
 
 {
