@@ -1,17 +1,43 @@
-FROM node:21-alpine
+FROM node:22-alpine AS builder
 
 # Create app directory
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+# Copy package files
+COPY package.json yarn.lock* ./
 
-RUN npm install --omit=dev
+# Install yarn
+RUN apk add --no-cache yarn
+
+# Install dependencies using yarn
+RUN yarn install --frozen-lockfile --production
 
 # Bundle app source
 COPY . .
 
+# Production image
+FROM node:22-alpine
+
+WORKDIR /usr/src/app
+
+# Copy built artifacts from builder stage
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app .
+
+# Add non-root user
+RUN addgroup -g 1001 nodejs && \
+    adduser -S -u 1001 -G nodejs nodejs && \
+    chown -R nodejs:nodejs /usr/src/app
+
+USER nodejs
+
+# Expose ports
 EXPOSE 30000 30443
-CMD [ "npm", "start" ]
+
+# Set NODE_ENV
+ENV NODE_ENV=production
+
+CMD ["yarn", "start"]
 
 
 # --- list images:
