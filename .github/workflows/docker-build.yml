@@ -50,7 +50,7 @@ jobs:
         run: yarn install
 
       - name: Build App
-        run: yarn build --if-present
+        run: yarn build
 
       - name: Test App
         run: yarn test
