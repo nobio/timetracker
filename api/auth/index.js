@@ -13,11 +13,23 @@ const globalUtil = require('../global_util');
  */
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await util.getAllUsers();
-    res.status(200).json(result);
+    const users = await util.getAllUsers();
+    
+    if (!users || users.length === 0) {
+      return res.status(204).json({ message: 'No users found' });
+    }
+
+    return res.status(200).json({
+      count: users.length,
+      users: users
+    });
+
   } catch (err) {
-    // console.error(err);
-    res.status(500).json({ message: err });
+    // console.error(err); 
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: err.message
+    });
   }
 };
 
@@ -32,11 +44,30 @@ exports.getAllUsers = async (req, res) => {
 exports.getUser = async (req, res) => {
   // console.log(req.params.url);
   try {
+    if (!req.params.id) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'User ID is required'
+      });
+    }
+
     const result = await util.getUser(req.params.id);
-    res.status(200).json(result);
+    
+    if (!result) {
+      return res.status(404).json({
+        error: 'Not Found', 
+        message: 'User not found'
+      });
+    }
+
+    return res.status(200).json(result);
+
   } catch (err) {
     // console.error(err);
-    res.status(500).json({ message: err });
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message
+    });
   }
 };
 
@@ -50,12 +81,31 @@ exports.getUser = async (req, res) => {
  */
 exports.deleteUser = async (req, res) => {
   try {
+    if (!req.params.id) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'User ID is required'
+      });
+    }
+
     const result = await util.deleteUser(req.params.id);
+    
+    if (!result) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'User not found'
+      });
+    }
+
     globalUtil.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
-    res.status(202).json(result);
+    return res.status(202).json(result);
+
   } catch (err) {
     // console.error(err);
-    res.status(500).json({ message: err });
+    return res.status(500).json({
+      error: 'Internal Server Error', 
+      message: err.message
+    });
   }
 };
 
@@ -69,12 +119,36 @@ exports.deleteUser = async (req, res) => {
  */
 exports.createUser = async (req, res) => {
   try {
-    const result = await util.createUser(req.body.username, req.body.password, req.body.name, req.body.mailAddress);
+    // Validate required fields
+    if (!req.body.username || !req.body.password || !req.body.name || !req.body.mailAddress) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'All fields (username, password, name, mailAddress) are required'
+      });
+    }
+
+    const result = await util.createUser(
+      req.body.username,
+      req.body.password,
+      req.body.name,
+      req.body.mailAddress
+    );
+
     globalUtil.sendMessage('CREATE_USER', `user ${req.body.username} was created`);
-    res.status(201).json(result);
+
+    return res.status(201).json({
+      id: result,
+      username: req.body.username,
+      name: req.body.name,
+      mailAddress: req.body.mailAddress
+    });
+
   } catch (err) {
     // console.error(err);
-    res.status(500).json({ message: err });
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message || 'Error creating user'
+    });
   }
 };
 
@@ -88,13 +162,45 @@ exports.createUser = async (req, res) => {
  */
 exports.updateUser = async (req, res) => {
   try {
-    const result = await util.updateUser(req.params.id, req.body.username, req.body.name, req.body.mailAddress);
+    // Validate required id parameter
+    if (!req.params.id) {
+      return res.status(404).json({
+        error: 'Bad Request',
+        message: 'User ID is required'
+      });
+    }
+
+    // Update user with provided fields
+    const result = await util.updateUser(
+      req.params.id,
+      req.body.username,
+      req.body.name, 
+      req.body.mailAddress
+    );
+
+    // Send notification message
     globalUtil.sendMessage('UPDATE_USER', `user ${req.params.id} was updated`);
-    res.status(201).json(result);
+
+    return res.status(201).json({
+      id: result,
+      username: req.body.username,
+      name: req.body.name,
+      mailAddress: req.body.mailAddress
+    });
+
   } catch (err) {
     // console.error(err);
-    if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
-    else res.status(500).json({ message: err.message });
+    if (err.message === 'User does not exists') {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: err.message
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message || 'Error updating user'
+    });
   }
 };
 
@@ -105,14 +211,43 @@ exports.updateUser = async (req, res) => {
  */
 exports.updateUsersPassword = async (req, res) => {
   try {
+    // Validate required parameters
+    if (!req.params.id) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'User ID is required'
+      });
+    }
+
+    if (!req.body.password) {
+      return res.status(400).json({
+        error: 'Bad Request', 
+        message: 'Password is required'
+      });
+    }
+
     const result = await util.updateUsersPassword(req.params.id, req.body.password);
+    
     globalUtil.sendMessage('UPDATE_USER', `password for user ${req.params.id} was updated`);
-    res.status(201).json(result);
+    
+    return res.status(201).json({
+      id: req.params.id,
+      message: 'Password updated successfully'
+    });
+
   } catch (err) {
     // console.error(err);
-
-    if (err.message === 'User does not exists') res.status(404).json({ message: err.message });
-    else res.status(500).json({ message: err.message });
+    if (err.message === 'User does not exists') {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: err.message
+      });
+    }
+    
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message || 'Error updating password'
+    });
   }
 };
 
@@ -127,22 +262,25 @@ exports.updateUsersPassword = async (req, res) => {
 exports.login = async (req, res) => {
   // console.log(req)
   globalUtil.sendMessage('LOGIN', `try to login user ${req.body.username}`);
-  const { password } = req.body;
-  if (password === null) {
-    res.status(401).send();
-    return;
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Username and password are required'
+    });
   }
 
   try {
-    const tokens = await util.login(req.body.username, password);
-    res.status(200).json(tokens);
+    const tokens = await util.login(username, password);
+    return res.status(200).json(tokens);
   } catch (err) {
     console.error(err);
-    if (err.status) {
-      res.status(err.status).json({ message: err.message });
-    } else {
-      res.status(401).json({ message: err.message });
-    }
+    const status = err.status || 401;
+    return res.status(status).json({ 
+      error: status === 401 ? 'Unauthorized' : 'Error',
+      message: err.message 
+    });
   }
 };
 
