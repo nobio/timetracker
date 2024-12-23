@@ -104,10 +104,10 @@ const restoreFile = async (dbType) => {
     });
   });
   // const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
-  console.log(`>>>>>>> ${Model.modelName} >>>>>>>`);
+  // console.log(`>>>>>>> ${Model.modelName} >>>>>>>`);
   await Model.deleteMany({});
   await Model.insertMany(data);
-  console.log(`<<<<<<< ${Model.modelName} <<<<<<<`);
+  // console.log(`<<<<<<< ${Model.modelName} <<<<<<<`);
 
   return dbType;
 };
@@ -199,4 +199,4 @@ exports.backupTimeEntries = async () => {
   }
 };
 
-exports.getDumpedModel = async (modelType) => await downloadObject(modelType);
+exports.getDumpedModel = async (modelType) => downloadObject(modelType);
