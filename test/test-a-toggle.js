@@ -1,10 +1,11 @@
 require('./init');
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
 const chaiAsPromised = require('chai-as-promised');
 
-chai.use(chaiAsPromised);
-const { expect, assert } = chai;
-
+Chai.use(chaiAsPromised);
+const { describe, it } = Mocha;
+const { expect, assert } = Chai;
 const util = require('../api/admin/util-toggles');
 
 describe('test util.getAllToggles', () => {
@@ -112,6 +113,7 @@ describe('test util.deleteToggle', () => {
       const result = await util.getToggle(deletedToggle._id);
       expect(result).to.be.null;
     } catch (error) {
+      console.error(error);
       assert.fail('should not throw exception');
     }
   });

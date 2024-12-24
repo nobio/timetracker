@@ -39,7 +39,7 @@ exports.createToggle = (name, toggle, notification) => new Promise((resolve, rej
 });
 
 exports.deleteToggle = (id) => new Promise((resolve, reject) => {
-  Toggle.findByIdAndRemove(id)
+  Toggle.findByIdAndDelete(id)
     .then((toggle) => resolve(toggle))
     .catch((err) => reject(err));
 });

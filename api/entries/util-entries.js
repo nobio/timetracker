@@ -217,7 +217,7 @@ exports.update = async (timeEntry) => {
 exports.deleteById = (id) =>
   // console.log('entered deleteById ' + id)
   new Promise((resolve, reject) => {
-    TimeEntry.findByIdAndRemove(id)
+    TimeEntry.findByIdAndDelete(id)
       .then((timeentry) => resolve(timeentry))
       .then(globalUtil.sendMessage('DELETE_ENTRY', id))
       .catch((err) => reject(err));
@@ -438,7 +438,7 @@ exports.removeDoublets = async () => {
         && timeentry.direction === lastTimeentry.direction) {
         await TimeEntry.deleteOne({ _id: timeentry._id });
         count++;
-        // console.log(`removing timeentry ${timeentry}`); 
+        // console.log(`removing timeentry ${timeentry}`);
       } else {
         lastTimeentry = timeentry;
       }
@@ -542,16 +542,16 @@ exports.getErrorDates = () => new Promise((resolve, reject) => {
 });
 
 /**
- * creates two entries for the given entry dated marked with the given mark 
- * @param {*} entryDate 
- * @param {*} mark 
+ * creates two entries for the given entry dated marked with the given mark
+ * @param {*} entryDate
+ * @param {*} mark
  */
 exports.markADay = async (entryDate, mark) => {
-  // set enter to 08:00 
+  // set enter to 08:00
   const entryDateEnter = entryDate.clone().hours(8);
   // for the go entry, add 8 hours...
-  const entryDateGo = entryDate.clone().hours(8+8);
-  //... and then add the pause
+  const entryDateGo = entryDate.clone().hours(8 + 8);
+  // ... and then add the pause
   entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 'seconds');
 
   // create the enter time entry
@@ -560,7 +560,7 @@ exports.markADay = async (entryDate, mark) => {
     direction: 'enter',
     mark,
   });
-  
+
   // create the go time entry 8 hours later
   await this.create({
     datetime: entryDateGo,
@@ -568,4 +568,3 @@ exports.markADay = async (entryDate, mark) => {
     mark,
   });
 };
-
