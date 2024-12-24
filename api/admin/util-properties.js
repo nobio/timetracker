@@ -53,7 +53,7 @@ exports.setProperty = (key, value) => new Promise((resolve, reject) => {
 exports.deleteProperty = (key) => new Promise((resolve, reject) => {
   if (!key) { reject(new Error('the key must not be undefined')); return; }
 
-  Properties.findOneAndRemove({ key })
+  Properties.findOneAndDelete({ key })
     .then((property) => resolve(property))
     .catch((err) => reject(err));
 });

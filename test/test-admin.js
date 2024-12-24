@@ -5,11 +5,13 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const moment = require('moment');
 
-const chai = require('chai');
+const Chai = require('chai');
+const Mocha = require('mocha');
 const util = require('../api/admin/util-admin');
 // const chaiAsPromised = require('chai-as-promised');
 // chai.use(chaiAsPromised);
-const { expect, assert } = chai;
+const { describe, it } = Mocha;
+const { expect, assert } = Chai;
 
 const DUMP_DIR = './dump';
 
@@ -100,19 +102,18 @@ describe('test util.restoreDataFromFile', () => {
     expect(toggles.length).to.greaterThan(0);
     const countToggles = toggles.length; // needed to test against later
 
-    // delete Toggle in Database 
+    // delete Toggle in Database
     await Toggle.deleteMany();
     toggles = await Toggle.find();
     expect(toggles).to.be.an('array');
     expect(toggles.length).to.equal(0);
 
-    // restore from file 
+    // restore from file
     result = await util.restoreDataFromFile();
-    console.log(result)
+    console.log(result);
     toggles = await Toggle.find();
     expect(toggles).to.be.an('array');
     expect(toggles.length).to.equal(countToggles);
-
   }).timeout(50000);
 });
 

@@ -82,10 +82,10 @@ exports.setGeofence = async (geofence) => {
 };
 
 exports.deleteGeofence = async (id) => {
-  if (!id) { throw new Error('the id must not be undefined'); return; }
+  if (!id) { throw new Error('the id must not be undefined'); }
 
   try {
-    await GeoFence.findOneAndRemove({ _id: id });
+    await GeoFence.findOneAndDelete({ _id: id });
   } catch (error) {
     throw new Error(error.message);
   }

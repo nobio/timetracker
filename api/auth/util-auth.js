@@ -137,7 +137,7 @@ exports.updateUsersPassword = async (id, password) => {
 exports.deleteUser = async (id) => {
   if (!id) throw Error('id must be provided');
   return new Promise((resolve, reject) => {
-    User.findByIdAndRemove(id)
+    User.findByIdAndDelete(id)
       .then((res) => res)
       .then((ret) => resolve(ret))
       .catch((err) => reject(`cannot delete user ${id}`));

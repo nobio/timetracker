@@ -283,12 +283,12 @@ describe('test utilAuth.updateUser', () => {
       await User.deleteOne({ username: TESTUSER_USERNAME });
       await User.deleteOne({ username: 'alberto' });
       userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-console.log('UserId = ' + userId)
+      console.log(`UserId = ${userId}`);
       const res = mockResponse();
       const req = mockRequest({
         headers: [],
-        body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
-        params: { 'id': userId },
+        body: { username: 'alberto', name: 'ALBERTO EINSTEINO', mailAddress: 'alberto-einsteino@berkly.edu' },
+        params: { id: userId },
       });
 
       await auth.updateUser(req, res);
@@ -298,12 +298,11 @@ console.log('UserId = ' + userId)
       expect(user.username).to.be.equal('alberto');
       expect(user.name).to.be.equal('ALBERTO EINSTEINO');
       expect(user.mailAddress).to.be.equal('alberto-einsteino@berkly.edu');
-
     } catch (error) {
-      console.error(error.message)
+      console.error(error.message);
       assert.fail(`should not throw error\n${error.message}`);
     } finally {
-      await util.deleteUser(userId)
+      await util.deleteUser(userId);
     }
   });
   it('update an existing user - id null', async () => {
@@ -322,8 +321,8 @@ console.log('UserId = ' + userId)
     const res = mockResponse();
     const req = mockRequest({
       headers: [],
-      body: { 'username': 'alberto', 'name': 'ALBERTO EINSTEINO', 'mailAddress': 'alberto-einsteino@berkly.edu' },
-      //params: { 'id': userId },
+      body: { username: 'alberto', name: 'ALBERTO EINSTEINO', mailAddress: 'alberto-einsteino@berkly.edu' },
+      // params: { 'id': userId },
     });
 
     await auth.updateUser(req, res);
@@ -379,8 +378,6 @@ console.log('UserId = ' + userId)
       assert.fail(`should not throw exception\n${error.message}`);
     }
   });
-
-
 });
 
 /**
@@ -465,15 +462,14 @@ describe('test utilAuth.login', () => {
     }
   });
   it('login with valid principal and credenital (req/res)', async () => {
-    let refreshToken = '';
+    const refreshToken = '';
     try {
       const res = mockResponse();
       const req = mockRequest({
-        body: { 'username': TESTUSER_USERNAME, 'password': TESTUSER_PASSWORD },
+        body: { username: TESTUSER_USERNAME, password: TESTUSER_PASSWORD },
       });
       const result = await auth.login(req, res);
       expect(res.status).to.have.been.calledWith(200);
-
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -724,8 +720,8 @@ describe('test utilAuth.updateUsersPassword', () => {
     // update password
     const res = mockResponse();
     const req = mockRequest({
-      body: { 'password': NEW_PASSWORD },
-      params: { 'id': userId },
+      body: { password: NEW_PASSWORD },
+      params: { id: userId },
     });
 
     await auth.updateUsersPassword(req, res);
@@ -747,7 +743,6 @@ describe('test utilAuth.updateUsersPassword', () => {
       expect(err.status).to.equal(401);
       expect(err.message).to.equal('User not authenticated');
     }
-
   });
 
   afterEach(async () => {
