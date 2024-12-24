@@ -169,83 +169,75 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
  * @param {*} dtEnd
  * @param {*} accumulate
  */
-exports.getStatsByRange = (dtStart, dtEnd, accumulate, fill) => new Promise((resolve, reject) => {
-  // console.log(`  >>> searching data for date between ${dtStart}-${dtEnd} => ${moment(dtStart).format('YYYY-MM-DD')} and ${moment(dtEnd).format('YYYY-MM-DD')}`);
-  // console.log("  >>> searching data for date between " + dtStart + " and " + dtEnd);
-  StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd } })
-    .sort({ date: 1 })
-    .exec((err, stats) => {
-      if (err != undefined) {
-        reject(err);
-        return;
-      }
+// exports.getBusytimeByDate = async (dt) => {
+exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
+  const innerData = [];
+  const innerComp = [];
+  let actualWorkingTime = -1;
+  let plannedWorkingTime = -1;
+  let averageWorkingTime = -1;
 
-      const innerData = [];
-      const innerComp = [];
-      let actual_working_time = -1;
-      let planned_working_time = -1;
-      let average_working_time = -1;
+  // init arrays innerComp, innerData
+  if (fill === 'true') {
+    let i = 0;
+    for (let m = dtStart; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
+      // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')}`);
+      innerData[i] = {
+        x: m.format('YYYY-MM-DD'),
+        y: null,
+      };
+      innerComp[i] = {
+        x: m.format('YYYY-MM-DD'),
+        y: 0.0,
+      };
+      i++;
+    }
+    // console.table(innerComp)
+  }
 
-      // init arrays innerComp, innerData
-      if (fill === 'true') {
-        let i = 0;
-        for (let m = dtStart; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-          // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')}`);
-          innerData[i] = {
-            x: m.format('YYYY-MM-DD'),
-            y: null,
-          };
-          innerComp[i] = {
-            x: m.format('YYYY-MM-DD'),
-            y: 0.0,
-          };
-          i++;
-        }
-        // console.table(innerComp)
-      }
+  const stats = await StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd } }).sort({ date: 1 });
 
-      // calculating actual working time
-      stats.forEach((stat) => {
-        actual_working_time += stat.actual_working_time;
-      });
-      average_working_time = actual_working_time / stats.length / 60 / 60 / 1000;
+  // calculating actual working time
+  stats.forEach((stat) => {
+    actualWorkingTime += stat.actual_working_time;
+  });
+  averageWorkingTime = actualWorkingTime / stats.length / 60 / 60 / 1000;
 
-      // console.log("average_working_time = " + average_working_time);
-      // console.log("length = " + stats.length);
+  // console.log("average_working_time = " + average_working_time);
+  // console.log("length = " + stats.length);
 
-      let sumActual = 0;
-      let sumNominal = 0;
-      stats.forEach((stat) => {
-        const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
-        // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
-        let obj;
-        planned_working_time += stat.planned_working_time;
-        if (accumulate === 'true') {
-          (sumActual += Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
-          (sumNominal += Math.round(average_working_time * 100) / 100), // rounding 2 digits after comma
-          obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
-          obj.y = sumActual;
-          obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
-          obj.y = sumNominal;
-        } else {
-          obj = getXYObjectByXValue(innerData, statDateYMD);
-          obj.y = Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100; // rounding 2 digits after comma
-          obj = getXYObjectByXValue(innerComp, statDateYMD);
-          obj.y = Math.round(average_working_time * 100) / 100; // rounding 2 digits after comma;
-        }
-      });
+  let sumActual = 0;
+  let sumNominal = 0;
+  stats.forEach((stat) => {
+    const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
+    // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
+    let obj;
+    plannedWorkingTime += stat.planned_working_time;
+    if (accumulate === 'true') {
+      (sumActual += Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
+        (sumNominal += Math.round(averageWorkingTime * 100) / 100), // rounding 2 digits after comma
+        obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
+      obj.y = sumActual;
+      obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
+      obj.y = sumNominal;
+    } else {
+      obj = getXYObjectByXValue(innerData, statDateYMD);
+      obj.y = Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100; // rounding 2 digits after comma
+      obj = getXYObjectByXValue(innerComp, statDateYMD);
+      obj.y = Math.round(averageWorkingTime * 100) / 100; // rounding 2 digits after comma;
+    }
+  });
 
-      // console.log(JSON.stringify(innerComp))
+  // console.log(JSON.stringify(innerComp))
 
-      resolve({
-        actual_working_time,
-        planned_working_time,
-        average_working_time,
-        inner_data: innerData,
-        inner_comp: innerComp,
-      });
-    });
-});
+  return ({
+    actual_working_time: actualWorkingTime,
+    planned_working_time: plannedWorkingTime,
+    average_working_time: averageWorkingTime,
+    inner_data: innerData,
+    inner_comp: innerComp,
+  });
+};
 
 function getXYObjectByXValue(arr, xVal) {
   for (let n = 0; n < arr.length - 1; n++) {

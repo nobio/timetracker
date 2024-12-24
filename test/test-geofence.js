@@ -92,7 +92,7 @@ describe('test read one perticular geofence', () => {
 describe('test set a geofence', () => {
   before(async () => {
     // delete the test geofence again
-    try { await util.deleteGeofence(GEOFENCE.id); } catch (error) { }
+    try { await util.deleteGeofence(GEOFENCE.id); } catch (error) { /* empty */ }
     GEOFENCE = await util.createGeofence(true, 10, 20, 30, 'test', false);
   });
 

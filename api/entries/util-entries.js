@@ -436,9 +436,9 @@ exports.removeDoublets = async () => {
     if (lastTimeentry !== undefined) {
       if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
         && timeentry.direction === lastTimeentry.direction) {
-        timeentry.remove();
+        await TimeEntry.deleteOne({ _id: timeentry._id });
         count++;
-        // console.log(`removing timeentry ${timeentry}`);
+        // console.log(`removing timeentry ${timeentry}`); 
       } else {
         lastTimeentry = timeentry;
       }

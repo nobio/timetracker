@@ -64,7 +64,7 @@ exports.setGeofence = async (geofence) => {
   if (geofence.id === null) throw new Error('could not create new geofence: geo fence object could not be updated because it does not exist');
 
   try {
-    const geoFence = await GeoFence.findOne(mongoose.Types.ObjectId(geofence.id));
+    const geoFence = await GeoFence.findOne(new mongoose.Types.ObjectId(geofence.id));
     geoFence.enabled = geofence.enabled;
     geoFence.isCheckedIn = geofence.isCheckedIn;
     geoFence.lastChange = moment().toISOString(); // always set lastChange to now

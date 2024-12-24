@@ -49,50 +49,44 @@ function renderOneData(data, date) {
   };
 }
 
-exports.getStatsByTimeBox = (timeUnit) => new Promise((resolve, reject) => {
+exports.getStatsByTimeBox = async (timeUnit) => {
   let data;
 
-  StatsDay.find().sort({ date: 1 }).exec((err, stats) => {
-    if (err) {
-      reject(err);
-    } else {
-      if (timeUnit === 'month') {
-        data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
-      } else if (timeUnit === 'week') {
-        data = getStatsByTimeBoxTimeUnit(stats, 'gggg-ww');
-      } else if (timeUnit === 'year') {
-        data = getStatsByTimeBoxTimeUnit(stats, 'gggg');
-      } else if (timeUnit === 'day') {
-        data = getStatsByTimeBoxDay(stats);
-      } else if (timeUnit === 'weekday') {
-        data = getStatsByTimeBoxTimeWeekDay(stats);
-      } else {
-        reject(new Error(`time unit '${timeUnit}' is invalid`));
-        return;
-      }
+  const stats = await StatsDay.find().sort({ date: 1 });
 
-      // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
-      // console.log(JSON.stringify(data));
-      const avg = calculateAverage(data);
+  if (timeUnit === 'month') {
+    data = getStatsByTimeBoxTimeUnit(stats, 'gggg-MM');
+  } else if (timeUnit === 'week') {
+    data = getStatsByTimeBoxTimeUnit(stats, 'gggg-ww');
+  } else if (timeUnit === 'year') {
+    data = getStatsByTimeBoxTimeUnit(stats, 'gggg');
+  } else if (timeUnit === 'day') {
+    data = getStatsByTimeBoxDay(stats);
+  } else if (timeUnit === 'weekday') {
+    data = getStatsByTimeBoxTimeWeekDay(stats);
+  } else {
+    throw new Error(`time unit '${timeUnit}' is invalid`);
+  }
 
-      /**
+  // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
+  // console.log(JSON.stringify(data));
+  const avg = calculateAverage(data);
 
-       data[idx] = {
-              x: lastTimeUnit,
-              y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-            };
-      */
+  /**
+     data[idx] = {
+            x: lastTimeUnit,
+            y: Math.round(avg / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+          };
+    */
 
-      resolve({
-        actual_working_time: 0,
-        planned_working_time: 0,
-        average_working_time: 1,
-        inner_data: data,
-        inner_comp: avg,
-      });
-    }
+  return ({
+    actual_working_time: 0,
+    planned_working_time: 0,
+    average_working_time: 1,
+    inner_data: data,
+    inner_comp: avg,
   });
-});
+};
 
 /**
  * calculates the average of n points depending on timeUnit
