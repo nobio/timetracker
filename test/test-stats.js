@@ -268,7 +268,7 @@ describe('test utilHistogram.getHistogramByTimeUnit', () => {
   });
 });
 
-describec('test utilTimebox.getStatsByTimeBox', () => {
+describe('test utilTimebox.getStatsByTimeBox', () => {
   it('getStatsByTimeBox with year', async () => {
     const result = await utilTimebox.getStatsByTimeBox('year');
     checkTimeboxResult(result);
