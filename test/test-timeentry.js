@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 require('./init');
 require('../db');
@@ -9,9 +10,6 @@ const TimeEntry = mongoose.model('TimeEntry');
 
 const Mocha = require('mocha');
 const Chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-Chai.use(chaiAsPromised);
 
 const { describe, it } = Mocha;
 const { assert, expect } = Chai;
@@ -161,7 +159,11 @@ describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
     expect(timeentry).to.have.property('entry_date');
   });
   it('should not find a Time Entry by an invalid id', async () => {
-    await expect(util.findById('********_invalid-id_********')).to.be.rejectedWith(Error);
+    try {
+      await util.findById('********_invalid-id_********'); assert.fail('should throw exception name: Path `name` is required');
+    } catch (error) {
+      expect(error.message).to.eq('Cast to ObjectId failed for value \"********_invalid-id_********\" (type string) at path \"_id\" for model \"TimeEntry\"');
+    }
   });
 });
 
@@ -227,7 +229,12 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
   });
 
   it('create not successfully a new TimeEntry: first entry must not have direction "go"', async () => {
-    await expect(util.create('go', DEFAULT_DATE)).to.be.rejectedWith(Error);
+    try {
+      await util.create('go', DEFAULT_DATE); assert.fail('should throw exception name: Path `name` is required');
+    } catch (error) {
+      console.log(error);
+      expect(error.message).to.eq('Unable to read Time Entry for given date : undefined (Cast to date failed for value "Moment<Invalid date>" (type Moment) at path "entry_date" for model "TimeEntry")');
+    }
   });
 
   it('create not successfully: enter one entry with direction "enter" and then another one also with direction "enter"', async () => {
@@ -408,7 +415,7 @@ describe('test util.markADay ', () => {
     await clearAllEntries(DEFAULT_DATE);
     try {
       await util.markADay(DEFAULT_DATE, 'NOT-EXISTING-MARK');
-      assert('should throw an error: TimeEntry validation failed: mark: `NOT-EXISTING-MARK` is not a valid enum value for path `mark`.')
+      assert('should throw an error: TimeEntry validation failed: mark: `NOT-EXISTING-MARK` is not a valid enum value for path `mark`.');
     } catch (error) {
       // nothing to do, we expect an error
     }
@@ -420,16 +427,25 @@ describe('test util.markADay ', () => {
 });
 
 describe('test util.storeValidationErrors ', () => {
+  it('getErrorDates', async () => {
+    try {
+      const errorDates = await util.getErrorDates();
+      expect(errorDates).to.be.an('array');
+    } catch (error) {
+      assert.fail('should not throw an error here');
+    }
+  });
+
+  after(async () => {
+    clearAllEntries(DEFAULT_DATE);
+  });
+
   it('evaluate', async () => {
     const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
-    try {
-      const result = await util.evaluate(firstTime, lastTime);
-      expect(result).to.have.property('message');
-      expect(result.message).to.equal('calculation ongoing in background');
-    } catch (error) {
-      throw error;
-    }
+    const result = await util.evaluate(firstTime, lastTime);
+    expect(result).to.have.property('message');
+    expect(result.message).to.equal('calculation ongoing in background');
   });
 
   it('storeValidationErrors', async () => {
@@ -441,19 +457,11 @@ describe('test util.storeValidationErrors ', () => {
       expect(result).to.have.property('message');
       expect(result.message).to.equal('calculation ongoing in background');
     } catch (error) {
-      throw error;
+      console.log(error);
+      assert.fail('should not throw an error here');
     }
   });
-
-  it('getErrorDates', () => {
-    expect(util.getErrorDates()).to.eventually.be.an('array');
-  });
-
-  after(async () => {
-    clearAllEntries(DEFAULT_DATE);
-  });
 });
-
 
 // ########################################################################################################
 // #

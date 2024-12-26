@@ -71,17 +71,14 @@ exports.createUser = async (username, password, name, mailAddress) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  try {
-    const newUser = await new User({
-      username,
-      password: hashedPassword,
-      name,
-      mailaddress: mailAddress,
-    }).save();
-    return newUser._id;
-  } catch (error) {
-    throw error;
-  }
+  const newUser = await new User({
+    username,
+    password: hashedPassword,
+    name,
+    mailaddress: mailAddress,
+  }).save();
+
+  return newUser._id;
 };
 
 /**
@@ -102,12 +99,8 @@ exports.updateUser = async (id, username, name, mailAddress) => {
   if (name) user.name = name;
   if (mailAddress) user.mailaddress = mailAddress;
 
-  try {
-    const updatedUser = await user.save();
-    return updatedUser.id;
-  } catch (error) {
-    throw error;
-  }
+  const updatedUser = await user.save();
+  return updatedUser.id;
 };
 
 exports.updateUsersPassword = async (id, password) => {

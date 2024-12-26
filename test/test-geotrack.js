@@ -5,13 +5,11 @@ const moment = require('moment');
 
 const chai = require('chai');
 chai.use(require('chai-datetime'));
-const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
 const sinonChai = require('sinon-chai');
 const util = require('../api/geotrack/util-geotrack');
 const geo = require('../api/geotrack');
 
-chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 const { expect, assert } = chai;

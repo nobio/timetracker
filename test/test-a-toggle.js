@@ -1,11 +1,11 @@
+/* eslint-disable max-len */
 require('./init');
 const Chai = require('chai');
 const Mocha = require('mocha');
-const chaiAsPromised = require('chai-as-promised');
 
-Chai.use(chaiAsPromised);
 const { describe, it } = Mocha;
 const { expect, assert } = Chai;
+
 const util = require('../api/admin/util-toggles');
 
 describe('test util.getAllToggles', () => {
@@ -35,7 +35,7 @@ describe('test util.getToggle', () => {
   });
 
   it('load one not existing toggle; should fail', async () => {
-    expect(util.getToggle('12345')).to.be.rejectedWith(Error);
+    expect(await util.getToggle('777777777777777777777777')).to.be.null;
   });
 
   it('test to load notification toggle by existing name', async () => {
@@ -197,9 +197,15 @@ describe('test util.deleteToggle', () => {
       }
     });
 
-    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle()).to.be.rejectedWith(Error); });
-    it('creating a new toggle without name; should fail', async () => { await expect(util.createToggle('')).to.be.rejectedWith(Error); });
-    it('creating a new toggle without name but toggle; should fail', async () => { await expect(util.createToggle('', true)).to.be.rejectedWith(Error); });
+    it('creating a new toggle without name; should fail', async () => {
+      try { await util.createToggle(); assert.fail('should throw exception name: Path `name` is required'); } catch (error) { expect(error.message).to.eq('Toggle validation failed: name: Path `name` is required.'); }
+    });
+    it('creating a new toggle with empty name; should fail', async () => {
+      try { await util.createToggle(''); assert.fail('should throw exception name: Path `name` is required'); } catch (error) { expect(error.message).to.eq('Toggle validation failed: name: Path `name` is required.'); }
+    });
+    it('creating a new toggle without name but toggle; should fail', async () => {
+      try { await util.createToggle('', true); assert.fail('should throw exception name: Path `name` is required'); } catch (error) { expect(error.message).to.eq('Toggle validation failed: name: Path `name` is required.'); }
+    });
   });
 
   after(async () => {

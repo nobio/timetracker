@@ -408,29 +408,6 @@ exports.removeDoublets = async () => {
   let lastTimeentry;
   let count = 0;
 
-  /*
-  try {
-    const timeEntries = await TimeEntry.find().sort({ entry_date: 1 });
-    timeEntries.forEach((timeentry) => {
-      if (lastTimeentry !== undefined) {
-        if (moment(timeentry.entry_date).diff(lastTimeentry.entry_date) < 1000 // .diff -> milliseconds; < 1000 less than one second
-          && timeentry.direction === lastTimeentry.direction) {
-          timeentry.remove();
-          count++;
-          // console.log(`removing timeentry ${timeentry}`);
-        } else {
-          lastTimeentry = timeentry;
-        }
-      } else {
-        lastTimeentry = timeentry;
-      }
-    });
-
-    return { removed: count };
-  } catch (error) {
-    throw error;
-  }
-  */
   const timeEntries = await TimeEntry.find().sort({ entry_date: 1 });
   for await (const timeentry of timeEntries) {
     if (lastTimeentry !== undefined) {
@@ -451,29 +428,21 @@ exports.removeDoublets = async () => {
 
 exports.sleep = (delay) => {
   console.log(`I 'm going to sleep now for ${delay} ms`);
-  return new Promise((resolve) => setTimeout(resolve, delay));
+  return new Promise((resolve) => { setTimeout(resolve, delay); });
 };
 
 exports.evaluate = async () => {
-  let firstEntry;
-  let lastEntry;
+  const firstTimeEntry = await this.getFirstTimeEntry();
+  const lastTimeEntry = await this.getLastTimeEntry();
+  await FailureDay.deleteMany({});
+  const result = await this.storeValidationErrors(firstTimeEntry, lastTimeEntry);
+  globalUtil.sendMessage('EVALUATE_DATA');
 
-  try {
-    const firstTimeEntry = await this.getFirstTimeEntry();
-    const lastTimeEntry = await this.getLastTimeEntry();
-    await FailureDay.deleteMany({});
-    const result = await this.storeValidationErrors(firstTimeEntry, lastTimeEntry);
-    globalUtil.sendMessage('EVALUATE_DATA');
-
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  return result;
 };
 
 exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
   // console.log(JSON.stringify(firstEntry), lastEntry);
-  const lastEntriesAge = moment(lastEntry.age);
   const date = this.stripdownToDateUTC(firstEntry.age);
 
   for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
@@ -482,15 +451,12 @@ exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve,
 
     this.getAllByDate(dt).then((timeentries) => {
       // firstly evaluate the not (yet) complete entries and save them....
+      // if (timeentries.length > 0) console.log(`${timeentries[0].entry_date} ${timeentries.length}`);
       if (timeentries.length % 2 !== 0) {
         new FailureDay({
           date: dt,
           failure_type: 'INCOMPLETE',
-        }).save((err) => {
-          if (err) {
-            reject(err);
-          }
-        });
+        }).save();
       }
 
       // sencondly evaluate on wrong order of entries and save them too
@@ -500,11 +466,7 @@ exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve,
           new FailureDay({
             date: dt.toDate(),
             failure_type: 'WRONG_ORDER',
-          }).save((err) => {
-            if (err) {
-              reject(err);
-            }
-          });
+          }).save();
         }
       }
     });
@@ -526,20 +488,18 @@ exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve,
    *    }
    * ]
    */
-exports.getErrorDates = () => new Promise((resolve, reject) => {
-  FailureDay.find().sort({ failure_type: 1, date: -1 })
-    .then((failureDates) => {
-      const fDates = [];
-      for (let n = 0; n < failureDates.length; n++) {
-        fDates.push({
-          'error-date': failureDates[n].date,
-          'error-type': failureDates[n].failure_type,
-        });
-      }
-      resolve(fDates);
-    })
-    .catch((err) => reject(err));
-});
+exports.getErrorDates = async () => {
+  const failureDatesSorted = await FailureDay.find({ failure_type: 1, date: -1 }).exec();
+
+  const fDates = [];
+  for (let n = 0; n < failureDatesSorted.length; n++) {
+    fDates.push({
+      'error-date': failureDatesSorted[n].date,
+      'error-type': failureDatesSorted[n].failure_type,
+    });
+  }
+  return fDates;
+};
 
 /**
  * creates two entries for the given entry dated marked with the given mark
