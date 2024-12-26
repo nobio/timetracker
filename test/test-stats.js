@@ -8,10 +8,6 @@ const Chai = require('chai');
 const Mocha = require('mocha');
 
 const { expect, assert } = Chai;
-const chaiAsPromised = require('chai-as-promised');
-
-Chai.use(chaiAsPromised);
-
 const {
   describe, it, before, after,
 } = Mocha;
@@ -365,7 +361,7 @@ describe("test util.deleteAllStatsDays", () => {
     db = require("../db");
   });
 
-  it.only("load StatsDays", async () => {
+  ii("load StatsDays", async () => {
     let statsDays = await StatsDay.find();
     expect(statsDays).to.have.length > 0;
     const result = await util.deleteAllStatsDays();

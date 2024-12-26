@@ -3,14 +3,11 @@ const moment = require('moment');
 
 const Chai = require('chai');
 const Mocha = require('mocha');
-const chaiAsPromised = require('chai-as-promised');
 const utilBreaktime = require('../api/stats/util-breaktime');
 const globalUtil = require('../api/global_util');
 
 const { describe, it } = Mocha;
 const { expect, assert } = Chai;
-
-Chai.use(chaiAsPromised);
 
 const TIME_ENTRIES_01 = [
   { direction: 'enter', entry_date: '2014-02-20T07:00:00.00Z' },

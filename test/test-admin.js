@@ -8,8 +8,7 @@ const moment = require('moment');
 const Chai = require('chai');
 const Mocha = require('mocha');
 const util = require('../api/admin/util-admin');
-// const chaiAsPromised = require('chai-as-promised');
-// chai.use(chaiAsPromised);
+
 const { describe, it } = Mocha;
 const { expect, assert } = Chai;
 

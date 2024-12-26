@@ -2,16 +2,12 @@ require('./init');
 const moment = require('moment');
 const Chai = require('chai');
 const Mocha = require('mocha');
-const chaiAsPromised = require('chai-as-promised');
 const util = require('../api/admin/util-geofences');
 
 const {
   describe, it, before, after,
 } = Mocha;
 const { expect, assert } = Chai;
-
-Chai.use(chaiAsPromised);
-
 let GEOFENCE;
 
 describe('test read geofences', () => {

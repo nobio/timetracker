@@ -61,7 +61,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
     const dt = moment(date);
     const busytime = await this.getBusytimeByDate(dt);
     // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
-    if (busytime && busytime.busytime && busytime.busytime != 0) {
+    if (busytime && busytime.busytime && busytime.busytime !== 0) {
       new StatsDay({
         date: dt,
         actual_working_time: busytime.busytime / 1,
@@ -69,9 +69,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
         is_working_day: true,
         is_complete: true,
         last_changed: new Date(),
-      }).save((err) => {
-        if (err) throw (err);
-      });
+      }).save();
     }
     date = date.add(1, 'day');
     // date, busytime);
@@ -152,6 +150,7 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
           },
         ],
       };
+
       resolve({
         actual_working_time: calculatedBusyTime.actual_working_time,
         planned_working_time: calculatedBusyTime.planned_working_time,
@@ -180,8 +179,10 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   // init arrays innerComp, innerData
   if (fill === 'true') {
     let i = 0;
-    for (let m = dtStart; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-      // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')}`);
+    dtStartClone = dtStart.clone();
+
+    for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
+      console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
       innerData[i] = {
         x: m.format('YYYY-MM-DD'),
         y: null,

@@ -1,11 +1,9 @@
 require('./init');
 
 const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-const g_util = require('../api/global_util');
+const globalUtil = require('../api/global_util');
 const utilEntries = require('../api/entries/util-entries');
 
-chai.use(chaiAsPromised);
 const { expect, assert } = chai;
 chai.should();
 
@@ -13,7 +11,7 @@ describe('test global_util.sendMessage()', () => {
   it('should not throw exception because SLACK URL is not set; response is some error message', async () => {
     process.env.SLACK_TOKEN = '';
     try {
-      const response = await g_util.sendMessage('CREATE_ENTRY', 'XXXXXXX');
+      const response = await globalUtil.sendMessage('CREATE_ENTRY', 'XXXXXXX');
       // console.log(response)
       expect(response).to.be.string;
       expect(response).to.contain('could not send message');
@@ -26,7 +24,7 @@ describe('test global_util.sendMessage()', () => {
 
   it('should work just fine with unknown key as promise', async () => {
     try {
-      const result = await g_util.sendMessage('UNKNOWN_KEY', 'XXXXXXX');
+      const result = await globalUtil.sendMessage('UNKNOWN_KEY', 'XXXXXXX');
       expect(result).to.not.be.undefined;
       expect(result).to.be.string;
       expect(result).to.equal('toggle UNKNOWN_KEY switched off');

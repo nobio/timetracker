@@ -7,12 +7,10 @@ const User = mongoose.model('User');
 const Token = mongoose.model('Token');
 
 const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
 const { mockRequest, mockResponse } = require('mock-req-res');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
 
-chai.use(chaiAsPromised);
 chai.use(sinonChai);
 chai.use(require('chai-integer'));
 
