@@ -182,7 +182,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
     dtStartClone = dtStart.clone();
 
     for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-      console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
+      // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
       innerData[i] = {
         x: m.format('YYYY-MM-DD'),
         y: null,

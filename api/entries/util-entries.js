@@ -489,8 +489,7 @@ exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve,
    * ]
    */
 exports.getErrorDates = async () => {
-  const failureDatesSorted = await FailureDay.find();
-  // const failureDatesSorted = await failureDates.sort({ failure_type: 1, date: -1 }).exec();
+  const failureDatesSorted = await FailureDay.find({ failure_type: 1, date: -1 }).exec();
 
   const fDates = [];
   for (let n = 0; n < failureDatesSorted.length; n++) {
@@ -501,21 +500,6 @@ exports.getErrorDates = async () => {
   }
   return fDates;
 };
-
-exports.getErrorDatesOrig = () => new Promise((resolve, reject) => {
-  FailureDay.find().sort({ failure_type: 1, date: -1 })
-    .then((failureDates) => {
-      const fDates = [];
-      for (let n = 0; n < failureDates.length; n++) {
-        fDates.push({
-          'error-date': failureDates[n].date,
-          'error-type': failureDates[n].failure_type,
-        });
-      }
-      resolve(fDates);
-    })
-    .catch((err) => reject(err));
-});
 
 /**
  * creates two entries for the given entry dated marked with the given mark

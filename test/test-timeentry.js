@@ -427,7 +427,20 @@ describe('test util.markADay ', () => {
 });
 
 describe('test util.storeValidationErrors ', () => {
-  it.only('evaluate', async () => {
+  it('getErrorDates', async () => {
+    try {
+      const errorDates = await util.getErrorDates();
+      expect(errorDates).to.be.an('array');
+    } catch (error) {
+      assert.fail('should not throw an error here');
+    }
+  });
+
+  after(async () => {
+    clearAllEntries(DEFAULT_DATE);
+  });
+
+  it('evaluate', async () => {
     const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
     const result = await util.evaluate(firstTime, lastTime);
@@ -435,7 +448,7 @@ describe('test util.storeValidationErrors ', () => {
     expect(result.message).to.equal('calculation ongoing in background');
   });
 
-  it.only('storeValidationErrors', async () => {
+  it('storeValidationErrors', async () => {
     const firstTime = { age: moment('2018-01-13T06:30:00.000Z') };
     const lastTime = { age: moment('2018-12-15T14:09:49.314Z') };
 
@@ -447,21 +460,6 @@ describe('test util.storeValidationErrors ', () => {
       console.log(error);
       assert.fail('should not throw an error here');
     }
-  });
-
-  it.only('getErrorDates', async () => {
-    try {
-      console.log(1);
-      const errorDates = await util.getErrorDates();
-      console.log(2);
-      expect(errorDates).to.be.an('array');
-    } catch (error) {
-      assert.fail('should not throw an error here');
-    }
-  });
-
-  after(async () => {
-    clearAllEntries(DEFAULT_DATE);
   });
 });
 
