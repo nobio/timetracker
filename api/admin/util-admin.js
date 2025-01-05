@@ -144,9 +144,9 @@ exports.dumpModels = async () => {
   isDumpRunning = true;
 
   const res = [];
-  for (const model of MODELS) {
-    res.push(await dumpModel(mongoose.model(model)));
-  }
+  const promises = MODELS.map(model => dumpModel(mongoose.model(model)));
+  const results = await Promise.all(promises);
+  res.push(...results);
   isDumpRunning = false;
   console.info(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) DONE ---------------------`);
   return res;
