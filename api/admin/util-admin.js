@@ -7,196 +7,226 @@ require('../../db');
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
-
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const gUtil = require('../global_util');
 
-const TimeEntry = mongoose.model('TimeEntry');
-const TimeEntryBackup = mongoose.model('TimeEntryBackup');
-
+// Constants
 const DUMP_DIR = './dump';
 const MODELS = gUtil.MODEL_TYPES;
 
+// Models
+const TimeEntry = mongoose.model('TimeEntry');
+const TimeEntryBackup = mongoose.model('TimeEntryBackup');
+
+// State
 let isBackupRunning = false;
 let isDumpRunning = false;
 
 /* ====================================================================================== */
-/* ======================================== H E L P E R ================================= */
+/* ======================================== HELPERS ===================================== */
 /* ====================================================================================== */
 
 /**
- * deletes files in DUMP_DIR which are older than 31 days regarding their file name:
- * 'timeentry_<YYYY-MM-DD_HHmmss>.json'
+ * Deletes dump files older than 31 days
  */
 const deleteOldDumpfiles = async () => {
-  if (fs.existsSync(DUMP_DIR)) {
-    const fileNames = await fs.readdirSync(DUMP_DIR);
+  if (!fs.existsSync(DUMP_DIR)) return;
 
-    for (const fileName of fileNames) {
-      const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');
-      const diffDays = Math.floor(moment().diff(fileDate) / 86400000);
-      // console.log(moment(), fileDate, diffDays)
-      if (diffDays > 31) {
-        fs.rmSync(`${DUMP_DIR}/${fileName}`);
-      }
+  const fileNames = await fs.readdirSync(DUMP_DIR);
+  const thirtyOneDaysInMs = 31 * 24 * 60 * 60 * 1000;
+
+  fileNames.forEach(fileName => {
+    const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');
+    const ageInDays = moment().diff(fileDate, 'days');
+    
+    if (ageInDays > 31) {
+      fs.rmSync(`${DUMP_DIR}/${fileName}`);
     }
-  }
+  });
 };
-exports.testWrapperDeleteOldDumpfiles = async () => deleteOldDumpfiles();
 
 /**
- * dumps one model
- * @param {*} model
- * @returns
+ * Dumps a single model to a gzipped JSON file
  */
 const dumpModel = async (model) => {
-  if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
+  if (!fs.existsSync(DUMP_DIR)) {
+    fs.mkdirSync(DUMP_DIR);
+  }
+  
   await deleteOldDumpfiles();
 
-  const dumpFile = `${DUMP_DIR}/${model.modelName}_${moment().format('YYYY-MM-DD_HHmmss')}.json.gz`;
+  const timestamp = moment().format('YYYY-MM-DD_HHmmss');
+  const dumpFile = `${DUMP_DIR}/${model.modelName}_${timestamp}.json.gz`;
   const entries = await model.find();
 
-  console.log(`database dump model ${model.modelName} ${entries.length} items`);
+  console.log(`Dumping ${model.modelName}: ${entries.length} items`);
 
   return new Promise((resolve, reject) => {
     zlib.gzip(JSON.stringify(entries), (err, buffer) => {
-      if (err) reject(err);
-      else {
-        fs.writeFileSync(dumpFile, buffer); // use JSON.stringify for nice format of output
-        resolve({
-          size: entries.length,
-          filename: dumpFile,
-        });
+      if (err) {
+        reject(err);
+        return;
       }
+      
+      fs.writeFileSync(dumpFile, buffer);
+      resolve({
+        size: entries.length,
+        filename: dumpFile
+      });
     });
   });
 };
-exports.testWrapperDumpModel = async (model) => dumpModel(model);
 
 /**
- * returns the latest file of a typ within a directory
+ * Gets the most recent file of a given type from a directory
  */
-const recentFile = (dir, type) => {
+const getRecentFile = (dir, type) => {
   const files = fs.readdirSync(dir)
-    .filter((file) => fs.lstatSync(path.join(dir, file)).isFile())
-    .filter((file) => file.startsWith(type))
-    .map((file) => ({ file, mtime: fs.lstatSync(path.join(dir, file)).mtime }))
+    .filter(file => {
+      const stats = fs.lstatSync(path.join(dir, file));
+      return stats.isFile() && file.startsWith(type);
+    })
+    .map(file => ({
+      file,
+      mtime: fs.lstatSync(path.join(dir, file)).mtime
+    }))
     .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
 
-  return files.length ? files[0] : undefined;
+  return files[0];
 };
 
 /**
- * restore data of a specific data type
- * @param {*} dbType
+ * Restores data from a dump file into the database
  */
 const restoreFile = async (dbType) => {
-  const f = recentFile(DUMP_DIR, dbType);
-  if (!f) return;
+  const recentDumpFile = getRecentFile(DUMP_DIR, dbType);
+  if (!recentDumpFile) return;
 
   const Model = mongoose.model(dbType);
-  const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
+  const buffer = fs.readFileSync(`${DUMP_DIR}/${recentDumpFile.file}`);
+  
   const data = await new Promise((resolve, reject) => {
     zlib.gunzip(buffer, (err, buf) => {
-      if (err) reject(err);
-      else resolve(JSON.parse(buf.toString('utf-8')));
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(JSON.parse(buf.toString('utf-8')));
     });
   });
-  // const data = JSON.parse(fs.readFileSync(`${DUMP_DIR}/${f.file}`));
-  // console.log(`>>>>>>> ${Model.modelName} >>>>>>>`);
+
   await Model.deleteMany({});
   await Model.insertMany(data);
-  // console.log(`<<<<<<< ${Model.modelName} <<<<<<<`);
 
   return dbType;
 };
+
+/**
+ * Downloads and unzips a model's dump file
+ */
 const downloadObject = async (dbType) => {
   try {
-    const f = recentFile(DUMP_DIR, dbType);
-    if (!f) return;
+    const recentDumpFile = getRecentFile(DUMP_DIR, dbType);
+    if (!recentDumpFile) return;
 
-    const buffer = fs.readFileSync(`${DUMP_DIR}/${f.file}`);
-    const data = await new Promise((resolve, reject) => {
+    const buffer = fs.readFileSync(`${DUMP_DIR}/${recentDumpFile.file}`);
+    
+    return await new Promise((resolve, reject) => {
       zlib.gunzip(buffer, (err, buf) => {
-        if (err) reject(err);
-        else resolve(JSON.parse(buf.toString('utf-8')));
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(JSON.parse(buf.toString('utf-8')));
       });
     });
-
-    return data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return error.message;
   }
 };
 
 /* ====================================================================================== */
-/* ======================================== IMPL ================================= */
+/* ======================================== PUBLIC API ================================== */
 /* ====================================================================================== */
 
 /**
- * function dump the whole database to a file. This file is located in the "dump" folder
+ * Dumps all models to files
  */
 exports.dumpModels = async () => {
-  console.info(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) ---------------------`);
   if (isDumpRunning) return;
+  
+  console.info('------------------- STARTING DATABASE DUMP ---------------------');
   isDumpRunning = true;
 
-  const res = [];
-  const promises = MODELS.map(model => dumpModel(mongoose.model(model)));
-  const results = await Promise.all(promises);
-  res.push(...results);
-  isDumpRunning = false;
-  console.info(`------------------- DUMP DATA TO FILE SYSTEM (${isDumpRunning}) DONE ---------------------`);
-  return res;
+  try {
+    const promises = MODELS.map(model => dumpModel(mongoose.model(model)));
+    const results = await Promise.all(promises);
+    return results;
+  } finally {
+    isDumpRunning = false;
+    console.info('------------------- DATABASE DUMP COMPLETE ---------------------');
+  }
 };
 
+/**
+ * Restores all models from dump files
+ */
 exports.restoreDataFromFile = async () => {
-  if (!fs.existsSync(DUMP_DIR)) fs.mkdirSync(DUMP_DIR);
-
-  const res = [];
-  for (const model of MODELS) {
-    res.push(await restoreFile(model));
+  if (!fs.existsSync(DUMP_DIR)) {
+    fs.mkdirSync(DUMP_DIR);
   }
 
-  isBackupRunning = false;
-  return res;
+  const restoredModels = [];
+  for (const model of MODELS) {
+    const result = await restoreFile(model);
+    if (result) restoredModels.push(result);
+  }
+
+  return restoredModels;
 };
 
+/**
+ * Backs up time entries to a backup collection
+ */
 exports.backupTimeEntries = async () => {
-  console.info(`------------------- BACKUP DATA TO BACKUP TABLE (${isBackupRunning}) ---------------------`);
   if (isBackupRunning) return;
+
+  console.info('------------------- STARTING TIME ENTRY BACKUP ---------------------');
   isBackupRunning = true;
 
-  await TimeEntryBackup.deleteMany({});
-  const timeEntries = await TimeEntry.find();
-  console.log(`${timeEntries.length} time entries found to be backed up`);
-
-  const promises = [];
-  for (const timeentry of timeEntries) {
-    promises.push(
-      new TimeEntryBackup({
-        _id: timeentry._id,
-        entry_date: timeentry.entry_date,
-        direction: timeentry.direction,
-        last_changed: timeentry.last_changed,
-        longitude: timeentry.longitude,
-        latitude: timeentry.latitude,
-      }).save(),
-    );
-  }
-
   try {
-    const values = await Promise.all(promises);
-    console.log(values.length);
+    await TimeEntryBackup.deleteMany({});
+    const timeEntries = await TimeEntry.find();
+    console.log(`Found ${timeEntries.length} time entries to backup`);
+
+    const backupPromises = timeEntries.map(entry => (
+      new TimeEntryBackup({
+        _id: entry._id,
+        entry_date: entry.entry_date,
+        direction: entry.direction,
+        last_changed: entry.last_changed,
+        longitude: entry.longitude,
+        latitude: entry.latitude
+      }).save()
+    ));
+
+    const results = await Promise.all(backupPromises);
     gUtil.sendMessage('BACKUP_DB');
-    return { backup_count: timeEntries.length };
+    
+    return { backup_count: results.length };
   } catch (error) {
-    console.error(error);
+    console.error('Backup failed:', error);
+    throw error;
   } finally {
     isBackupRunning = false;
+    console.info('------------------- TIME ENTRY BACKUP COMPLETE ---------------------');
   }
 };
 
 exports.getDumpedModel = async (modelType) => downloadObject(modelType);
+
+// Test helpers
+exports.testWrapperDeleteOldDumpfiles = deleteOldDumpfiles;
+exports.testWrapperDumpModel = dumpModel;
