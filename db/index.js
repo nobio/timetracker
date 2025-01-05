@@ -10,8 +10,8 @@ const MONGODB_OPTIONS = {
   // keepAlive: true,
   // bufferMaxEntries: -1,
   // useCreateIndex: true,
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  // useNewUrlParser: true,
+  // useUnifiedTopology: true,
   // useFindAndModify: false,
 };
 

@@ -21,13 +21,14 @@ const jsyaml = require('js-yaml');
 const cors = require('cors');
 const db = require('./db');
 const globalUtil = require('./api/global_util');
-const api_geotrack = require('./api/geotrack');
-const api_auth = require('./api/auth');
-const api_misc = require('./api/misc');
-const api_stats = require('./api/stats');
-const api_admin = require('./api/admin');
-const api_entries = require('./api/entries');
-const api_schedule = require('./api/schedule');
+const apiGeotrack = require('./api/geotrack');
+const apiAuth = require('./api/auth');
+const apiMisc = require('./api/misc');
+const apiStats = require('./api/stats');
+const apiAdmin = require('./api/admin');
+const apiEntries = require('./api/entries');
+const apiSchedule = require('./api/schedule');
+const scheduler = require('./api/schedule/scheduler');
 
 require('log-timestamp')(() => `[${moment().format('ddd, DD MMM YYYY hh:mm:ss Z')}] - %s`);
 
@@ -46,11 +47,11 @@ app.use(cookieParser());
 
 app.use(rateLimit({
   windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
-  max: process.env.RATE_LIMIT_RQEUESTS,
+  max: process.env.RATE_LIMIT_REQUESTS,
 }));
 
 app.use(cors());
-app.use(api_auth.authorize);
+app.use(apiAuth.authorize);
 
 /* ============================================================================= */
 const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
@@ -88,98 +89,98 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // -----------------------------------------------------------------------
 const API_PATH = process.env.API_PATH || '/api';
 
-app.get(`${API_PATH}/entries`, api_entries.getEntries);
-app.post(`${API_PATH}/entries`, api_entries.createEntry);
-app.get(`${API_PATH}/entries/:id`, api_entries.getEntryById);
-app.put(`${API_PATH}/entries/:id`, api_entries.saveEntry);
-app.delete(`${API_PATH}/entries/:id`, api_entries.deleteEntry);
-app.post(`${API_PATH}/entries/error/evaluate`, api_entries.evaluate);
-app.get(`${API_PATH}/entries/error/dates`, api_entries.getErrorDates);
-app.post(`${API_PATH}/entries/mark`, api_entries.markADay);
+app.get(`${API_PATH}/entries`, apiEntries.getEntries);
+app.post(`${API_PATH}/entries`, apiEntries.createEntry);
+app.get(`${API_PATH}/entries/:id`, apiEntries.getEntryById);
+app.put(`${API_PATH}/entries/:id`, apiEntries.saveEntry);
+app.delete(`${API_PATH}/entries/:id`, apiEntries.deleteEntry);
+app.post(`${API_PATH}/entries/error/evaluate`, apiEntries.evaluate);
+app.get(`${API_PATH}/entries/error/dates`, apiEntries.getErrorDates);
+app.post(`${API_PATH}/entries/mark`, apiEntries.markADay);
 // .......................................................................
 // geofencing
 // .......................................................................
-// app.post('/api/geofence', api_entries.geofence);
-app.post(`${API_PATH}/geotrack`, api_geotrack.createGeoTrack);
-app.get(`${API_PATH}/geotrack`, api_geotrack.getGeoTracking);
-app.get(`${API_PATH}/geotrack/metadata`, api_geotrack.getGeoTrackingMetadata);
+// app.post('/api/geofence', apiEntries.geofence);
+app.post(`${API_PATH}/geotrack`, apiGeotrack.createGeoTrack);
+app.get(`${API_PATH}/geotrack`, apiGeotrack.getGeoTracking);
+app.get(`${API_PATH}/geotrack/metadata`, apiGeotrack.getGeoTrackingMetadata);
 
-app.get(`${API_PATH}/geofences`, api_admin.getGeofences);
-app.get(`${API_PATH}/geofences/:id`, api_admin.getGeofence);
-app.post(`${API_PATH}/geofences`, api_admin.createGeofence);
-app.put(`${API_PATH}/geofences/:id`, api_admin.saveGeofence);
-app.delete(`${API_PATH}/geofences/:id`, api_admin.deleteGeofence);
+app.get(`${API_PATH}/geofences`, apiAdmin.getGeofences);
+app.get(`${API_PATH}/geofences/:id`, apiAdmin.getGeofence);
+app.post(`${API_PATH}/geofences`, apiAdmin.createGeofence);
+app.put(`${API_PATH}/geofences/:id`, apiAdmin.saveGeofence);
+app.delete(`${API_PATH}/geofences/:id`, apiAdmin.deleteGeofence);
 
 // .......................................................................
 // admin
 // .......................................................................
-app.post(`${API_PATH}/entries/dump`, api_admin.dumpModels);
-app.get(`${API_PATH}/entries/dump/:modelType`, api_admin.getDumpedModels);
-app.post(`${API_PATH}/entries/backup`, api_admin.backupTimeEntries);
-app.post(`${API_PATH}/entries/restore`, api_admin.restore);
+app.post(`${API_PATH}/entries/dump`, apiAdmin.dumpModels);
+app.get(`${API_PATH}/entries/dump/:modelType`, apiAdmin.getDumpedModels);
+app.post(`${API_PATH}/entries/backup`, apiAdmin.backupTimeEntries);
+app.post(`${API_PATH}/entries/restore`, apiAdmin.restore);
 
 // .......................................................................
 // toggles
 // .......................................................................
-app.get(`${API_PATH}/toggles`, api_admin.getAllToggles);
-app.get(`${API_PATH}/toggles/status`, api_admin.getToggleStatus);
-app.get(`${API_PATH}/toggles/:id`, api_admin.getToggleById);
-app.get(`${API_PATH}/toggles/name/:name`, api_admin.getToggleByName);
-app.put(`${API_PATH}/toggles/:id`, api_admin.saveToggle);
-app.post(`${API_PATH}/toggles`, api_admin.createToggle);
-app.delete(`${API_PATH}/toggles/:id`, api_admin.deleteToggle);
+app.get(`${API_PATH}/toggles`, apiAdmin.getAllToggles);
+app.get(`${API_PATH}/toggles/status`, apiAdmin.getToggleStatus);
+app.get(`${API_PATH}/toggles/:id`, apiAdmin.getToggleById);
+app.get(`${API_PATH}/toggles/name/:name`, apiAdmin.getToggleByName);
+app.put(`${API_PATH}/toggles/:id`, apiAdmin.saveToggle);
+app.post(`${API_PATH}/toggles`, apiAdmin.createToggle);
+app.delete(`${API_PATH}/toggles/:id`, apiAdmin.deleteToggle);
 
 // .......................................................................
 // properties
 // .......................................................................
-app.get(`${API_PATH}/properties`, api_admin.getProperties);
-app.get(`${API_PATH}/properties/:key`, api_admin.getProperty);
-app.put(`${API_PATH}/properties/:key`, api_admin.setProperty);
-app.delete(`${API_PATH}/properties/:key`, api_admin.deleteProperty);
+app.get(`${API_PATH}/properties`, apiAdmin.getProperties);
+app.get(`${API_PATH}/properties/:key`, apiAdmin.getProperty);
+app.put(`${API_PATH}/properties/:key`, apiAdmin.setProperty);
+app.delete(`${API_PATH}/properties/:key`, apiAdmin.deleteProperty);
 
 // .......................................................................
 // statistics
 // .......................................................................
-app.put(`${API_PATH}/stats`, api_stats.calcStats);
-app.get(`${API_PATH}/stats/:date/:timeUnit`, api_stats.getStats);
-app.delete(`${API_PATH}/stats`, api_stats.deleteAllStatsDays);
-app.get(`${API_PATH}/statistics/aggregate`, api_stats.getStatsByTimeBox);
-app.get(`${API_PATH}/statistics/histogram/:interval`, api_stats.histogram);
-app.get(`${API_PATH}/statistics/breaktime/:interval`, api_stats.breaktime);
-app.get(`${API_PATH}/statistics/extrahours`, api_stats.extraHours);
+app.put(`${API_PATH}/stats`, apiStats.calcStats);
+app.get(`${API_PATH}/stats/:date/:timeUnit`, apiStats.getStats);
+app.delete(`${API_PATH}/stats`, apiStats.deleteAllStatsDays);
+app.get(`${API_PATH}/statistics/aggregate`, apiStats.getStatsByTimeBox);
+app.get(`${API_PATH}/statistics/histogram/:interval`, apiStats.histogram);
+app.get(`${API_PATH}/statistics/breaktime/:interval`, apiStats.breaktime);
+app.get(`${API_PATH}/statistics/extrahours`, apiStats.extraHours);
 
 // .......................................................................
 // maintain
 // .......................................................................
-app.get(`${API_PATH}/ping`, api_misc.ping);
-app.get(`${API_PATH}/version`, api_misc.version);
-app.all(`${API_PATH}/experiment`, api_misc.experiment);
-app.get(`${API_PATH}/health`, api_misc.healthcheck);
+app.get(`${API_PATH}/ping`, apiMisc.ping);
+app.get(`${API_PATH}/version`, apiMisc.version);
+app.all(`${API_PATH}/experiment`, apiMisc.experiment);
+app.get(`${API_PATH}/health`, apiMisc.healthcheck);
 // log the request on different methods
-app.get(`${API_PATH}/log`, api_misc.log);
-app.post(`${API_PATH}/log`, api_misc.log);
-app.put(`${API_PATH}/log`, api_misc.log);
+app.get(`${API_PATH}/log`, apiMisc.log);
+app.post(`${API_PATH}/log`, apiMisc.log);
+app.put(`${API_PATH}/log`, apiMisc.log);
 
 // .......................................................................
 // users and authentication
 // .......................................................................
-app.get(`${API_PATH}/users`, api_auth.getAllUsers);
-app.get(`${API_PATH}/users/:id`, api_auth.getUser);
-app.post(`${API_PATH}/users`, api_auth.createUser);
-app.put(`${API_PATH}/users/:id`, api_auth.updateUser);
-app.put(`${API_PATH}/users/:id/password`, api_auth.updateUsersPassword);
-app.delete(`${API_PATH}/users/:id`, api_auth.deleteUser);
+app.get(`${API_PATH}/users`, apiAuth.getAllUsers);
+app.get(`${API_PATH}/users/:id`, apiAuth.getUser);
+app.post(`${API_PATH}/users`, apiAuth.createUser);
+app.put(`${API_PATH}/users/:id`, apiAuth.updateUser);
+app.put(`${API_PATH}/users/:id/password`, apiAuth.updateUsersPassword);
+app.delete(`${API_PATH}/users/:id`, apiAuth.deleteUser);
 
-app.post(`${API_PATH}/auth/login`, api_auth.login);
-app.post(`${API_PATH}/auth/logout`, api_auth.logout);
-app.post(`${API_PATH}/auth/token`, api_auth.refreshToken);
+app.post(`${API_PATH}/auth/login`, apiAuth.login);
+app.post(`${API_PATH}/auth/logout`, apiAuth.logout);
+app.post(`${API_PATH}/auth/token`, apiAuth.refreshToken);
 
 // .......................................................................
 // export functionalities that are supposed to run regulary. If
 // timetracker does not do scheduling (see process.env.START_CRONJOBS)
 // the jobs should be triggered from outside (for example by a CronJob pod)
 // .......................................................................
-app.put(`${API_PATH}/schedule`, api_schedule.schedule);
+app.put(`${API_PATH}/schedule`, apiSchedule.schedule);
 // .......................................................................
 // Check Slack url
 // .......................................................................
@@ -213,13 +214,13 @@ const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'
 });
 
 /* ================= start the web service on https ================= */
-const ssl_options = {
+const sslOptions = {
   key: Buffer.from(process.env.SSL_PRIVATE_KEY_BASE64, 'base64').toString('ascii'),
   cert: Buffer.from(process.env.SSL_CERT_BASE64, 'base64').toString('ascii'),
 };
 
 // write output to console
-const httpsServer = https.createServer(ssl_options, app).listen(app.get('ssl-port'), app.get('host'), () => {
+const httpsServer = https.createServer(sslOptions, app).listen(app.get('ssl-port'), app.get('host'), () => {
   console.log(`ssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
@@ -230,7 +231,7 @@ webSocketFacade.init(httpsServer);
 
 /* start scheduler */
 if (process.env.START_CRONJOBS !== 'false') { // default should be "start it up". I need to explicitly switch startup off
-  require('./api/schedule/scheduler').scheduleTasks();
+  scheduler.scheduleTasks();
 }
 
 /* send message that server has been started */
