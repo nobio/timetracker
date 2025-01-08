@@ -43,12 +43,14 @@ app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
 app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
 app.use(express.json());
 app.use(cookieParser());
-// apply rate limiter to all requests
 
-app.use(rateLimit({
-  windowMs: process.env.RATE_LIMIT_WINDOW_MS, // 10 requests per second
-  max: process.env.RATE_LIMIT_REQUESTS,
-}));
+// apply rate limiter to all requests
+if (process.env.RATE_LIMIT_ACTIVE === 'true') {
+  app.use(rateLimit({
+    windowMs: process.env.RATE_LIMIT_WINDOW_MS || 1000, // Default: pro Sekunde
+    max: process.env.RATE_LIMIT_REQUESTS || 100, // limit each IP to 100 requests per windowMs
+  }));
+}
 
 app.use(cors());
 app.use(apiAuth.authorize);
@@ -58,18 +60,18 @@ const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
 const swaggerDoc = jsyaml.load(spec);
 
 /*
-app.use((req, res, next) => {
-  console.log(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
-  console.log(`▶ params:${JSON.stringify(req.params)}`);
-  console.log(`▶ body:${JSON.stringify(req.body)}`);
-  next();
-});
-*/
+  app.use((req, res, next) => {
+    console.log(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
+    console.log(`▶ params:${JSON.stringify(req.params)}`);
+    console.log(`▶ body:${JSON.stringify(req.body)}`);
+    next();
+  });
+  */
 /*
-app.configure('production', function() {
-  app.use(express.errorHandler());
-});
-*/
+  app.configure('production', function() {
+    app.use(express.errorHandler());
+  });
+  */
 app.use(compression({
   filter(req, res) {
     if (req.headers['x-no-compression']) {
