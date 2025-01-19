@@ -50,11 +50,6 @@ exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
       bookedTime = busytime - pause + AOK_WEGEZEIT_SECONDS;
     }
     bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
-  } else if (moment(date, 'X').isAfter('2023-09-30')) {
-    // Baader Bank
-    // TODO: IF busytime <= 6h und pause = 0 -> 30min Abzug
-    // TODO: IF busytime > 6h und pause = 0 -> 45min Abzug
-    bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
   } else {
     // vor/nach AOK Bayern
     if (entriesPerDay > 2) bookedTime = busytime; // more then 2 (i.e. 4, 6, etc.) entries, the pause has already been taken into account
