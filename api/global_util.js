@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-lonely-if */
 const Axios = require('axios');
 const moment = require('moment');
@@ -8,31 +9,36 @@ const DEFAULT_BREAK_TIME_SECONDS = 60 * 45; // 45 min Pause
 const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
-const BAADERBANK_BREAK_TIME_SECONDS = 60 * 60; // 60 min Pause
+const BAADERBANK_BREAK_TIME_SECONDS_30_MIN = 30 * 60; // 30 min Pause
+const BAADERBANK_BREAK_TIME_SECONDS_45_MIN = 45 * 60; // 30 min Pause
+const BAADERBANK_6_HOURS = 6 * 60 * 60 * 1000; // 6 h Arbeit pro Tag in ms
+const BAADERBANK_9_HOURS = 9 * 60 * 60 * 1000; // 9 h Arbeit pro Tag in ms
 exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 /**
  * calculates the break time dependeing on the date (needed to use the right employer) and
  * the numbers of entries per day
  */
-exports.getBreakTimeSeconds = (date) => {
+exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
+  const workDurationInMS = workDurationInHours * 60 * 60 * 1000;
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
-
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021: ${dateMoment.isAfter('2021-08-31')}`);
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is before 31.08.2021: ${dateMoment.isBefore('2023-10-01')}`);
-
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021 (AOK): ${dateMoment.isAfter('2021-08-31')} work: ${workDurationInMS / 1000 / 3600}`);
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 01.10.2023 (BAD): ${dateMoment.isAfter('2023-10-01')}`);
+  // console.log(dateMoment.isAfter('2021-08-31')); console.log(dateMoment.isBefore('2023-10-01'));
   if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) {
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
   } if (dateMoment.isAfter('2023-09-30')) {
     // Baader Bank
-    return BAADERBANK_BREAK_TIME_SECONDS;
+    if (workDurationInMS < BAADERBANK_6_HOURS) return 0;
+    if (workDurationInMS >= BAADERBANK_6_HOURS && workDurationInMS <= BAADERBANK_9_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_30_MIN;
+    if (workDurationInMS > BAADERBANK_9_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_45_MIN;
   }
   return DEFAULT_BREAK_TIME_SECONDS;
 };
-exports.getBreakTimeMilliSeconds = (date) => this.getBreakTimeSeconds(date) * 1000;
+exports.getBreakTimeMilliSeconds = (date, workDurationInHours = 8) => this.getBreakTimeSeconds(date, workDurationInHours) * 1000;
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
   // console.log(busytime, pause, date, entriesPerDay)
   let bookedTime;
@@ -49,12 +55,13 @@ exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
     // TODO: IF busytime <= 6h und pause = 0 -> 30min Abzug
     // TODO: IF busytime > 6h und pause = 0 -> 45min Abzug
     bookedTime = Math.min(bookedTime, AOK_MAX_WORKTIME_SECONDS);
-  } else
+  } else {
     // vor/nach AOK Bayern
     if (entriesPerDay > 2) bookedTime = busytime; // more then 2 (i.e. 4, 6, etc.) entries, the pause has already been taken into account
     else if (busytime < pause) bookedTime = busytime; // pause > bookedTime: we are at the very morning shortly after checking in
     else bookedTime = busytime - pause; // remains: n==2 and bookedTime longer than calculated pause
   }
+
   return bookedTime;
 };
 

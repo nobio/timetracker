@@ -34,12 +34,11 @@ const deleteOldDumpfiles = async () => {
   if (!fs.existsSync(DUMP_DIR)) return;
 
   const fileNames = await fs.readdirSync(DUMP_DIR);
-  const thirtyOneDaysInMs = 31 * 24 * 60 * 60 * 1000;
 
-  fileNames.forEach(fileName => {
+  fileNames.forEach((fileName) => {
     const fileDate = moment(fileName.split('.')[0].split('_')[1]).tz('Europe/Berlin');
     const ageInDays = moment().diff(fileDate, 'days');
-    
+
     if (ageInDays > 31) {
       fs.rmSync(`${DUMP_DIR}/${fileName}`);
     }
@@ -53,7 +52,7 @@ const dumpModel = async (model) => {
   if (!fs.existsSync(DUMP_DIR)) {
     fs.mkdirSync(DUMP_DIR);
   }
-  
+
   await deleteOldDumpfiles();
 
   const timestamp = moment().format('YYYY-MM-DD_HHmmss');
@@ -68,11 +67,11 @@ const dumpModel = async (model) => {
         reject(err);
         return;
       }
-      
+
       fs.writeFileSync(dumpFile, buffer);
       resolve({
         size: entries.length,
-        filename: dumpFile
+        filename: dumpFile,
       });
     });
   });
@@ -83,13 +82,13 @@ const dumpModel = async (model) => {
  */
 const getRecentFile = (dir, type) => {
   const files = fs.readdirSync(dir)
-    .filter(file => {
+    .filter((file) => {
       const stats = fs.lstatSync(path.join(dir, file));
       return stats.isFile() && file.startsWith(type);
     })
-    .map(file => ({
+    .map((file) => ({
       file,
-      mtime: fs.lstatSync(path.join(dir, file)).mtime
+      mtime: fs.lstatSync(path.join(dir, file)).mtime,
     }))
     .sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
 
@@ -105,7 +104,7 @@ const restoreFile = async (dbType) => {
 
   const Model = mongoose.model(dbType);
   const buffer = fs.readFileSync(`${DUMP_DIR}/${recentDumpFile.file}`);
-  
+
   const data = await new Promise((resolve, reject) => {
     zlib.gunzip(buffer, (err, buf) => {
       if (err) {
@@ -131,7 +130,7 @@ const downloadObject = async (dbType) => {
     if (!recentDumpFile) return;
 
     const buffer = fs.readFileSync(`${DUMP_DIR}/${recentDumpFile.file}`);
-    
+
     return await new Promise((resolve, reject) => {
       zlib.gunzip(buffer, (err, buf) => {
         if (err) {
@@ -156,12 +155,12 @@ const downloadObject = async (dbType) => {
  */
 exports.dumpModels = async () => {
   if (isDumpRunning) return;
-  
+
   console.info('------------------- STARTING DATABASE DUMP ---------------------');
   isDumpRunning = true;
 
   try {
-    const promises = MODELS.map(model => dumpModel(mongoose.model(model)));
+    const promises = MODELS.map((model) => dumpModel(mongoose.model(model)));
     const results = await Promise.all(promises);
     return results;
   } finally {
@@ -201,20 +200,20 @@ exports.backupTimeEntries = async () => {
     const timeEntries = await TimeEntry.find();
     console.log(`Found ${timeEntries.length} time entries to backup`);
 
-    const backupPromises = timeEntries.map(entry => (
+    const backupPromises = timeEntries.map((entry) => (
       new TimeEntryBackup({
         _id: entry._id,
         entry_date: entry.entry_date,
         direction: entry.direction,
         last_changed: entry.last_changed,
         longitude: entry.longitude,
-        latitude: entry.latitude
+        latitude: entry.latitude,
       }).save()
     ));
 
     const results = await Promise.all(backupPromises);
     gUtil.sendMessage('BACKUP_DB');
-    
+
     return { backup_count: results.length };
   } catch (error) {
     console.error('Backup failed:', error);

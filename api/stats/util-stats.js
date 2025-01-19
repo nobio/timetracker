@@ -74,7 +74,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
     date = date.add(1, 'day');
     // date, busytime);
   }
-
+  console.log('calculateStatistics done');
   return { firstEntry, lastEntry };
 };
 
@@ -93,7 +93,7 @@ exports.getBusytimeByDate = async (dt) => {
 
     return { busytime: calculated.busytime };
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     return { busytime: 0 };
   }
 };

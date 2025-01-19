@@ -4,8 +4,9 @@
 /**
  * Module dependencies.
  */
-require('dotenv').config();
 
+require('dotenv').config();
+console.log(require('figlet').textSync('Timetracker'));
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const express = require('express');

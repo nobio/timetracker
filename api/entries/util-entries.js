@@ -214,14 +214,12 @@ exports.update = async (timeEntry) => {
  * @param id unique id of an entry like 5a2100cf87f1f368d087696a
  * @returns TimeEntry object that has been deleted
  */
-exports.deleteById = (id) =>
-  // console.log('entered deleteById ' + id)
-  new Promise((resolve, reject) => {
-    TimeEntry.findByIdAndDelete(id)
-      .then((timeentry) => resolve(timeentry))
-      .then(globalUtil.sendMessage('DELETE_ENTRY', id))
-      .catch((err) => reject(err));
-  });
+exports.deleteById = (id) => new Promise((resolve, reject) => {
+  TimeEntry.findByIdAndDelete(id)
+    .then((timeentry) => resolve(timeentry))
+    .then(globalUtil.sendMessage('DELETE_ENTRY', id))
+    .catch((err) => reject(err));
+});
 
 /**
  * lists all Time Entries for a given date (this particular day)
@@ -303,7 +301,10 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
     }
 
     if (timeentries.length === 2) {
-      pause = globalUtil.getBreakTimeMilliSeconds(timeentries[0].entry_date);
+      pause = globalUtil.getBreakTimeMilliSeconds(
+        timeentries[0].entry_date,
+        timeentries[1].entry_date - timeentries[0].entry_date,
+      );
     }
 
     // calculate break time depending on the dates in timeentries (all entries for this given day)
@@ -362,9 +363,6 @@ exports.getLastTimeEntryByDate = (dt) => {
       .then((timeentry) => {
         if (timeentry === undefined || timeentry.length === 0 || timeentry.length > 1) {
           // reject(new Error('No Time Entry found for given date : ' + date))
-          resolve(undefined);
-        } else if (timeentry.length > 1) {
-          // reject(new Error('More then 1 last time entry found, which is absurd! Given date : ' + date))
           resolve(undefined);
         } else {
           resolve(timeentry[0]);
@@ -509,10 +507,10 @@ exports.getErrorDates = async () => {
 exports.markADay = async (entryDate, mark) => {
   // set enter to 08:00
   const entryDateEnter = entryDate.clone().hours(8);
-  // for the go entry, add 8 hours...
+  // for the go entry, add 8 hours... reads 08:00 + 8h
   const entryDateGo = entryDate.clone().hours(8 + 8);
   // ... and then add the pause
-  entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 'seconds');
+  entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 8);
 
   // create the enter time entry
   await this.create({
