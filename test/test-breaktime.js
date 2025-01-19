@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 require('./init');
 const moment = require('moment');
 
@@ -279,14 +280,24 @@ describe('test g_util.getBreakTime...', () => {
     expect(timestamp).to.equal(1800);
   });
 
-  it('test getBreakTimeSeconds(date) a day after AOK engagement (2023-10-01)', () => {
-    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'));
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 5 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 5);
+    expect(timestamp).to.equal(0);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 8 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 8);
+    expect(timestamp).to.equal(1800);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 9.8 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 9.8);
     expect(timestamp).to.equal(2700);
   });
 
   it('test getBreakTimeSeconds(date) somewhere in the future (2024-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2024-01-01'));
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(1800);
   });
 
   it('getBreakTimeMilliSeconds before AOK', async () => {
@@ -329,12 +340,20 @@ describe('test g_util.getBreakTime...', () => {
 
   it('test getBreakTimeMilliSeconds(date) a day after AOK engagement (2023-10-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2023-10-01'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(1800000);
   });
 
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 5 hours', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 5);
+    expect(timestamp).to.equal(0);
+  });
   it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(1800000);
+  });
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 9 hours', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 9);
+    expect(timestamp).to.equal(1800000);
   });
 });
 
