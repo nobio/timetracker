@@ -301,9 +301,9 @@ exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
     }
 
     if (timeentries.length === 2) {
-      pause = globalUtil.getBreakTimeMilliSeconds(
+      pause = globalUtil.getBreakTimeMilliSeconds( // puase comes in ms but later we need it in hours
         timeentries[0].entry_date,
-        timeentries[1].entry_date - timeentries[0].entry_date,
+        (timeentries[1].entry_date - timeentries[0].entry_date) / 1000 / 3600,
       );
     }
 
