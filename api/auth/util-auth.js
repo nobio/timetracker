@@ -219,7 +219,7 @@ exports.removeExpiredToken = async () => {
       const token = JSON.parse(Buffer.from(payload, 'base64').toString('ascii'));
       if (parseInt(token.exp), now - token.exp > 0) {
         console.log(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
-        jwt.remove();
+        jwt.deleteOne();
       } else {
         console.log(`refresh token NOT yet expired and will not be deleted now: (${JSON.stringify(token)})`);
       }

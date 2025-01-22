@@ -179,7 +179,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   // init arrays innerComp, innerData
   if (fill === 'true') {
     let i = 0;
-    dtStartClone = dtStart.clone();
+    const dtStartClone = dtStart.clone();
 
     for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
       // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);

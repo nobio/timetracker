@@ -16,8 +16,10 @@ const BAADERBANK_9_HOURS = 9 * 60 * 60 * 1000; // 9 h Arbeit pro Tag in ms
 exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 /**
- * calculates the break time dependeing on the date (needed to use the right employer) and
- * the numbers of entries per day
+ * Calculates the break time depending on the date and the number of entries per day.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} workDurationInHours - The duration of work in hours.
+ * @returns {number} - The break time in seconds.
  */
 exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
   const workDurationInMS = workDurationInHours * 60 * 60 * 1000;
@@ -38,7 +40,23 @@ exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
   }
   return DEFAULT_BREAK_TIME_SECONDS;
 };
+
+/**
+ * Converts the break time from seconds to milliseconds.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} workDurationInHours - The duration of work in hours.
+ * @returns {number} - The break time in milliseconds.
+ */
 exports.getBreakTimeMilliSeconds = (date, workDurationInHours = 8) => this.getBreakTimeSeconds(date, workDurationInHours) * 1000;
+
+/**
+ * Calculates the booked time in milliseconds.
+ * @param {number} busytime - The busy time in milliseconds.
+ * @param {number} pause - The pause time in milliseconds.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} entriesPerDay - The number of entries per day.
+ * @returns {number} - The booked time in milliseconds.
+ */
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
   // console.log(busytime, pause, date, entriesPerDay)
   let bookedTime;
@@ -71,7 +89,10 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
 */
 
 /**
- * use Slack's 'incoming Webhooks' to publish messages
+ * Sends a message using Slack's 'incoming Webhooks'.
+ * @param {string} notificationKey - The key for the notification.
+ * @param {string} [addedContent] - Additional content to add to the message.
+ * @returns {Promise<string>} - The result of the message sending.
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
@@ -90,9 +111,9 @@ exports.sendMessage = async (notificationKey, addedContent) => {
 };
 
 /**
- * just send any text to slack; please mind that it could be markd down formatted
- * @param {*} message
- * @returns
+ * Sends any text message to Slack.
+ * @param {string} message - The message to send.
+ * @returns {Promise<string>} - The result of the message sending.
  */
 exports.sendTextMessage = async (message) => {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
@@ -115,4 +136,31 @@ exports.sendTextMessage = async (message) => {
   }
 
   return (`could not send message <'${message}'> to SLACK (no slack url provided); logging to stderr instead`);
+};
+
+/**
+ * Gets the first day of the specified time unit (week, month, or year).
+ * @param {string} dateStr - The date string in 'YYYY-MM-DD' format.
+ * @param {string} timeUnit - The time unit ('week', 'month', or 'year').
+ * @returns {string} - The first day of the specified time unit in 'YYYY-MM-DD' format.
+ * @throws {Error} - If the date format is invalid or the time unit is invalid.
+ */
+exports.getFirstDayByTimeUnit = (dateStr, timeUnit) => {
+  const date = moment(dateStr, 'YYYY-MM-DD');
+  if (!date.isValid()) {
+    throw new Error('Invalid date format. Expected format is YYYY-MM-DD.');
+  }
+
+  switch (timeUnit) {
+    case 'day':
+      return dateStr;
+    case 'week':
+      return date.startOf('week').format('YYYY-MM-DD');
+    case 'month':
+      return date.startOf('month').format('YYYY-MM-DD');
+    case 'year':
+      return date.startOf('year').format('YYYY-MM-DD');
+    default:
+      throw new Error('Invalid time unit. Expected "day", "week", "month", or "year".');
+  }
 };
