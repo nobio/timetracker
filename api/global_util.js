@@ -5,14 +5,14 @@ const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-const DEFAULT_BREAK_TIME_SECONDS = 60 * 45; // 45 min Pause
+const DEFAULT_BREAK_TIME_SECONDS = 45 * 60; // 45 min Pause
 const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
 const BAADERBANK_BREAK_TIME_SECONDS_30_MIN = 30 * 60; // 30 min Pause
 const BAADERBANK_BREAK_TIME_SECONDS_45_MIN = 45 * 60; // 30 min Pause
 const BAADERBANK_6_HOURS = 6 * 60 * 60 * 1000; // 6 h Arbeit pro Tag in ms
-const BAADERBANK_9_HOURS = 9 * 60 * 60 * 1000; // 9 h Arbeit pro Tag in ms
+const BAADERBANK_8_HOURS = 8 * 60 * 60 * 1000; // 9 h Arbeit pro Tag in ms
 exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 /**
@@ -35,8 +35,8 @@ exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
   } if (dateMoment.isAfter('2023-09-30')) {
     // Baader Bank
     if (workDurationInMS < BAADERBANK_6_HOURS) return 0;
-    if (workDurationInMS >= BAADERBANK_6_HOURS && workDurationInMS <= BAADERBANK_9_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_30_MIN;
-    if (workDurationInMS > BAADERBANK_9_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_45_MIN;
+    if (workDurationInMS >= BAADERBANK_6_HOURS && workDurationInMS < BAADERBANK_8_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_30_MIN;
+    if (workDurationInMS >= BAADERBANK_8_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_45_MIN;
   }
   return DEFAULT_BREAK_TIME_SECONDS;
 };

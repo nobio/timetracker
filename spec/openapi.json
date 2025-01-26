@@ -3139,6 +3139,7 @@
             "name": "startDate",
             "in": "query",
             "description": "start date from when to calculate the extra hours; format: YYYY-MM-DD; if not provided startDate will be defaulted by 2014-01-01",
+            "default": "2014-01-01",
             "required": false,
             "schema": {
               "type": "string",
