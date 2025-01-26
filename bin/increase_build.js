@@ -8,34 +8,37 @@
  */
 
 const fs = require('fs');
+const yaml = require('js-yaml');
 const { exec } = require('child_process');
-const package_json = require('../package.json');
-const package_lock_json = require('../package-lock.json');
+const packageJson = require('../package.json');
+const packageLockJson = require('../package-lock.json');
 
-const arg = process.argv.slice(2);
-if (arg == '--help') {
+const openapiYaml = yaml.load(fs.readFileSync('./spec/openapi.yaml', 'utf8'));
+
+const args = process.argv.slice(2);
+if (args[0] === '--help') {
   console.log('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 }
 
 let modified = false;
-const versions = package_json.version.split('.');
-let major_version = parseInt(versions[0]);
-let minor_version = parseInt(versions[1]);
-let build_version = parseInt(versions[2]);
-if (arg == 'ma') {
-  major_version++;
-  minor_version = 0;
-  build_version = 0;
+const versions = packageJson.version.split('.');
+let majorVersion = parseInt(versions[0], 10);
+let minorVersion = parseInt(versions[1], 10);
+let buildVersion = parseInt(versions[2], 10);
+if (args[0] === 'ma') {
+  majorVersion++;
+  minorVersion = 0;
+  buildVersion = 0;
   modified = true;
 }
-if (arg == 'mi') {
-  minor_version++;
-  build_version = 0;
+if (args[0] === 'mi') {
+  minorVersion++;
+  buildVersion = 0;
   modified = true;
 }
-if (!arg || arg == '' || arg == 'b') {
-  build_version++;
+if (!args[0] || args[0] === '' || args[0] === 'b') {
+  buildVersion++;
   modified = true;
 }
 
@@ -44,26 +47,22 @@ if (!modified) { // only write file if version has changed
   console.log('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 } else {
-  package_json.version = `${major_version}.${minor_version}.${build_version}`;
-  package_json.last_build = new Date();
-  package_lock_json.version = `${major_version}.${minor_version}.${build_version}`;
+  packageJson.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
+  packageJson.last_build = new Date();
+  packageLockJson.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
+  openapiYaml.info.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
+  openapiYaml.info.lastUpdate = new Date().toISOString().split('T')[0];
 
-  console.log(`new version ${package_json.version} last_build ${package_json.last_build}`);
+  console.log(`new version ${packageJson.version} lastUpdate ${packageJson.last_build}`);
 
-  fs.writeFileSync(
-    './package.json',
-    JSON.stringify(package_json, null, 4),
-    'UTF8',
-  );
-  fs.writeFileSync(
-    './package-lock.json',
-    JSON.stringify(package_lock_json, null, 4),
-    'UTF8',
-  );
-  fs.writeFileSync('./VERSION', `${major_version}.${minor_version}.${build_version}`);
+  fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 4), 'UTF8');
+  fs.writeFileSync('./package-lock.json', JSON.stringify(packageLockJson, null, 4), 'UTF8');
+  fs.writeFileSync('./spec/openapi.json', JSON.stringify(openapiYaml, null, 4), 'UTF8');
+  fs.writeFileSync('./spec/openapi.yaml', yaml.dump(openapiYaml), 'utf8');
+  fs.writeFileSync('./VERSION', `${majorVersion}.${minorVersion}.${buildVersion}`);
 
   // tag the branch
-  exec(`git tag ${major_version}.${minor_version}.${build_version}`, (err) => {
+  exec(`git tag ${majorVersion}.${minorVersion}.${buildVersion}`, (err) => {
     if (err) {
       console.error(`exec error: ${err}`);
     }
