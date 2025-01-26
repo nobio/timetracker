@@ -24,6 +24,20 @@ const DEFAULT_DATE = moment('1967-03-16');
 
 /** ************************************************************ */
 
+// ========================================================================================================
+function checkTimeboxResult(result) {
+  expect(result).to.have.property('planned_working_time');
+  expect(result).to.have.property('average_working_time');
+  expect(result).to.have.property('actual_working_time');
+  expect(result).to.have.property('inner_data');
+  expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
+  expect(result.inner_data[0]).to.have.property('x');
+  expect(result.inner_data[0]).to.have.property('y');
+  expect(result).to.have.property('inner_comp');
+  expect(result.inner_comp).to.not.be.empty;
+}
+// ========================================================================================================
+
 describe('test utilTimeEntry.getFirstTimeEntry/getLastTimeEntry', () => {
   it('getFirstTimeEntry', async () => {
     result = await utilTimeEntry.getFirstTimeEntry();
@@ -327,7 +341,7 @@ describe('test calculation of extra hours', () => {
   });
 
   it('extra hours by day, no fill', async () => {
-    const result = await utilExtraHours.getExtraHours(false, 'day');
+    const result = await utilExtraHours.getExtraHours(false, 'day', '2023-10-01');
 
     expect(result).to.be.an('array').with.length.greaterThan(0);
     expect(result[0]).to.have.property('date');
@@ -335,6 +349,8 @@ describe('test calculation of extra hours', () => {
     expect(result[0]).to.have.property('hour');
 
     expect(result[6].date).to.be.equal('2023-10-11');
+    expect(result[6].extra_hour).to.be.greaterThan(1);
+    expect(result[6].extra_hour).to.be.lessThan(6);
     expect(result[6].extra_hour).to.be.equal(2);
     expect(result[6].hour).to.be.equal(8);
   });
@@ -403,16 +419,3 @@ async function clearAllEntries(dt) {
     await utilTimeEntry.deleteById(timeentry._id);
   }
 }
-
-function checkTimeboxResult(result) {
-  expect(result).to.have.property('planned_working_time');
-  expect(result).to.have.property('average_working_time');
-  expect(result).to.have.property('actual_working_time');
-  expect(result).to.have.property('inner_data');
-  expect(result.inner_data).to.be.an('array').with.length.greaterThan(0);
-  expect(result.inner_data[0]).to.have.property('x');
-  expect(result.inner_data[0]).to.have.property('y');
-  expect(result).to.have.property('inner_comp');
-  expect(result.inner_comp).to.not.be.empty;
-}
-// ========================================================================================================

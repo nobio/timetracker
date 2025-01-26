@@ -1,38 +1,62 @@
+/* eslint-disable max-len */
 /* eslint-disable no-lonely-if */
 const Axios = require('axios');
 const moment = require('moment');
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 
-const DEFAULT_BREAK_TIME_SECONDS = 60 * 45; // 45 min Pause
+const DEFAULT_BREAK_TIME_SECONDS = 45 * 60; // 45 min Pause
 const AOK_BREAK_TIME_SECONDS = 30 * 60; // 30 min Pause
 const AOK_WEGEZEIT_SECONDS = 504 * 60; // 0.14 Stunden = 60*0.14=8.4 Minuten = 8.4*60=504 Sekunden
 const AOK_MAX_WORKTIME_SECONDS = 10 * 60 * 60 * 1000; // max 10 h Arbeit pro Tag
-// const BAADERBANK_BREAK_TIME_SECONDS = 60 * 60; // 60 min Pause
+const BAADERBANK_BREAK_TIME_SECONDS_30_MIN = 30 * 60; // 30 min Pause
+const BAADERBANK_BREAK_TIME_SECONDS_45_MIN = 45 * 60; // 30 min Pause
+const BAADERBANK_6_HOURS = 6 * 60 * 60 * 1000; // 6 h Arbeit pro Tag in ms
+const BAADERBANK_8_HOURS = 8 * 60 * 60 * 1000; // 9 h Arbeit pro Tag in ms
 exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay', 'StatsDay', 'TimeEntry', 'GeoTracking'];
 
 /**
- * calculates the break time dependeing on the date (needed to use the right employer) and
- * the numbers of entries per day
+ * Calculates the break time depending on the date and the number of entries per day.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} workDurationInHours - The duration of work in hours.
+ * @returns {number} - The break time in seconds.
  */
-exports.getBreakTimeSeconds = (date) => {
+exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
+  const workDurationInMS = workDurationInHours * 60 * 60 * 1000;
   // console.log(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
-
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021: ${dateMoment.isAfter('2021-08-31')}`);
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is before 31.08.2021: ${dateMoment.isBefore('2023-10-01')}`);
-
-  if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) { // AOK enty date and exit date
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021 (AOK): ${dateMoment.isAfter('2021-08-31')} work: ${workDurationInMS / 1000 / 3600}`);
+  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 01.10.2023 (BAD): ${dateMoment.isAfter('2023-10-01')}`);
+  // console.log(dateMoment.isAfter('2021-08-31')); console.log(dateMoment.isBefore('2023-10-01'));
+  if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) {
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
-    //  } if (dateMoment.isAfter('2023-09-30')) {
-    //    // Baader Bank
-    //    return BAADERBANK_BREAK_TIME_SECONDS;
+  } if (dateMoment.isAfter('2023-09-30')) {
+    // Baader Bank
+    if (workDurationInMS < BAADERBANK_6_HOURS) return 0;
+    if (workDurationInMS >= BAADERBANK_6_HOURS && workDurationInMS < BAADERBANK_8_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_30_MIN;
+    if (workDurationInMS >= BAADERBANK_8_HOURS) return BAADERBANK_BREAK_TIME_SECONDS_45_MIN;
   }
   return DEFAULT_BREAK_TIME_SECONDS;
 };
-exports.getBreakTimeMilliSeconds = (date) => this.getBreakTimeSeconds(date) * 1000;
+
+/**
+ * Converts the break time from seconds to milliseconds.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} workDurationInHours - The duration of work in hours.
+ * @returns {number} - The break time in milliseconds.
+ */
+exports.getBreakTimeMilliSeconds = (date, workDurationInHours = 8) => this.getBreakTimeSeconds(date, workDurationInHours) * 1000;
+
+/**
+ * Calculates the booked time in milliseconds.
+ * @param {number} busytime - The busy time in milliseconds.
+ * @param {number} pause - The pause time in milliseconds.
+ * @param {string} date - The date in Unix timestamp format.
+ * @param {number} entriesPerDay - The number of entries per day.
+ * @returns {number} - The booked time in milliseconds.
+ */
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
   // console.log(busytime, pause, date, entriesPerDay)
   let bookedTime;
@@ -50,6 +74,7 @@ exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
     else if (busytime < pause) bookedTime = busytime; // pause > bookedTime: we are at the very morning shortly after checking in
     else bookedTime = busytime - pause; // remains: n==2 and bookedTime longer than calculated pause
   }
+
   return bookedTime;
 };
 
@@ -64,7 +89,10 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
 */
 
 /**
- * use Slack's 'incoming Webhooks' to publish messages
+ * Sends a message using Slack's 'incoming Webhooks'.
+ * @param {string} notificationKey - The key for the notification.
+ * @param {string} [addedContent] - Additional content to add to the message.
+ * @returns {Promise<string>} - The result of the message sending.
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
@@ -83,9 +111,9 @@ exports.sendMessage = async (notificationKey, addedContent) => {
 };
 
 /**
- * just send any text to slack; please mind that it could be markd down formatted
- * @param {*} message
- * @returns
+ * Sends any text message to Slack.
+ * @param {string} message - The message to send.
+ * @returns {Promise<string>} - The result of the message sending.
  */
 exports.sendTextMessage = async (message) => {
   // if no SLACK_URL was found then lets just return the default slack response (test cases...)
@@ -108,4 +136,31 @@ exports.sendTextMessage = async (message) => {
   }
 
   return (`could not send message <'${message}'> to SLACK (no slack url provided); logging to stderr instead`);
+};
+
+/**
+ * Gets the first day of the specified time unit (week, month, or year).
+ * @param {string} dateStr - The date string in 'YYYY-MM-DD' format.
+ * @param {string} timeUnit - The time unit ('week', 'month', or 'year').
+ * @returns {string} - The first day of the specified time unit in 'YYYY-MM-DD' format.
+ * @throws {Error} - If the date format is invalid or the time unit is invalid.
+ */
+exports.getFirstDayByTimeUnit = (dateStr, timeUnit) => {
+  const date = moment(dateStr, 'YYYY-MM-DD');
+  if (!date.isValid()) {
+    throw new Error('Invalid date format. Expected format is YYYY-MM-DD.');
+  }
+
+  switch (timeUnit) {
+    case 'day':
+      return dateStr;
+    case 'week':
+      return date.startOf('week').format('YYYY-MM-DD');
+    case 'month':
+      return date.startOf('month').format('YYYY-MM-DD');
+    case 'year':
+      return date.startOf('year').format('YYYY-MM-DD');
+    default:
+      throw new Error('Invalid time unit. Expected "day", "week", "month", or "year".');
+  }
 };

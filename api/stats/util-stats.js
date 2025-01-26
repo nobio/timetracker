@@ -74,7 +74,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
     date = date.add(1, 'day');
     // date, busytime);
   }
-
+  console.log('calculateStatistics done');
   return { firstEntry, lastEntry };
 };
 
@@ -93,7 +93,7 @@ exports.getBusytimeByDate = async (dt) => {
 
     return { busytime: calculated.busytime };
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     return { busytime: 0 };
   }
 };
@@ -179,7 +179,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   // init arrays innerComp, innerData
   if (fill === 'true') {
     let i = 0;
-    dtStartClone = dtStart.clone();
+    const dtStartClone = dtStart.clone();
 
     for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
       // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);

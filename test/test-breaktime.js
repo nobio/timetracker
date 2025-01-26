@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 require('./init');
 const moment = require('moment');
 
@@ -279,8 +280,18 @@ describe('test g_util.getBreakTime...', () => {
     expect(timestamp).to.equal(1800);
   });
 
-  it('test getBreakTimeSeconds(date) a day after AOK engagement (2023-10-01)', () => {
-    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'));
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 5 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 5);
+    expect(timestamp).to.equal(0);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 8 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 8);
+    expect(timestamp).to.equal(2700);
+  });
+
+  it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 9.8 hours working', () => {
+    const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 9.8);
     expect(timestamp).to.equal(2700);
   });
 
@@ -332,8 +343,16 @@ describe('test g_util.getBreakTime...', () => {
     expect(timestamp).to.equal(2700000);
   });
 
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 5 hours', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 5);
+    expect(timestamp).to.equal(0);
+  });
   it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'));
+    expect(timestamp).to.equal(2700000);
+  });
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 9 hours', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 9);
     expect(timestamp).to.equal(2700000);
   });
 });
@@ -354,5 +373,91 @@ describe('test g_util.getBookedTimeMilliSeconds...', () => {
   it('getBookedTimeMilliSeconds after AOK with 4 entries', async () => {
     const result = await globalUtil.getBookedTimeMilliSeconds(100000, 5000, moment('2022-02-01').unix(), 4);
     expect(result).to.equal(100000 + 504 * 60); // default time before AOK
+  });
+});
+
+describe('test global_util break time', () => {
+  it('Consorsbank: getBreakTimeSeconds               -> expect 60', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1577185859);
+    expect(breakTime).to.equal(45 * 60);
+  });
+  it('AOK:         getBreakTimeSeconds               -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1640344259);
+    expect(breakTime).to.equal(30 * 60);
+  });
+  it('Baader Bank: getBreakTimeSeconds <6 hours      -> expect 0', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 5);
+    expect(breakTime).to.equal(0);
+  });
+  it('Baader Bank: getBreakTimeSeconds 6 hours       -> expect 6', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 6);
+    expect(breakTime).to.equal(30 * 60);
+  });
+  it('Baader Bank: getBreakTimeSeconds 7 hours (6-8) -> expect 30', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 7);
+    expect(breakTime).to.equal(30 * 60);
+  });
+  it('Baader Bank: getBreakTimeSeconds 8 hours       -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 8);
+    expect(breakTime).to.equal(45 * 60);
+  });
+  it('Baader Bank: getBreakTimeSeconds               -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291);
+    expect(breakTime).to.equal(45 * 60);
+  });
+  it('Baader Bank: getBreakTimeSeconds >8 hours (9)  -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 9);
+    expect(breakTime).to.equal(45 * 60);
+  });
+  it('Baader Bank: getBreakTimeMilliSeconds          -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeMilliSeconds(1735040291);
+    expect(breakTime).to.equal(45 * 60 * 1000);
+  });
+});
+
+describe('test global_util getBookedTimeMilliSeconds', () => {
+  it('Consorsbank: getBookedTimeMilliSeconds (0 entries) -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 0);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Consorsbank: getBookedTimeMilliSeconds (2 entries) -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 2);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Consorsbank: getBookedTimeMilliSeconds (3 entrie   -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 3);
+    expect(bookedTime).to.equal(6 * 60 * 60);
+  });
+  it('AOK: getBookedTimeMilliSeconds (1 entries)         -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 1);
+    expect(bookedTime).to.equal(18900);
+  });
+  it('AOK: getBookedTimeMilliSeconds (2 entries)         -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 2);
+    expect(bookedTime).to.equal(18900);
+  });
+  it('AOK: getBookedTimeMilliSeconds (3 entries)         -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1577185859, 3);
+    expect(bookedTime).to.equal(6 * 60 * 60);
+  });
+  it('Baader Bank getBookedTimeMilliSeconds (0 entries)  -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1735040291, 0);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Baader Bank getBookedTimeMilliSeconds (2 entries)  -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1735040291, 2);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Baader Bank getBookedTimeMilliSeconds (0 entries)  -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1735040291, 0);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Baader Bank getBookedTimeMilliSeconds (2 entries)  -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1735040291, 2);
+    expect(bookedTime).to.equal(6 * 60 * 60 - 45 * 60);
+  });
+  it('Baader Bank getBookedTimeMilliSeconds (3 entries)  -> expect 21600', async () => {
+    const bookedTime = await globalUtil.getBookedTimeMilliSeconds(6 * 60 * 60, 45 * 60, 1735040291, 3);
+    expect(bookedTime).to.equal(6 * 60 * 60);
   });
 });

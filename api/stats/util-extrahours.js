@@ -17,8 +17,10 @@
 require('../../db');
 const moment = require('moment-timezone');
 const utilStats = require('./util-stats');
+const gUtil = require('../global_util');
 
-const startDate = moment('2023-10-01').tz('Europe/Berlin'); // start with Baader Bank
+// const startDate = moment('2023-10-01').tz('Europe/Berlin'); // start with Baader Bank
+const START_DATE_DEFAULT = moment('2014-01-01').tz('Europe/Berlin'); // start with Baader Bank
 
 /**
  * Calculates the extra hours depending on the time unit (day, week, month, year)
@@ -26,11 +28,11 @@ const startDate = moment('2023-10-01').tz('Europe/Berlin'); // start with Baader
  * @param {*} timeUnit day, week, month, year
  * @returns array that contains the date, extra_hour and hour (Regelarbeitszeit)
  */
-exports.getExtraHours = async (accumulate, timeUnit) => {
+exports.getExtraHours = async (accumulate, timeUnit, startDate = START_DATE_DEFAULT) => {
   try {
     // get stats data from 01.10.2023 (Baader Bank) until now
     const stats = await utilStats.getStatsByRange(
-      startDate,
+      gUtil.getFirstDayByTimeUnit(startDate, timeUnit),
       moment().tz('Europe/Berlin'), // until today
       accumulate,
       false,

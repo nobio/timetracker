@@ -129,9 +129,9 @@ exports.breaktime = (req, res) => {
  */
 exports.extraHours = (req, res) => {
   const acc = (req.query.accumulate === 'true');
-  const { timeUnit } = req.query;
+  const { timeUnit, startDate } = req.query;
 
-  utilExtraHours.getExtraHours(acc, timeUnit)
+  utilExtraHours.getExtraHours(acc, timeUnit, startDate)
     .then((data) => res.status(200).send(data))
     .catch((err) => res.status(403).send(`Error while reading extra hoursbreak with parameter acc (${acc}): ${err.message}`));
 };

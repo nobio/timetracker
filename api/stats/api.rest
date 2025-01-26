@@ -9,7 +9,9 @@ GET https://79.219.195.193/api/stats/1684706400000/week?accumulate=false&fill=fa
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vYmlvIiwibmFtZSI6Ikdlcm5vdCBILiBSZWljaGVsIiwibWFpbEFkZHJlc3MiOiJnZXJub3RAZGllLXJlaWNoZWxzLmRlIiwiaWF0IjoxNjg4Mjk2NzU5LCJleHAiOjE2ODgyOTc2NTl9.aVeqoB5hAclgi_ASYxv2_nWmPANuLUn9RqlVy9bouho
 
 ###
-GET http://localhost:30000/api/statistics/extrahours?accumulate=false&timeUnit=week
+GET http://localhost:30000/api/statistics/extrahours?accumulate=false&timeUnit=week&startDate=2016-03-16
+###
+GET http://localhost:30000/api/statistics/extrahours?accumulate=false&timeUnit=year&startDate=2022-03-16
 ###
 GET http://localhost:30000/api/statistics/extrahours?accumulate=true
 ###

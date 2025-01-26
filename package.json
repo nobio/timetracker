@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "17.6.1",
-    "last_build": "2025-01-08T19:17:13.496Z",
+    "version": "17.7.2",
+    "last_build": "2025-01-26T13:03:02.743Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -48,6 +48,7 @@
         "dotenv": "^16.3.1",
         "express": "^4.21.1",
         "express-rate-limit": "^7.1.5",
+        "figlet": "^1.8.0",
         "http-errors": "^2.0.0",
         "js-yaml": "^4.1.0",
         "jsonwebtoken": "^9.0.2",
