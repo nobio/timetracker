@@ -257,27 +257,27 @@ describe('test g_util.getBreakTime...', () => {
   });
   it('test getBreakTimeSeconds(date) with date in the past before AOK (1970-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('1970-01-01'));
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(45 * 60);
   });
 
   it('test getBreakTimeSeconds(date) a day before starting at AOK (2021-08-31)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2021-08-31'));
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(45 * 60);
   });
 
   it('test getBreakTimeSeconds(date) a day after starting at AOK (2021-09-01)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2021-09-01'));
-    expect(timestamp).to.equal(1800);
+    expect(timestamp).to.equal(30 * 60);
   });
 
   it('test getBreakTimeSeconds(date) somwhere in the midst of AOK engagement (2022-03-16)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2022-03-16'));
-    expect(timestamp).to.equal(1800);
+    expect(timestamp).to.equal(30 * 60);
   });
 
   it('test getBreakTimeSeconds(date) at last day of AOK engagement (2023-09-30)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-09-30'));
-    expect(timestamp).to.equal(1800);
+    expect(timestamp).to.equal(30 * 60);
   });
 
   it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 5 hours working', () => {
@@ -287,17 +287,17 @@ describe('test g_util.getBreakTime...', () => {
 
   it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 8 hours working', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 8);
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(30 * 60);
   });
 
   it('test getBreakTimeSeconds(date) a day after AOK engagement, first day of Baader Bank engagement (2023-10-01) with 9.8 hours working', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2023-10-01'), 9.8);
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(45 * 60);
   });
 
   it('test getBreakTimeSeconds(date) somewhere in the future (2024-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeSeconds(moment('2024-01-01'));
-    expect(timestamp).to.equal(2700);
+    expect(timestamp).to.equal(30 * 60);
   });
 
   it('getBreakTimeMilliSeconds before AOK', async () => {
@@ -315,32 +315,32 @@ describe('test g_util.getBreakTime...', () => {
 
   it('test getBreakTimeMilliSeconds(date) with date in the past before AOK (1970-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('1970-01-01'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(45 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) a day before starting at AOK (2021-08-31)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2021-08-31'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(45 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) a day after starting at AOK (2021-09-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2021-09-01'));
-    expect(timestamp).to.equal(1800000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) somwhere in the midst of AOK engagement (2022-03-16)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2022-03-16'));
-    expect(timestamp).to.equal(1800000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) at last day of AOK engagement (2023-09-30)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2023-09-30'));
-    expect(timestamp).to.equal(1800000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) a day after AOK engagement (2023-10-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2023-10-01'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
   });
 
   it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 5 hours', () => {
@@ -349,11 +349,15 @@ describe('test g_util.getBreakTime...', () => {
   });
   it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01)', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'));
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
   });
   it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 9 hours', () => {
     const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 9);
-    expect(timestamp).to.equal(2700000);
+    expect(timestamp).to.equal(30 * 60 * 1000);
+  });
+  it('test getBreakTimeMilliSeconds(date) somewhere in the future (2024-01-01) 9.5 hours', () => {
+    const timestamp = globalUtil.getBreakTimeMilliSeconds(moment('2024-01-01'), 9.5);
+    expect(timestamp).to.equal(45 * 60 * 1000);
   });
 });
 
@@ -389,29 +393,29 @@ describe('test global_util break time', () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 5);
     expect(breakTime).to.equal(0);
   });
-  it('Baader Bank: getBreakTimeSeconds 6 hours       -> expect 6', async () => {
+  it('Baader Bank: getBreakTimeSeconds 6 hours       -> expect 0', async () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 6);
-    expect(breakTime).to.equal(30 * 60);
+    expect(breakTime).to.equal(0 * 60);
   });
   it('Baader Bank: getBreakTimeSeconds 7 hours (6-8) -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 7);
     expect(breakTime).to.equal(30 * 60);
   });
-  it('Baader Bank: getBreakTimeSeconds 8 hours       -> expect 45', async () => {
+  it('Baader Bank: getBreakTimeSeconds 8 hours       -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 8);
-    expect(breakTime).to.equal(45 * 60);
+    expect(breakTime).to.equal(30 * 60);
   });
-  it('Baader Bank: getBreakTimeSeconds               -> expect 45', async () => {
+  it('Baader Bank: getBreakTimeSeconds               -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291);
-    expect(breakTime).to.equal(45 * 60);
+    expect(breakTime).to.equal(30 * 60);
   });
-  it('Baader Bank: getBreakTimeSeconds >8 hours (9)  -> expect 45', async () => {
+  it('Baader Bank: getBreakTimeSeconds >8 hours (9)  -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 9);
-    expect(breakTime).to.equal(45 * 60);
+    expect(breakTime).to.equal(30 * 60);
   });
-  it('Baader Bank: getBreakTimeMilliSeconds          -> expect 45', async () => {
+  it('Baader Bank: getBreakTimeMilliSeconds          -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeMilliSeconds(1735040291);
-    expect(breakTime).to.equal(45 * 60 * 1000);
+    expect(breakTime).to.equal(30 * 60 * 1000);
   });
 });
 
