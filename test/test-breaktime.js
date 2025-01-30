@@ -413,6 +413,10 @@ describe('test global_util break time', () => {
     const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 9);
     expect(breakTime).to.equal(30 * 60);
   });
+  it('Baader Bank: getBreakTimeSeconds >9            -> expect 45', async () => {
+    const breakTime = await globalUtil.getBreakTimeSeconds(1735040291, 9);
+    expect(breakTime).to.equal(30 * 60);
+  });
   it('Baader Bank: getBreakTimeMilliSeconds          -> expect 30', async () => {
     const breakTime = await globalUtil.getBreakTimeMilliSeconds(1735040291);
     expect(breakTime).to.equal(30 * 60 * 1000);

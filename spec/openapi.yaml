@@ -5,7 +5,7 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  version: 17.7.19
+  version: 17.7.20
   lastUpdate: '2025-01-30'
 servers:
   - url: http://localhost:30000/api
