@@ -55,7 +55,7 @@
         "log-timestamp": "^0.3.0",
         "minio": "^8.0.3",
         "moment": "^2.30.1",
-        "moment-timezone": "^0.5.43",
+        "moment-timezone": "^0.5.47",
         "mongodb": "^6.12.0",
         "mongoose": "^8.9.5",
         "morgan": "^1.10.0",
