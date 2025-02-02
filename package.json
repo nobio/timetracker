@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "17.7.20",
-    "last_build": "2025-01-30T15:30:53.170Z",
+    "version": "17.8.0",
+    "last_build": "2025-02-02T14:27:40.405Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -31,12 +31,12 @@
         "sinon-chai": "^3.7.0"
     },
     "dependencies": {
-        "@opentelemetry/api": "^1.7.0",
-        "@opentelemetry/auto-instrumentations-node": "^0.55.0",
-        "@opentelemetry/exporter-metrics-otlp-proto": "^0.57.0",
-        "@opentelemetry/exporter-trace-otlp-proto": "^0.57.0",
-        "@opentelemetry/sdk-metrics": "^1.19.0",
-        "@opentelemetry/sdk-node": "^0.57.0",
+        "@opentelemetry/api": "^1.9.0",
+        "@opentelemetry/auto-instrumentations-node": "^0.55.3",
+        "@opentelemetry/exporter-metrics-otlp-proto": "^0.57.1",
+        "@opentelemetry/exporter-trace-otlp-proto": "^0.57.1",
+        "@opentelemetry/sdk-metrics": "^1.30.1",
+        "@opentelemetry/sdk-node": "^0.57.1",
         "axios": "^1.6.3",
         "bcrypt": "^5.1.1",
         "body-parser": "^1.20.2",
