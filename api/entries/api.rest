@@ -20,3 +20,12 @@ Content-Type: application/json
 {
     "mark": "sick-leave"
 }
+
+###
+POST http://localhost:30000/api/geotrack
+Authorization: Basic iOS:eei8ddj3iod0ßdk3
+
+
+###
+POST https://nobio.myhome-server.de/api/geotrack
+Authorization: Basic iOS:eei8ddj3iod0ßdk3

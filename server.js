@@ -93,7 +93,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 const API_PATH = process.env.API_PATH || '/api';
 
 app.get(`${API_PATH}/entries`, apiEntries.getEntries);
-app.post(`${API_PATH}/entries`, apiEntries.createEntry);
+app.post(`${API_PATH}/entries`, apiEntries.createEntry); // token authorization
+app.put(`${API_PATH}/entries`, apiEntries.createEntry); // basic authorization
 app.get(`${API_PATH}/entries/:id`, apiEntries.getEntryById);
 app.put(`${API_PATH}/entries/:id`, apiEntries.saveEntry);
 app.delete(`${API_PATH}/entries/:id`, apiEntries.deleteEntry);
