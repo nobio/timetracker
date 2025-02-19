@@ -320,28 +320,30 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.authorize = async (req, res, next) => {
+  console.log(`URL: ${req.url}`);
+  const API_PATH = process.env.API_PATH || '/api';
   // console.log(req.url);
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
   // console.log(req.method, req.url);
   if (process.env.AUTHORIZATION !== 'on' || (
-    (req.method === 'POST' && req.url.startsWith('/api/auth/login'))
-    || (req.method === 'POST' && req.url.startsWith('/api/auth/logout'))
-    || (req.method === 'POST' && req.url.startsWith('/api/auth/token'))
-    || (req.method === 'GET' && req.url.startsWith('/api/health'))
-    || (req.method === 'GET' && req.url.startsWith('/api-docs'))
+    (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/login`))
+    || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/logout`))
+    || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/token`))
+    || (req.method === 'GET' && req.url.startsWith(`${API_PATH}/health`))
+    || (req.method === 'GET' && req.url.startsWith('api-docs'))
     || (req.method === 'GET' && req.url.startsWith('/ws'))
-    || (req.url.startsWith('/api/log'))
-    || (req.url.startsWith('/api/experiment'))
+    || (req.url.startsWith(`${API_PATH}/log`))
+    || (req.url.startsWith(`${API_PATH}/experiment`))
   )) {
     // just continue...
     // console.log(`authorization disabled for ${req.url}`);
     res.status(200);
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
-    (req.method === 'POST' && (req.url === '/api/geofence' || req.url === '/api/geofence/')) // .startsWith is not sufficiant since there is an endpoint /api/geofences
-    || (req.method === 'POST' && req.url.startsWith('/api/geotrack'))
-    || (req.method === 'PUT' && req.url.startsWith('/api/entries')) // create entry but with basic auth :-)
+    (req.method === 'POST' && (req.url === `${API_PATH}/geofence` || req.url === `${API_PATH}/geofence/`)) // .startsWith is not sufficiant since there is an endpoint /api/geofences
+    || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/geotrack`))
+    || (req.method === 'PUT' && req.url === `${API_PATH}/entries`) // create entry but with basic auth :-)
   )) {
     // basic authorisation
     return this.authorizeBasicAuth(req, res, next);
