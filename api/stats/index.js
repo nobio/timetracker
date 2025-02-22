@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const { trace } = require('@opentelemetry/api');
 const utilStats = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');
@@ -11,9 +12,16 @@ const utilExtraHours = require('./util-extrahours');
  * curl -X PUT http://localhost:30000/api/stats
  */
 exports.calcStats = (req, res) => {
+  const span = trace.getTracer('default').startSpan('calcStats');
   utilStats.calcStats()
-    .then((timeentry) => res.status(200).send(timeentry))
-    .catch((err) => res.status(500).send(`Error while reading Time Entry: ${err}`));
+    .then((timeentry) => {
+      res.status(200).send(timeentry);
+      span.end();
+    })
+    .catch((err) => {
+      res.status(500).send(`Error while reading Time Entry: ${err}`);
+      span.end();
+    });
 };
 
 /**

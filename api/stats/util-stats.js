@@ -2,7 +2,8 @@ require('../../db');
 // const moment = require('moment');
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
-const g_util = require('../global_util');
+const { trace } = require('@opentelemetry/api');
+const util = require('../global_util'); // Renamed g_util to util
 
 const utilEntry = require('../entries/util-entries');
 
@@ -16,29 +17,41 @@ let isCalcRunning = false;
  * Orchestrate the calculation of statistics
  */
 exports.calcStats = async () => {
+  const parentSpan = trace.getTracer('default').startSpan('utilStats.calcStats');
   console.log(`---------------------- calcStats isRunning: ${isCalcRunning} -----------------------------`);
   if (isCalcRunning) return;
   isCalcRunning = true;
   try {
-    g_util.sendMessage('RECALCULATE', 'delete stats');
+    const deleteStatsSpan = trace.getTracer('default').startSpan('utilStats.deleteStats', { parent: parentSpan });
+    util.sendMessage('RECALCULATE', 'delete stats');
     await StatsDay.deleteMany();
+    deleteStatsSpan.end();
 
-    g_util.sendMessage('RECALCULATE', 'delete doublets');
+    const removeDoubletsSpan = trace.getTracer('default').startSpan('utilStats.removeDoublets', { parent: parentSpan });
+    util.sendMessage('RECALCULATE', 'delete doublets');
     await utilEntry.removeDoublets();
+    removeDoubletsSpan.end();
 
+    const getEntriesSpan = trace.getTracer('default').startSpan('utilStats.getEntries', { parent: parentSpan });
     const firstEntry = await utilEntry.getFirstTimeEntry();
     const lastEntry = await utilEntry.getLastTimeEntry();
-    g_util.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
+    util.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
+    getEntriesSpan.end();
 
-    g_util.sendMessage('RECALCULATE', 'start calculating...');
+    const calculateSpan = trace.getTracer('default').startSpan('utilStats.calculate', { parent: parentSpan });
+    util.sendMessage('RECALCULATE', 'start calculating...');
     const result = await this.calculateStatistics(firstEntry, lastEntry);
-    g_util.sendMessage('RECALCULATE', '...calculation done');
+    util.sendMessage('RECALCULATE', '...calculation done');
+    calculateSpan.end();
 
     isCalcRunning = false;
+    parentSpan.end();
+
     return result;
   } catch (error) {
     console.log(error);
     isCalcRunning = false;
+    parentSpan.end();
     throw error;
   } finally {
     isCalcRunning = false;
@@ -53,16 +66,27 @@ exports.calcStats = async () => {
  * @param {*} lastEntry  the last entry in database
  */
 exports.calculateStatistics = async (firstEntry, lastEntry) => {
+  const parentSpan = trace.getTracer('default').startSpan('utilStats.calculateStatistics');
   // console.log(firstEntry, lastEntry)
   let date = utilEntry.stripdownToDateUTC(firstEntry.age);
 
+  const dates = [];
   while (date <= moment(lastEntry.age)) {
-    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
-    const dt = moment(date);
-    const busytime = await this.getBusytimeByDate(dt);
-    // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
+    dates.push(moment(date));
+    date = date.add(1, 'day');
+  }
+
+  console.log(`calculate busy times for ${dates.length} days`);
+  const busytimesSpan = trace.getTracer('default').startSpan('utilStats.calculateStatistics.busytimes', { parent: parentSpan });
+  const busytimes = await Promise.all(dates.map((dt) => this.getBusytimeByDate(dt)));
+  busytimesSpan.end();
+
+  console.log('saving busy times');
+  const saveBusyTimesSpan = trace.getTracer('default').startSpan('utilStats.calculateStatistics.saveBusyTimes', { parent: parentSpan });
+  await Promise.all(dates.map((dt, index) => {
+    const busytime = busytimes[index];
     if (busytime && busytime.busytime && busytime.busytime !== 0) {
-      new StatsDay({
+      return new StatsDay({
         date: dt,
         actual_working_time: busytime.busytime / 1,
         planned_working_time: DEFAULT_WORKING_TIME,
@@ -71,10 +95,10 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
         last_changed: new Date(),
       }).save();
     }
-    date = date.add(1, 'day');
-    // date, busytime);
-  }
+  }));
+  saveBusyTimesSpan.end();
   console.log('calculateStatistics done');
+  parentSpan.end();
   return { firstEntry, lastEntry };
 };
 
