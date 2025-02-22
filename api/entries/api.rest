@@ -14,6 +14,14 @@ Content-Type: application/json
     "mark": "sick-leave"
 }
 ###
+PUT  http://localhost:30000/api/entries
+#Authorization: Basic aU9TOmVlaThkZGozaW9kMMOfZGsz
+Authorization: Basic iOS:eei8ddj3iod0ßdk3
+
+{
+    "direction": "enter",
+}
+###
 POST http://localhost:30000/api/entries/mark
 Content-Type: application/json
 
