@@ -509,9 +509,10 @@ exports.markADay = async (entryDate, mark) => {
   const entryDateEnter = entryDate.clone().hours(8);
   // for the go entry, add 8 hours... reads 08:00 + 8h
   const entryDateGo = entryDate.clone().hours(8 + 8);
+  console.log(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
   // ... and then add the pause
-  entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate), 8);
-
+  entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate, 8.5), 'seconds');
+  console.log(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
   // create the enter time entry
   await this.create({
     datetime: entryDateEnter,
