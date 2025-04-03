@@ -57,7 +57,7 @@
         "minio": "^8.0.5",
         "moment": "^2.30.1",
         "moment-timezone": "^0.5.47",
-        "mongodb": "^6.14.0",
+        "mongodb": "^6.15.0",
         "mongoose": "^8.9.5",
         "morgan": "^1.10.0",
         "node-schedule": "^2.1.1",
