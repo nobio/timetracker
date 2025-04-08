@@ -2,7 +2,10 @@
 
 see `https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/`
 
-Minikube herunterladen
+## Documentation to download the correct minikube: 
+see `https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Farm64%2Fstable%2Fbinary+download`
+
+## Minikube herunterladen
 ```
 # install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
