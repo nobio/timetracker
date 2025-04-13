@@ -5,8 +5,8 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  version: 18.1.0
-  lastUpdate: '2025-03-02'
+  version: 18.1.1
+  lastUpdate: '2025-04-13'
 servers:
   - url: http://localhost:30000/api
   - url: https://localhost:30443/api
