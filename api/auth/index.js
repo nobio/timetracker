@@ -331,7 +331,7 @@ exports.authorize = async (req, res, next) => {
     || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/logout`))
     || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/token`))
     || (req.method === 'GET' && req.url.startsWith(`${API_PATH}/health`))
-    || (req.method === 'GET' && req.url.startsWith('api-docs'))
+    || (req.method === 'GET' && req.url.startsWith('/api-docs'))
     || (req.method === 'GET' && req.url.startsWith('/ws'))
     || (req.url.startsWith(`${API_PATH}/log`))
     || (req.url.startsWith(`${API_PATH}/experiment`))
