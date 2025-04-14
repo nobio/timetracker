@@ -30,14 +30,10 @@ exports.ping = async (req, res) => {
  * curl -X GET http://localhost:30000/api/version
  */
 exports.version = (req, res) => {
-  if (packageJson) {
-    res.status(200).json({
-      version: packageJson.version,
-      last_build: packageJson.last_build,
-    });
-  } else {
-    res.status(500).send('no package.json found');
-  }
+  res.status(200).json({
+    version: packageJson.version,
+    last_build: packageJson.last_build,
+  });
 };
 
 /**

@@ -7,5 +7,10 @@ Content-Type: application/json
 }
 
 ###
-
 GET http://localhost:30000/api/ping
+###
+GET http://localhost:30000/api/version
+###
+GET http://localhost:30000/api/health
+###
+GET http://localhost:30000/api/experiment
