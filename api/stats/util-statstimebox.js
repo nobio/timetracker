@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment');
 
 const mongoose = require('mongoose');
@@ -6,7 +7,7 @@ const StatsDay = mongoose.model('StatsDay');
 
 /* function of reduce */
 function add(a, b) {
-  // console.log("a=" + a + ", b=" + b);
+  // logger.info("a=" + a + ", b=" + b);
   return a + b;
 }
 
@@ -38,7 +39,7 @@ function renderOneData(data, date) {
   // calculate duration (=sum over all workingTimes) and count
   const tmpData = calculateOneDae(data);
 
-  // console.log(JSON.stringify(tmpData));
+  // logger.info(JSON.stringify(tmpData));
 
   return {
     x: date,
@@ -69,7 +70,7 @@ exports.getStatsByTimeBox = async (timeUnit) => {
   }
 
   // calculate inner_comp: moving average. I.e. consider 5 values calculating average of values of relative position [-2, -1, 0, 1, 2]
-  // console.log(JSON.stringify(data));
+  // logger.info(JSON.stringify(data));
   const avg = calculateAverage(data);
 
   /**
@@ -101,7 +102,7 @@ function calculateAverage(data) {
     const idxStart = idx - parseInt(avgLenth / 2);
     const idxEnd = idx + parseInt(avgLenth / 2);
     for (let n = idxStart; n <= idxEnd; n++) {
-      if (n >= 0 && n < data.length) /* console.log(idx, n, parseInt(avgLenth / 2), data[n]) */sum.push(data[n].y);
+      if (n >= 0 && n < data.length) /* logger.info(idx, n, parseInt(avgLenth / 2), data[n]) */sum.push(data[n].y);
     }
 
     const average = Math.round(100 * sum.reduce((previous, current) => previous + current, 0) / sum.length) / 100;
@@ -122,7 +123,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
   let timeUnitStats = [];
   if (stats === undefined || stats.length === 0) return data;
 
-  // console.log(timeUnitStats.reduce(add, 0));
+  // logger.info(timeUnitStats.reduce(add, 0));
 
   let lastTimeUnit = moment(stats[0].date).format(timeUnitFormatString);
   let actualTimeUnit;
@@ -131,7 +132,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
 
   stats.forEach((stat) => {
     actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
-    // console.log(actualTimeUnit)
+    // logger.info(actualTimeUnit);
 
     if (lastTimeUnit !== actualTimeUnit || lastHash === stat._id) {
       tmpData = calculateOneDae(timeUnitStats);

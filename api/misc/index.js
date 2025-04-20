@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment');
 const mongoose = require('mongoose');
 
@@ -98,11 +99,11 @@ exports.healthcheck = async (req, res) => {
  * curl -X GET http://localhost:30000/api/experiment
  */
 exports.experiment = async (req, res) => {
-  console.log('================================== HEADERS ==================================');
-  console.log(req.headers);
-  console.log('=================================== BODY ==================================');
-  console.log(req.body);
-  console.log('===========================================================================');
+  logger.info('================================== HEADERS ==================================');
+  logger.info(req.headers);
+  logger.info('=================================== BODY ==================================');
+  logger.info(req.body);
+  logger.info('===========================================================================');
   res.status(200).send('nothing to see here');
 };
 
@@ -122,7 +123,7 @@ exports.log = async (req, res) => {
   if (Object.keys(req.headers).length) resp.headers = req.headers;
   if (Object.keys(req.body).length) resp.body = req.body;
 
-  console.debug(JSON.stringify(resp, null, 2));
+  logger.debug(JSON.stringify(resp, null, 2));
 
   res.status(201).json(resp);
 };

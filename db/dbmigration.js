@@ -1,5 +1,6 @@
+const logger = require('../api/config/logger'); // Logger configuration
 #!/usr/local/bin/node
-/* eslint-disable no-console */
+
 const commander = require('commander');
 const mongoose = require('mongoose');
 const readline = require('readline').createInterface({
@@ -45,18 +46,18 @@ const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 const TOKEN_SOURCE = connectionSource.model('Token', models.Token);
 const TOKEN_TARGET = connectionTarget.model('Token', models.Token);
 
-console.log('--------------------------------------------------------------- \n');
-console.log('Backing up mongodb');
-console.log('\n--------------------------------------------------------------- ');
+logger.info('--------------------------------------------------------------- \n');
+logger.info('Backing up mongodb');
+logger.info('\n--------------------------------------------------------------- ');
 
 /**
  * Reads data from source data source and returns an json array
  */
 async function getDataFromSource(source) {
   try {
-    console.log(`reading entries of <${source.modelName}> from source`);
+    logger.info(`reading entries of <${source.modelName}> from source`);
     const entries = await source.find();
-    console.log(`found ${entries.length} entries of <${source.modelName}> in source`);
+    logger.info(`found ${entries.length} entries of <${source.modelName}> in source`);
     return entries;
   } catch (error) {
     throw new Error(error);
@@ -65,8 +66,8 @@ async function getDataFromSource(source) {
 
 async function deleteTarget(target) {
   try {
-    console.log('connecting to target database');
-    console.log(`deleting target data of ${target.modelName} in target`);
+    logger.info('connecting to target database');
+    logger.info(`deleting target data of ${target.modelName} in target`);
     await target.deleteMany({});
     return `all data deleted from ${target}`;
   } catch (error) {
@@ -80,12 +81,12 @@ async function deleteTarget(target) {
  * @param {entries} entries
  */
 async function storeDataToTarget(entries, target) {
-  console.log(entries.length, target.modelName);
+  logger.info(entries.length, target.modelName);
   try {
     const r = await target.collection.insertMany(entries);
-    console.log(`success = ${r.acknowledged} in ${target.modelName}`);
+    logger.info(`success = ${r.acknowledged} in ${target.modelName}`);
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
   }
 
   mongoose.connection.close();
@@ -140,12 +141,12 @@ const app = async () => {
 
     process.exit(0);
   } catch (err) {
-    console.error(err);
-    console.error('***********************************************************************');
+    logger.error(err);
+    logger.error('***********************************************************************');
     process.exit(-1);
   }
 };
-console.log(`backup from '${MONGO_URL_SOURCE}' to '${MONGO_URL_TARGET}'`);
+logger.info(`backup from '${MONGO_URL_SOURCE}' to '${MONGO_URL_TARGET}'`);
 
 commander
   .version('2.0.0')

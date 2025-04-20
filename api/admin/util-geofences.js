@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 require('../../db');
@@ -42,7 +43,7 @@ exports.getGeofence = async (id) => {
   try {
     return castGeofence(await GeoFence.findOne({ _id: id }));
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
     throw new Error(`geofence with id ${id} could not be found`);
   }
 };
@@ -54,7 +55,7 @@ exports.createGeofence = async (enabled, longitude, latitude, radius, descriptio
     }).save();
     return castGeofence(newGeoFence);
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
     throw new Error('could not create new geofence');
   }
 };
@@ -76,7 +77,7 @@ exports.setGeofence = async (geofence) => {
     await geoFence.save();
     return castGeofence(geoFence);
   } catch (error) {
-    // console.error(error.message);
+    // logger.error(error.message);
     throw new Error(`could not create new geofence: ${error.message}`);
   }
 };

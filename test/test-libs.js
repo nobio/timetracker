@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 require('./init');
 const chai = require('chai');
 const util = require('../api/entries/util-entries');

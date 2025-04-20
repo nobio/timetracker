@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const gUtils = require('../global_util');
 
 const { MODEL_TYPES } = gUtils;
@@ -17,7 +18,7 @@ exports.dumpModels = async (req, res) => {
     const response = await this.dumpModelsInternally();
     res.status(201).send(response);
   } catch (error) {
-    console.log(error)
+    logger.info(error);
     res.status(500).send(`Error while dumping data: ${error}`);
   }
 };

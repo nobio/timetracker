@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable no-undef */
 require('./init');
 const mongoose = require('mongoose');
@@ -21,11 +22,11 @@ require('moment-timezone');
 describe('test util.dumpModels', () => {
   beforeEach(() => {
     db = require('../db');
-    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { console.log(err); });
+    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { logger.info(err); });
   });
 
   afterEach(() => {
-    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { console.log(err); });
+    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { logger.info(err); });
   });
 
   it('dumping the Model Toggle; should lead to a new file in /dump', async () => {
@@ -33,7 +34,7 @@ describe('test util.dumpModels', () => {
       // const result = await util.dumpModel(mongoose.model('Toggle'));
       const result = await util.dumpModels();
 
-      // console.log(result)
+      // logger.info(result);
       expect(result).to.be.an('array');
       expect(result.length).to.gt(0);
       expect(result[0]).to.have.property('size');
@@ -42,7 +43,7 @@ describe('test util.dumpModels', () => {
       const data = fs.readFileSync(result[0].filename);
       expect(data).to.not.be.empty;
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw exception');
     }
   }).timeout(50000);
@@ -62,7 +63,7 @@ describe('test util.dumpModels', () => {
 
     // read files from dump directory
     const dirContent = fs.readdirSync(DUMP_DIR);
-    // console.log(dirContent)
+    // logger.info(dirContent);
 
     // first file date should be today - 32 because today - 31 are deleted
     const lastDateFileShouldExist = moment().subtract(31, 'days').format('YYYY-MM-DD');
@@ -79,11 +80,11 @@ describe('test util.dumpModels', () => {
 describe('test util.restoreDataFromFile', () => {
   before(() => {
     db = require('../db');
-    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { console.log(err); });
+    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { logger.info(err); });
   });
 
   after(() => {
-    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { console.log(err); });
+    fs.rmSync(DUMP_DIR, { recursive: true, force: true }, (err) => { logger.info(err); });
   });
 
   it('restore data (Toggle)', async () => {
@@ -109,7 +110,7 @@ describe('test util.restoreDataFromFile', () => {
 
     // restore from file
     result = await util.restoreDataFromFile();
-    console.log(result);
+    logger.info(result);
     toggles = await Toggle.find();
     expect(toggles).to.be.an('array');
     expect(toggles.length).to.equal(countToggles);
@@ -120,7 +121,7 @@ describe('test util.backupTimeEnties', () => {
   it.skip('backing up the database', async () => {
     try {
       const result = await util.backupTimeEntries();
-      console.log(result);
+      logger.info(result);
       expect(result).to.have.property('backup_count');
     } catch (error) {
       assert.fail('should not throw exception');

@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+const logger = require('../config/logger'); // Logger configuration
+
 const moment = require('moment');
 const util = require('./util-geotrack');
 
@@ -16,13 +17,13 @@ exports.createGeoTrack = async (req, res) => {
   const geoTrack = util.parseGeoTrackingObject(req.body);
 
   if (geoTrack === null) {
-    console.error('data encrypted');
+    logger.error('data encrypted');
     res.status(201).send('data encrypted');
     return;
   }
 
   if (!geoTrack) {
-    console.error('missing data (longitude, latitude, accuracy, source)');
+    logger.error('missing data (longitude, latitude, accuracy, source)');
     res.status(400).send('missing data (longitude, latitude, accuracy, source)');
     return;
   }

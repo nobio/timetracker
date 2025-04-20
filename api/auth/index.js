@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
 const jwt = require('jsonwebtoken');
 const util = require('./util-auth');
@@ -24,7 +25,7 @@ exports.getAllUsers = async (req, res) => {
       users,
     });
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     return res.status(500).json({
       error: 'Internal server error',
       message: err.message,
@@ -41,7 +42,7 @@ exports.getAllUsers = async (req, res) => {
  * @param {*} res Response object
  */
 exports.getUser = async (req, res) => {
-  // console.log(req.params.url);
+  // logger.info(req.params.url);
   try {
     if (!req.params.id) {
       return res.status(400).json({
@@ -61,7 +62,7 @@ exports.getUser = async (req, res) => {
 
     return res.status(200).json(result);
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     return res.status(500).json({
       error: 'Internal Server Error',
       message: err.message,
@@ -98,7 +99,7 @@ exports.deleteUser = async (req, res) => {
     globalUtil.sendMessage('DELETE_USER', `user ${req.params.id} was deleted`);
     return res.status(202).json(result);
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     return res.status(500).json({
       error: 'Internal Server Error',
       message: err.message,
@@ -140,7 +141,7 @@ exports.createUser = async (req, res) => {
       mailAddress: req.body.mailAddress,
     });
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     return res.status(500).json({
       error: 'Internal Server Error',
       message: err.message || 'Error creating user',
@@ -184,7 +185,7 @@ exports.updateUser = async (req, res) => {
       mailAddress: req.body.mailAddress,
     });
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     if (err.message === 'User does not exists') {
       return res.status(404).json({
         error: 'Not Found',
@@ -230,7 +231,7 @@ exports.updateUsersPassword = async (req, res) => {
       message: 'Password updated successfully',
     });
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     if (err.message === 'User does not exists') {
       return res.status(404).json({
         error: 'Not Found',
@@ -254,7 +255,7 @@ exports.updateUsersPassword = async (req, res) => {
  * @param {*} res Response object; resp.json: {accessToken: '...'}
  */
 exports.login = async (req, res) => {
-  // console.log(req)
+  // logger.info(req);
   globalUtil.sendMessage('LOGIN', `try to login user ${req.body.username}`);
   const { username, password } = req.body;
 
@@ -269,7 +270,7 @@ exports.login = async (req, res) => {
     const tokens = await util.login(username, password);
     return res.status(200).json(tokens);
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     const status = err.status || 401;
     return res.status(status).json({
       error: status === 401 ? 'Unauthorized' : 'Error',
@@ -314,18 +315,18 @@ exports.refreshToken = async (req, res) => {
     const token = await util.refreshToken(refreshToken);
     res.status(200).send(token);
   } catch (err) {
-    // console.error(err);
+    // logger.error(err);
     res.status(400).send({ message: err.message });
   }
 };
 
 exports.authorize = async (req, res, next) => {
-  console.log(`URL: ${req.url}`);
+  logger.info(`URL: ${req.url}`);
   const API_PATH = process.env.API_PATH || '/api';
-  // console.log(req.url);
+  // logger.info(req.url);
   // check the switch if we are supposed to authorize
   // or request is a login POST (must be possible without token)
-  // console.log(req.method, req.url);
+  // logger.info(req.method, req.url);
   if (process.env.AUTHORIZATION !== 'on' || (
     (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/login`))
     || (req.method === 'POST' && req.url.startsWith(`${API_PATH}/auth/logout`))
@@ -337,7 +338,7 @@ exports.authorize = async (req, res, next) => {
     || (req.url.startsWith(`${API_PATH}/experiment`))
   )) {
     // just continue...
-    // console.log(`authorization disabled for ${req.url}`);
+    // logger.info(`authorization disabled for ${req.url}`);
     res.status(200);
     return next();
   } if (process.env.AUTHORIZATION === 'on' && (
@@ -400,7 +401,7 @@ exports.authorizeBasicAuth = async (req, res, next) => {
     res.status(200);
     next();
   } catch (err) {
-    // console.log(err);
+    // logger.info(err);
     if (err.status) res.status(err.status).json({ message: err.message });
     else res.status(400).json({ message: err.message });
   }

@@ -1,11 +1,10 @@
 /* eslint-disable no-cond-assign */
 /* eslint-disable no-constant-condition */
-/* eslint-disable no-console */
+
 /**
  * Module dependencies.
  */
-
-require('dotenv').config();
+const logger = require('./api/config/logger'); // Logger configuration
 console.log(require('figlet').textSync('Timetracker'));
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
@@ -62,9 +61,9 @@ const swaggerDoc = jsyaml.load(spec);
 
 /*
   app.use((req, res, next) => {
-    console.log(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
-    console.log(`▶ params:${JSON.stringify(req.params)}`);
-    console.log(`▶ body:${JSON.stringify(req.body)}`);
+    logger.info(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
+    logger.info(`▶ params:${JSON.stringify(req.params)}`);
+    logger.info(`▶ body:${JSON.stringify(req.body)}`);
     next();
   });
   */
@@ -189,17 +188,17 @@ app.put(`${API_PATH}/schedule`, apiSchedule.schedule);
 // Check Slack url
 // .......................................................................
 if (process.env.SLACK_URL) {
-  console.log('using Slack to notify');
+  logger.info('using Slack to notify');
 } else {
-  console.log('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
+  logger.info('ignoring Slack; notification disabled; please provide process.env.SLACK_URL');
 }
 // .......................................................................
 // Check MinIO
 // .......................................................................
 if (process.env.MINIO_ACTIVE === 'true') {
-  console.log('using MinIO to save and read database objects');
+  logger.info('using MinIO to save and read database objects');
 } else {
-  console.log('MinIO is not used. If you want to use MinIO please set process.env.MINIO_ACTIVE to true');
+  logger.info('MinIO is not used. If you want to use MinIO please set process.env.MINIO_ACTIVE to true');
 }
 
 // .......................................................................
@@ -214,7 +213,7 @@ app.use((err, req, res, next) => {
 });
 /* ================= start the web service on http ================= */
 const httpServer = http.createServer(app).listen(app.get('port'), app.get('host'), () => {
-  console.log(`server listening on http://${app.get('host')}:${app.get('port')}`);
+  logger.info(`server listening on http://${app.get('host')}:${app.get('port')}`);
 });
 
 /* ================= start the web service on https ================= */
@@ -225,7 +224,7 @@ const sslOptions = {
 
 // write output to console
 const httpsServer = https.createServer(sslOptions, app).listen(app.get('ssl-port'), app.get('host'), () => {
-  console.log(`ssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
+  logger.info(`ssl server listening on https://${app.get('host')}:${app.get('ssl-port')}`);
 });
 
 /* init and start Websocket Server */
@@ -243,20 +242,20 @@ globalUtil.sendMessage('SERVER_STARTED', `on http://${app.get('host')}:${app.get
 
 /* shutdown */
 const gracefulShutdown = async () => {
-  console.log('Closing server and ending process...');
+  logger.info('Closing server and ending process...');
   await globalUtil.sendMessage('SERVER_SHUTDOWN');
 
   webSocketFacade.shutdown();
-  console.log('websocket closed');
+  logger.info('websocket closed');
 
   await httpServer.close();
-  console.log('http server stopped');
+  logger.info('http server stopped');
 
   await httpsServer.close();
-  console.log('https server stopped');
+  logger.info('https server stopped');
 
   await db.closeConnection();
-  console.log('database disconnected');
+  logger.info('database disconnected');
 
   process.exit();
 };

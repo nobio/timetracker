@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 require('../../db');
 // const moment = require('moment');
 const moment = require('moment-timezone');
@@ -16,7 +17,7 @@ let isCalcRunning = false;
  * Orchestrate the calculation of statistics
  */
 exports.calcStats = async () => {
-  console.log(`---------------------- calcStats isRunning: ${isCalcRunning} -----------------------------`);
+  logger.info(`---------------------- calcStats isRunning: ${isCalcRunning} -----------------------------`);
   if (isCalcRunning) return;
   isCalcRunning = true;
   try {
@@ -37,7 +38,7 @@ exports.calcStats = async () => {
     isCalcRunning = false;
     return result;
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     isCalcRunning = false;
     throw error;
   } finally {
@@ -53,14 +54,14 @@ exports.calcStats = async () => {
  * @param {*} lastEntry  the last entry in database
  */
 exports.calculateStatistics = async (firstEntry, lastEntry) => {
-  // console.log(firstEntry, lastEntry)
+  // logger.info(firstEntry, lastEntry);
   let date = utilEntry.stripdownToDateUTC(firstEntry.age);
 
   while (date <= moment(lastEntry.age)) {
-    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+    // logger.info(`calculating for day ${date.format('YYYY-MM-DD')}`);
     const dt = moment(date);
     const busytime = await this.getBusytimeByDate(dt);
-    // console.log(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
+    // logger.info(`-> ${dt.toISOString()} ${JSON.stringify(busytime)}`);
     if (busytime && busytime.busytime && busytime.busytime !== 0) {
       new StatsDay({
         date: dt,
@@ -74,7 +75,7 @@ exports.calculateStatistics = async (firstEntry, lastEntry) => {
     date = date.add(1, 'day');
     // date, busytime);
   }
-  console.log('calculateStatistics done');
+  logger.info('calculateStatistics done');
   return { firstEntry, lastEntry };
 };
 
@@ -93,7 +94,7 @@ exports.getBusytimeByDate = async (dt) => {
 
     return { busytime: calculated.busytime };
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
     return { busytime: 0 };
   }
 };
@@ -106,10 +107,10 @@ exports.deleteAllStatsDays = () => new Promise((resolve) => {
   StatsDay.find((err, statsdays) => {
     size = statsdays.length;
     statsdays.forEach((statsday) => {
-      // console.log('removing ' + statsday);
+      // logger.info('removing ' + statsday);
       statsday.remove();
     });
-    console.log(`deleted ${size} items`);
+    logger.info(`deleted ${size} items`);
     resolve({ size });
   });
 });
@@ -129,11 +130,11 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
     dtEnd = moment(dtStart).add(1, 'days');
   }
 
-  // console.log("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
+  // logger.info("Start at " + dtStart.toDate() + "\nEnd at " + dtEnd.toDate());
 
   return new Promise((resolve, reject) => {
     this.getStatsByRange(dtStart, dtEnd, accumulate, fill).then((calculatedBusyTime) => {
-      // console.log(`getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
+      // logger.info(`getStatsByRange: ${JSON.stringify(calculatedBusyTime)}`);
       const chart_data = {
         xScale: timeUnit === 'day' ? 'ordinal' : 'time',
         yScale: 'linear',
@@ -182,7 +183,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
     const dtStartClone = dtStart.clone();
 
     for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-      // console.log(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
+      // logger.info(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
       innerData[i] = {
         x: m.format('YYYY-MM-DD'),
         y: null,
@@ -204,14 +205,14 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   });
   averageWorkingTime = actualWorkingTime / stats.length / 60 / 60 / 1000;
 
-  // console.log("average_working_time = " + average_working_time);
-  // console.log("length = " + stats.length);
+  // logger.info("average_working_time = " + average_working_time);
+  // logger.info("length = " + stats.length);
 
   let sumActual = 0;
   let sumNominal = 0;
   stats.forEach((stat) => {
     const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
-    // console.log(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
+    // logger.info(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
     let obj;
     plannedWorkingTime += stat.planned_working_time;
     if (accumulate === 'true') {
@@ -229,7 +230,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
     }
   });
 
-  // console.log(JSON.stringify(innerComp))
+  // logger.info(JSON.stringify(innerComp));
 
   return ({
     actual_working_time: actualWorkingTime,

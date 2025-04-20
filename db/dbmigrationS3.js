@@ -1,8 +1,9 @@
+const logger = require('../api/config/logger'); // Logger configuration
 #!/usr/local/bin/node
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-console */
+
 require('dotenv').config();
 const Axios = require('axios');
 const mongoose = require('mongoose');
@@ -39,16 +40,16 @@ const PROPS_TARGET = connectionTarget.model('Properties', models.Properties);
 
 let accessToken;
 
-console.log('--------------------------------------------------------------- \n');
-console.log('Backing up data');
-console.log('\n--------------------------------------------------------------- ');
+logger.info('--------------------------------------------------------------- \n');
+logger.info('Backing up data');
+logger.info('\n--------------------------------------------------------------- ');
 
 /**
  * Reads data from source data source (i.e. url) and returns an json array
  */
 async function getDataFromSource(sourceUrl, model) {
   try {
-    console.log(`reading entries of <${sourceUrl}> from source`);
+    logger.info(`reading entries of <${sourceUrl}> from source`);
     const response = await Axios.get(sourceUrl, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -71,8 +72,8 @@ async function getDataFromSource(sourceUrl, model) {
 
 const deleteTarget = async (targetModel) => {
   try {
-    console.log('connecting to target database');
-    console.log(`deleting target data of ${targetModel.modelName} in target`);
+    logger.info('connecting to target database');
+    logger.info(`deleting target data of ${targetModel.modelName} in target`);
     await targetModel.deleteMany({});
     return `all data deleted from ${targetModel}`;
   } catch (error) {
@@ -86,12 +87,12 @@ const deleteTarget = async (targetModel) => {
  * @param {entries} entries
  */
 const storeDataToTarget = async (entries, targetModel) => {
-  console.log(entries.length, targetModel.modelName);
+  logger.info(entries.length, targetModel.modelName);
   try {
     const r = await targetModel.collection.insertMany(entries);
-    console.log(`success = ${r.acknowledged} in ${targetModel.modelName}`);
+    logger.info(`success = ${r.acknowledged} in ${targetModel.modelName}`);
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
   }
 
   mongoose.connection.close();
@@ -153,8 +154,8 @@ const app = async () => {
     await storeDataToTarget(await getDataFromSource(GEO_TRACKING_MODEL_SOURCE, GEO_TRACKING_MODEL_TARGET), GEO_TRACKING_MODEL_TARGET);
     console.timeEnd('geo tracking'); process.stdout.write('\n');
   } catch (err) {
-    console.error(err);
-    console.error('***********************************************************************');
+    logger.error(err);
+    logger.error('***********************************************************************');
   } finally {
     await Axios.post(
       API_URL_HETZNER_LOGOUT,
@@ -168,7 +169,7 @@ const app = async () => {
     process.exit(-1);
   }
 };
-console.log(`backup from '${API_URL_HETZNER}' to '${MONGO_URL_TARGET}'`);
+logger.info(`backup from '${API_URL_HETZNER}' to '${MONGO_URL_TARGET}'`);
 app();
 /*
 commander

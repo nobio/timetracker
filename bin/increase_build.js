@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /**
  * Read the version and build time from / package.json, increase the build number and set the build time to now
  * Usage: node bin/build.js [<ma|mi|b>]
@@ -17,7 +18,7 @@ const openapiYaml = yaml.load(fs.readFileSync('./spec/openapi.yaml', 'utf8'));
 
 const args = process.argv.slice(2);
 if (args[0] === '--help') {
-  console.log('Usage: node bin/build.js [<ma|mi|b>]');
+  logger.info('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 }
 
@@ -43,8 +44,8 @@ if (!args[0] || args[0] === '' || args[0] === 'b') {
 }
 
 if (!modified) { // only write file if version has changed
-  console.log('nothing to do, please check your parameters');
-  console.log('Usage: node bin/build.js [<ma|mi|b>]');
+  logger.info('nothing to do, please check your parameters');
+  logger.info('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 } else {
   packageJson.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
@@ -53,7 +54,7 @@ if (!modified) { // only write file if version has changed
   openapiYaml.info.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
   openapiYaml.info.lastUpdate = new Date().toISOString().split('T')[0];
 
-  console.log(`new version ${packageJson.version} lastUpdate ${packageJson.last_build}`);
+  logger.info(`new version ${packageJson.version} lastUpdate ${packageJson.last_build}`);
 
   fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 4), 'UTF8');
   fs.writeFileSync('./package-lock.json', JSON.stringify(packageLockJson, null, 4), 'UTF8');
@@ -64,7 +65,7 @@ if (!modified) { // only write file if version has changed
   // tag the branch
   exec(`git tag ${majorVersion}.${minorVersion}.${buildVersion}`, (err) => {
     if (err) {
-      console.error(`exec error: ${err}`);
+      logger.error(`exec error: ${err}`);
     }
   });
 }

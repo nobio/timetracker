@@ -1,6 +1,7 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-mixed-operators */
-/* eslint-disable no-console */
+
 const moment = require('moment');
 const mongoose = require('mongoose');
 const ws = require('../ws');
@@ -75,11 +76,11 @@ exports.meanAccuracy = (tracks) => {
 exports.createGeoTrack = async (geoTrack) => {
   if (!geoTrack) return;
 
-  try { await this.geoFence(geoTrack); } catch (error) { console.error(error.message); }
+  try { await this.geoFence(geoTrack); } catch (error) { logger.error(error.message); }
   try {
     globalUtil.sendMessage('GEOFENCE_DEBUG', `LON: ${geoTrack.longitude}, LAT: ${geoTrack.latitude}, ACCURACY: ${geoTrack.accuracy}`);
   } catch (error) {
-    console.error('ignoring error during debugging');
+    logger.error('ignoring error during debugging');
   }
 
   try {
@@ -87,7 +88,7 @@ exports.createGeoTrack = async (geoTrack) => {
     return await geoTrack.save();
   } catch (error) {
     if (error.code === 11000) {
-      console.error('ignoring duplication error');
+      logger.error('ignoring duplication error');
       const err = new Error('ignoring duplication error'); err.status = 202;
       throw err;
     } else {
@@ -221,7 +222,7 @@ const appendMetadata = (tracks) => {
     }
     oldPoint = point;
   });
-  // console.log(JSON.stringify(tracks, null, 2))
+  // logger.info(JSON.stringify(tracks, null, 2));
 
   return tracks;
 };
@@ -235,23 +236,23 @@ const appendMetadata = (tracks) => {
  */
 exports.geoFence = async (geoTrack) => {
   const geoFences = await GeoFence.find();
-  // console.log(JSON.stringify(geoFences));
+  // logger.info(JSON.stringify(geoFences));
   // eslint-disable-next-line no-restricted-syntax
   let isSaved = false;
   for (const gf of geoFences) {
     if (gf.enabled) { // only do something when this geofence is enabled
       let direction;
       const dist = calcDist(geoTrack.longitude, geoTrack.latitude, gf.longitude, gf.latitude);
-      console.log(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
+      logger.info(`${gf.description}: distance=${dist}m and radius=${gf.radius}m; I am checked in: ${gf.isCheckedIn}`);
 
       if (dist <= gf.radius && !gf.isCheckedIn) {
-        console.log('Treffer - einchecken!!!');
+        logger.info('Treffer - einchecken!!!');
         direction = 'enter';
       } else if (dist > gf.radius && gf.isCheckedIn) {
-        console.log('Treffer - auschecken!!!!');
+        logger.info('Treffer - auschecken!!!!');
         direction = 'go';
       } else {
-        console.log('kein Handlungsbedarf da Entfernung größer als Radius ist');
+        logger.info('kein Handlungsbedarf da Entfernung größer als Radius ist');
       }
 
       // if no direction was found then do not create a new time entry
@@ -266,7 +267,7 @@ exports.geoFence = async (geoTrack) => {
           utilEntry.create(timeEntry);
           isSaved = true;
         } catch (error) {
-          console.error(`trying to create a new time entry but not successful: ${error.message}`);
+          logger.error(`trying to create a new time entry but not successful: ${error.message}`);
         }
       }
       try {
@@ -274,7 +275,7 @@ exports.geoFence = async (geoTrack) => {
         gf.lastChange = geoTrack.date;
         gf.save();
       } catch (error) {
-        console.error(`trying to save this geofence (${gf.description}): ${error.message}`);
+        logger.error(`trying to save this geofence (${gf.description}): ${error.message}`);
       }
     }
   }

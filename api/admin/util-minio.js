@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+const logger = require('../config/logger'); // Logger configuration
+
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-undef */
@@ -26,17 +27,17 @@ let minioClient = connectMinioClient();
 // Ensure the bucket exists
 minioClient.bucketExists(BUCKET_NAME)
   .then((buckExists) => {
-    if (buckExists) { console.log(`S3 bucket "${BUCKET_NAME}" already exists.`); } else {
+    if (buckExists) { logger.info(`S3 bucket "${BUCKET_NAME}" already exists.`); } else {
       // Create the bucket if it does not exist
       minioClient.makeBucket(BUCKET_NAME, '', (error) => {
         if (error) {
-          console.log(`Error creating S3 bucket ${BUCKET_NAME}: `, err);
+          logger.info(`Error creating S3 bucket ${BUCKET_NAME}: `, err);
         }
-        console.log(`S3 Bucket ${BUCKET_NAME} + created successfully.`);
+        logger.info(`S3 Bucket ${BUCKET_NAME} + created successfully.`);
       });
     }
   })
-  .catch((err) => console.error(err));
+  .catch((err) => logger.error(err));
 
 /**
  * Uploads a JSON Object to a S3 bucket
@@ -62,11 +63,11 @@ const upload = async (objectName, object) => {
     const ojbBuffer = Buffer.from(JSON.stringify(object));
     // await minioClient.removeObject(bucket, objectName);
     const objInfo = await minioClient.putObject(BUCKET_NAME, objectName, ojbBuffer, metaData);
-    console.log(`${objectName} uploaded successfully to S3 bucket ${BUCKET_NAME}: ${JSON.stringify(objInfo)}`);
+    logger.info(`${objectName} uploaded successfully to S3 bucket ${BUCKET_NAME}: ${JSON.stringify(objInfo)}`);
 
     return `${objectName} uploaded successfully`;
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 };
 
@@ -83,13 +84,13 @@ const downloadObject = async (objectName) => {
 
     return JSON.parse(Buffer.concat(chunks).toString('utf-8'));
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     return error.message;
   }
 };
 
 const restore = async (objectName, objectArray) => {
-  console.log(`restoring model ${objectName}`);
+  logger.info(`restoring model ${objectName}`);
 
   if (objectArray.length === 0) return;
 
@@ -97,14 +98,14 @@ const restore = async (objectName, objectArray) => {
     const Model = mongoose.model(objectName);
     await Model.deleteMany({});
     const r = await Model.collection.insertMany(objectArray);
-    console.log(r);
+    logger.info(r);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 };
 
 exports.dumpModels = async () => {
-  console.log(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) ---------------------`);
+  logger.info(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) ---------------------`);
   if (isDumpRunning) return;
   isDumpRunning = true;
 
@@ -118,11 +119,11 @@ exports.dumpModels = async () => {
       res.push(result);
     } catch (error) {
       res.push(`${modelType} could not be stored`);
-      console.error(error);
+      logger.error(error);
     }
   }
   isDumpRunning = false;
-  console.log(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) DONE ---------------------`);
+  logger.info(`------------------- DUMP DATA TO S3 STORAGE (${isDumpRunning}) DONE ---------------------`);
   return res;
 };
 
@@ -151,7 +152,7 @@ const deleteBucketAndAllObjects = async () => new Promise((resolve, reject) => {
   });
 
   objectsStream.on('error', (err) => {
-    console.log(err);
+    logger.info(err);
     reject(err);
   });
 

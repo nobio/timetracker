@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -201,7 +202,7 @@ exports.logout = async (token) => {
     const user = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     await Token.deleteMany({ user: user.username }); // delete all refresh tokens with the same username
   } catch (err) {
-    console.error(`error when logout: ${err.message} \n${err}`);
+    logger.error(`error when logout: ${err.message} \n${err}`);
     // commented for bugfix #101
     // throw createError(400, err.message);
   }
@@ -218,14 +219,14 @@ exports.removeExpiredToken = async () => {
       const payload = jwt.token.split('.')[1];
       const token = JSON.parse(Buffer.from(payload, 'base64').toString('ascii'));
       if (parseInt(token.exp), now - token.exp > 0) {
-        console.log(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
+        logger.info(`refresh token expired and will be deleted now: (${JSON.stringify(token)})`);
         jwt.deleteOne();
       } else {
-        console.log(`refresh token NOT yet expired and will not be deleted now: (${JSON.stringify(token)})`);
+        logger.info(`refresh token NOT yet expired and will not be deleted now: (${JSON.stringify(token)})`);
       }
     });
   } catch (err) {
-    console.log(err);
+    logger.info(err);
     throw createError(500, err.message);
   }
 };
@@ -243,7 +244,7 @@ exports.validateBasicAuth = async (authorization) => {
   const credentials = Buffer.from(credentialsBase64, 'base64').toString();
   const username = credentials.split(':')[0];
   const password = credentials.split(':')[1];
-  // console.log(user, password);
+  // logger.info(user, password);
 
   const mdbUser = await User.findOne({ username: { $eq: username } });
   if (mdbUser === null) throw createError(401, 'User not authenticated');

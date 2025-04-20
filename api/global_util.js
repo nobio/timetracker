@@ -1,3 +1,4 @@
+const logger = require('./config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-lonely-if */
 const Axios = require('axios');
@@ -23,12 +24,12 @@ exports.MODEL_TYPES = ['User', 'Toggle', 'Properties', 'GeoFence', 'FailureDay',
  */
 exports.getBreakTimeSeconds = (date, workDurationInHours = 8) => {
   const workDurationInMS = workDurationInHours * 60 * 60 * 1000;
-  // console.log(date, moment(date, 'X'));
+  // logger.info(date, moment(date, 'X'));
   // const dateMoment = moment(date * 1000, 'x');  // format 'x' is 'Unix ms timestamp'
   const dateMoment = moment(date, 'X'); // format 'X' is 'Unix timestamp'
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021 (AOK): ${dateMoment.isAfter('2021-08-31')} work: ${workDurationInMS / 1000 / 3600}`);
-  // console.log(`date ${dateMoment.format('DD.MM.YYYY')} is after 01.10.2023 (BAD): ${dateMoment.isAfter('2023-10-01')}`);
-  // console.log(dateMoment.isAfter('2021-08-31')); console.log(dateMoment.isBefore('2023-10-01'));
+  // logger.info(`date ${dateMoment.format('DD.MM.YYYY')} is after 31.08.2021 (AOK): ${dateMoment.isAfter('2021-08-31')} work: ${workDurationInMS / 1000 / 3600}`);
+  // logger.info(`date ${dateMoment.format('DD.MM.YYYY')} is after 01.10.2023 (BAD): ${dateMoment.isAfter('2023-10-01')}`);
+  // logger.info(dateMoment.isAfter('2021-08-31')); console.log(dateMoment.isBefore('2023-10-01'));
   if (dateMoment.isAfter('2021-08-31') && dateMoment.isBefore('2023-10-01')) {
     // AOK Bayern
     return AOK_BREAK_TIME_SECONDS;
@@ -61,7 +62,7 @@ exports.getBreakTimeMilliSeconds = (date, workDurationInHours = 8) => this.getBr
  * @returns {number} - The booked time in milliseconds.
  */
 exports.getBookedTimeMilliSeconds = (busytime, pause, date, entriesPerDay) => {
-  // console.log(busytime, pause, date, entriesPerDay)
+  // logger.info(busytime, pause, date, entriesPerDay);
   let bookedTime;
   if (moment(date, 'X').isAfter('2021-08-31') && moment(date, 'X').isBefore('2023-09-30')) {
     // AOK Bayern
@@ -99,11 +100,11 @@ curl -X POST -H "Content-Type: application/json" -d '{"name":"SERVER_STARTED", "
  */
 exports.sendMessage = async (notificationKey, addedContent) => {
   const addedCtnt = (addedContent) || ''; // if addedContent is undefined set it with blank string
-  console.log(`${notificationKey} (${addedCtnt})`);
+  logger.info(`${notificationKey} (${addedCtnt})`);
   try {
     const toggle = await toggleUtil.getToggleByName(notificationKey);
     if (toggle != null && toggle.toggle === true) {
-      // console.log(`toggle '${notificationKey}' switched on`);
+      // logger.info(`toggle '${notificationKey}' switched on`);
       const msg = `(${moment.tz('Europe/Berlin').format('HH:mm:ss')}) *${toggle.notification}* ${addedCtnt}`;
       return this.sendTextMessage(msg);
     }

@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 require('./init');
@@ -148,7 +149,7 @@ describe('test find one TimeEntry by its id:  -> util.findById() ', () => {
     const lastTimeEntry = await util.getLastTimeEntryByDate('2017-12-19T19:34:00.000Z');
     const timeentry = await util.findById(lastTimeEntry._id);
 
-    // console.log(timeentry)
+    // logger.info(timeentry);
     expect(timeentry).to.have.property('_id');
     expect(timeentry).to.have.property('direction');
     expect(timeentry).to.have.property('longitude');
@@ -171,7 +172,7 @@ describe('test to load the last TimeEntry of a given date: -> util.getLastTimeEn
   it('check the last entry of a given date', async () => {
     const MY_DATE = moment('2018-01-12');
     const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
-    // console.log(timeEntry)
+    // logger.info(timeEntry);
     expect(timeEntry).to.not.be.null;
     expect(timeEntry).to.not.be.undefined;
     expect(timeEntry).to.have.property('entry_date');
@@ -182,7 +183,7 @@ describe('test to load the last TimeEntry of a given date: -> util.getLastTimeEn
   it('last entry of an empty date (in the future) must be undefined', async () => {
     const MY_DATE = moment('2050-01-01');
     const timeEntry = await util.getLastTimeEntryByDate(MY_DATE);
-    // console.log(timeEntry)
+    // logger.info(timeEntry);
     expect(timeEntry).to.be.undefined;
   });
 });
@@ -196,7 +197,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       // 1. crete a time entry....
       let timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
-      // console.log(timeEntry._id)
+      // logger.info(timeEntry._id);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
       expect(timeEntry._id).to.not.be.undefined;
@@ -222,7 +223,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
       timeEntry = await util.findById(id);
       expect(timeEntry).to.be.null;
     } catch (error) {
-      console.log(`no error should occure; instead: ${error.message}`);
+      logger.info(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
       throw error;
     }
@@ -232,7 +233,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       await util.create('go', DEFAULT_DATE); assert.fail('should throw exception name: Path `name` is required');
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       expect(error.message).to.eq('Unable to read Time Entry for given date : undefined (Cast to date failed for value "Moment<Invalid date>" (type Moment) at path "entry_date" for model "TimeEntry")');
     }
   });
@@ -253,7 +254,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
     try {
       // 1. crete a time entry....
       let timeEntry = await util.create({ direction: 'enter', datetime: DEFAULT_DATE });
-      // console.log(timeEntry)
+      // logger.info(timeEntry);
       expect(timeEntry).to.not.be.undefined;
       expect(timeEntry).to.have.property('_id');
       expect(timeEntry._id).to.not.be.undefined;
@@ -279,7 +280,7 @@ describe('test to create one TimeEntry:  -> util.create()', () => {
       timeEntry = await util.findById(id);
       expect(timeEntry).to.be.null;
     } catch (error) {
-      console.log(`no error should occure; instead: ${error.message}`);
+      logger.info(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
       throw error;
     }
@@ -358,7 +359,7 @@ describe('test to modify one TimeEntry:  -> util.update() ', () => {
       timeEntry = await util.findById(timeEntry.id);
       expect(timeEntry).to.be.null;
     } catch (error) {
-      console.log(`no error should occure; instead: ${error.message}`);
+      logger.info(`no error should occure; instead: ${error.message}`);
       await clearAllEntries(DEFAULT_DATE);
       throw error;
     }
@@ -457,7 +458,7 @@ describe('test util.storeValidationErrors ', () => {
       expect(result).to.have.property('message');
       expect(result.message).to.equal('calculation ongoing in background');
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw an error here');
     }
   });
@@ -472,7 +473,7 @@ describe('test util.storeValidationErrors ', () => {
  * create a new TimeEntry regardless other entries. No checks will be performed - not like util.crea
  */
 function create(timeEntry) {
-  // console.log('entered save ' + id)
+  // logger.info('entered save ' + id);
   return new Promise((resolve, reject) => {
     new TimeEntry({
       entry_date: timeEntry.datetime,
