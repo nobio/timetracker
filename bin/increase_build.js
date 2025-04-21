@@ -17,7 +17,7 @@ const openapiYaml = yaml.load(fs.readFileSync('./spec/openapi.yaml', 'utf8'));
 
 const args = process.argv.slice(2);
 if (args[0] === '--help') {
-  logger.info('Usage: node bin/build.js [<ma|mi|b>]');
+  console.log('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 }
 
@@ -43,8 +43,8 @@ if (!args[0] || args[0] === '' || args[0] === 'b') {
 }
 
 if (!modified) { // only write file if version has changed
-  logger.info('nothing to do, please check your parameters');
-  logger.info('Usage: node bin/build.js [<ma|mi|b>]');
+  console.log('nothing to do, please check your parameters');
+  console.log('Usage: node bin/build.js [<ma|mi|b>]');
   process.exit(1);
 } else {
   packageJson.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
@@ -53,7 +53,7 @@ if (!modified) { // only write file if version has changed
   openapiYaml.info.version = `${majorVersion}.${minorVersion}.${buildVersion}`;
   openapiYaml.info.lastUpdate = new Date().toISOString().split('T')[0];
 
-  logger.info(`new version ${packageJson.version} lastUpdate ${packageJson.last_build}`);
+  console.log(`new version ${packageJson.version} lastUpdate ${packageJson.last_build}`);
 
   fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 4), 'UTF8');
   fs.writeFileSync('./package-lock.json', JSON.stringify(packageLockJson, null, 4), 'UTF8');
