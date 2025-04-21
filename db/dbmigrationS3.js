@@ -1,10 +1,10 @@
-const logger = require('../api/config/logger'); // Logger configuration
 #!/usr/local/bin/node
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
 
 require('dotenv').config();
+const logger = require('../api/config/logger'); // Logger configuration
 const Axios = require('axios');
 const mongoose = require('mongoose');
 const models = require('./models');

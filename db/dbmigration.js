@@ -1,6 +1,6 @@
-const logger = require('../api/config/logger'); // Logger configuration
 #!/usr/local/bin/node
 
+const logger = require('../api/config/logger'); // Logger configuration
 const commander = require('commander');
 const mongoose = require('mongoose');
 const readline = require('readline').createInterface({

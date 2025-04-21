@@ -1,1 +1,14 @@
-http://88.198.110.159:3100/api/v1
+###
+GET http://88.198.110.159:3100/ready
+
+###
+GET http://88.198.110.159:3100/config
+
+###
+GET http://88.198.110.159:3100/services
+
+###
+POST http://88.198.110.159:3100/flush
+
+###
+GET http://88.198.110.159:3100/loki/api/v1/status/buildinfo

@@ -3,7 +3,7 @@ const LokiTransport = require('winston-loki');
 
 const options = {
     console: {
-        level: process.env.LOKI_LOG_LEVEL || 'info',
+        level: process.env.LOKI_LOG_LEVEL || 'debug',
         handleExceptions: true,
         format: winston.format.combine(
             winston.format.timestamp(),
@@ -13,10 +13,12 @@ const options = {
     },
     loki: {
         host: process.env.LOKI_HOST || 'http://loki:3100',
-        labels: { app: 'timetracker' },
+        labels: { app: process.env.LOKI_APP_NAME || 'timetracker' },
         json: true,
         format: winston.format.json(),
         replaceTimestamp: true,
+        batching: true,
+        level: 'debug',
         onConnectionError: (err) => winston.error(err),
     },
 };
