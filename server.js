@@ -34,13 +34,34 @@ require('log-timestamp')(() => `[${moment().format('ddd, DD MMM YYYY hh:mm:ss Z'
 
 const app = express();
 
-// morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
+app.use((req, res, next) => {
+  // Start timer
+  const start = process.hrtime();
+  // Override res.end to calculate latency and log response
+  const originalEnd = res.end;
+  res.end = function (chunk, encoding) {
+    // Calculate latency
+    const diff = process.hrtime(start);
+    const latency = (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(3); // in milliseconds
 
+    // Log response
+    const message = `(${req.headers.host}, ${latency}ms, status: ${res.statusCode}) ${req.method} ${req.url}`;
+
+    if (res.statusCode <= 299) logger.info(message)
+    else if (res.statusCode >= 300 && res.statusCode <= 399) logger.warn(message);
+    else logger.error(message);
+    // Call the original res.end function
+    originalEnd.call(this, chunk, encoding);
+  };
+
+  next();
+});
+// morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
+//app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
 app.set('websock-port', process.env.WEBSOCK_PORT || '30444');
-app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -59,14 +80,6 @@ app.use(apiAuth.authorize);
 const spec = fs.readFileSync(path.join(__dirname, 'spec/openapi.yaml'), 'utf8');
 const swaggerDoc = jsyaml.load(spec);
 
-/*
-  app.use((req, res, next) => {
-    logger.info(`▶ headers: ${JSON.stringify(req.headers, null, 2)}`);
-    logger.info(`▶ params:${JSON.stringify(req.params)}`);
-    logger.info(`▶ body:${JSON.stringify(req.body)}`);
-    next();
-  });
-  */
 /*
   app.configure('production', function() {
     app.use(express.errorHandler());

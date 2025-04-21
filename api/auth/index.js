@@ -321,7 +321,6 @@ exports.refreshToken = async (req, res) => {
 };
 
 exports.authorize = async (req, res, next) => {
-  logger.info(`URL: ${req.url}`);
   const API_PATH = process.env.API_PATH || '/api';
   // logger.info(req.url);
   // check the switch if we are supposed to authorize
