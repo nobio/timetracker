@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable global-require */
 require('./init');
 require('../db');
@@ -83,7 +84,7 @@ describe('test util.getStats and getStatsByRange', () => {
     const dtEnd = moment(dtStart).add(1, 'months');
 
     const result = await util.getStatsByRange(dtStart, dtEnd);
-    // console.log(result)
+    // logger.info(result);
     expect(result).to.have.property('planned_working_time');
     expect(result).to.have.property('average_working_time');
     expect(result).to.have.property('actual_working_time');
@@ -398,8 +399,8 @@ describe("test util.deleteAllStatsDays", () => {
  * create a new TimeEntry regardless other entries. No checks will be performed
  */
 async function createTimeEntry(timeEntry) {
-  // console.log('entered save ' + id)
-  // console.log(timeEntry);
+  // logger.info('entered save ' + id);
+  // logger.info(timeEntry);
   await new TimeEntry({
     entry_date: timeEntry.datetime,
     direction: timeEntry.direction,

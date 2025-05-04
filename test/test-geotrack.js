@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 require('./init');
 require('../db');
 const mongoose = require('mongoose');

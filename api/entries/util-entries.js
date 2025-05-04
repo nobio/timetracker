@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-restricted-syntax */
@@ -39,7 +40,7 @@ exports.stripdownToDateBerlin = (date) => {
   d.second(0);
   d.minutes(0);
   d.hours(0);
-  // console.log(d.format('YYYY-MM-DD HH:mm:ss'))
+  // logger.info(d.format('YYYY-MM-DD HH:mm:ss'));
   return d;
 };
 /**
@@ -52,7 +53,7 @@ exports.stripdownToDateUTC = (date) => {
   d.second(0);
   d.minutes(0);
   d.hours(0);
-  // console.log(d.format('YYYY-MM-DD HH:mm:ss'))
+  // logger.info(d.format('YYYY-MM-DD HH:mm:ss'));
   return d;
 };
 
@@ -72,7 +73,7 @@ exports.stripdownToDateUTC = (date) => {
 }
  */
 exports.findById = (id) =>
-  // console.log('entered findById ' + id)
+  // logger.info('entered findById ' + id);
   new Promise((resolve, reject) => {
     TimeEntry.findById(id)
       .then((timeentries) => resolve(timeentries))
@@ -100,7 +101,7 @@ exports.create = async (timeEntry) => {
 
   // ============== 1st check: Last Time Entry ==============
   const lastTimeEntry = await this.getLastTimeEntryByDate(timeEntry.datetime);
-  // console.log(JSON.stringify(timeEntry));
+  // logger.info(JSON.stringify(timeEntry));
   if (!lastTimeEntry) { // no entry today -> direction must be 'enter'
     if (timeEntry.direction !== 'enter') {
       throw new Error(`first entry of the day must be an enter and not ${timeEntry.direction}`);
@@ -112,16 +113,16 @@ exports.create = async (timeEntry) => {
   // ============== 2nd check: is the new entry really a new entry or does it already exist? ==============
   try {
     const entriesByDate = await this.getAllByDate(moment(timeEntry.datetime));
-    // console.log(entriesByDate);
+    // logger.info(entriesByDate);
     entriesByDate.forEach((entry) => {
       if (entry.entry_date.toISOString() === timeEntry.datetime
         && entry.direction === timeEntry.direction) {
-        console.error('entry already exists; use update to modify');
+        logger.error('entry already exists; use update to modify');
         throw new Error('entry already exists; use update to modify');
       }
     });
   } catch (error) {
-    console.log(error);
+    logger.info(error);
     throw error;
   }
 
@@ -165,7 +166,7 @@ const setGeofenceCheckStatus = async (direction) => {
       }
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 };
 
@@ -204,7 +205,7 @@ exports.update = async (timeEntry) => {
     const msg = ((process.env.EXTERNAL_DOMAIN) ? `(<${process.env.EXTERNAL_DOMAIN}/#/members/entries/entries/${tEntry._id}|Link>)` : JSON.stringify(timeEntry));
     globalUtil.sendMessage('UPDATE_ENTRY', msg);
   } catch (error) {
-    console.log(`unable to update entry ${tEntry._id}\n${error}`);
+    logger.info(`unable to update entry ${tEntry._id}\n${error}`);
   }
   return tEntry;
 };
@@ -229,7 +230,7 @@ exports.deleteById = (id) => new Promise((resolve, reject) => {
 exports.getAllByDate = (date) => {
   const dtStart = this.stripdownToDateBerlin(moment.unix(date / 1000));
   const dtEnd = moment(dtStart).add(1, 'days');
-  // console.log('getAllByDate received date: ' + moment(dtStart).format('DD.MM.YYYY HH:mm:ss') + ' - ' + moment(dtEnd).format('DD.MM.YYYY HH:mm:ss'))
+  // logger.info('getAllByDate received date: ' + moment(dtStart).format('DD.MM.YYYY HH:mm:ss') + ' - ' + moment(dtEnd).format('DD.MM.YYYY HH:mm:ss'));
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
@@ -263,7 +264,7 @@ exports.getAllByDate = (date) => {
  * @returns Promise
  */
 exports.calculateBusyTime = (timeentries) => new Promise((resolve, reject) => {
-  // console.log(timeentries);
+  // logger.info(timeentries);
 
   if (timeentries.length === 0) {
     // reject(new Error(`Es gibt keine Einträge für diesen Tag (${dt.format('DD.MM.YYYY')})`), 0);
@@ -351,7 +352,7 @@ exports.getLastTimeEntryByDate = (dt) => {
   const dtStart = this.stripdownToDateBerlin(dt);
   const dtEnd = moment(dtStart).add(1, 'days');
 
-  // console.log(dtStart.toDate() + '\n' + dtEnd.toDate())
+  // logger.info(dtStart.toDate() + '\n' + dtEnd.toDate());
 
   return new Promise((resolve, reject) => {
     TimeEntry.find({
@@ -413,7 +414,7 @@ exports.removeDoublets = async () => {
         && timeentry.direction === lastTimeentry.direction) {
         await TimeEntry.deleteOne({ _id: timeentry._id });
         count++;
-        // console.log(`removing timeentry ${timeentry}`);
+        // logger.info(`removing timeentry ${timeentry}`);
       } else {
         lastTimeentry = timeentry;
       }
@@ -425,7 +426,7 @@ exports.removeDoublets = async () => {
 };
 
 exports.sleep = (delay) => {
-  console.log(`I 'm going to sleep now for ${delay} ms`);
+  logger.info(`I 'm going to sleep now for ${delay} ms`);
   return new Promise((resolve) => { setTimeout(resolve, delay); });
 };
 
@@ -440,16 +441,16 @@ exports.evaluate = async () => {
 };
 
 exports.storeValidationErrors = (firstEntry, lastEntry) => new Promise((resolve, reject) => {
-  // console.log(JSON.stringify(firstEntry), lastEntry);
+  // logger.info(JSON.stringify(firstEntry), lastEntry);
   const date = this.stripdownToDateUTC(firstEntry.age);
 
   for (let d = date; d < moment(lastEntry.age); date.add(1, 'day')) {
-    // console.log(`calculating for day ${date.format('YYYY-MM-DD')}`);
+    // logger.info(`calculating for day ${date.format('YYYY-MM-DD')}`);
     const dt = moment(date);
 
     this.getAllByDate(dt).then((timeentries) => {
       // firstly evaluate the not (yet) complete entries and save them....
-      // if (timeentries.length > 0) console.log(`${timeentries[0].entry_date} ${timeentries.length}`);
+      // if (timeentries.length > 0) logger.info(`${timeentries[0].entry_date} ${timeentries.length}`);
       if (timeentries.length % 2 !== 0) {
         new FailureDay({
           date: dt,
@@ -509,10 +510,10 @@ exports.markADay = async (entryDate, mark) => {
   const entryDateEnter = entryDate.clone().hours(8);
   // for the go entry, add 8 hours... reads 08:00 + 8h
   const entryDateGo = entryDate.clone().hours(8 + 8);
-  console.log(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
+  logger.info(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
   // ... and then add the pause
   entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate, 8.5), 'seconds');
-  console.log(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
+  logger.info(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
   // create the enter time entry
   await this.create({
     datetime: entryDateEnter,

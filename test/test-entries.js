@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 require('./init');
 
 const chai = require('chai');
@@ -12,12 +13,12 @@ describe('test global_util.sendMessage()', () => {
     process.env.SLACK_TOKEN = '';
     try {
       const response = await globalUtil.sendMessage('CREATE_ENTRY', 'XXXXXXX');
-      // console.log(response)
+      // logger.info(response);
       expect(response).to.be.string;
       expect(response).to.contain('could not send message');
       expect(response).to.contain('no slack url provided');
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw exception');
     }
   });
@@ -29,7 +30,7 @@ describe('test global_util.sendMessage()', () => {
       expect(result).to.be.string;
       expect(result).to.equal('toggle UNKNOWN_KEY switched off');
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw exception');
     }
   });

@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable camelcase */
 const utilStats = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
@@ -71,7 +72,7 @@ exports.getStatsByTimeBox = (req, res) => {
         }],
       };
 
-      console.log(JSON.stringify(timeboxedStatistics));
+      logger.info(JSON.stringify(timeboxedStatistics));
       res.send({
         actual_working_time: timeboxedStatistics.actual_working_time,
         planned_working_time: timeboxedStatistics.planned_working_time,

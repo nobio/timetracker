@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-restricted-syntax */
 const moment = require('moment');
@@ -54,7 +55,7 @@ exports.getAllTimeEntriesGroupedByDate = (timeEntries) => new Promise((resolve, 
 exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve) => {
   const breakTimes = [];
   for (const timeItem of timeEntries.values()) {
-    // console.log(timeItem);
+    // logger.info(timeItem);
     let breakTime = -1;
     if ((timeItem.length % 2) !== 0) {
       breakTime = 0;
@@ -68,14 +69,14 @@ exports.prepareBreakTimes = (timeEntries, realCalc) => new Promise((resolve) => 
 
     if (breakTime === -1) { // calculate breakTime by the difference between an go and a new start (min. 2 blocks must exist)
       breakTime = timeItem.reduce((acc, timeEntry, idx) => {
-        // console.log('idx=' + idx + ' timeEntry=' + timeEntry + ' acc=' + acc);
+        // logger.info('idx=' + idx + ' timeEntry=' + timeEntry + ' acc=' + acc);
         if ((idx % 2) === 0 && idx > 0) {
           return acc + (timeEntry - timeItem[idx - 1]);
         }
         return acc; // always return commulator
       }, 0);
     }
-    // console.log(`>>> timeItem=${timeItem}: BreakTime=${breakTime}s / ${breakTime / 60}min`);
+    // logger.info(`>>> timeItem=${timeItem}: BreakTime=${breakTime}s / ${breakTime / 60}min`);
     breakTimes.push(Math.round(breakTime / 60));
   }
   resolve(breakTimes);
@@ -106,7 +107,7 @@ exports.calculateHistogram = (preparedBreakTimes, interval, realCalc) => new Pro
   preparedBreakTimes.reduce((acc, breakTimeMin) => {
     const idx = parseInt((breakTimeMin - 1) / interval, 10);
     if (idx > 0 && idx < breakTimes.length && !(realCalc && breakTimeMin === 0)) { // ignore longer breaks and in case of realCalc the 0 value (all calculated values end up with 0)
-      // console.log('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
+      // logger.info('length: ' + breakTimes.length + ' - index: ' + breakTimeMin + ' - calculated idx: ' + idx);
       breakTimes[idx].breakTime++; // TODO: also take the measurements during the interval into account!!!
     }
     return acc;

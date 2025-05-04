@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 require('../../db');
 
 const mongoose = require('mongoose');
@@ -39,7 +40,7 @@ exports.setProperty = (key, value) => new Promise((resolve, reject) => {
     .then((property) => {
       if (property === null) {
         // create a new property
-        // console.log(`creating a new property`);
+        // logger.info(`creating a new property`);
         property = new Properties({ key, value });
       }
       property.value = value;

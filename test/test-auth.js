@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable prefer-destructuring */
 require('./init');
 require('../db');
@@ -47,7 +48,7 @@ describe('test utilAuth.getAllUsers', () => {
 
   it('getAllUsers', async () => {
     const result = await util.getAllUsers();
-    // console.log(result);
+    // logger.info(result);
     expect(result).to.be.an('array');
     expect(result).to.have.length > 0;
     expect(result[0]).to.have.property('username');
@@ -114,7 +115,7 @@ describe('test utilAuth.createUser', () => {
       await auth.createUser(req, res);
       expect(res.status).to.have.been.calledWith(201);
     } catch (err) {
-      console.log(error);
+      logger.info(error);
       assert.fail(`should not throw error\n${err.message}`);
     }
   });
@@ -234,7 +235,7 @@ describe('test utilAuth.createUser', () => {
       await auth.getUser(req, res);
       expect(res.status).to.have.been.calledWith(200);
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail(`should not throw error\n${error.message}`);
     }
   });
@@ -281,7 +282,7 @@ describe('test utilAuth.updateUser', () => {
       await User.deleteOne({ username: TESTUSER_USERNAME });
       await User.deleteOne({ username: 'alberto' });
       userId = await util.createUser(TESTUSER_USERNAME, TESTUSER_PASSWORD, TESTUSER_NAME, TESTUSER_MAIL);
-      console.log(`UserId = ${userId}`);
+      logger.info(`UserId = ${userId}`);
       const res = mockResponse();
       const req = mockRequest({
         headers: [],
@@ -297,7 +298,7 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal('ALBERTO EINSTEINO');
       expect(user.mailAddress).to.be.equal('alberto-einsteino@berkly.edu');
     } catch (error) {
-      console.error(error.message);
+      logger.error(error.message);
       assert.fail(`should not throw error\n${error.message}`);
     } finally {
       await util.deleteUser(userId);
@@ -355,7 +356,7 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal(TESTUSER_NAME);
       expect(user.mailAddress).to.be.equal('donald.duck@aol.com');
     } catch (err) {
-      console.log(err);
+      logger.info(err);
       assert.fail(`should not throw exception\n${error.message}`);
     }
   });
@@ -372,7 +373,7 @@ describe('test utilAuth.updateUser', () => {
       expect(user.name).to.be.equal('Donald Duck');
       expect(user.mailAddress).to.be.equal(TESTUSER_MAIL);
     } catch (err) {
-      console.log(err);
+      logger.info(err);
       assert.fail(`should not throw exception\n${error.message}`);
     }
   });
@@ -421,7 +422,7 @@ describe('test utilAuth.deleteUser', () => {
       await auth.deleteUser(req, res);
       expect(res.status).to.have.been.calledWith(202);
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail(`should not throw error\n${error.message}`);
     }
   });
@@ -569,7 +570,7 @@ describe('test utilAuth.login', () => {
       res = mockResponse();
 
       await auth.authorize(req, res, next);
-      // console.log(res.status.getCalls()[0].lastArg);
+      // logger.info(res.status.getCalls()[0].lastArg);
       expect(res.status).to.have.been.calledWith(200);
 
       // *** let the access token expire
@@ -922,7 +923,7 @@ describe('test index.refreshToken', () => {
 
     try {
       await auth.refreshToken(req, res, next);
-      // console.log(res.json.getCalls()[0].lastArg)
+      // logger.info(res.json.getCalls()[0].lastArg);
       expect(res.status).to.have.been.calledWith(400);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
@@ -1009,7 +1010,7 @@ describe('test index.logout', () => {
 
     try {
       await auth.logout(req, res, next);
-      // console.log(res.json.getCalls()[0].lastArg)
+      // logger.info(res.json.getCalls()[0].lastArg);
       // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
       expect(res.status).to.have.been.calledWith(200);
     } catch (err) {

@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable max-len */
 require('./init');
 const moment = require('moment');
@@ -112,7 +113,7 @@ describe('test util-breaktime - Promise', () => {
       const timeEntries = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02);
       result = await utilBreaktime.prepareBreakTimes(timeEntries, false);
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw exception');
     }
     expect(result).to.be.an('array');
@@ -126,7 +127,7 @@ describe('test util-breaktime - Promise', () => {
       const timeEntries = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_03_AOK);
       result = await utilBreaktime.prepareBreakTimes(timeEntries, false);
     } catch (error) {
-      console.log(error);
+      logger.info(error);
       assert.fail('should not throw exception');
     }
     expect(result).to.be.an('array');
