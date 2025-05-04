@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable consistent-return */
 /* eslint-disable no-shadow */
 /* eslint-disable no-use-before-define */
@@ -41,7 +42,7 @@ exports.getExtraHours = async (accumulate, timeUnit, startDate = START_DATE_DEFA
     if (accumulate) return getExtraHoursByTimeUnitAcc(stats, timeUnit);
     return getExtraHoursByTimeUnitNoAcc(stats, timeUnit);
   } catch (error) {
-    console.error(error.message);
+    logger.error(error.message);
     throw (error);
   }
 };
@@ -97,7 +98,7 @@ const getExtraHoursByTimeUnitAcc = async (stats, timeUnit) => {
   // iterate all accumulated days and pick the one at the and of our time unit
   dailyExtraHours.forEach((extraHour, idx) => {
     const actualEndOfTimeUnit = moment(extraHour.date).endOf(timeUnit);
-    // console.log(actualEndOfTimeUnit.format('YYYY-MM-DD'), lastEndOfTimeUnit.format('YYYY-MM-DD'), extraHour);
+    // logger.info(actualEndOfTimeUnit.format('YYYY-MM-DD'), lastEndOfTimeUnit.format('YYYY-MM-DD'), extraHour);
     if (moment(extraHour.date).isAfter(lastEndOfTimeUnit)) {
       lastEndOfTimeUnit = actualEndOfTimeUnit;
       extraHours.push(dailyExtraHours[idx - 1]);

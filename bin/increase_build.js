@@ -64,7 +64,7 @@ if (!modified) { // only write file if version has changed
   // tag the branch
   exec(`git tag ${majorVersion}.${minorVersion}.${buildVersion}`, (err) => {
     if (err) {
-      console.error(`exec error: ${err}`);
+      logger.error(`exec error: ${err}`);
     }
   });
 }

@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment-timezone');
 const util = require('./util-entries');
 
@@ -30,15 +31,15 @@ exports.getEntries = async (req, res) => {
 
   try {
     if (filterByDate && filterByBusy) {
-      // console.log('filter by date and busy');
+      // logger.info('filter by date and busy');
       await res.status(500).send('date and busy filter set; can only handle one of them');
     } else if (filterByDate) {
-      // console.log(`filter by date: ${filterByDate}`);
+      // logger.info(`filter by date: ${filterByDate}`);
       await util.getAllByDate(filterByDate)
         .then((timeentries) => res.status(200).send(timeentries))
         .catch((err) => res.status(500).send(err));
     } else if (filterByBusy) {
-      // console.log(`filter by busy: ${filterByBusy}`);
+      // logger.info(`filter by busy: ${filterByBusy}`);
       await util.getAllByDate(filterByBusy)
         .then(util.calculateBusyTime)
         .then((busytime) => res.status(200).send(busytime))
@@ -49,7 +50,7 @@ exports.getEntries = async (req, res) => {
         .catch((err) => res.status(500).send(`Error while reading Time Entry: ${req.params.id} ${err.message}`));
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 };
 
@@ -67,7 +68,7 @@ exports.getEntries = async (req, res) => {
  * curl -X POST -H "Content-Type: application/json" -d '{"direction":"enter","entry_date":"2018-02-18T09:46:02.151Z","last_changed":"2018-02-18T09:46:02.151Z","datetime":"2018-02-18T09:46:00.000Z"}'  http://localhost:30000/api/entries
  ****************************************************************************** */
 exports.createEntry = async (req, res) => {
-  // console.log(JSON.stringify(req.body));
+  // logger.info(JSON.stringify(req.body));
   const timeEntry = {
     direction: req.body.direction,
     datetime: req.body.datetime,
@@ -89,7 +90,7 @@ exports.createEntry = async (req, res) => {
  * curl -X PUT -H "Content-Type: application/json" -d '{"direction":"enter", "latitude":"45", "longitude":"45"}' http://localhost:30000/api/entries/5a36aab25ba9cf154bd2a384
  ****************************************************************************** */
 exports.saveEntry = async (req, res) => {
-  // console.log(JSON.stringify(req.body))
+  // logger.info(JSON.stringify(req.body));
   const { id } = req.params;
   const timeEntry = {
     id: req.params.id,
@@ -191,7 +192,7 @@ exports.getErrorDates = async (req, res) => {
 }'
  ****************************************************************************** */
 exports.geofence = async (req, res) => {
-  // console.log(JSON.stringify(req.body));
+  // logger.info(JSON.stringify(req.body));
 
   let errMsg = '';
   if (!req.body) errMsg += 'body is empty; ';
@@ -201,7 +202,7 @@ exports.geofence = async (req, res) => {
   if (!req.body.latitude) errMsg += 'latitude is missing; ';
 
   if (errMsg !== '') {
-    // console.error(`invalid request: ${errMsg}`);
+    // logger.error(`invalid request: ${errMsg}`);
     res.status(500).send({ message: `invalid request: ${errMsg}` });
     return;
   }
@@ -234,7 +235,7 @@ exports.geofence = async (req, res) => {
  * @param {*} res
  */
 exports.markADay = async (req, res) => {
-  // console.log(req.body);
+  // logger.info(req.body);
   const marks = 'vacation sick-leave'.split(' ');
 
   if (!req.body.mark) { res.status(400).send('please provide a mark'); return; }

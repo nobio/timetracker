@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment');
 const WebSocketServer = require('ws');
 let wss;
@@ -14,21 +15,21 @@ class WebSocketFacade {
   }
 
   init(server) {
-    console.log('web socket server exposing path  /ws');
+    logger.info('web socket server exposing path  /ws');
     wss = new WebSocketServer.Server({ server, clientTracking: true, path: '/ws' });
 
     wss.on("connection", (ws, req) => {
 
-      console.log(`new webservice client connected with url ${req.url}`);
+      logger.info(`new webservice client connected with url ${req.url}`);
 
       // handling what to do when clients disconnects from server
       ws.on("close", () => {
-        console.log("webservice client has disconnected");
+        logger.info("webservice client has disconnected");
         this.remove(ws);
       });
       // handling client connection error
       ws.onerror = () => {
-        console.log("Some Error occurred")
+        logger.info("Some Error occurred");
         this.remove(ws);
       }
 
@@ -47,9 +48,9 @@ class WebSocketFacade {
       })), 10000);
       */
 
-      console.log(`numbers of web sockets before adding: ${WebSocketFacade.websockets.length}`);
+      logger.info(`numbers of web sockets before adding: ${WebSocketFacade.websockets.length}`);
       WebSocketFacade.websockets.push(ws);
-      console.log(`numbers of web sockets after adding: ${WebSocketFacade.websockets.length}`);
+      logger.info(`numbers of web sockets after adding: ${WebSocketFacade.websockets.length}`);
 
     });
 
@@ -79,9 +80,9 @@ class WebSocketFacade {
    * @param {} ws
    */
   remove(ws) {
-    console.log(`numbers of web sockets before remove: ${WebSocketFacade.websockets.length}`);
+    logger.info(`numbers of web sockets before remove: ${WebSocketFacade.websockets.length}`);
     WebSocketFacade.websockets = WebSocketFacade.websockets.filter(websocket => websocket !== ws);
-    console.log(`numbers of web sockets after remove: ${WebSocketFacade.websockets.length}`);
+    logger.info(`numbers of web sockets after remove: ${WebSocketFacade.websockets.length}`);
   }
 
   shutdown() {

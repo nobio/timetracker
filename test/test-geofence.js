@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 require('./init');
 const moment = require('moment');
 const Chai = require('chai');
@@ -31,7 +32,7 @@ describe('test read geofences', () => {
 describe('test read one perticular geofence', () => {
   before(async () => {
     GEOFENCE = await util.createGeofence(true, 10, 20, 30, 'test', false);
-    // console.log(GEOFENCE);
+    // logger.info(GEOFENCE);
   });
 
   it('read an existing geofecne', async () => {
@@ -93,7 +94,7 @@ describe('test set a geofence', () => {
   });
 
   it('set an existing geofence', async () => {
-    // console.log(GEOFENCE);
+    // logger.info(GEOFENCE);
     const gf = await util.setGeofence({
       id: GEOFENCE.id,
       enabled: false,

@@ -1,3 +1,4 @@
+const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable max-len */
 require('./init');
 const Chai = require('chai');
@@ -113,7 +114,7 @@ describe('test util.deleteToggle', () => {
       const result = await util.getToggle(deletedToggle._id);
       expect(result).to.be.null;
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       assert.fail('should not throw exception');
     }
   });
@@ -131,7 +132,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('NOTIFICATION_SLACK');
         expect(result.NOTIFICATION_SLACK).to.equal(false);
       } catch (error) {
-        console.log(error);
+        logger.info(error);
         assert.fail('should not throw exception');
       }
     });
@@ -142,7 +143,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('NOTIFICATION_SLACK');
         expect(result.NOTIFICATION_SLACK).to.equal(true);
       } catch (error) {
-        console.log(error);
+        logger.info(error);
         assert.fail('should not throw exception');
       }
     });
@@ -211,7 +212,7 @@ describe('test util.deleteToggle', () => {
   after(async () => {
     try {
       const result = await util.deleteTestToggles();
-      console.log(JSON.stringify(result));
+      logger.info(JSON.stringify(result));
     } catch (error) {
       assert.fail('should not throw exception');
     }

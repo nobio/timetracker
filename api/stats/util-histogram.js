@@ -1,3 +1,4 @@
+const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment-timezone');
 const utilEntry = require('../entries/util-entries');
 

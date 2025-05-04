@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+const logger = require('../config/logger'); // Logger configuration
+
 /* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
@@ -59,7 +60,7 @@ const dumpModel = async (model) => {
   const dumpFile = `${DUMP_DIR}/${model.modelName}_${timestamp}.json.gz`;
   const entries = await model.find();
 
-  console.log(`Dumping ${model.modelName}: ${entries.length} items`);
+  logger.info(`Dumping ${model.modelName}: ${entries.length} items`);
 
   return new Promise((resolve, reject) => {
     zlib.gzip(JSON.stringify(entries), (err, buffer) => {
@@ -141,7 +142,7 @@ const downloadObject = async (dbType) => {
       });
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     return error.message;
   }
 };
@@ -198,7 +199,7 @@ exports.backupTimeEntries = async () => {
   try {
     await TimeEntryBackup.deleteMany({});
     const timeEntries = await TimeEntry.find();
-    console.log(`Found ${timeEntries.length} time entries to backup`);
+    logger.info(`Found ${timeEntries.length} time entries to backup`);
 
     const backupPromises = timeEntries.map((entry) => (
       new TimeEntryBackup({
@@ -216,7 +217,7 @@ exports.backupTimeEntries = async () => {
 
     return { backup_count: results.length };
   } catch (error) {
-    console.error('Backup failed:', error);
+    logger.error('Backup failed:', error);
     throw error;
   } finally {
     isBackupRunning = false;
