@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "19.0.5",
-    "last_build": "2025-06-01T16:56:19.119Z",
+    "version": "19.0.6",
+    "last_build": "2025-06-01T17:09:25.051Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -18,10 +18,10 @@
     },
     "devDependencies": {
         "@opentelemetry/api": "^1.9.0",
-        "@opentelemetry/exporter-metrics-otlp-proto": "^0.200.0",
-        "@opentelemetry/exporter-trace-otlp-proto": "^0.200.0",
+        "@opentelemetry/exporter-metrics-otlp-proto": "^0.201.1",
+        "@opentelemetry/exporter-trace-otlp-proto": "^0.201.1",
         "@opentelemetry/sdk-metrics": "^2.0.1",
-        "@opentelemetry/sdk-node": "^0.200.0",
+        "@opentelemetry/sdk-node": "^0.201.1",
         "@opentelemetry/sdk-trace-node": "^2.0.1",
         "chai": "^4.5.0",
         "chai-datetime": "^1.8.1",
@@ -33,7 +33,7 @@
         "mock-req-res": "^1.2.1",
         "nodemon": "^3.1.10",
         "nyc": "^17.1.0",
-        "sinon": "^19.0.5",
+        "sinon": "^20.0.0",
         "sinon-chai": "^3.7.0"
     },
     "dependencies": {
