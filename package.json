@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "19.0.3",
-    "last_build": "2025-05-04T17:52:02.805Z",
+    "version": "19.0.4",
+    "last_build": "2025-06-01T16:54:23.844Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -20,18 +20,18 @@
         "@opentelemetry/api": "^1.9.0",
         "@opentelemetry/exporter-metrics-otlp-proto": "^0.200.0",
         "@opentelemetry/exporter-trace-otlp-proto": "^0.200.0",
-        "@opentelemetry/sdk-metrics": "^2.0.0",
+        "@opentelemetry/sdk-metrics": "^2.0.1",
         "@opentelemetry/sdk-node": "^0.200.0",
-        "@opentelemetry/sdk-trace-node": "^2.0.0",
+        "@opentelemetry/sdk-trace-node": "^2.0.1",
         "chai": "^4.5.0",
         "chai-datetime": "^1.8.1",
         "chai-integer": "^0.1.0",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-plugin-import": "^2.31.0",
-        "mocha": "^11.1.0",
+        "mocha": "^11.5.0",
         "mock-req-res": "^1.2.1",
-        "nodemon": "^3.1.9",
+        "nodemon": "^3.1.10",
         "nyc": "^17.1.0",
         "sinon": "^19.0.5",
         "sinon-chai": "^3.7.0"
@@ -45,7 +45,7 @@
         "compression": "^1.8.0",
         "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
-        "debug": "^4.4.0",
+        "debug": "^4.4.1",
         "dotenv": "^16.5.0",
         "express": "^5.1.0",
         "express-rate-limit": "^7.5.0",
@@ -58,7 +58,7 @@
         "moment": "^2.30.1",
         "moment-timezone": "^0.5.48",
         "mongodb": "^6.16.0",
-        "mongoose": "^8.14.1",
+        "mongoose": "^8.15.1",
         "morgan": "^1.10.0",
         "node-schedule": "^2.1.1",
         "swagger-ui-express": "^5.0.1",
@@ -67,7 +67,7 @@
         "ws": "^8.18.2"
     },
     "engines": {
-        "node": "^22"
+        "node": "^24"
     },
     "repository": {
         "type": "git",
