@@ -1,7 +1,7 @@
 {
     "name": "timetracker",
-    "version": "19.0.6",
-    "last_build": "2025-06-01T17:09:25.051Z",
+    "version": "19.0.7",
+    "last_build": "2025-06-14T16:57:24.404Z",
     "author": "Gernot H. Reichel <gernot.reichel@me.com>",
     "private": true,
     "scripts": {
@@ -12,7 +12,8 @@
         "serve-noauth": "AUTHORIZATION=false node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
-        "build": "node bin/increase_build",
+        "build": "rm -rf node_modules; npm install --omit=dev",
+        "versionup": "node bin/increase_build",
         "backup": "node db/dbmigration -f",
         "backup-hetzner": "node db/dbmigrationS3 -f"
     },
@@ -21,7 +22,6 @@
         "@opentelemetry/exporter-metrics-otlp-proto": "^0.201.1",
         "@opentelemetry/exporter-trace-otlp-proto": "^0.201.1",
         "@opentelemetry/sdk-metrics": "^2.0.1",
-        "@opentelemetry/sdk-node": "^0.201.1",
         "@opentelemetry/sdk-trace-node": "^2.0.1",
         "chai": "^4.5.0",
         "chai-datetime": "^1.8.1",
@@ -37,6 +37,7 @@
         "sinon-chai": "^3.7.0"
     },
     "dependencies": {
+        "@opentelemetry/sdk-node": "^0.201.1",
         "@opentelemetry/auto-instrumentations-node": "^0.56.1",
         "axios": "^1.9.0",
         "bcrypt": "^5.1.1",
