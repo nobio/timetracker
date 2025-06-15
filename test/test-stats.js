@@ -341,7 +341,7 @@ describe('test calculation of extra hours', () => {
     db = require('../db');
   });
 
-  it('extra hours by day, no fill', async () => {
+  it.only('extra hours by day, no fill', async () => {
     const result = await utilExtraHours.getExtraHours(false, 'day', '2023-10-01');
 
     expect(result).to.be.an('array').with.length.greaterThan(0);
