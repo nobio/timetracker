@@ -171,6 +171,9 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
  */
 // exports.getBusytimeByDate = async (dt) => {
 exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
+  logger.error(`getStatsByRange: dtStart: ${dtStart.format('YYYY-MM-DD hh:mm')} dtEnd: ${dtEnd.format('YYYY-MM-DD hh:mm')}`);
+  logger.info(`getStatsByRange: dtStart: ${dtStart.toDate()} dtEnd: ${dtEnd.toDate()}`);
+
   const innerData = [];
   const innerComp = [];
   let actualWorkingTime = -1;
@@ -183,7 +186,8 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
     const dtStartClone = dtStart.clone();
 
     for (let m = dtStartClone; m.isBefore(dtEnd); m.add(1, 'days')) { // dtStart and dtEnd have type "moment"
-      // logger.info(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
+      logger.info(` >>> ${m} -> ${m.format('YYYY-MM-DD')} / ${dtStart}`);
+
       innerData[i] = {
         x: m.format('YYYY-MM-DD'),
         y: null,
@@ -194,7 +198,7 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
       };
       i++;
     }
-    // console.table(innerComp)
+    console.table(innerComp)
   }
 
   const stats = await StatsDay.find({ date: { $gte: dtStart, $lt: dtEnd } }).sort({ date: 1 });
@@ -229,8 +233,12 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
       obj.y = Math.round(averageWorkingTime * 100) / 100; // rounding 2 digits after comma;
     }
   });
-
-  // logger.info(JSON.stringify(innerComp));
+  console.log("---------------------- getStatsByRange -----------------------------");
+  console.table(innerData)
+  console.table(innerComp)
+  console.log(JSON.stringify(innerData))
+  console.log(JSON.stringify(innerComp))
+  console.log("---------------------- getStatsByRange end -----------------------------");
 
   return ({
     actual_working_time: actualWorkingTime,
