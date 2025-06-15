@@ -216,15 +216,14 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   let sumNominal = 0;
   stats.forEach((stat) => {
     const statDateYMD = moment(stat.date).tz('Europe/Berlin').format('YYYY-MM-DD');
-    // logger.info(`${moment(stat.date).format('YYYY-MM-DD')} ${stat.actual_working_time} ${stat.planned_working_time} -> ${stat._id}`);
     let obj;
     plannedWorkingTime += stat.planned_working_time;
     if (accumulate === 'true') {
       (sumActual += Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
         (sumNominal += Math.round(averageWorkingTime * 100) / 100), // rounding 2 digits after comma
-        obj = getXYObjectByXValue(innerData, moment(stat.date).format('YYYY-MM-DD'));
+        obj = getXYObjectByXValue(innerData, statDateYMD);
       obj.y = sumActual;
-      obj = getXYObjectByXValue(innerComp, moment(stat.date).format('YYYY-MM-DD'));
+      obj = getXYObjectByXValue(innerComp, statDateYMD);
       obj.y = sumNominal;
     } else {
       obj = getXYObjectByXValue(innerData, statDateYMD);
