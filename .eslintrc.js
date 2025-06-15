@@ -1,4 +1,3 @@
-const logger = require('/logger');  // Logger configuration
 module.exports = {
   extends: 'airbnb-base',
   plugins: [

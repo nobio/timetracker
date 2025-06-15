@@ -1,4 +1,3 @@
-const logger = require('../config/logger'); // Logger configuration
 require('../../db');
 
 const mongoose = require('mongoose');

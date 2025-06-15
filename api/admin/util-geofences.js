@@ -1,10 +1,10 @@
-const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 require('../../db');
 
 const mongoose = require('mongoose');
 const moment = require('moment');
+const logger = require('../config/logger'); // Logger configuration
 
 const GeoFence = mongoose.model('GeoFence');
 

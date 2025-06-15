@@ -1,4 +1,3 @@
-const logger = require('../config/logger'); // Logger configuration
 require('../../db');
 const mongoose = require('mongoose');
 
@@ -23,9 +22,9 @@ exports.getToggleByName = (name) => new Promise((resolve, reject) => {
     .catch((err) => reject(err));
 });
 
-exports.getToggleStatus = () => new Promise((resolve, reject) => {
+exports.getToggleStatus = () => new Promise((resolve) => {
   resolve({
-    NOTIFICATION_SLACK: (process.env.SLACK_URL != null && process.env.SLACK_URL != undefined && process.env.SLACK_URL != ''),
+    NOTIFICATION_SLACK: (process.env.SLACK_URL != null && process.env.SLACK_URL !== undefined && process.env.SLACK_URL !== ''),
   });
 });
 

@@ -1,5 +1,3 @@
-const logger = require('../config/logger'); // Logger configuration
-
 /* eslint-disable consistent-return */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
@@ -11,6 +9,7 @@ const zlib = require('zlib');
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const gUtil = require('../global_util');
+const logger = require('../config/logger'); // Logger configuration
 
 // Constants
 const DUMP_DIR = './dump';
@@ -157,7 +156,7 @@ const downloadObject = async (dbType) => {
 exports.dumpModels = async () => {
   if (isDumpRunning) return;
 
-  console.info('------------------- STARTING DATABASE DUMP ---------------------');
+  logger.info('------------------- STARTING DATABASE DUMP ---------------------');
   isDumpRunning = true;
 
   try {
@@ -166,7 +165,7 @@ exports.dumpModels = async () => {
     return results;
   } finally {
     isDumpRunning = false;
-    console.info('------------------- DATABASE DUMP COMPLETE ---------------------');
+    logger.info('------------------- DATABASE DUMP COMPLETE ---------------------');
   }
 };
 
@@ -193,7 +192,7 @@ exports.restoreDataFromFile = async () => {
 exports.backupTimeEntries = async () => {
   if (isBackupRunning) return;
 
-  console.info('------------------- STARTING TIME ENTRY BACKUP ---------------------');
+  logger.info('------------------- STARTING TIME ENTRY BACKUP ---------------------');
   isBackupRunning = true;
 
   try {
@@ -221,7 +220,7 @@ exports.backupTimeEntries = async () => {
     throw error;
   } finally {
     isBackupRunning = false;
-    console.info('------------------- TIME ENTRY BACKUP COMPLETE ---------------------');
+    logger.info('------------------- TIME ENTRY BACKUP COMPLETE ---------------------');
   }
 };
 

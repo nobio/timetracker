@@ -1,11 +1,10 @@
-const logger = require('../config/logger'); // Logger configuration
-
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-syntax */
 const Minio = require('minio');
 const mongoose = require('mongoose');
+const logger = require('../config/logger'); // Logger configuration
 const gUtil = require('../global_util');
 
 const { MODEL_TYPES } = gUtil;
@@ -68,6 +67,7 @@ const upload = async (objectName, object) => {
     return `${objectName} uploaded successfully`;
   } catch (error) {
     logger.error(error);
+    return `Error uploading ${objectName} to S3 bucket ${BUCKET_NAME}: ${error.message}`;
   }
 };
 
@@ -127,7 +127,7 @@ exports.dumpModels = async () => {
   return res;
 };
 
-exports.getDumpedModel = async (modelType) => await downloadObject(modelType);
+exports.getDumpedModel = async (modelType) => downloadObject(modelType);
 
 exports.restoreFromS3 = async () => {
   const res = [];

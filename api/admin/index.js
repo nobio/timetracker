@@ -223,7 +223,7 @@ exports.setProperty = (req, res) => {
   const { value } = req.query;
 
   utilProps.setProperty(key, value)
-    .then((response) => res.status(201).send())
+    .then(() => res.status(201).send())
     .catch((err) => res.status(500).send(`Error while reading a property: ${err}`));
 };
 
