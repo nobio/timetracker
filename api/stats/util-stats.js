@@ -172,6 +172,7 @@ exports.getStats = (timeUnit, startDate, accumulate, fill) => {
 // exports.getBusytimeByDate = async (dt) => {
 exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
   logger.error(`getStatsByRange: dtStart: ${dtStart} dtEnd: ${dtEnd}`);
+  logger.error(`getStatsByRange: accumulate: ${accumulate} fill: ${fill}`);
 
   const innerData = [];
   const innerComp = [];
