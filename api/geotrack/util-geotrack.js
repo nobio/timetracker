@@ -1,9 +1,9 @@
-const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-mixed-operators */
 
 const moment = require('moment');
 const mongoose = require('mongoose');
+const logger = require('../config/logger'); // Logger configuration
 const ws = require('../ws');
 const utilEntry = require('../entries/util-entries');
 const globalUtil = require('../global_util');

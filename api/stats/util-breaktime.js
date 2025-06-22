@@ -1,7 +1,6 @@
-const logger = require('../config/logger'); // Logger configuration
+const moment = require('moment');
 /* eslint-disable max-len */
 /* eslint-disable no-restricted-syntax */
-const moment = require('moment');
 const gUtil = require('../global_util');
 const utilEntry = require('../entries/util-entries');
 

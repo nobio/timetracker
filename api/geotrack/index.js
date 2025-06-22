@@ -1,6 +1,6 @@
+const moment = require('moment');
 const logger = require('../config/logger'); // Logger configuration
 
-const moment = require('moment');
 const util = require('./util-geotrack');
 
 /**

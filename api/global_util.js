@@ -1,8 +1,8 @@
-const logger = require('./config/logger'); // Logger configuration
 /* eslint-disable max-len */
 /* eslint-disable no-lonely-if */
 const Axios = require('axios');
 const moment = require('moment');
+const logger = require('./config/logger'); // Logger configuration
 const toggleUtil = require('./admin/util-toggles');
 require('moment-timezone');
 

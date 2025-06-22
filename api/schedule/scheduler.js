@@ -1,5 +1,5 @@
-const logger = require('../config/logger'); // Logger configuration
 const scheduler = require('node-schedule');
+const logger = require('../config/logger'); // Logger configuration
 const admin = require('../admin/util-admin');
 const stats = require('../stats/util-stats');
 const entries = require('../entries/util-entries');

@@ -1,7 +1,9 @@
-const logger = require('../config/logger'); // Logger configuration
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable camelcase */
 const moment = require('moment');
 
 const mongoose = require('mongoose');
+const logger = require('../config/logger'); // Logger configuration
 
 const StatsDay = mongoose.model('StatsDay');
 
@@ -43,11 +45,55 @@ function renderOneData(data, date) {
 
   return {
     x: date,
-    y: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    y: Math.round((tmpData.average / 60 / 60 / 1000) * 100) / 100, // rounding 2 digits after comma
     n: tmpData.length,
-    average: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
-    deviation: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+    average: Math.round((tmpData.average / 60 / 60 / 1000) * 100) / 100, // rounding 2 digits after comma
+    deviation: Math.round((tmpData.deviation / 60 / 60 / 1000) * 100) / 100, // rounding 2 digits after comma
   };
+}
+
+/**
+ * calculates the timeboxed stats for a time unit given by a format
+ * @param {*} stats
+ * @param {*} timeUnitFormatString 'gggg-MM', 'ggg-ww', 'gggg'
+ */
+function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
+  const data = [{
+    0: 0,
+  }];
+  let timeUnitStats = [];
+  if (stats === undefined || stats.length === 0) return data;
+
+  // logger.info(timeUnitStats.reduce(add, 0));
+
+  let lastTimeUnit = moment(stats[0].date).format(timeUnitFormatString);
+  let actualTimeUnit;
+  let idx = 0;
+  const lastHash = stats[stats.length - 1]._id;
+
+  stats.forEach((stat) => {
+    actualTimeUnit = moment(stat.date).format(timeUnitFormatString);
+    // logger.info(actualTimeUnit);
+
+    if (lastTimeUnit !== actualTimeUnit || lastHash === stat._id) {
+      const tmpData = calculateOneDae(timeUnitStats);
+
+      data[idx] = {
+        x: lastTimeUnit,
+        y: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+        n: tmpData.length,
+        average: Math.round(tmpData.average / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+        deviation: Math.round(tmpData.deviation / 60 / 60 / 1000 * 100) / 100, // rounding 2 digits after comma
+      };
+
+      // reset to next week
+      lastTimeUnit = actualTimeUnit;
+      timeUnitStats = [];
+      idx++;
+    }
+    timeUnitStats.push(stat.actual_working_time);
+  });
+  return data;
 }
 
 exports.getStatsByTimeBox = async (timeUnit) => {
@@ -135,7 +181,7 @@ function getStatsByTimeBoxTimeUnit(stats, timeUnitFormatString) {
     // logger.info(actualTimeUnit);
 
     if (lastTimeUnit !== actualTimeUnit || lastHash === stat._id) {
-      tmpData = calculateOneDae(timeUnitStats);
+      const tmpData = calculateOneDae(timeUnitStats);
 
       data[idx] = {
         x: lastTimeUnit,

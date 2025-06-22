@@ -1,6 +1,6 @@
+const jwt = require('jsonwebtoken');
 const logger = require('../config/logger'); // Logger configuration
 /* eslint-disable max-len */
-const jwt = require('jsonwebtoken');
 const util = require('./util-auth');
 const globalUtil = require('../global_util');
 

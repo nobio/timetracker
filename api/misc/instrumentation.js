@@ -1,16 +1,17 @@
 require('dotenv').config();
-const logger = require('../config/logger'); // Logger configuration
 require('dotenv').config();
-
-logger.info(`OTEL instrumentation using trace server  ${process.env.OTEL_TRACE_URL}`);
-logger.info(`OTEL instrumentation using metric server ${process.env.OTEL_METRICS_URL}`);
-logger.info(`OTEL service name is '${process.env.OTEL_SERVICE_NAME}'`);
 
 const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
 const { PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
+const logger = require('../config/logger');
+
+// Logger configuration
+logger.info(`OTEL instrumentation using trace server  ${process.env.OTEL_TRACE_URL}`);
+logger.info(`OTEL instrumentation using metric server ${process.env.OTEL_METRICS_URL}`);
+logger.info(`OTEL service name is '${process.env.OTEL_SERVICE_NAME}'`);
 
 const sdk = new opentelemetry.NodeSDK({
   traceExporter: new OTLPTraceExporter({

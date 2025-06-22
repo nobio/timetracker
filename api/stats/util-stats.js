@@ -1,9 +1,9 @@
-const logger = require('../config/logger'); // Logger configuration
 require('../../db');
 // const moment = require('moment');
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
-const g_util = require('../global_util');
+const logger = require('../config/logger'); // Logger configuration
+const gUtil = require('../global_util');
 
 const utilEntry = require('../entries/util-entries');
 
@@ -21,25 +21,23 @@ exports.calcStats = async () => {
   if (isCalcRunning) return;
   isCalcRunning = true;
   try {
-    g_util.sendMessage('RECALCULATE', 'delete stats');
+    gUtil.sendMessage('RECALCULATE', 'delete stats');
     await StatsDay.deleteMany();
 
-    g_util.sendMessage('RECALCULATE', 'delete doublets');
+    gUtil.sendMessage('RECALCULATE', 'delete doublets');
     await utilEntry.removeDoublets();
 
     const firstEntry = await utilEntry.getFirstTimeEntry();
     const lastEntry = await utilEntry.getLastTimeEntry();
-    g_util.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
+    gUtil.sendMessage('RECALCULATE', `first: ${firstEntry.age}, last: ${lastEntry.age}`);
 
-    g_util.sendMessage('RECALCULATE', 'start calculating...');
+    gUtil.sendMessage('RECALCULATE', 'start calculating...');
     const result = await this.calculateStatistics(firstEntry, lastEntry);
-    g_util.sendMessage('RECALCULATE', '...calculation done');
+    gUtil.sendMessage('RECALCULATE', '...calculation done');
 
-    isCalcRunning = false;
     return result;
   } catch (error) {
     logger.info(error);
-    isCalcRunning = false;
     throw error;
   } finally {
     isCalcRunning = false;
@@ -217,8 +215,8 @@ exports.getStatsByRange = async (dtStart, dtEnd, accumulate, fill) => {
     plannedWorkingTime += stat.planned_working_time;
     if (accumulate === 'true') {
       (sumActual += Math.round((stat.actual_working_time / 60 / 60 / 1000) * 100) / 100), // rounding 2 digits after comma
-        (sumNominal += Math.round(averageWorkingTime * 100) / 100), // rounding 2 digits after comma
-        obj = getXYObjectByXValue(innerData, statDateYMD);
+      (sumNominal += Math.round(averageWorkingTime * 100) / 100), // rounding 2 digits after comma
+      obj = getXYObjectByXValue(innerData, statDateYMD);
       obj.y = sumActual;
       obj = getXYObjectByXValue(innerComp, statDateYMD);
       obj.y = sumNominal;

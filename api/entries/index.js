@@ -1,5 +1,5 @@
-const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment-timezone');
+const logger = require('../config/logger'); // Logger configuration
 const util = require('./util-entries');
 
 /** ******************************************************************************

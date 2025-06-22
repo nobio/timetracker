@@ -1,8 +1,8 @@
-const logger = require('../config/logger'); // Logger configuration
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
+const logger = require('../config/logger'); // Logger configuration
 
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');

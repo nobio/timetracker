@@ -1,6 +1,6 @@
-const logger = require('../config/logger'); // Logger configuration
 const moment = require('moment');
 const mongoose = require('mongoose');
+const logger = require('../config/logger'); // Logger configuration
 
 const User = mongoose.model('User');
 const packageJson = require('../../package.json');
