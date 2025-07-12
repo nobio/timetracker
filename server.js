@@ -47,7 +47,7 @@ app.use((req, res, next) => {
     // Log response
     const message = `(${req.headers.host}, ${latency}ms, status: ${res.statusCode}) ${req.method} ${req.url}`;
 
-    if (res.statusCode <= 299) logger.info(message)
+    if (res.statusCode <= 299) logger.info({ message, labels: { latency } });
     else if (res.statusCode >= 300 && res.statusCode <= 399) logger.warn(message);
     else logger.error(message);
     // Call the original res.end function
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
   next();
 });
 // morgan.token('req-headers', (req, res) => JSON.stringify(req.headers));
-//app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
+// app.use(morgan('[:date[web]] (:remote-addr, :response-time ms) :method :url (:user-agent) status: :status'));
 app.set('host', process.env.IP || '0.0.0.0');
 app.set('port', process.env.PORT || '30000');
 app.set('ssl-port', process.env.SSL_PORT || '30443');
