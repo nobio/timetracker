@@ -10,6 +10,7 @@
         "test:dev": "node_modules/nodemon/bin/nodemon.js --delay 1 --watch test --watch src --exec ./node_modules/.bin/mocha --reporter spec --timeout 5000 --exit",
         "start:dev": "node_modules/nodemon/bin/nodemon.js  --require ./api/misc/instrumentation.js server",
         "serve-noauth": "AUTHORIZATION=false node_modules/nodemon/bin/nodemon.js --ignore ./dump server",
+        "rebuild": "rm -rf node_modules; npm install",
         "lint-fix": "eslint --fix",
         "lint": "eslint",
         "build": "rm -rf node_modules; npm install --omit=dev",
