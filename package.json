@@ -23,7 +23,7 @@
         "chai-integer": "^0.1.0",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-import": "^2.32.0",
         "mocha": "^11.5.0",
         "mock-req-res": "^1.2.1",
         "nodemon": "^3.1.10",
