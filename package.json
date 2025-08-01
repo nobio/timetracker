@@ -51,7 +51,7 @@
         "dotenv": "^16.5.0",
         "express": "^5.1.0",
         "express-rate-limit": "^7.5.0",
-        "figlet": "^1.8.1",
+        "figlet": "^1.8.2",
         "http-errors": "^2.0.0",
         "js-yaml": "^4.1.0",
         "jsonwebtoken": "^9.0.2",
