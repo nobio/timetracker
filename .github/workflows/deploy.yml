@@ -23,6 +23,11 @@ jobs:
           ECHO_OUTPUT: ${{ secrets.HETZNER_SERVER }}
         run: echo "$ECHO_OUTPUT"
         
+      - name: Ping hetzner server
+        env:
+          ECHO_OUTPUT: ${{ secrets.HETZNER_SERVER }}
+        run: ping ${{ secrets.HETZNER_SERVER }}
+        
       - name: Add SSH private key to agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
