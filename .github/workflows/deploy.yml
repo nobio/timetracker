@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Dump GitHub context
+        env:
+          ECHO_OUTPUT: ${{ secrets.HETZNER_SERVER }}
+        run: echo "$ECHO_OUTPUT"
         
       - name: Add SSH private key to agent
         uses: webfactory/ssh-agent@v0.5.3
