@@ -23,11 +23,11 @@ jobs:
           ECHO_OUTPUT: ${{ secrets.HETZNER_SERVER }}
         run: echo "$ECHO_OUTPUT"
         
-      - name: Ping hetzner server by IP
-        run: ping -c 4 88.198.110.159
-        
       - name: Ping hetzner server
-        run: ping -c 4 csrvhz01
+        run: ping -c 1 csrvhz01
+        
+      - name: Ping hetzner server by IP
+        run: ping -c 1 88.198.110.159
         
       - name: Add SSH private key to agent
         uses: webfactory/ssh-agent@v0.5.3
