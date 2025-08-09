@@ -66,3 +66,31 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+
+      # deploy on hetzner server
+      - name: Create SSH key
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{secrets.HETZNER_SSH_PRIVATE_KEY}}
+          SSH_KNOWN_HOSTS: ${{secrets.HETZNER_SERVER}}
+          #SSH_KNOWN_HOSTS: 88.198.110.159
+          SSH_KEY_PATH: .ssh/private.key
+        run: |
+          mkdir -p .ssh/
+          chmod 700 .ssh
+          echo "$SSH_PRIVATE_KEY" > .ssh/private.key
+          sudo chmod 600 .ssh/private.key
+          echo "$SSH_KNOWN_HOSTS" > .ssh/known_hosts
+          ls -la .ssh/
+
+      - name: Deploy to Server
+        env:
+          SSH_KEY_PATH: .ssh/private.key
+          SERVER_USER: ${{secrets.HETZNER_USER}}
+          SERVER: ${{secrets.HETZNER_SERVER}}
+          APP_DIR: /home/nobio/container/timetracker
+        run: |
+          ssh -o StrictHostKeyChecking=no -i $SSH_KEY_PATH $SERVER_USER@$SERVER "
+          cd $APP_DIR &&
+          ls -la 
+          "
