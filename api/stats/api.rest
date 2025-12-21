@@ -17,3 +17,5 @@ GET http://localhost:30000/api/statistics/extrahours?accumulate=false&timeUnit=y
 GET http://localhost:30000/api/statistics/extrahours?accumulate=true
 ###
 GET http://localhost:30000/api/statistics/histogram/1?direction=enter
+###
+PUT http://localhost:30000/api/stats

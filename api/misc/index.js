@@ -84,7 +84,7 @@ exports.healthcheck = async (req, res) => {
   healthData.details.push(databaseDetail);
 
   try {
-    const users = await User.find();
+    await User.findOne();
     databaseDetail.metricValue = true;
   } catch (error) {
     databaseDetail.metricValue = false;
@@ -104,6 +104,8 @@ exports.experiment = async (req, res) => {
   logger.info('=================================== BODY ==================================');
   logger.info(req.body);
   logger.info('===========================================================================');
+  await User.findOne().then((user) =>     logger.info(user));
+  await User.findOne().then((user) =>     logger.info(user));
   res.status(200).send('nothing to see here');
 };
 

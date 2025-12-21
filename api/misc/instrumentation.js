@@ -20,14 +20,14 @@ const sdk = new opentelemetry.NodeSDK({
     // optional - collection of custom headers to be sent with each request, empty by default
     headers: {},
   }),
-  metricReader: new PeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter({
-      // url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
-      url: process.env.OTEL_METRICS_URL,
-      headers: {}, // an optional object containing custom headers to be sent with each request
-      concurrencyLimit: 1, // an optional limit on pending requests
-    }),
-  }),
+  // metricReader: new PeriodicExportingMetricReader({
+  //   exporter: new OTLPMetricExporter({
+  //     // url: '<your-otlp-endpoint>/v1/metrics', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
+  //     url: process.env.OTEL_METRICS_URL,
+  //     headers: {}, // an optional object containing custom headers to be sent with each request
+  //     concurrencyLimit: 1, // an optional limit on pending requests
+  //   }),
+  // }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
