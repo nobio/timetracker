@@ -45,7 +45,8 @@ app.use((req, res, next) => {
     const latency = (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(3); // in milliseconds
 
     // Log response
-    const message = `(${req.headers.host}, ${latency}ms, status: ${res.statusCode}) ${req.method} ${req.url}`;
+//    const message = `(${req.headers.host}, ${latency}ms, status: ${res.statusCode}) ${req.method} ${req.url}`;
+    const message = `(${req.headers.host}, ${latency}, ${res.statusCode}) ${req.method} ${req.url}`;
 
     if (res.statusCode <= 299) logger.info({ message, labels: { latency } });
     else if (res.statusCode >= 300 && res.statusCode <= 399) logger.warn(message);
