@@ -69,8 +69,8 @@ app.use(cookieParser());
 // apply rate limiter to all requests
 if (process.env.RATE_LIMIT_ACTIVE === 'true') {
   app.use(rateLimit({
-    windowMs: process.env.RATE_LIMIT_WINDOW_MS || 1000, // Default: pro Sekunde
-    max: process.env.RATE_LIMIT_REQUESTS || 100, // limit each IP to 100 requests per windowMs
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 1000, // Default: pro Sekunde
+    max: parseInt(process.env.RATE_LIMIT_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
   }));
 }
 
