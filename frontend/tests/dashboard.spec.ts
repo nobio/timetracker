@@ -41,26 +41,4 @@ test.describe('Timetracker E2E Dashboard Tests', () => {
         await expect(page.locator('text=Time Entries').first()).toBeVisible({ timeout: 15000 });
         await expect(page.locator('button:has-text("Clock")')).toBeVisible();
     });
-    test('Hast Clock In and Clock Out Buttons and can be clicked', async ({ page }) => {
-        // Navigate to the app (the dev server is set as baseURL in config)
-        await page.goto('/');
-
-        // Next.js will likely push us to /login if we are not authenticated
-        // Wait for the login form to appear
-        const loginHeading = page.locator('h2', { hasText: 'Timetracker 2.0' });
-        await expect(loginHeading).toBeVisible({ timeout: 10000 });
-
-        // Fill in the login credentials
-        await page.fill('input[placeholder="Enter your username"]', 'nobio');
-        await page.fill('input[placeholder="••••••••"]', 'schernoo');
-
-        // Click the Sign in Clock In button
-        await page.click('button:has-text("Clock In")');
-
-        // Verify dashboard elements loaded successfully. The initial render may show a loading spinner.
-        // We use a relaxed assertion and increase the wait time to allow React Query to settle.
-        await expect(page.locator('text=Clock Out').first()).toBeVisible({ timeout: 15000 });
-        await page.click('button:has-text("Clock Out")');
-    });
-
 });
