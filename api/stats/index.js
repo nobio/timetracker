@@ -72,7 +72,7 @@ exports.getStatsByTimeBox = (req, res) => {
         }],
       };
 
-      logger.info(JSON.stringify(timeboxedStatistics));
+      //logger.info(JSON.stringify(timeboxedStatistics));
       res.send({
         actual_working_time: timeboxedStatistics.actual_working_time,
         planned_working_time: timeboxedStatistics.planned_working_time,

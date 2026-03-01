@@ -1,0 +1,137 @@
+"use client";
+
+import { AggregateChart } from "@/components/statistics/AggregateChart";
+import { BreaktimeChart } from "@/components/statistics/BreaktimeChart";
+import { ComeGoChart } from "@/components/statistics/ComeGoChart";
+import { ExtraHoursChart } from "@/components/statistics/ExtraHoursChart";
+import { addMonths, format, subMonths } from "date-fns";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useState } from "react";
+
+type TimeUnit = "day" | "week" | "month" | "year";
+
+export default function StatisticsPage() {
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [timeUnit, setTimeUnit] = useState<TimeUnit>("month");
+    const [accumulate, setAccumulate] = useState(false);
+    const [activeTab, setActiveTab] = useState<"aggregate" | "breaktime" | "come-go" | "extrahours">("aggregate");
+
+    const handleDateChange = (direction: "prev" | "next") => {
+        setSelectedDate(current =>
+            direction === "prev" ? subMonths(current, 1) : addMonths(current, 1)
+        );
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h1 className="text-2xl font-bold text-slate-800">Statistics</h1>
+
+                {/* Global Date & Unit Controls */}
+                <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center bg-white rounded-lg shadow-sm border border-slate-200">
+                        <button
+                            onClick={() => handleDateChange("prev")}
+                            className="p-2 hover:bg-slate-50 text-slate-600 rounded-l-lg"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <div className="relative px-3 py-2 font-medium text-blue-600 border-x border-slate-200 min-w-32 text-center pointer-events-none">
+                            {format(selectedDate, "MMM yyyy")}
+                            {/* Hidden DatePicker Overlay (Native) */}
+                            <input
+                                type="date"
+                                className="absolute inset-0 opacity-0 cursor-pointer pointer-events-auto"
+                                value={format(selectedDate, "yyyy-MM-dd")}
+                                onChange={(e) => {
+                                    if (e.target.value) setSelectedDate(new Date(e.target.value));
+                                }}
+                            />
+                        </div>
+                        <button
+                            onClick={() => handleDateChange("next")}
+                            className="p-2 hover:bg-slate-50 text-slate-600 rounded-r-lg"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div className="flex bg-slate-100 p-1 rounded-lg">
+                        {(["day", "week", "month", "year"] as TimeUnit[]).map(unit => (
+                            <button
+                                key={unit}
+                                onClick={() => setTimeUnit(unit)}
+                                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${timeUnit === unit
+                                    ? "bg-white text-blue-600 shadow-sm"
+                                    : "text-slate-600 hover:text-slate-900"
+                                    }`}
+                            >
+                                {unit.charAt(0).toUpperCase() + unit.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+
+                    <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
+                        <input
+                            type="checkbox"
+                            checked={accumulate}
+                            onChange={(e) => setAccumulate(e.target.checked)}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                        />
+                        Accumulate
+                    </label>
+                </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="border-b border-slate-200">
+                <nav className="flex space-x-8" aria-label="Tabs">
+                    {[
+                        { id: "aggregate", label: "Aggregate" },
+                        { id: "breaktime", label: "Breaktime" },
+                        { id: "come-go", label: "Come & Go" },
+                        { id: "extrahours", label: "Extra Hours" },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                                ? "border-blue-500 text-blue-600"
+                                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
+            </div>
+
+            {/* Tab Views */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[400px] flex items-center justify-center">
+                {activeTab === "aggregate" && (
+                    <AggregateChart timeUnit={timeUnit} />
+                )}
+
+                {activeTab === "breaktime" && (
+                    <BreaktimeChart intervalMinute={10} />
+                )}
+
+                {activeTab === "come-go" && (
+                    <ComeGoChart intervalMinute={60} />
+                )}
+
+                {activeTab === "extrahours" && (
+                    <ExtraHoursChart timeUnit={timeUnit} accumulate={accumulate} />
+                )}
+
+                {activeTab !== "aggregate" && activeTab !== "breaktime" && activeTab !== "come-go" && activeTab !== "extrahours" && (
+                    <div className="text-center text-slate-500">
+                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
+                        <p>Loading {activeTab} statistics...</p>
+                    </div>
+                )}
+            </div>
+
+        </div>
+    );
+}

@@ -22,8 +22,10 @@ services:
     restart: always
     image: nobio/timetracker:master
     env_file:
-      - .env
-      - .env_overwrite
+      - path: .env
+        required: true
+      - path: .env_overwrite
+        required: false
     volumes:
       # in-host:in-container
       - ./dump:/usr/src/app/dump
@@ -97,7 +99,7 @@ services:
         - ./minio_storage:/data
       env_files:
         - .env
-        - .env_overwritey
+        - .env_overwrite
       networks:
         - nobio-network
   minio:

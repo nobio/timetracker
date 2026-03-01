@@ -1,6 +1,7 @@
 .git
 Dockerfile
 docker-compose.yml
+docker-compose.yaml
 .dockerignore
 .DS_Store
 .gitignore
@@ -8,6 +9,11 @@ README.md
 .es*
 .travis.yml
 dump
-node_modules
+**/node_modules
 bin
 test
+**/frontend
+yarn.loc
+**/k8s
+**/coverage
+**/build
