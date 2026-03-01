@@ -26,3 +26,4 @@ coverage
 *.xcodeproj
 timetracker.code-workspace
 **/k8s/app.yaml
+k8s
