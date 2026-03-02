@@ -7,6 +7,14 @@ import { Clock, Play, Square, Loader2, ChevronLeft, ChevronRight, Calendar as Ca
 import { components } from "@/lib/api/schema";
 import { useState } from "react";
 
+function formatMsToHoursMinutes(ms: number) {
+    if (!ms || isNaN(ms)) return "00:00";
+    const minutes = Math.floor(ms / 60000);
+    const h = Math.floor(minutes / 60);
+    const m = Math.floor(minutes % 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+}
+
 type TimeEntry = components["schemas"]["TimeEntry"] & { _id?: string };
 
 export default function DashboardPage() {
@@ -16,12 +24,24 @@ export default function DashboardPage() {
     const [entryToEdit, setEntryToEdit] = useState<TimeEntry | null>(null);
     const [editFormTime, setEditFormTime] = useState<string>("00:00");
 
-    const { data: allEntries, isLoading, error } = useQuery({
+    const { data: allEntries, isLoading: isLoadingEntries, error: entriesError } = useQuery({
         queryKey: ["entries"],
         queryFn: async () => {
             const { data, error } = await apiClient.GET("/entries");
             if (error) throw new Error("Failed to fetch entries");
             return data as TimeEntry[];
+        },
+    });
+
+    const { data: busyStats, isLoading: isLoadingStats } = useQuery({
+        queryKey: ["entries", format(selectedDate, "yyyy-MM-dd"), "busy"],
+        queryFn: async () => {
+            const { data, error } = await apiClient.GET("/entries", {
+                // @ts-ignore: adding custom query arguments mapped to openapi types
+                params: { query: { busy: selectedDate.getTime() } }
+            });
+            if (error) throw new Error("Failed to fetch busy stats");
+            return data as unknown as { duration: number, busytime: number, pause: number, count: number };
         },
     });
 
@@ -48,6 +68,7 @@ export default function DashboardPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["entries"] });
+            queryClient.invalidateQueries({ queryKey: ["entries", format(selectedDate, "yyyy-MM-dd"), "busy"] });
         }
     });
 
@@ -61,6 +82,7 @@ export default function DashboardPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["entries"] });
+            queryClient.invalidateQueries({ queryKey: ["entries", format(selectedDate, "yyyy-MM-dd"), "busy"] });
             setEntryToDelete(null);
         }
     });
@@ -81,6 +103,7 @@ export default function DashboardPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["entries"] });
+            queryClient.invalidateQueries({ queryKey: ["entries", format(selectedDate, "yyyy-MM-dd"), "busy"] });
             setEntryToEdit(null);
         }
     });
@@ -109,7 +132,7 @@ export default function DashboardPage() {
         }
     };
 
-    if (isLoading) {
+    if (isLoadingEntries || isLoadingStats) {
         return (
             <div className="flex justify-center items-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -117,7 +140,7 @@ export default function DashboardPage() {
         );
     }
 
-    if (error) {
+    if (entriesError) {
         return (
             <div className="bg-red-50 text-red-600 p-4 rounded-lg">
                 Error loading entries. Please try again.
@@ -136,6 +159,17 @@ export default function DashboardPage() {
         ? [...entries].sort((a, b) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime())[0]
         : undefined;
     const isWorking = latestEntry?.direction === "enter";
+
+    const firstEntry = entries.length > 0
+        ? [...entries].sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime())[0]
+        : undefined;
+
+    let predictedEnd = "--:--";
+    if (firstEntry && busyStats) {
+        const workGoalMs = 8 * 60 * 60 * 1000;
+        const endTimeMs = new Date(firstEntry.entry_date).getTime() + workGoalMs + (busyStats.pause || 0);
+        predictedEnd = format(new Date(endTimeMs), "HH:mm");
+    }
 
     const handleToggleTimer = () => {
         createEntryMutation.mutate(isWorking ? "go" : "enter");
@@ -164,6 +198,26 @@ export default function DashboardPage() {
                     )}
                     {isWorking ? "Clock Out" : "Clock In"}
                 </button>
+            </div>
+
+            {/* Stats Overview Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <p className="text-sm font-medium text-slate-500 mb-1">Total (Gesamt)</p>
+                    <p className="text-2xl font-bold text-slate-800">{formatMsToHoursMinutes(busyStats?.duration || 0)}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <p className="text-sm font-medium text-slate-500 mb-1">Work (Arbeit)</p>
+                    <p className="text-2xl font-bold text-blue-600">{formatMsToHoursMinutes(busyStats?.busytime || 0)}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <p className="text-sm font-medium text-slate-500 mb-1">Pause</p>
+                    <p className="text-2xl font-bold text-amber-500">{formatMsToHoursMinutes(busyStats?.pause || 0)}</p>
+                </div>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-center">
+                    <p className="text-sm font-medium text-slate-500 mb-1">End (Predicted)</p>
+                    <p className="text-2xl font-bold text-slate-800">{predictedEnd}</p>
+                </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
