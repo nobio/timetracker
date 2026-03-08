@@ -66,7 +66,7 @@ export default function SettingsPage() {
     };
 
     const handleToggleChange = (toggle: Toggle, newValue: boolean) => {
-        updateToggleMutation.mutate({ ...toggle, toggle: String(newValue) });
+        updateToggleMutation.mutate({ ...toggle, toggle: newValue as any });
     };
 
     if (isLoading) {
@@ -110,7 +110,7 @@ export default function SettingsPage() {
                                         type="checkbox"
                                         id={`toggle-${toggle.name}`}
                                         className="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 transition-all cursor-pointer"
-                                        checked={toggle.toggle === "true"}
+                                        checked={toggle.toggle as any === true || toggle.toggle === "true"}
                                         onChange={(e) => handleToggleChange(toggle, e.target.checked)}
                                         disabled={updateToggleMutation.isPending}
                                     />

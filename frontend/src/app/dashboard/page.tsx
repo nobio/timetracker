@@ -3,7 +3,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import { format, isSameDay, addDays, subDays } from "date-fns";
-import { Clock, Play, Square, Loader2, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Trash2, Pencil } from "lucide-react";
+import { Clock, Play, Square, Loader2, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Trash2, Pencil, Map as MapIcon, X } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MapComponent = dynamic(() => import("@/components/Map"), {
+    ssr: false,
+});
 import { components } from "@/lib/api/schema";
 import { useState } from "react";
 
@@ -23,6 +28,7 @@ export default function DashboardPage() {
     const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
     const [entryToEdit, setEntryToEdit] = useState<TimeEntry | null>(null);
     const [editFormTime, setEditFormTime] = useState<string>("00:00");
+    const [showMapModal, setShowMapModal] = useState(false);
 
     const { data: allEntries, isLoading: isLoadingEntries, error: entriesError } = useQuery({
         queryKey: ["entries"],
@@ -56,11 +62,28 @@ export default function DashboardPage() {
                 entryDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
             }
 
+            let longitude: number | undefined = undefined;
+            let latitude: number | undefined = undefined;
+
+            if ("geolocation" in navigator) {
+                try {
+                    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    longitude = position.coords.longitude;
+                    latitude = position.coords.latitude;
+                } catch (err) {
+                    console.warn("Could not get location:", err);
+                }
+            }
+
             const { data, error } = await apiClient.POST("/entries", {
                 body: {
                     direction,
                     // @ts-expect-error: The backend expects 'datetime' but the OpenAPI spec only defines 'entry_date'
                     datetime: entryDate.toISOString(),
+                    longitude,
+                    latitude,
                 }
             });
             if (error) throw new Error("Failed to create entry");
@@ -152,6 +175,8 @@ export default function DashboardPage() {
     const entries = allEntries?.filter(entry =>
         isSameDay(new Date(entry.entry_date), selectedDate)
     ) || [];
+    // Determine if any entry for the selected date has location data
+    const hasLocation = entries.some(entry => entry.latitude !== undefined && entry.longitude !== undefined);
 
     // The backend returns entries sorted chronologically ascending. 
     // To find if the user is currently working on the selected date, we check the latest entry on THAT day.
@@ -181,23 +206,34 @@ export default function DashboardPage() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Time Entries</h1>
-                <button
-                    onClick={handleToggleTimer}
-                    disabled={createEntryMutation.isPending}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full sm:w-auto justify-center font-medium shadow-sm disabled:opacity-50 ${isWorking
-                        ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                        }`}
-                >
-                    {createEntryMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : isWorking ? (
-                        <Square className="w-4 h-4" />
-                    ) : (
-                        <Play className="w-4 h-4" />
-                    )}
-                    {isWorking ? "Clock Out" : "Clock In"}
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                        onClick={() => setShowMapModal(true)}
+                        disabled={!hasLocation}
+                        className={`flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors w-full sm:w-auto justify-center font-medium shadow-sm ${!hasLocation ? "opacity-50 cursor-not-allowed" : ""}`}
+                        title={hasLocation ? "Show locations on map" : "No location data for this date"}
+                    >
+                        <MapIcon className="w-4 h-4" />
+                        <span className="hidden sm:inline">Map</span>
+                    </button>
+                    <button
+                        onClick={handleToggleTimer}
+                        disabled={createEntryMutation.isPending}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors w-full sm:w-auto justify-center font-medium shadow-sm disabled:opacity-50 ${isWorking
+                            ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
+                    >
+                        {createEntryMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : isWorking ? (
+                            <Square className="w-4 h-4" />
+                        ) : (
+                            <Play className="w-4 h-4" />
+                        )}
+                        {isWorking ? "Clock Out" : "Clock In"}
+                    </button>
+                </div>
             </div>
 
             {/* Stats Overview Grid */}
@@ -335,12 +371,6 @@ export default function DashboardPage() {
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                                     Type
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    Longitude
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                    Latitude
-                                </th>
                                 <th scope="col" className="relative px-6 py-3">
                                     <span className="sr-only">Actions</span>
                                 </th>
@@ -363,12 +393,6 @@ export default function DashboardPage() {
                                             }`}>
                                             {entry.direction}
                                         </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        {entry.longitude ? entry.longitude.toFixed(4) : "-"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                                        {entry.latitude ? entry.latitude.toFixed(4) : "-"}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div className="flex items-center justify-end gap-2">
@@ -393,7 +417,7 @@ export default function DashboardPage() {
                             ))}
                             {entries.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-16 text-center text-slate-500">
+                                    <td colSpan={4} className="px-6 py-16 text-center text-slate-500">
                                         <div className="flex flex-col items-center justify-center space-y-3">
                                             <div className="bg-slate-50 p-3 rounded-full">
                                                 <CalendarIcon className="w-8 h-8 text-slate-300" />
@@ -495,6 +519,37 @@ export default function DashboardPage() {
                                 {editEntryMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                                 Save Changes
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Map Modal */}
+            {showMapModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center p-4 border-b border-slate-200">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <MapIcon className="w-5 h-5 text-blue-600" />
+                                Locations for {isToday ? "Today" : format(selectedDate, "MMM d, yyyy")}
+                            </h3>
+                            <button
+                                onClick={() => setShowMapModal(false)}
+                                className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-full hover:bg-slate-100"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-4">
+                            <MapComponent
+                                locations={entries
+                                    .filter(e => e.latitude && e.longitude)
+                                    .map(e => ({
+                                        lat: e.latitude!,
+                                        lng: e.longitude!,
+                                        label: `${format(new Date(e.entry_date), "HH:mm")} - ${e.direction === "enter" ? "Clocked In" : "Clocked Out"}`
+                                    }))}
+                            />
                         </div>
                     </div>
                 </div>
