@@ -156,7 +156,11 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
                                     return [display, 'Overtime'];
                                 }}
                             />
-                            <Bar dataKey="extra_hour" fill="#8B5CF6" />
+                            <Bar
+                                dataKey="extra_hour"
+                                name="Extra Hours"
+                                radius={[4, 4, 0, 0]}
+                                fill="#5d2bd4ff" />
                         </BarChart>
                     ) : (
                         <AreaChart data={filteredData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
@@ -194,8 +198,8 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
                                 type="monotone"
                                 dataKey="extra_hour"
                                 name="Overtime"
-                                stroke="#8B5CF6"
-                                strokeWidth={3}
+                                stroke="#5d2bd4ff"
+                                strokeWidth={1}
                                 fillOpacity={1}
                                 fill="url(#colorExtra)"
                             />
