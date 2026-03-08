@@ -29,10 +29,11 @@ interface ExtraHourData {
 }
 
 export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) {
+    const [showLastPeriod, setShowLastPeriod] = useState<boolean>(false);
+
     const { data: stats, isLoading, error } = useQuery<ExtraHourData[]>({
         queryKey: ["statistics", "extrahours", timeUnit, accumulate],
         queryFn: async () => {
-            // The backend util checks accumulate === 'true' strictly.
             const { data, error } = await apiClient.GET("/statistics/extrahours", {
                 params: {
                     query: {
@@ -45,8 +46,6 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
             return data as unknown as ExtraHourData[];
         }
     });
-
-
 
     if (isLoading) {
         return (
@@ -66,56 +65,54 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
     }
 
     const chartData = stats || [];
-        // Apply last period filter if enabled
-        const filteredData = showLastPeriod ? chartData.filter(entry => {
-            const entryDate = parseISO(entry.date);
-            const now = new Date();
-            let threshold: Date;
-            switch (timeUnit) {
-                case "day":
-                    threshold = subDays(now, 1);
-                    break;
-                case "week":
-                    threshold = subWeeks(now, 1);
-                    break;
-                case "month":
-                    threshold = subMonths(now, 1);
-                    break;
-                case "year":
-                    threshold = subYears(now, 1);
-                    break;
-                default:
-                    threshold = now;
-            }
-            return isAfter(entryDate, threshold);
-        }) : chartData;
+
+    // Apply last period filter if enabled
+    const filteredData = showLastPeriod ? chartData.filter(entry => {
+        const entryDate = parseISO(entry.date);
+        const now = new Date();
+        let threshold: Date;
+        switch (timeUnit) {
+            case "day":
+                threshold = subDays(now, 1);
+                break;
+            case "week":
+                threshold = subWeeks(now, 1);
+                break;
+            case "month":
+                threshold = subMonths(now, 1);
+                break;
+            case "year":
+                threshold = subYears(now, 1);
+                break;
+            default:
+                threshold = now;
+        }
+        return isAfter(entryDate, threshold);
+    }) : chartData;
 
     // Calculate color based on the final extra_hour value
     const finalBalance = filteredData.length > 0 ? filteredData[filteredData.length - 1].extra_hour : 0;
-        const totalExtraHours = filteredData.reduce((sum, entry) => sum + (entry.extra_hour ?? 0), 0);
-        const isPositiveBalance = finalBalance >= 0;
-    // Total extra hours for the selected period (sum of extra_hour, can be negative)
-
+    const totalExtraHours = filteredData.reduce((sum, entry) => sum + (entry.extra_hour ?? 0), 0);
+    const isPositiveBalance = finalBalance >= 0;
 
     return (
         <div className="w-full space-y-6">
-                {/* Last period filter checkbox */}
-                <div className="flex items-center mb-4">
-                    <input
-                        type="checkbox"
-                        id="lastPeriod"
-                        checked={showLastPeriod}
-                        onChange={e => setShowLastPeriod(e.target.checked)}
-                        className="mr-2 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                    />
-                    <label htmlFor="lastPeriod" className="text-sm font-medium text-slate-700">
-                        last {timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}
-                    </label>
-                </div>
+            {/* Last period filter checkbox */}
+            <div className="flex items-center mb-4">
+                <input
+                    type="checkbox"
+                    id="lastPeriod"
+                    checked={showLastPeriod}
+                    onChange={e => setShowLastPeriod(e.target.checked)}
+                    className="mr-2 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+                <label htmlFor="lastPeriod" className="text-sm font-medium text-slate-700">
+                    Last {timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}
+                </label>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className={`p-4 rounded-lg border ${isPositiveBalance ? "bg-emerald-50 border-emerald-100" : "bg-rose-50 border-rose-100"}`}
-                >
+                <div className={`p-4 rounded-lg border ${isPositiveBalance ? "bg-emerald-50 border-emerald-100" : "bg-rose-50 border-rose-100"}`}>
                     <p className={`text-sm font-medium mb-1 ${isPositiveBalance ? "text-emerald-600" : "text-rose-600"}`}>
                         {accumulate ? "Total Accumulated Balance" : "Current Period Balance"}
                     </p>
