@@ -107,6 +107,7 @@ export function AggregateChart({ timeUnit }: AggregateChartProps) {
                             tick={{ fill: '#64748B', fontSize: 12 }}
                             dx={-10}
                             min={4}
+                            domain={[6, 'dataMin']} // Start Y-axis at 6 hours, with some padding above max
                         />
                         <Tooltip
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}

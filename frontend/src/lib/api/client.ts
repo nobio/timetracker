@@ -3,14 +3,12 @@ import type { paths } from "./schema";
 
 export const apiClient = createClient<paths>({
   baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:30000/api",
-  //baseUrl: process.env.BACKEND_BASEURL
 });
 
 // Helper to inject bearer token before each request
 apiClient.use({
   onRequest: async ({ request }) => {
     // Check local storage for token if we are on client side
-    console.info("baseUrl", process.env.NEXT_PUBLIC_API_URL );
 
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");
