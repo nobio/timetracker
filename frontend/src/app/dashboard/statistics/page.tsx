@@ -4,7 +4,7 @@ import { AggregateChart } from "@/components/statistics/AggregateChart";
 import { BreaktimeChart } from "@/components/statistics/BreaktimeChart";
 import { ComeGoChart } from "@/components/statistics/ComeGoChart";
 import { ExtraHoursChart } from "@/components/statistics/ExtraHoursChart";
-import { addMonths, format, subMonths } from "date-fns";
+import { addDays, addMonths, addWeeks, addYears, format, getISOWeek, getISOWeekYear, subDays, subMonths, subWeeks, subYears } from "date-fns";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
@@ -17,9 +17,36 @@ export default function StatisticsPage() {
     const [activeTab, setActiveTab] = useState<"aggregate" | "breaktime" | "come-go" | "extrahours">("aggregate");
 
     const handleDateChange = (direction: "prev" | "next") => {
-        setSelectedDate(current =>
-            direction === "prev" ? subMonths(current, 1) : addMonths(current, 1)
-        );
+        setSelectedDate(current => {
+            const isPrev = direction === "prev";
+            switch (timeUnit) {
+                case "year":
+                    return isPrev ? subYears(current, 1) : addYears(current, 1);
+                case "month":
+                    return isPrev ? subMonths(current, 1) : addMonths(current, 1);
+                case "week":
+                    return isPrev ? subWeeks(current, 1) : addWeeks(current, 1);
+                case "day":
+                    return isPrev ? subDays(current, 1) : addDays(current, 1);
+                default:
+                    return isPrev ? subMonths(current, 1) : addMonths(current, 1);
+            }
+        });
+    };
+
+    const getDateLabel = (): string => {
+        switch (timeUnit) {
+            case "year":
+                return format(selectedDate, "yyyy");
+            case "month":
+                return format(selectedDate, "MMM yyyy");
+            case "week":
+                return `KW ${getISOWeek(selectedDate)}/${getISOWeekYear(selectedDate)}`;
+            case "day":
+                return format(selectedDate, "dd MMM yyyy");
+            default:
+                return format(selectedDate, "MMM yyyy");
+        }
     };
 
     return (
@@ -37,7 +64,7 @@ export default function StatisticsPage() {
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <div className="relative px-3 py-2 font-medium text-blue-600 border-x border-slate-200 min-w-32 text-center pointer-events-none">
-                            {format(selectedDate, "MMM yyyy")}
+                            {getDateLabel()}
                             {/* Hidden DatePicker Overlay (Native) */}
                             <input
                                 type="date"
@@ -121,7 +148,7 @@ export default function StatisticsPage() {
                 )}
 
                 {activeTab === "extrahours" && (
-                    <ExtraHoursChart timeUnit={timeUnit} accumulate={accumulate} />
+                    <ExtraHoursChart timeUnit={timeUnit} accumulate={accumulate} selectedDate={selectedDate} />
                 )}
 
                 {activeTab !== "aggregate" && activeTab !== "breaktime" && activeTab !== "come-go" && activeTab !== "extrahours" && (

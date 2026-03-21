@@ -14,12 +14,13 @@ import {
     ResponsiveContainer
 } from "recharts";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
-import { subDays, subWeeks, subMonths, subYears, isAfter, parseISO } from "date-fns";
+import { useMemo, useState } from "react";
+import { startOfYear, startOfMonth, startOfWeek, format } from "date-fns";
 
 interface ExtraHoursChartProps {
     timeUnit: "day" | "week" | "month" | "year";
     accumulate: boolean;
+    selectedDate: Date;
 }
 
 interface ExtraHourData {
@@ -28,17 +29,52 @@ interface ExtraHourData {
     hour: number;
 }
 
-export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) {
+type EffectiveTimeUnit = "day" | "week" | "month" | "year";
+
+export function ExtraHoursChart({ timeUnit, accumulate, selectedDate }: ExtraHoursChartProps) {
     const [showLastPeriod, setShowLastPeriod] = useState<boolean>(false);
 
+    // Compute the effective timeUnit and startDate for the API call
+    const { effectiveTimeUnit, startDate } = useMemo(() => {
+        if (!showLastPeriod) {
+            return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined };
+        }
+
+        const now = selectedDate;
+        switch (timeUnit) {
+            case "year":
+                // Current year in monthly slices
+                return {
+                    effectiveTimeUnit: "month" as EffectiveTimeUnit,
+                    startDate: format(startOfYear(now), "yyyy-MM-dd"),
+                };
+            case "month":
+                // Current month in daily slices
+                return {
+                    effectiveTimeUnit: "day" as EffectiveTimeUnit,
+                    startDate: format(startOfMonth(now), "yyyy-MM-dd"),
+                };
+            case "week":
+                // Current week in daily slices (week starts Monday)
+                return {
+                    effectiveTimeUnit: "day" as EffectiveTimeUnit,
+                    startDate: format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd"),
+                };
+            default:
+                // "day" – no meaningful subdivision, keep as-is
+                return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined };
+        }
+    }, [showLastPeriod, timeUnit, selectedDate]);
+
     const { data: stats, isLoading, error } = useQuery<ExtraHourData[]>({
-        queryKey: ["statistics", "extrahours", timeUnit, accumulate],
+        queryKey: ["statistics", "extrahours", effectiveTimeUnit, accumulate, startDate],
         queryFn: async () => {
             const { data, error } = await apiClient.GET("/statistics/extrahours", {
                 params: {
                     query: {
-                        timeUnit,
+                        timeUnit: effectiveTimeUnit,
                         accumulate: accumulate ? true : false,
+                        ...(startDate ? { startDate } : {}),
                     }
                 }
             });
@@ -64,35 +100,11 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
         );
     }
 
-    const chartData = stats || [];
-
-    // Apply last period filter if enabled
-    const filteredData = showLastPeriod ? chartData.filter(entry => {
-        const entryDate = parseISO(entry.date);
-        const now = new Date();
-        let threshold: Date;
-        switch (timeUnit) {
-            case "day":
-                threshold = subDays(now, 1);
-                break;
-            case "week":
-                threshold = subWeeks(now, 1);
-                break;
-            case "month":
-                threshold = subMonths(now, 1);
-                break;
-            case "year":
-                threshold = subYears(now, 1);
-                break;
-            default:
-                threshold = now;
-        }
-        return isAfter(entryDate, threshold);
-    }) : chartData;
+    const chartData = (stats || []).filter((entry): entry is ExtraHourData => entry != null);
 
     // Calculate color based on the final extra_hour value
-    const finalBalance = filteredData.length > 0 ? filteredData[filteredData.length - 1].extra_hour : 0;
-    const totalExtraHours = filteredData.reduce((sum, entry) => sum + (entry.extra_hour ?? 0), 0);
+    const finalBalance = chartData.length > 0 ? (chartData[chartData.length - 1].extra_hour ?? 0) : 0;
+    const totalExtraHours = chartData.reduce((sum, entry) => sum + (entry.extra_hour ?? 0), 0);
     const isPositiveBalance = finalBalance >= 0;
 
     return (
@@ -130,8 +142,8 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
 
             <div className="h-[400px] w-full mt-8">
                 <ResponsiveContainer width="100%" height="100%">
-                    {timeUnit === "month" || timeUnit === "year" ? (
-                        <BarChart data={filteredData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
+                    {timeUnit !== "day" ? (
+                        <BarChart data={chartData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                             <XAxis
                                 dataKey="date"
@@ -163,7 +175,7 @@ export function ExtraHoursChart({ timeUnit, accumulate }: ExtraHoursChartProps) 
                                 fill="#5d2bd4ff" />
                         </BarChart>
                     ) : (
-                        <AreaChart data={filteredData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
+                        <AreaChart data={chartData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
                             <defs>
                                 <linearGradient id="colorExtra" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8} />
