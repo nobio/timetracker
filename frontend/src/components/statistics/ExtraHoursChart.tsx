@@ -21,6 +21,8 @@ interface ExtraHoursChartProps {
     timeUnit: "day" | "week" | "month" | "year";
     accumulate: boolean;
     selectedDate: Date;
+        showLastPeriod: boolean;
+        setShowLastPeriod: (val: boolean) => void;
 }
 
 interface ExtraHourData {
@@ -31,43 +33,48 @@ interface ExtraHourData {
 
 type EffectiveTimeUnit = "day" | "week" | "month" | "year";
 
-export function ExtraHoursChart({ timeUnit, accumulate, selectedDate }: ExtraHoursChartProps) {
-    const [showLastPeriod, setShowLastPeriod] = useState<boolean>(false);
+export function ExtraHoursChart({ timeUnit, accumulate, selectedDate, showLastPeriod, setShowLastPeriod }: ExtraHoursChartProps) {
 
-    // Compute the effective timeUnit and startDate for the API call
-    const { effectiveTimeUnit, startDate } = useMemo(() => {
+    // Compute the effective timeUnit, startDate, and endDate for the API call
+    const { effectiveTimeUnit, startDate, endDate } = useMemo(() => {
         if (!showLastPeriod) {
-            return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined };
+            return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined, endDate: undefined };
         }
 
         const now = selectedDate;
+        let start, end;
         switch (timeUnit) {
             case "year":
-                // Current year in monthly slices
+                start = startOfYear(now);
+                end = new Date(start.getFullYear() + 1, 0, 0, 23, 59, 59, 999); // End of year
                 return {
                     effectiveTimeUnit: "month" as EffectiveTimeUnit,
-                    startDate: format(startOfYear(now), "yyyy-MM-dd"),
+                    startDate: format(start, "yyyy-MM-dd"),
+                    endDate: format(end, "yyyy-MM-dd"),
                 };
             case "month":
-                // Current month in daily slices
+                start = startOfMonth(now);
+                end = new Date(start.getFullYear(), start.getMonth() + 1, 0, 23, 59, 59, 999); // End of month
                 return {
                     effectiveTimeUnit: "day" as EffectiveTimeUnit,
-                    startDate: format(startOfMonth(now), "yyyy-MM-dd"),
+                    startDate: format(start, "yyyy-MM-dd"),
+                    endDate: format(end, "yyyy-MM-dd"),
                 };
             case "week":
-                // Current week in daily slices (week starts Monday)
+                start = startOfWeek(now, { weekStartsOn: 1 });
+                end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6, 23, 59, 59, 999); // End of week
                 return {
                     effectiveTimeUnit: "day" as EffectiveTimeUnit,
-                    startDate: format(startOfWeek(now, { weekStartsOn: 1 }), "yyyy-MM-dd"),
+                    startDate: format(start, "yyyy-MM-dd"),
+                    endDate: format(end, "yyyy-MM-dd"),
                 };
             default:
-                // "day" – no meaningful subdivision, keep as-is
-                return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined };
+                return { effectiveTimeUnit: timeUnit as EffectiveTimeUnit, startDate: undefined, endDate: undefined };
         }
     }, [showLastPeriod, timeUnit, selectedDate]);
 
     const { data: stats, isLoading, error } = useQuery<ExtraHourData[]>({
-        queryKey: ["statistics", "extrahours", effectiveTimeUnit, accumulate, startDate],
+        queryKey: ["statistics", "extrahours", effectiveTimeUnit, accumulate, startDate, endDate],
         queryFn: async () => {
             const { data, error } = await apiClient.GET("/statistics/extrahours", {
                 params: {
@@ -75,6 +82,7 @@ export function ExtraHoursChart({ timeUnit, accumulate, selectedDate }: ExtraHou
                         timeUnit: effectiveTimeUnit,
                         accumulate: accumulate ? true : false,
                         ...(startDate ? { startDate } : {}),
+                        ...(endDate ? { endDate } : {}),
                     }
                 }
             });
@@ -100,7 +108,12 @@ export function ExtraHoursChart({ timeUnit, accumulate, selectedDate }: ExtraHou
         );
     }
 
-    const chartData = (stats || []).filter((entry): entry is ExtraHourData => entry != null);
+    const chartData = (stats || []).filter((entry): entry is ExtraHourData => {
+        if (!entry) return false;
+        if (startDate && entry.date < startDate) return false;
+        if (endDate && entry.date > endDate) return false;
+        return true;
+    });
 
     // Calculate color based on the final extra_hour value
     const finalBalance = chartData.length > 0 ? (chartData[chartData.length - 1].extra_hour ?? 0) : 0;

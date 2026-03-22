@@ -11,13 +11,16 @@ import { useState } from "react";
 type TimeUnit = "day" | "week" | "month" | "year";
 
 export default function StatisticsPage() {
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    // windowAnchorDate is the anchor for the current time window (start of month/year/week/day)
+    const [windowAnchorDate, setWindowAnchorDate] = useState<Date>(new Date());
     const [timeUnit, setTimeUnit] = useState<TimeUnit>("month");
     const [accumulate, setAccumulate] = useState(false);
     const [activeTab, setActiveTab] = useState<"aggregate" | "breaktime" | "come-go" | "extrahours">("aggregate");
+    const [showLastPeriod, setShowLastPeriod] = useState(false);
 
+    // Move the windowAnchorDate by the time unit
     const handleDateChange = (direction: "prev" | "next") => {
-        setSelectedDate(current => {
+        setWindowAnchorDate(current => {
             const isPrev = direction === "prev";
             switch (timeUnit) {
                 case "year":
@@ -37,15 +40,15 @@ export default function StatisticsPage() {
     const getDateLabel = (): string => {
         switch (timeUnit) {
             case "year":
-                return format(selectedDate, "yyyy");
+                return format(windowAnchorDate, "yyyy");
             case "month":
-                return format(selectedDate, "MMM yyyy");
+                return format(windowAnchorDate, "MMM yyyy");
             case "week":
-                return `KW ${getISOWeek(selectedDate)}/${getISOWeekYear(selectedDate)}`;
+                return `KW ${getISOWeek(windowAnchorDate)}/${getISOWeekYear(windowAnchorDate)}`;
             case "day":
-                return format(selectedDate, "dd MMM yyyy");
+                return format(windowAnchorDate, "dd MMM yyyy");
             default:
-                return format(selectedDate, "MMM yyyy");
+                return format(windowAnchorDate, "MMM yyyy");
         }
     };
 
@@ -69,9 +72,9 @@ export default function StatisticsPage() {
                             <input
                                 type="date"
                                 className="absolute inset-0 opacity-0 cursor-pointer pointer-events-auto"
-                                value={format(selectedDate, "yyyy-MM-dd")}
+                                value={format(windowAnchorDate, "yyyy-MM-dd")}
                                 onChange={(e) => {
-                                    if (e.target.value) setSelectedDate(new Date(e.target.value));
+                                    if (e.target.value) setWindowAnchorDate(new Date(e.target.value));
                                 }}
                             />
                         </div>
@@ -148,7 +151,13 @@ export default function StatisticsPage() {
                 )}
 
                 {activeTab === "extrahours" && (
-                    <ExtraHoursChart timeUnit={timeUnit} accumulate={accumulate} selectedDate={selectedDate} />
+                    <ExtraHoursChart
+                        timeUnit={timeUnit}
+                        accumulate={accumulate}
+                        selectedDate={windowAnchorDate}
+                        showLastPeriod={showLastPeriod}
+                        setShowLastPeriod={setShowLastPeriod}
+                    />
                 )}
 
                 {activeTab !== "aggregate" && activeTab !== "breaktime" && activeTab !== "come-go" && activeTab !== "extrahours" && (
