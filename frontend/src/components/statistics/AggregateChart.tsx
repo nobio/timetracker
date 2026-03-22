@@ -117,7 +117,7 @@ export function AggregateChart({ timeUnit }: AggregateChartProps) {
                         <Bar
                             dataKey="actual"
                             name="Working Hours"
-                            fill="#3B82F6"
+                            fill="#7aabfa"
                             radius={[4, 4, 0, 0]}
                             barSize={timeUnit === 'year' || timeUnit === 'month' ? 40 : 20}
                         />
@@ -127,7 +127,7 @@ export function AggregateChart({ timeUnit }: AggregateChartProps) {
                             name="Moving Avg Trend"
                             stroke="#10B981"
                             strokeWidth={3}
-                            dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                            dot={{ fill: '#10B981', strokeWidth: 1, r: 2 }}
                             activeDot={{ r: 6 }}
                         />
                     </ComposedChart>
