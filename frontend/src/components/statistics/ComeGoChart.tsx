@@ -131,12 +131,14 @@ export function ComeGoChart({ intervalMinute = 60 }: ComeGoChartProps) {
                             name="Clock In (Come)"
                             fill="#10B981"
                             radius={[4, 4, 0, 0]}
+                            stackId="a"
                         />
                         <Bar
                             dataKey="go"
                             name="Clock Out (Go)"
                             fill="#F43F5E"
                             radius={[4, 4, 0, 0]}
+                            stackId="a"
                         />
                     </BarChart>
                 </ResponsiveContainer>
