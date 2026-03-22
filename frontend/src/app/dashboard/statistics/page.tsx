@@ -52,6 +52,10 @@ export default function StatisticsPage() {
         }
     };
 
+    const showAccumulateControls = activeTab === "extrahours";
+    const showCalendarControls = activeTab === "extrahours";
+    const showTimeUnitControls = activeTab === "extrahours" || activeTab === "aggregate";
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -59,57 +63,64 @@ export default function StatisticsPage() {
 
                 {/* Global Date & Unit Controls */}
                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center bg-white rounded-lg shadow-sm border border-slate-200">
-                        <button
-                            onClick={() => handleDateChange("prev")}
-                            className="p-2 hover:bg-slate-50 text-slate-600 rounded-l-lg"
-                        >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <div className="relative px-3 py-2 font-medium text-blue-600 border-x border-slate-200 min-w-32 text-center pointer-events-none">
-                            {getDateLabel()}
-                            {/* Hidden DatePicker Overlay (Native) */}
+                    {showAccumulateControls && (
+                        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
                             <input
-                                type="date"
-                                className="absolute inset-0 opacity-0 cursor-pointer pointer-events-auto"
-                                value={format(windowAnchorDate, "yyyy-MM-dd")}
-                                onChange={(e) => {
-                                    if (e.target.value) setWindowAnchorDate(new Date(e.target.value));
-                                }}
+                                type="checkbox"
+                                checked={accumulate}
+                                onChange={(e) => setAccumulate(e.target.checked)}
+                                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                             />
-                        </div>
-                        <button
-                            onClick={() => handleDateChange("next")}
-                            className="p-2 hover:bg-slate-50 text-slate-600 rounded-r-lg"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
-                    </div>
+                            Accumulate
+                        </label>
+                    )}
 
-                    <div className="flex bg-slate-100 p-1 rounded-lg">
-                        {(["day", "week", "month", "year"] as TimeUnit[]).map(unit => (
+                    {showCalendarControls && (
+                        <div className="flex items-center bg-white rounded-lg shadow-sm border border-slate-200">
                             <button
-                                key={unit}
-                                onClick={() => setTimeUnit(unit)}
-                                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${timeUnit === unit
-                                    ? "bg-white text-blue-600 shadow-sm"
-                                    : "text-slate-600 hover:text-slate-900"
-                                    }`}
+                                onClick={() => handleDateChange("prev")}
+                                className="p-2 hover:bg-slate-50 text-slate-600 rounded-l-lg"
                             >
-                                {unit.charAt(0).toUpperCase() + unit.slice(1)}
+                                <ChevronLeft className="w-5 h-5" />
                             </button>
-                        ))}
-                    </div>
+                            <div className="relative px-3 py-2 font-medium text-blue-600 border-x border-slate-200 min-w-32 text-center pointer-events-none">
+                                {getDateLabel()}
+                                {/* Hidden DatePicker Overlay (Native) */}
+                                <input
+                                    type="date"
+                                    className="absolute inset-0 opacity-0 cursor-pointer pointer-events-auto"
+                                    value={format(windowAnchorDate, "yyyy-MM-dd")}
+                                    onChange={(e) => {
+                                        if (e.target.value) setWindowAnchorDate(new Date(e.target.value));
+                                    }}
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleDateChange("next")}
+                                className="p-2 hover:bg-slate-50 text-slate-600 rounded-r-lg"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
 
-                    <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
-                        <input
-                            type="checkbox"
-                            checked={accumulate}
-                            onChange={(e) => setAccumulate(e.target.checked)}
-                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
-                        />
-                        Accumulate
-                    </label>
+                    {showTimeUnitControls && (
+                        <div className="flex bg-slate-100 p-1 rounded-lg">
+                            {(["day", "week", "month", "year"] as TimeUnit[]).map(unit => (
+                                <button
+                                    key={unit}
+                                    onClick={() => setTimeUnit(unit)}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${timeUnit === unit
+                                        ? "bg-white text-blue-600 shadow-sm"
+                                        : "text-slate-600 hover:text-slate-900"
+                                        }`}
+                                >
+                                    {unit.charAt(0).toUpperCase() + unit.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                 </div>
             </div>
 
