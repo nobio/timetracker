@@ -132,7 +132,7 @@ export function ExtraHoursChart({ timeUnit, accumulate, selectedDate, showLastPe
                     className="mr-2 h-4 w-4 text-indigo-600 border-gray-300 rounded"
                 />
                 <label htmlFor="lastPeriod" className="text-sm font-medium text-slate-700">
-                    Last {timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}
+                    Selected {timeUnit.charAt(0).toUpperCase() + timeUnit.slice(1)}
                 </label>
             </div>
 

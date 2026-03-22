@@ -15,7 +15,7 @@ export default function StatisticsPage() {
     const [windowAnchorDate, setWindowAnchorDate] = useState<Date>(new Date());
     const [timeUnit, setTimeUnit] = useState<TimeUnit>("month");
     const [accumulate, setAccumulate] = useState(false);
-    const [activeTab, setActiveTab] = useState<"aggregate" | "breaktime" | "come-go" | "extrahours">("aggregate");
+    const [activeTab, setActiveTab] = useState<"aggregate" | "breaktime" | "come-go" | "extrahours">("extrahours");
     const [showLastPeriod, setShowLastPeriod] = useState(false);
 
     // Move the windowAnchorDate by the time unit
@@ -128,10 +128,10 @@ export default function StatisticsPage() {
             <div className="border-b border-slate-200">
                 <nav className="flex space-x-8" aria-label="Tabs">
                     {[
-                        { id: "aggregate", label: "Aggregate" },
+                        { id: "extrahours", label: "Extra Hours" },
                         { id: "breaktime", label: "Breaktime" },
                         { id: "come-go", label: "Come & Go" },
-                        { id: "extrahours", label: "Extra Hours" },
+                        { id: "aggregate", label: "Aggregate" },
                     ].map((tab) => (
                         <button
                             key={tab.id}

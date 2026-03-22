@@ -106,7 +106,6 @@ export function AggregateChart({ timeUnit }: AggregateChartProps) {
                             tickLine={false}
                             tick={{ fill: '#64748B', fontSize: 12 }}
                             dx={-10}
-                            min={4}
                             domain={[6, 'dataMin']} // Start Y-axis at 6 hours, with some padding above max
                         />
                         <Tooltip
@@ -129,6 +128,7 @@ export function AggregateChart({ timeUnit }: AggregateChartProps) {
                             strokeWidth={3}
                             dot={{ fill: '#10B981', strokeWidth: 1, r: 2 }}
                             activeDot={{ r: 6 }}
+                            animationDuration={1000}
                         />
                     </ComposedChart>
                 </ResponsiveContainer>
