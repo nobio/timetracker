@@ -44,7 +44,7 @@ describe('test util.dumpModels', () => {
       expect(data).to.not.be.empty;
     } catch (error) {
       logger.info(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   }).timeout(50000);
 
@@ -124,7 +124,7 @@ describe('test util.backupTimeEnties', () => {
       logger.info(result);
       expect(result).to.have.property('backup_count');
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   }).timeout(50000);
 });

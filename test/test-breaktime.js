@@ -47,7 +47,7 @@ describe('test util-breaktime - Promise', () => {
     try {
       result = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.a('map');
     const ar = result.get('20.02.2014');
@@ -64,7 +64,7 @@ describe('test util-breaktime - Promise', () => {
     try {
       result = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.a('map');
     let ar = result.get('20.02.2014');
@@ -88,7 +88,7 @@ describe('test util-breaktime - Promise', () => {
       const timeEntries = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01);
       result = await utilBreaktime.prepareBreakTimes(timeEntries, false);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -100,7 +100,7 @@ describe('test util-breaktime - Promise', () => {
       const timeEntries = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_01);
       result = await utilBreaktime.prepareBreakTimes(timeEntries, true);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -114,7 +114,7 @@ describe('test util-breaktime - Promise', () => {
       result = await utilBreaktime.prepareBreakTimes(timeEntries, false);
     } catch (error) {
       logger.info(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
@@ -128,7 +128,7 @@ describe('test util-breaktime - Promise', () => {
       result = await utilBreaktime.prepareBreakTimes(timeEntries, false);
     } catch (error) {
       logger.info(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(1);
@@ -140,7 +140,7 @@ describe('test util-breaktime - Promise', () => {
       const timeEntries = await utilBreaktime.getAllTimeEntriesGroupedByDate(TIME_ENTRIES_02);
       result = await utilBreaktime.prepareBreakTimes(timeEntries, true);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(2);
@@ -155,7 +155,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, false);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(121);
@@ -171,7 +171,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, true);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result).to.be.an('array');
     expect(result).to.have.lengthOf(121);
@@ -187,7 +187,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, false);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
 
     expect(result).to.be.an('array');
@@ -205,7 +205,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, true);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 1, false);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
 
     expect(result).to.be.an('array');
@@ -223,7 +223,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, true);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 20, true);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result[2].breakTime).to.equal(1); // time: 40 - 59
   });
@@ -234,7 +234,7 @@ describe('test util-breaktime - Promise', () => {
       const preparedBreakTimes = await utilBreaktime.prepareBreakTimes(timeEntries, false);
       result = await utilBreaktime.calculateHistogram(preparedBreakTimes, 20, true);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
     expect(result[2].breakTime).to.equal(2); // time: 40 - 59
   });

@@ -126,7 +126,7 @@ describe('test set a geofence', () => {
     try {
       await util.setGeofence();
     } catch (err) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 
@@ -135,7 +135,7 @@ describe('test set a geofence', () => {
     try {
       await util.setGeofence(null);
     } catch (err) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 

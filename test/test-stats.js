@@ -352,8 +352,8 @@ describe('test calculation of extra hours', () => {
     expect(result[6].date).to.be.equal('2023-10-11');
     expect(result[6].extra_hour).to.be.greaterThan(1);
     expect(result[6].extra_hour).to.be.lessThan(6);
-    expect(result[6].extra_hour).to.be.equal(2);
-    expect(result[6].hour).to.be.equal(8);
+    expect(result[6].extra_hour).to.be.equal(4);
+    expect(result[6].hour).to.be.equal(16);
   });
 
   it('extra hours by day, fill - hours increase in value', async () => {

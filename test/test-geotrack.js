@@ -3,15 +3,18 @@ require('./init');
 require('../db');
 const mongoose = require('mongoose');
 const moment = require('moment');
-
-const chai = require('chai');
-chai.use(require('chai-datetime'));
-const { mockRequest, mockResponse } = require('mock-req-res');
-const sinonChai = require('sinon-chai');
 const util = require('../api/geotrack/util-geotrack');
 const geo = require('../api/geotrack');
 
-chai.use(sinonChai);
+const chai = require('chai');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
+const chaiDatetime = require('chai-datetime');
+const { mockRequest, mockResponse } = require('mock-req-res');
+
+chai.use(chaiDatetime);
+chai.use(require('chai-integer'));
+
 
 const { expect, assert } = chai;
 
@@ -240,7 +243,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(200); // duplicate
+      sinon.assert.calledWith(res.status, 200);
     } catch (error) {
       throw error;
     }
@@ -265,7 +268,7 @@ describe('test creating of GeoTrack', () => {
     try {
       await geo.createGeoTrack(req, res);
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(202); // duplicate
+      sinon.assert.calledWith(res.status, 202); // duplicate
     } catch (error) {
       throw error;
     }
@@ -277,7 +280,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(400);
+      sinon.assert.calledWith(res.status, 400);
     } catch (error) {
       throw error;
     }
@@ -289,7 +292,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(201);
+      sinon.assert.calledWith(res.status, 201);
     } catch (error) {
       throw error;
     }
@@ -301,7 +304,7 @@ describe('test creating of GeoTrack', () => {
 
     try {
       await geo.createGeoTrack(req, res);
-      expect(res.status).to.have.been.calledWith(400); // duplicate
+      sinon.assert.calledWith(res.status, 400); // duplicate
     } catch (error) {
       throw error;
     }

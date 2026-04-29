@@ -5,13 +5,12 @@ require('../db');
 
 const Chai = require('chai');
 const Mocha = require('mocha');
+const sinon = require('sinon');
 
 const { expect, assert } = Chai;
 const { describe, it } = Mocha;
 const { mockRequest, mockResponse } = require('mock-req-res');
-const sinonChai = require('sinon-chai');
 
-Chai.use(sinonChai);
 Chai.use(require('chai-integer'));
 
 const misc = require('../api/misc');
@@ -29,7 +28,7 @@ describe('test misc functions', () => {
     await misc.ping(req, res);
     const response = res.json.getCalls()[0].lastArg;
 
-    expect(res.status).to.have.been.calledWith(200);
+    sinon.assert.calledWith(res.status, 200);
     expect(response).to.have.property('response');
     expect(response.response).to.equal('pong');
     expect(response).to.have.property('client_ip');
@@ -42,7 +41,7 @@ describe('test misc functions', () => {
     await misc.ping(req, res);
     const response = res.json.getCalls()[0].lastArg;
 
-    expect(res.status).to.have.been.calledWith(200);
+    sinon.assert.calledWith(res.status, 200);
     expect(response).to.have.property('response');
     expect(response.response).to.equal('pong');
     expect(response).to.have.property('client_ip');
@@ -61,7 +60,7 @@ describe('test misc functions', () => {
       assert.fail(`should not throw exception\n${err.message}`);
     }
 
-    expect(res.status).to.have.been.calledWith(200);
+    sinon.assert.calledWith(res.status, 200);
     expect(response).to.have.property('version');
     expect(response).to.have.property('last_build');
   });
@@ -78,7 +77,7 @@ describe('test misc functions', () => {
       assert.fail(`should not throw exception\n${err.message}`);
     }
 
-    expect(res.status).to.have.been.calledWith(200);
+    sinon.assert.calledWith(res.status, 200);
     expect(response).to.have.property('version');
     expect(response).to.have.property('status');
     expect(response).to.have.property('time');
@@ -114,7 +113,7 @@ describe('test misc functions', () => {
     await misc.log(req, res);
     const response = res.json.getCalls()[0].lastArg;
 
-    expect(res.status).to.have.been.calledWith(201);
+    sinon.assert.calledWith(res.status, 201);
     expect(response).to.have.property('url'); expect(response.url).to.equal('/api/log');
     expect(response).to.have.property('method'); expect(response.method).to.equal('POST');
     expect(response).to.have.property('headers'); expect(response.headers['x-forwarded-for']).to.equal('1.2.3.4');

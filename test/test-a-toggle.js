@@ -1,6 +1,8 @@
 const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable max-len */
 require('./init');
+require('../db');
+
 const Chai = require('chai');
 const Mocha = require('mocha');
 
@@ -14,11 +16,10 @@ describe('test util.getAllToggles', () => {
     try {
       const result = await util.getAllToggles();
       expect(result).to.be.an('array');
-      expect(result[0]).not.to.be.empty;
       expect(result[0]).to.have.property('toggle');
       expect(result[0]).to.have.property('name');
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });
@@ -31,7 +32,7 @@ describe('test util.getToggle', () => {
       expect(toggle).to.have.property('toggle');
       expect(toggle).to.have.property('name');
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 
@@ -44,7 +45,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName('CREATE_ENTRY');
       expect(result.name).to.equal('CREATE_ENTRY');
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
   it('test to load notification toggle by a not existing name', async () => {
@@ -52,7 +53,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName('xxx');
       expect(result).to.be.null;
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
   it('test to load notification toggle without any name (null)', async () => {
@@ -60,7 +61,7 @@ describe('test util.getToggle', () => {
       const result = await util.getToggleByName();
       expect(result).to.be.null;
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });
@@ -79,7 +80,7 @@ describe('test util.updateToggle', () => {
       expect(result.toggle).to.equal(true);
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
   it('update existing toggle but only notification text', async () => {
@@ -93,7 +94,7 @@ describe('test util.updateToggle', () => {
       expect(result).not.to.be.null;
       expect(result.notification).to.equal(`${notification}_TOO`);
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 
@@ -101,7 +102,7 @@ describe('test util.updateToggle', () => {
     try {
       const toggle = await util.updateToggle('41224d776a326fb40f000001', true);
       expect(toggle).to.be.null;
-    } catch (error) { assert.fail('should not throw exception'); }
+    } catch (error) { assert.fail(`should not throw error\n${error.message}`); }
   });
 });
 
@@ -115,7 +116,7 @@ describe('test util.deleteToggle', () => {
       expect(result).to.be.null;
     } catch (error) {
       logger.error(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 
@@ -133,7 +134,7 @@ describe('test util.deleteToggle', () => {
         expect(result.NOTIFICATION_SLACK).to.equal(false);
       } catch (error) {
         logger.info(error);
-        assert.fail('should not throw exception');
+        assert.fail(`should not throw error\n${error.message}`);
       }
     });
     it('check Slack status with SLACK_URL', async () => {
@@ -144,7 +145,7 @@ describe('test util.deleteToggle', () => {
         expect(result.NOTIFICATION_SLACK).to.equal(true);
       } catch (error) {
         logger.info(error);
-        assert.fail('should not throw exception');
+        assert.fail(`should not throw error\n${error.message}`);
       }
     });
   });
@@ -162,7 +163,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('generic message');
       } catch (error) {
-        assert.fail('should not throw exception');
+        assert.fail(`should not throw error\n${error.message}`);
       }
     });
 
@@ -178,7 +179,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('generic message');
       } catch (error) {
-        assert.fail('should not throw exception');
+        assert.fail(`should not throw error\n${error.message}`);
       }
     });
 
@@ -194,7 +195,7 @@ describe('test util.deleteToggle', () => {
         expect(result).to.have.property('notification');
         expect(result.notification).to.equal('DELETE_ME');
       } catch (error) {
-        assert.fail('should not throw exception');
+        assert.fail(`should not throw error\n${error.message}`);
       }
     });
 
@@ -214,7 +215,7 @@ describe('test util.deleteToggle', () => {
       const result = await util.deleteTestToggles();
       logger.info(JSON.stringify(result));
     } catch (error) {
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });

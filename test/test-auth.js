@@ -1,20 +1,19 @@
 const logger = require('../api/config/logger'); // Logger configuration
 /* eslint-disable prefer-destructuring */
 require('./init');
-require('../db');
+//require('../db');
 const mongoose = require('mongoose');
 
 const User = mongoose.model('User');
 const Token = mongoose.model('Token');
 
 const chai = require('chai');
-const { mockRequest, mockResponse } = require('mock-req-res');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
+const { mockRequest, mockResponse } = require('mock-req-res');
 
-chai.use(sinonChai);
+chai.use(require('chai-datetime'));
 chai.use(require('chai-integer'));
-
 const { expect, assert } = chai;
 
 const util = require('../api/auth/util-auth');
@@ -62,7 +61,7 @@ describe('test utilAuth.getAllUsers', () => {
 
     try {
       await auth.getAllUsers(req, res);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
     } catch (error) {
       assert.fail(`should not throw error\n${error.message}`);
     }
@@ -113,9 +112,9 @@ describe('test utilAuth.createUser', () => {
       };
 
       await auth.createUser(req, res);
-      expect(res.status).to.have.been.calledWith(201);
+      sinon.assert.calledWith(res.status, 201);
     } catch (err) {
-      logger.info(error);
+      logger.info(err);
       assert.fail(`should not throw error\n${err.message}`);
     }
   });
@@ -233,7 +232,7 @@ describe('test utilAuth.createUser', () => {
       req.params = { id: userId };
 
       await auth.getUser(req, res);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
     } catch (error) {
       logger.info(error);
       assert.fail(`should not throw error\n${error.message}`);
@@ -291,7 +290,7 @@ describe('test utilAuth.updateUser', () => {
       });
 
       await auth.updateUser(req, res);
-      expect(res.status).to.have.been.calledWith(201);
+      sinon.assert.calledWith(res.status, 201);
 
       const user = await util.getUser(userId);
       expect(user.username).to.be.equal('alberto');
@@ -325,7 +324,7 @@ describe('test utilAuth.updateUser', () => {
     });
 
     await auth.updateUser(req, res);
-    expect(res.status).to.have.been.calledWith(404);
+    sinon.assert.calledWith(res.status, 404);
   });
   it('update an existing user - username null', async () => {
     try {
@@ -420,7 +419,7 @@ describe('test utilAuth.deleteUser', () => {
       req.params = { id: userId };
 
       await auth.deleteUser(req, res);
-      expect(res.status).to.have.been.calledWith(202);
+      sinon.assert.calledWith(res.status, 202);
     } catch (error) {
       logger.info(error);
       assert.fail(`should not throw error\n${error.message}`);
@@ -468,7 +467,7 @@ describe('test utilAuth.login', () => {
         body: { username: TESTUSER_USERNAME, password: TESTUSER_PASSWORD },
       });
       const result = await auth.login(req, res);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
     } finally {
       await Token.deleteOne({ token: refreshToken });
     }
@@ -571,7 +570,7 @@ describe('test utilAuth.login', () => {
 
       await auth.authorize(req, res, next);
       // logger.info(res.status.getCalls()[0].lastArg);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
 
       // *** let the access token expire
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -582,7 +581,7 @@ describe('test utilAuth.login', () => {
       res = mockResponse();
 
       await auth.authorize(req, res, next);
-      expect(res.status).to.have.been.calledWith(401);
+      sinon.assert.calledWith(res.status, 401);
 
       // *** get a new token using the refresh token
       accessToken = await (await util.refreshToken(refreshToken)).accessToken;
@@ -593,7 +592,7 @@ describe('test utilAuth.login', () => {
       res = mockResponse();
 
       await auth.authorize(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     } finally {
@@ -724,7 +723,7 @@ describe('test utilAuth.updateUsersPassword', () => {
     });
 
     await auth.updateUsersPassword(req, res);
-    expect(res.status).to.have.been.calledWith(201);
+    sinon.assert.calledWith(res.status, 201);
     await new Promise((resolve) => setTimeout(resolve, 100)); // sleep a little while...
 
     // try to login with new password
@@ -770,8 +769,8 @@ describe('test index.authorize', () => {
     const next = sinon.spy();
     try {
       await auth.authorize(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
-      expect(next).to.have.been.called;
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.called(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -785,8 +784,8 @@ describe('test index.authorize', () => {
     const next = sinon.spy();
     try {
       await auth.authorize(req, res, next);
-      expect(res.status).to.have.been.calledWith(401);
-      expect(next).to.not.have.been.called;
+      sinon.assert.calledWith(res.status, 401);
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -801,8 +800,8 @@ describe('test index.authorize', () => {
     try {
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(403);
-      expect(next).to.not.have.been.called;
+      sinon.assert.calledWith(res.status, 403);
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -818,8 +817,8 @@ describe('test index.authorize', () => {
       const next = sinon.spy();
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(200);
-      expect(next).to.have.been.called;
+      sinon.assert.calledWith(res.status, 200);
+      sinon.assert.called(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err}`);
     }
@@ -835,8 +834,8 @@ describe('test index.authorize', () => {
     try {
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(401);
-      expect(next).not.to.have.been.called;
+      sinon.assert.calledWith(res.status, 401);
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -851,8 +850,8 @@ describe('test index.authorize', () => {
     try {
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(401);
-      expect(next).not.to.have.been.called;
+      sinon.assert.calledWith(res.status, 401);
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -867,8 +866,8 @@ describe('test index.authorize', () => {
     try {
       await auth.authorize(req, res, next);
 
-      expect(res.status).to.have.been.calledWith(403);
-      expect(next).not.to.have.been.called;
+      sinon.assert.calledWith(res.status, 403);
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -910,7 +909,7 @@ describe('test index.refreshToken', () => {
 
     try {
       await auth.refreshToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(400);
+      sinon.assert.calledWith(res.status, 400);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -924,7 +923,7 @@ describe('test index.refreshToken', () => {
     try {
       await auth.refreshToken(req, res, next);
       // logger.info(res.json.getCalls()[0].lastArg);
-      expect(res.status).to.have.been.calledWith(400);
+      sinon.assert.calledWith(res.status, 400);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -937,7 +936,7 @@ describe('test index.refreshToken', () => {
 
     try {
       await auth.refreshToken(req, res, next);
-      expect(res.status).to.have.been.calledWith(400);
+      sinon.assert.calledWith(res.status, 400);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -974,7 +973,7 @@ describe('test index.logout', () => {
 
     try {
       await auth.logout(req, res, next);
-      expect(res.status).to.have.been.calledWith(200);
+      sinon.assert.calledWith(res.status, 200);
 
       // *** authorization should fail now
       process.env.AUTHORIZATION = 'on';
@@ -982,8 +981,8 @@ describe('test index.logout', () => {
       res = mockResponse();
 
       await auth.authorize(req, res, next);
-      expect(res.status).to.have.been.calledWith(403); // Forbidden
-      expect(next).to.not.have.been.called;
+      sinon.assert.calledWith(res.status, 403); // Forbidden
+      sinon.assert.notCalled(next);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -996,8 +995,8 @@ describe('test index.logout', () => {
 
     try {
       await auth.logout(req, res, next);
-      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
-      expect(res.status).to.have.been.calledWith(200);
+      // sinon.assert.calledWith(res.status,400); // commented for bugfix #101
+      sinon.assert.calledWith(res.status, 200);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }
@@ -1011,8 +1010,8 @@ describe('test index.logout', () => {
     try {
       await auth.logout(req, res, next);
       // logger.info(res.json.getCalls()[0].lastArg);
-      // expect(res.status).to.have.been.calledWith(400); // commented for bugfix #101
-      expect(res.status).to.have.been.calledWith(200);
+      // sinon.assert.calledWith(res.status,400); // commented for bugfix #101
+      sinon.assert.calledWith(res.status, 200);
     } catch (err) {
       assert.fail(`should not throw exception\n${err.message}`);
     }

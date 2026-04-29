@@ -157,7 +157,7 @@ exports.getFirstDayByTimeUnit = (dateStr, timeUnit) => {
 
   switch (timeUnit) {
     case 'day':
-      return dateStr;
+      return moment(dateStr);
     case 'week':
       return date.startOf('week').format('YYYY-MM-DD');
     case 'month':

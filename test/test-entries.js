@@ -19,7 +19,7 @@ describe('test global_util.sendMessage()', () => {
       expect(response).to.contain('no slack url provided');
     } catch (error) {
       logger.info(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 
@@ -31,7 +31,7 @@ describe('test global_util.sendMessage()', () => {
       expect(result).to.equal('toggle UNKNOWN_KEY switched off');
     } catch (error) {
       logger.info(error);
-      assert.fail('should not throw exception');
+      assert.fail(`should not throw error\n${error.message}`);
     }
   });
 });
