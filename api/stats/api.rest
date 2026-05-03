@@ -21,3 +21,5 @@ GET http://localhost:30000/api/statistics/histogram/1?direction=enter
 PUT http://localhost:30000/api/stats
 ###
 GET http://localhost:30000/api/statistics/extrahours?timeUnit=day&accumulate=false&startDate=2026-04-20&endDate=2026-04-26
+###
+GET http://localhost:30000/api/statistics/extrahours?timeUnit=day&accumulate=true&startDate=2026-04-27
