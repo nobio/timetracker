@@ -31,9 +31,10 @@ const START_DATE_DEFAULT = moment('2014-01-01').tz('Europe/Berlin'); // start wi
  */
 exports.getExtraHours = async (accumulate, timeUnit, startDate = START_DATE_DEFAULT) => {
   try {
+    const dtStart = moment(gUtil.getFirstDayByTimeUnit(startDate, timeUnit)).tz('Europe/Berlin').subtract(1, 'days');
     // get stats data from 01.10.2023 (Baader Bank) until now
     const stats = await utilStats.getStatsByRange(
-      gUtil.getFirstDayByTimeUnit(startDate, timeUnit),
+      dtStart,
       moment().tz('Europe/Berlin'), // until today
       accumulate,
       false,
