@@ -5,8 +5,8 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  version: 20.0.2
-  lastUpdate: '2026-05-03'
+  version: 20.1.0
+  lastUpdate: '2026-05-09'
 servers:
   - url: http://localhost:30000/api
   - url: https://localhost:30443/api
@@ -469,7 +469,9 @@ paths:
       parameters:
         - name: dateStart
           in: query
-          description: start date of the time range; format YYYY-MM-DD like 2020-03-09
+          description: >-
+            start date of the time range; format YYYY-MM-DD like 2020-03-09
+            (beginning of the day)
           example: 2022-03-16T00:00:00.000Z
           required: false
           schema:
@@ -477,7 +479,9 @@ paths:
             format: date
         - name: dateEnd
           in: query
-          description: end date of the time range; format YYYY-MM-DD like 2020-03-10
+          description: >-
+            end date of the time range; format YYYY-MM-DD like 2020-03-10 (end
+            of the day)
           example: 2022-03-17T00:00:00.000Z
           required: false
           schema:

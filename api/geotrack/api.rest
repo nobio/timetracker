@@ -1,0 +1,1 @@
+GET http://localhost:30000/api/geotrack?dateStart=2020-03-10&dateEnd=2020-03-10

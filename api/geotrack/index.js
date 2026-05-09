@@ -35,13 +35,14 @@ exports.createGeoTrack = async (req, res) => {
 
 /**
  * reads geo tracks
+ * dateStart counts from the beginning of the day, dateEnd counts to the end of the day
  *
  * curl -X GET http://localhost:30000/api/geotrack
- * curl -X GET "http://localhost:30000/api/geotrack?dateStart=2020-03-09&dateEnd=2020-03-10" -H "accept: application/json"
+ * curl -X GET "http://localhost:30000/api/geotrack?dateStart=2020-03-10&dateEnd=2020-03-10" -H "accept: application/json"
  */
 exports.getGeoTracking = (req, res) => {
-  const dtStart = moment(req.query.dateStart);
-  const dtEnd = moment(req.query.dateEnd);
+  const dtStart = moment(req.query.dateStart).startOf('day');
+  const dtEnd = moment(req.query.dateEnd).endOf('day');
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then((tracks) => res.status(200).send(tracks))
