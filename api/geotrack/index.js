@@ -41,15 +41,19 @@ exports.createGeoTrack = async (req, res) => {
  * curl -X GET "http://localhost:30000/api/geotrack?dateStart=2020-03-10&dateEnd=2020-03-10" -H "accept: application/json"
  */
 exports.getGeoTracking = (req, res) => {
-  logger.error(moment(req.query.dateStart).subtract(1, 'day').endOf('day'));
-  logger.error(moment(req.query.dateEnd).endOf('day'));
-
-  const dtStart = moment(req.query.dateStart).subtract(1, 'day').startOf('day');
-  const dtEnd = moment(req.query.dateEnd).endOf('day');
+  //  const dtStart = moment(req.query.dateStart).subtract(1, 'day').startOf('day');
+  const dtStart = moment(req.query.dateStart).startOf('day').add(2, 'hours');
+  const dtEnd = moment(req.query.dateEnd).endOf('day').add(2, 'hours');
 
   util.getGeoTrackingDataByTime(dtStart, dtEnd)
     .then((tracks) => res.status(200).send(tracks))
-    .catch((err) => { res.status(err.status).json({ message: err.message }); });
+    .catch((err) => { 
+      if (err.status) { 
+        res.status(err.status).json({ message: err.message }); 
+      } else {
+        res.status(500).json({ message: err.message });
+      }
+    });
 };
 
 /**
