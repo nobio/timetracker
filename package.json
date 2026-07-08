@@ -39,7 +39,7 @@
         "@opentelemetry/exporter-metrics-otlp-proto": "^0.219.0",
         "@opentelemetry/exporter-trace-otlp-proto": "^0.219.0",
         "@opentelemetry/sdk-metrics": "^2.9.0",
-        "@opentelemetry/sdk-node": "^0.219.0",
+        "@opentelemetry/sdk-node": "^0.220.0",
         "@opentelemetry/sdk-trace-node": "^2.8.0",
         "axios": "^1.18.1",
         "bcrypt": "^6.0.0",
