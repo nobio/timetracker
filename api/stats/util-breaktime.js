@@ -1,6 +1,4 @@
 const moment = require('moment');
-/* eslint-disable max-len */
-/* eslint-disable no-restricted-syntax */
 const gUtil = require('../global_util');
 const utilEntry = require('../entries/util-entries');
 

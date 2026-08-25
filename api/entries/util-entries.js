@@ -1,7 +1,4 @@
 const logger = require('../config/logger'); // Logger configuration
-/* eslint-disable max-len */
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-restricted-syntax */
 /**
  *
  * Methods of this file must never be used from server.js directly rather than from api layer
@@ -137,7 +134,6 @@ exports.create = async (timeEntry) => {
       mark: timeEntry.mark,
     }).save();
     // in case the external URL is given, use it to render a deep link
-    // eslint-disable-next-line max-len
     const msg = ((process.env.EXTERNAL_DOMAIN) ? `(<${process.env.EXTERNAL_DOMAIN}/#/members/entries/entries/${tEntry._id}|Link>)` : JSON.stringify(timeEntry));
     globalUtil.sendMessage('CREATE_ENTRY', msg);
     setGeofenceCheckStatus(timeEntry.direction); // Activate/Deactivate checkin status
@@ -161,7 +157,6 @@ const setGeofenceCheckStatus = async (direction) => {
     for (const geofence of geofences) {
       if (geofence.enabled) {
         geofence.isCheckedIn = (direction === 'enter');
-        // eslint-disable-next-line no-await-in-loop
         await utilGeofence.setGeofence(geofence);
       }
     }
@@ -201,7 +196,6 @@ exports.update = async (timeEntry) => {
     tEntry.last_changed = new Date();
 
     tEntry.save();
-    // eslint-disable-next-line max-len
     const msg = ((process.env.EXTERNAL_DOMAIN) ? `(<${process.env.EXTERNAL_DOMAIN}/#/members/entries/entries/${tEntry._id}|Link>)` : JSON.stringify(timeEntry));
     globalUtil.sendMessage('UPDATE_ENTRY', msg);
   } catch (error) {

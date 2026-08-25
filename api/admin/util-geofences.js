@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable no-underscore-dangle */
 require('../../db');
 
 const mongoose = require('mongoose');

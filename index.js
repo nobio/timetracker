@@ -1,5 +1,3 @@
-/* eslint-disable no-cond-assign */
-/* eslint-disable no-constant-condition */
 require('dotenv').config();
 
 /**

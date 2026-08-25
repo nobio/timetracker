@@ -1,5 +1,4 @@
 const logger = require('../api/config/logger'); // Logger configuration
-/* eslint-disable global-require */
 require('./init');
 require('../db');
 const mongoose = require('mongoose');
@@ -411,7 +410,7 @@ async function createTimeEntry(timeEntry) {
 }
 
 /**
- *
+ * delete all entries of a given date. This is used to clean up the test data after each test case
  * @param {*} date date to delete all entries which might have stayed because of any error
  */
 async function clearAllEntries(dt) {

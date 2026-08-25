@@ -1,5 +1,4 @@
 const logger = require('../api/config/logger'); // Logger configuration
-/* eslint-disable max-len */
 const mongoose = require('mongoose');
 const models = require('./models');
 

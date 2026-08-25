@@ -1,9 +1,4 @@
 const logger = require('../config/logger'); // Logger configuration
-/* eslint-disable consistent-return */
-/* eslint-disable no-shadow */
-/* eslint-disable no-use-before-define */
-/* eslint-disable max-len */
-/* eslint-disable no-restricted-syntax */
 /*
 
     Index:         1  |  2  |  3  ||  4  |  5  |  6  ||  7  |  8  |  9  ||

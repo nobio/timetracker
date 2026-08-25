@@ -1,7 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-loop-func */
-/* eslint-disable no-undef */
-/* eslint-disable no-restricted-syntax */
 const Minio = require('minio');
 const mongoose = require('mongoose');
 const logger = require('../config/logger'); // Logger configuration

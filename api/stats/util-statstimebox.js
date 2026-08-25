@@ -1,5 +1,3 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable camelcase */
 const moment = require('moment');
 
 const mongoose = require('mongoose');

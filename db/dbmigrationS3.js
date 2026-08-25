@@ -1,7 +1,4 @@
 #!/usr/local/bin/node
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-unused-vars */
 
 require('dotenv').config();
 const logger = require('../api/config/logger'); // Logger configuration

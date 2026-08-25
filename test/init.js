@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 require('dotenv').config();
 
 const logger = require('../api/config/logger'); // Logger configuration

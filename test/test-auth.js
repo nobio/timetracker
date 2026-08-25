@@ -1,5 +1,4 @@
 const logger = require('../api/config/logger'); // Logger configuration
-/* eslint-disable prefer-destructuring */
 require('./init');
 //require('../db');
 const mongoose = require('mongoose');

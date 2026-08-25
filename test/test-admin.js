@@ -1,5 +1,4 @@
 const logger = require('../api/config/logger'); // Logger configuration
-/* eslint-disable no-undef */
 require('./init');
 const mongoose = require('mongoose');
 

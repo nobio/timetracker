@@ -1,6 +1,3 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-mixed-operators */
-
 const moment = require('moment');
 const mongoose = require('mongoose');
 const logger = require('../config/logger'); // Logger configuration
@@ -139,7 +136,6 @@ exports.parseGeoTrackingObject = (body) => {
       velocity: body.vel,
       // battery: body.batt,
       date: moment.unix(body.tst),
-      // eslint-disable-next-line no-nested-ternary
       source: (body.desc) ? body.desc : (body.tid) ? body.tid : 'unknown',
     });
   } else if (body.longitude && body.latitude) {
@@ -150,7 +146,6 @@ exports.parseGeoTrackingObject = (body) => {
       accuracy: body.accuracy,
       source: body.source,
     });
-    // eslint-disable-next-line no-underscore-dangle
   } else if (body._type === 'encrypted') {
     // encrypted...
     geoTrack = null;
@@ -237,7 +232,6 @@ const appendMetadata = (tracks) => {
 exports.geoFence = async (geoTrack) => {
   const geoFences = await GeoFence.find();
   // logger.info(JSON.stringify(geoFences));
-  // eslint-disable-next-line no-restricted-syntax
   let isSaved = false;
   for (const gf of geoFences) {
     if (gf.enabled) { // only do something when this geofence is enabled

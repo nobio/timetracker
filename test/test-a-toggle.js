@@ -1,5 +1,4 @@
 const logger = require('../api/config/logger'); // Logger configuration
-/* eslint-disable max-len */
 require('./init');
 require('../db');
 

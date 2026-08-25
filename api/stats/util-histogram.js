@@ -3,7 +3,7 @@ const logger = require('../config/logger'); // Logger configuration
 const utilEntry = require('../entries/util-entries');
 
 /**
- *
+ * calculates the histogram of the given time entries regarding the given interval
  * @param {Number} interval
  * @param {String} direction: undefined (both), enter, go
  */

@@ -1,5 +1,4 @@
 const logger = require('../config/logger'); // Logger configuration
-/* eslint-disable camelcase */
 const utilStats = require('./util-stats');
 const utilTimebox = require('./util-statstimebox');
 const utilHistogram = require('./util-histogram');

@@ -1,7 +1,3 @@
-/* eslint-disable consistent-return */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable no-restricted-syntax */
 require('../../db');
 const fs = require('fs');
 const path = require('path');
