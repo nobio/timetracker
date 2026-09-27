@@ -508,6 +508,7 @@ exports.markADay = async (entryDate, mark) => {
   // ... and then add the pause
   entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate, 8.5), 'seconds');
   logger.info(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
+  
   // create the enter time entry
   await this.create({
     datetime: entryDateEnter,
