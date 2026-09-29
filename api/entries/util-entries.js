@@ -500,6 +500,9 @@ exports.getErrorDates = async () => {
  * @param {*} mark
  */
 exports.markADay = async (entryDate, mark) => {
+  if ((await this.getAllByDate(entryDate)).length > 0) {
+    throw new Error(`cannot mark the day because there are already entries for ${entryDate.format('YYYY-MM-DD')}`);
+  }
   // set enter to 08:00
   const entryDateEnter = entryDate.clone().hours(8);
   // for the go entry, add 8 hours... reads 08:00 + 8h
@@ -508,7 +511,7 @@ exports.markADay = async (entryDate, mark) => {
   // ... and then add the pause
   entryDateGo.add(globalUtil.getBreakTimeSeconds(entryDate, 8.5), 'seconds');
   logger.info(entryDateGo.format('YYYY-MM-DD HH:mm:ss'));
-  
+
   // create the enter time entry
   await this.create({
     datetime: entryDateEnter,
