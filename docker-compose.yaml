@@ -1,23 +1,9 @@
 services:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # timetracker-ui - the frontend
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  timetracker-ui:
-    container_name: timetracker-ui
-    restart: always
-    # build: .
-    image: nobio/timetracker-ui:master.prod
-    ports:
-      - "8083:80"
-    depends_on:
-      - timetracker
-    networks:
-      - network-nobio
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # timetracker - the api and backend
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   timetracker:
+    build: .
     container_name: timetracker
     restart: always
     image: nobio/timetracker:master
@@ -120,28 +106,6 @@ services:
       - .env
       - .env_overwrite
     command: server --console-address ":9001" /data
-    networks:
-      - network-nobio
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Jaeger
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  jaeger:
-    container_name: jaeger
-    image: jaegertracing/all-in-one:1.45
-    env_file:
-      - .env
-    ports:
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 5778:5778
-      - 16686:16686
-      - 14268:14268
-      - 14269:14269
-      - 14250:14250
-      - 9411:9411
-      - 4317:4317
-      - 4318:4318
     networks:
       - network-nobio
 

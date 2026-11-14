@@ -75,5 +75,11 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/nobio/timetrack.git"
+    },
+    "allowScripts": {
+        "@scarf/scarf@1.4.0": true,
+        "bcrypt@6.0.0": true,
+        "fsevents@2.3.3": true,
+        "protobufjs@7.6.5": true
     }
 }

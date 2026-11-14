@@ -3,15 +3,13 @@ FROM node:26-alpine
 # Create app directory
 WORKDIR /usr/src/app
 
+RUN npm install -g pnpm
 COPY package*.json ./
-
-RUN npm install --omit=dev
-
+RUN pnpm install
 # Bundle app source
 COPY . .
-
 EXPOSE 30000 30443
-CMD [ "npm", "start" ]
+CMD [ "pnpm", "start" ]
 
 
 # --- list images:
