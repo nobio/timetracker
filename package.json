@@ -21,7 +21,7 @@
         "backup-hetzner": "node db/dbmigrationS3 -f"
     },
     "devDependencies": {
-        "chai": "^6.2.2",
+        "chai": "^6.3.0",
         "chai-datetime": "^1.8.1",
         "chai-integer": "^0.1.0",
         "eslint": "^10.12.0",
