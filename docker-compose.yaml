@@ -6,7 +6,7 @@ services:
     build: .
     container_name: timetracker
     restart: always
-    image: nobio/timetracker:pnpm
+    image: nobio/timetracker:main
     env_file:
       - path: .env
         required: true
