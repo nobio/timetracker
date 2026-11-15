@@ -1,17 +1,19 @@
-FROM node:26-alpine
+ARG PNPM_VERSION=latest
+ARG NODE_VERSION=26-alpine
+FROM node:$NODE_VERSION AS base
+LABEL maintainer="ubbn"
+
+RUN apk update && apk add --no-cache libc6-compat
+RUN npm install --global pnpm@${PNPM_VERSION}
 
 # Create app directory
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN npm install --omit=dev
-
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 # Bundle app source
 COPY . .
-
 EXPOSE 30000 30443
-CMD [ "npm", "start" ]
+CMD [ "pnpm", "start" ]
 
 
 # --- list images:
