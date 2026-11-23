@@ -47,6 +47,24 @@ services:
     networks:
       - network-nobio
 
+  # Daily MongoDB archive backups, stored separately from the database files.
+  mongo-backup:
+    image: mongo:5.0.26
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      MONGO_BACKUP_URI: ${MONGO_BACKUP_URI:-mongodb://mongo:27017}
+      MONGO_BACKUP_HOUR_UTC: ${MONGO_BACKUP_HOUR_UTC:-2}
+      MONGO_BACKUP_MINUTE_UTC: ${MONGO_BACKUP_MINUTE_UTC:-0}
+      MONGO_BACKUP_RETENTION_DAYS: ${MONGO_BACKUP_RETENTION_DAYS:-30}
+    volumes:
+      - ./dump/mongodb:/backups
+      - ./bin/mongodb-backup.sh:/usr/local/bin/mongodb-backup.sh:ro
+    entrypoint: ["/bin/bash", "/usr/local/bin/mongodb-backup.sh"]
+    networks:
+      - network-nobio
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # mongo-admin: frontend for mongodb
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

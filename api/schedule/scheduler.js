@@ -18,8 +18,8 @@ exports.scheduleTasks = function () {
     stats.calcStats().catch((err) => logger.error(err));
   });
 
-  logger.info('job scheduler: dumpModels (every day at 12:05)');
-  scheduler.scheduleJob({ hour: 12, minute: 5 }, () => { // every day at 12:05
+  logger.info('job scheduler: dumpModels (every day at 23:05)');
+  scheduler.scheduleJob({ hour: 23, minute: 5 }, () => { // every day at 23:05
     logger.info('scheduled task "dumpModels" started');
     dumpster.dumpModels().catch((err) => logger.error(err));
   });

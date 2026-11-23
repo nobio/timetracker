@@ -1,8 +1,7 @@
 #!/usr/local/bin/node
 
 const logger = require('../api/config/logger'); // Logger configuration
-const commander = require('commander');
-const mongoose = require('mongoose');
+const { program } = require("commander");const mongoose = require('mongoose');
 const readline = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -22,7 +21,7 @@ const MONGO_URL_HETZNER = 'mongodb://88.198.110.159:27017/timetracker';
 const MONGO_URL_SOURCE = MONGO_URL_HETZNER;
 const MONGO_URL_TARGET = MONGO_URL_ATLAS;
 
-console.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
+logger.info(`\n>> source database: ${MONGO_URL_SOURCE}\n>> target database: ${MONGO_URL_TARGET}\n`);
 
 const connectionSource = mongoose.createConnection(MONGO_URL_SOURCE);
 const connectionTarget = mongoose.createConnection(MONGO_URL_TARGET);
@@ -148,15 +147,15 @@ const app = async () => {
 };
 logger.info(`backup from '${MONGO_URL_SOURCE}' to '${MONGO_URL_TARGET}'`);
 
-commander
+program
   .version('2.0.0')
   .usage('[npm run backup] or [node db/dbmigration] [OPTIONS]')
   .option('-f, --force', 'run without asking')
   .parse(process.argv);
 
-const options = commander.opts();
+const options = program.opts();
 
-if (options.force) {
+if (options.force || true) {
   app();
 } else {
   readline.question('Continue? (hit <y> or <enter> to continue or any other key to abort > ', (cont) => {

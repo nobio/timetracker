@@ -26,7 +26,7 @@ const options = {
 const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(options.console),
-    new LokiTransport(options.loki),
+    //new LokiTransport(options.loki),
   ],
   exitOnError: false,
 });
