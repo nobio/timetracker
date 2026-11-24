@@ -44,7 +44,7 @@
         "@opentelemetry/sdk-trace-node": "^2.11.0",
         "axios": "^1.21.1",
         "bcrypt": "^6.0.0",
-        "body-parser": "^2.3.0",
+        "body-parser": "^2.4.0",
         "commander": "^15.1.0",
         "compression": "^1.8.2",
         "cookie-parser": "^1.4.7",
