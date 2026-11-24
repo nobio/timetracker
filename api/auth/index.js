@@ -248,7 +248,7 @@ exports.updateUsersPassword = async (req, res) => {
 /**
  * login with user and password (needs to be passed)
  *
- * curl -X POST -H "Content-Type: application/json" -d '{"name": "Tester", "password": "test12345"}' http://localhost:30000/api/users/login
+ * curl -X POST -H "Content-Type: application/json" -d '{"username": "Tester", "password": "test12345"}' http://localhost:30000/api/users/login
  *
  * @param {*} req Request object
  * @param {*} res Response object; resp.json: {accessToken: '...'}
